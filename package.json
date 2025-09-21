@@ -1,19 +1,59 @@
 {
   "name": "commet",
   "version": "0.0.1",
-  "description": "commet",
-  "main": "index.js",
+  "description": "Commet SDK for Node.js",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "README.md"],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "biome lint src/",
+    "lint:fix": "biome lint --apply src/",
+    "clean": "rm -rf .turbo node_modules .next",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [
-    "commet",
-    "reserved"
+    "billing",
+    "sdk",
+    "typescript",
+    "payments",
+    "invoicing",
+    "usage-based-billing",
+    "seat-licensing"
   ],
-  "author": "",
+  "author": "Commet Team",
   "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3",
+    "vitest": "^1.0.4",
+    "@vitest/coverage-v8": "^1.0.4"
+  },
+  "dependencies": {
+    "zod": "^3.22.4"
+  },
+  "peerDependencies": {
+    "typescript": ">=5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "repository": {
     "type": "git",
-    "url": ""
-  }
+    "url": "https://github.com/commet/commet-node.git"
+  },
+  "bugs": {
+    "url": "https://github.com/commet/commet-node/issues"
+  },
+  "homepage": "https://docs.commet.co/docs/sdk"
 }
