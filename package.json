@@ -1,6 +1,6 @@
 {
   "name": "commet",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "description": "Commet SDK for Node.js",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -12,7 +12,10 @@
       "require": "./dist/index.js"
     }
   },
-  "files": ["dist", "README.md"],
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
