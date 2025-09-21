@@ -128,7 +128,7 @@ export class CommetHTTPClient {
       const headers: Record<string, string> = {
         "x-api-key": this.config.apiKey,
         "Content-Type": "application/json",
-        "User-Agent": "@repo/sdk/0.1.0",
+        "User-Agent": "commet/0.1.0",
       };
 
       if (options?.idempotencyKey) {
