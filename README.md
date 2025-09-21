@@ -1,17 +1,17 @@
-# @commet/sdk
+# commet
 
 TypeScript SDK for Commet billing and usage tracking.
 
 ## Install
 
 ```bash
-npm install @commet/sdk
+npm install commet
 ```
 
 ## Quick Start
 
 ```typescript
-import { Commet } from '@commet/sdk';
+import { Commet } from 'commet';
 
 const commet = new Commet({
   apiKey: process.env.COMMET_API_KEY!,
