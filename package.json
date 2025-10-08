@@ -1,6 +1,6 @@
 {
   "name": "commet",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Commet SDK for Node.js",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -53,10 +53,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/commet/commet-node.git"
+    "url": "https://github.com/commet-labs/commet-node.git"
   },
   "bugs": {
-    "url": "https://github.com/commet/commet-node/issues"
+    "url": "https://github.com/commet-labs/commet-node/issues"
   },
   "homepage": "https://docs.commet.co/docs/sdk"
 }
