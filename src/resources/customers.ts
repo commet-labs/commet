@@ -11,6 +11,7 @@ import type { CommetHTTPClient } from "../utils/http";
 export interface Customer {
   id: CustomerID;
   organizationId: string;
+  externalId?: string;
   legalName: string;
   displayName?: string;
   domain?: string;
@@ -31,13 +32,14 @@ export interface Customer {
 }
 
 export interface CreateCustomerParams {
+  externalId?: string;
   legalName: string;
   displayName?: string;
   domain?: string;
   website?: string;
   taxStatus?: "TAXED" | "TAX_EXEMPT" | "REVERSE_CHARGE" | "NOT_APPLICABLE";
   currency?: Currency;
-  address: {
+  address?: {
     line1: string;
     line2?: string;
     city: string;
@@ -56,6 +58,7 @@ export interface CreateCustomerParams {
 }
 
 export interface UpdateCustomerParams {
+  externalId?: string;
   legalName?: string;
   displayName?: string;
   domain?: string;
@@ -73,6 +76,7 @@ export interface UpdateCustomerParams {
 }
 
 export interface ListCustomersParams extends ListParams {
+  externalId?: string;
   taxStatus?: "TAXED" | "TAX_EXEMPT" | "REVERSE_CHARGE" | "NOT_APPLICABLE";
   currency?: Currency;
   isActive?: boolean;
