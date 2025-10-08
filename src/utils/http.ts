@@ -104,7 +104,7 @@ export class CommetHTTPClient {
     console.log("Request logged, not sent to server");
 
     if (this.config.debug) {
-      console.log("Base URL:", "https://api.commet.co/api");
+      console.log("Base URL:", "https://billing.commet.co/api");
       console.log("Debug mode enabled");
     }
     return Promise.resolve({
@@ -281,7 +281,7 @@ export class CommetHTTPClient {
    * Build full URL from endpoint and params
    */
   private buildURL(endpoint: string, params?: Record<string, unknown>): string {
-    const baseURL = "https://api.commet.co";
+    const baseURL = "https://billing.commet.co";
 
     // Construct full path with /api prefix
     const fullPath = `/api${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;

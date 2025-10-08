@@ -42,7 +42,7 @@ export class Commet {
 
       if (config.debug) {
         console.log("API Key:", `${config.apiKey.substring(0, 12)}...`);
-        console.log("Base URL:", "https://api.commet.co");
+        console.log("Base URL:", "https://billing.commet.co");
 
         if (this.environment === "development") {
           console.log(
