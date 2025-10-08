@@ -2,7 +2,6 @@ import { CustomersResource } from "./resources/customers";
 import { SeatsResource } from "./resources/seats";
 import { UsageResource } from "./resources/usage";
 import type { CommetConfig, Environment } from "./types/common";
-import { detectEnvironment } from "./utils/environment";
 import { CommetHTTPClient } from "./utils/http";
 
 /**
@@ -27,29 +26,22 @@ export class Commet {
       );
     }
 
-    this.environment =
-      config.environment === "auto"
-        ? detectEnvironment()
-        : config.environment || detectEnvironment();
+    // Default to sandbox for safety
+    this.environment = config.environment || "sandbox";
 
     this.httpClient = new CommetHTTPClient(config, this.environment);
     this.customers = new CustomersResource(this.httpClient);
     this.usage = new UsageResource(this.httpClient);
     this.seats = new SeatsResource(this.httpClient);
 
-    if (this.environment === "development" || config.debug) {
+    if (config.debug) {
       console.log(`[Commet SDK] Initialized in ${this.environment} mode`);
-
-      if (config.debug) {
-        console.log("API Key:", `${config.apiKey.substring(0, 12)}...`);
-        console.log("Base URL:", "https://billing.commet.co");
-
-        if (this.environment === "development") {
-          console.log(
-            "Dev mode: Events will be logged to console, not sent to server",
-          );
-        }
-      }
+      console.log("API Key:", `${config.apiKey.substring(0, 12)}...`);
+      const baseURL =
+        this.environment === "production"
+          ? "https://billing.commet.co"
+          : "https://sandbox.commet.co";
+      console.log("Base URL:", baseURL);
     }
   }
 
@@ -57,8 +49,8 @@ export class Commet {
     return this.environment;
   }
 
-  isDevelopment(): boolean {
-    return this.environment === "development";
+  isSandbox(): boolean {
+    return this.environment === "sandbox";
   }
 
   isProduction(): boolean {

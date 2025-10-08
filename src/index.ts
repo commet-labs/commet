@@ -59,11 +59,7 @@ export type {
 } from "./resources/seats";
 
 // Utility exports
-export {
-  detectEnvironment,
-  isDevelopment,
-  isProduction,
-} from "./utils/environment";
+export { isSandbox, isProduction } from "./utils/environment";
 
 // Default export
 import { Commet } from "./client";

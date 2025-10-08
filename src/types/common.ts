@@ -1,8 +1,8 @@
-export type Environment = "development" | "production";
+export type Environment = "sandbox" | "production";
 
 export type CommetConfig = {
   apiKey: string;
-  environment?: "auto" | Environment;
+  environment?: Environment;
   debug?: boolean;
   timeout?: number;
   retries?: number;
@@ -14,7 +14,6 @@ export interface ApiResponse<T = unknown> {
   data?: T;
   error?: string;
   message?: string;
-  devMode?: boolean;
 }
 
 export interface PaginatedResponse<T> {

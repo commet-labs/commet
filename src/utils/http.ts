@@ -5,7 +5,6 @@ import type {
   RequestOptions,
 } from "../types/common";
 import { CommetAPIError, CommetValidationError } from "../types/common";
-import { isDevelopment } from "./environment";
 
 export interface RetryConfig {
   maxRetries: number;
@@ -67,7 +66,7 @@ export class CommetHTTPClient {
   }
 
   /**
-   * Core request method with retry logic and dev mode support
+   * Core request method with retry logic
    */
   private async request<T = unknown>(
     method: string,
@@ -77,41 +76,7 @@ export class CommetHTTPClient {
     params?: Record<string, unknown>,
   ): Promise<ApiResponse<T>> {
     const url = this.buildURL(endpoint, params);
-
-    if (isDevelopment(this.environment)) {
-      return this.logDevRequest(method, url, data);
-    }
-
     return this.executeRequest(method, url, data, options);
-  }
-
-  /**
-   * Log request in development mode instead of sending to API
-   */
-  private logDevRequest<T = unknown>(
-    method: string,
-    url: string,
-    data?: unknown,
-  ): Promise<ApiResponse<T>> {
-    console.log("[Commet SDK] Dev mode");
-    console.log(`Method: ${method}`);
-    console.log(`Endpoint: ${url}`);
-
-    if (data) {
-      console.log("Data:", JSON.stringify(data, null, 2));
-    }
-
-    console.log("Request logged, not sent to server");
-
-    if (this.config.debug) {
-      console.log("Base URL:", "https://billing.commet.co/api");
-      console.log("Debug mode enabled");
-    }
-    return Promise.resolve({
-      success: true,
-      devMode: true,
-      data: { id: `dev_${Date.now()}` } as T,
-    });
   }
 
   /**
@@ -278,10 +243,19 @@ export class CommetHTTPClient {
   }
 
   /**
+   * Get base URL based on environment
+   */
+  private getBaseURL(): string {
+    return this.environment === "production"
+      ? "https://billing.commet.co"
+      : "https://sandbox.commet.co";
+  }
+
+  /**
    * Build full URL from endpoint and params
    */
   private buildURL(endpoint: string, params?: Record<string, unknown>): string {
-    const baseURL = "https://billing.commet.co";
+    const baseURL = this.getBaseURL();
 
     // Construct full path with /api prefix
     const fullPath = `/api${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
