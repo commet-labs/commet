@@ -1,6 +1,6 @@
 {
   "name": "commet",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Commet SDK for Node.js",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -11,7 +11,7 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
     }
-  }, 
+  },
   "files": [
     "dist",
     "README.md"
