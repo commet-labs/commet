@@ -37,7 +37,7 @@ export interface CreateCustomerParams {
   displayName?: string;
   domain?: string;
   website?: string;
-  taxStatus?: "TAXED" | "TAX_EXEMPT" | "REVERSE_CHARGE" | "NOT_APPLICABLE";
+  taxStatus?: "TAXED" | "TAX_EXEMPT" | "REVERSE_CHARGE" | "NOT_APPLICABLE"; // Default: NOT_APPLICABLE
   currency?: Currency;
   address?: {
     line1: string;
