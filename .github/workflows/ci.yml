@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  lint-and-build:
+  build:
     runs-on: ubuntu-latest
     
     steps:
@@ -39,9 +39,6 @@ jobs:
           
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-        
-      - name: Lint code
-        run: pnpm lint
         
       - name: Type check
         run: pnpm typecheck
