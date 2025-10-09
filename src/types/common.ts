@@ -14,6 +14,9 @@ export interface ApiResponse<T = unknown> {
   data?: T;
   error?: string;
   message?: string;
+  // Pagination fields (optional, included for list endpoints)
+  hasMore?: boolean;
+  nextCursor?: string;
 }
 
 export interface PaginatedResponse<T> {
