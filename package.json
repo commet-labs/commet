@@ -5,6 +5,9 @@
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "bin": {
+    "commet": "./bin/commet"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -14,6 +17,7 @@
   },
   "files": [
     "dist",
+    "bin",
     "README.md"
   ],
   "scripts": {
@@ -36,13 +40,19 @@
   "author": "Commet Team",
   "license": "MIT",
   "devDependencies": {
+    "@types/inquirer": "^9.0.9",
     "@types/node": "^20.10.0",
+    "@vitest/coverage-v8": "^1.0.4",
     "tsup": "^8.0.1",
     "typescript": "^5.3.3",
-    "vitest": "^1.0.4",
-    "@vitest/coverage-v8": "^1.0.4"
+    "vitest": "^1.0.4"
   },
   "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^12.0.0",
+    "inquirer": "^9.2.0",
+    "open": "^10.0.0",
+    "ora": "^7.0.1",
     "zod": "^3.22.4"
   },
   "peerDependencies": {
