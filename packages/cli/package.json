@@ -5,11 +5,7 @@
   "bin": {
     "commet": "./bin/commet"
   },
-  "files": [
-    "dist",
-    "bin",
-    "README.md"
-  ],
+  "files": ["dist", "bin", "README.md"],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
@@ -17,12 +13,7 @@
     "lint:fix": "biome lint --apply src/",
     "typecheck": "tsc --noEmit"
   },
-  "keywords": [
-    "billing",
-    "cli",
-    "typescript",
-    "commet"
-  ],
+  "keywords": ["billing", "cli", "typescript", "commet"],
   "author": "Commet Team",
   "license": "MIT",
   "dependencies": {
@@ -45,7 +36,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/commet-labs/commet-node.git",
+    "url": "https://github.com/commet-labs/commet.git",
     "directory": "packages/cli"
   },
   "publishConfig": {
