@@ -81,10 +81,10 @@ export const linkCommand = new Command("link")
 
     spinner.stop();
 
-    // Prompt user to select organization and environment
+    // Prompt user to select organization only
+    // Environment is already determined by the auth token
     const answers = await inquirer.prompt<{
       orgId: string;
-      environment: "sandbox" | "production";
     }>([
       {
         type: "list",
@@ -95,16 +95,6 @@ export const linkCommand = new Command("link")
           value: org.id,
         })),
       },
-      {
-        type: "list",
-        name: "environment",
-        message: "Select environment:",
-        choices: [
-          { name: "Sandbox (Development)", value: "sandbox" },
-          { name: "Production", value: "production" },
-        ],
-        default: "sandbox",
-      },
     ]);
 
     const selectedOrg = organizations.find((org) => org.id === answers.orgId);
@@ -114,16 +104,17 @@ export const linkCommand = new Command("link")
     }
 
     // Save project config
+    // Environment comes from the auth token (sandbox or production)
     saveProjectConfig({
       orgId: selectedOrg.id,
       orgName: selectedOrg.name,
-      environment: answers.environment,
+      environment: auth.environment,
     });
 
     console.log(chalk.green("\n✓ Project linked successfully!"));
     console.log(chalk.dim("\nProject configuration:"));
     console.log(chalk.dim(`  Organization: ${selectedOrg.name}`));
-    console.log(chalk.dim(`  Environment: ${answers.environment}`));
+    console.log(chalk.dim(`  Environment: ${auth.environment}`));
     console.log(
       chalk.dim(
         "\nNext step:\n  Run `commet pull` to generate TypeScript types",
