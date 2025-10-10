@@ -77,5 +77,9 @@ declare module '@commet/node' {
     seatType: ${seatTypeUnion};
   }
 }
+
+// This export is required for TypeScript to treat this file as a module
+// and apply the module augmentation above
+export {};
 `;
 }
