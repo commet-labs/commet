@@ -1,10 +1,11 @@
+import { select } from "@inquirer/prompts";
 import chalk from "chalk";
 import { Command } from "commander";
-import inquirer from "inquirer";
 import open from "open";
 import ora from "ora";
 import { getBaseURL } from "../utils/api";
 import { authExists, loadAuth, saveAuth } from "../utils/config";
+import { promptTheme } from "../utils/prompt-theme";
 
 export const loginCommand = new Command("login")
   .description("Authenticate with Commet")
@@ -22,23 +23,28 @@ export const loginCommand = new Command("login")
     }
 
     // Ask user to select environment
-    const { environment } = await inquirer.prompt<{
-      environment: "sandbox" | "production";
-    }>([
-      {
-        type: "list",
-        name: "environment",
+    let environment: "sandbox" | "production";
+    try {
+      environment = await select<"sandbox" | "production">({
         message: "Select environment to login:",
         choices: [
           {
-            name: "Sandbox (Development) - sandbox.commet.co",
+            name: `Sandbox ${chalk.dim("(Development)")}`,
             value: "sandbox",
           },
-          { name: "Production - billing.commet.co", value: "production" },
+          {
+            name: "Production",
+            value: "production",
+          },
         ],
         default: "sandbox",
-      },
-    ]);
+        theme: promptTheme,
+      });
+    } catch (error) {
+      // User cancelled with Ctrl+C
+      console.log(chalk.yellow("\n⚠ Login cancelled"));
+      return;
+    }
 
     const spinner = ora("Initiating login flow...").start();
     const baseURL = getBaseURL(environment);

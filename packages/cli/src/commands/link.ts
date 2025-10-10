@@ -1,6 +1,6 @@
+import { select } from "@inquirer/prompts";
 import chalk from "chalk";
 import { Command } from "commander";
-import inquirer from "inquirer";
 import ora from "ora";
 import { apiRequest, getBaseURL } from "../utils/api";
 import {
@@ -10,6 +10,7 @@ import {
   projectConfigExists,
   saveProjectConfig,
 } from "../utils/config";
+import { promptTheme } from "../utils/prompt-theme";
 
 interface Organization {
   id: string;
@@ -83,21 +84,23 @@ export const linkCommand = new Command("link")
 
     // Prompt user to select organization only
     // Environment is already determined by the auth token
-    const answers = await inquirer.prompt<{
-      orgId: string;
-    }>([
-      {
-        type: "list",
-        name: "orgId",
+    let orgId: string;
+    try {
+      orgId = await select({
         message: "Select organization:",
         choices: organizations.map((org) => ({
-          name: `${org.name} (${org.slug})`,
+          name: `${org.name} ${chalk.dim(`(${org.slug})`)}`,
           value: org.id,
         })),
-      },
-    ]);
+        theme: promptTheme,
+      });
+    } catch (error) {
+      // User cancelled with Ctrl+C
+      console.log(chalk.yellow("\n⚠ Link cancelled"));
+      return;
+    }
 
-    const selectedOrg = organizations.find((org) => org.id === answers.orgId);
+    const selectedOrg = organizations.find((org) => org.id === orgId);
     if (!selectedOrg) {
       console.log(chalk.red("✗ Organization not found"));
       return;
