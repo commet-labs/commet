@@ -1,0 +1,62 @@
+{
+  "name": "@commet/node",
+  "version": "0.3.0",
+  "description": "Commet SDK for Node.js - Billing and usage tracking",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "biome lint src/",
+    "lint:fix": "biome lint --apply src/",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "billing",
+    "sdk",
+    "typescript",
+    "payments",
+    "invoicing",
+    "usage-based-billing",
+    "seat-licensing"
+  ],
+  "author": "Commet Team",
+  "license": "MIT",
+  "dependencies": {
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/node": "^20.10.0",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3"
+  },
+  "peerDependencies": {
+    "typescript": ">=5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/commet-labs/commet-node.git",
+    "directory": "packages/node"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}
+

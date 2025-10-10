@@ -38,7 +38,12 @@ export const loginCommand = new Command('login')
         return;
       }
 
-      const deviceData = await deviceResponse.json();
+      const deviceData = (await deviceResponse.json()) as {
+        device_code: string;
+        user_code: string;
+        verification_uri_complete: string;
+        interval?: number;
+      };
       const {
         device_code,
         user_code,
@@ -90,7 +95,12 @@ export const loginCommand = new Command('login')
             }),
           });
 
-          const tokenData = await tokenResponse.json();
+          const tokenData = (await tokenResponse.json()) as {
+            access_token?: string;
+            refresh_token?: string;
+            expires_in?: number;
+            error?: string;
+          };
 
           if (tokenData.access_token) {
             // Success!

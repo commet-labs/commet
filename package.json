@@ -1,72 +1,29 @@
 {
-  "name": "commet",
-  "version": "0.3.0",
-  "description": "Commet SDK for Node.js",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
-  "bin": {
-    "commet": "./bin/commet"
-  },
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
-    }
-  },
-  "files": [
-    "dist",
-    "bin",
-    "README.md"
-  ],
+  "name": "commet-monorepo",
+  "version": "0.0.0",
+  "private": true,
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
-    "lint": "biome lint src/",
-    "lint:fix": "biome lint --apply src/",
-    "clean": "rm -rf .turbo node_modules .next",
-    "typecheck": "tsc --noEmit"
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "lint": "turbo lint",
+    "lint:fix": "turbo lint:fix",
+    "typecheck": "turbo typecheck",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "changeset": "changeset",
+    "changeset:add": "changeset add",
+    "version-packages": "changeset version",
+    "release": "turbo build && changeset publish"
   },
-  "keywords": [
-    "billing",
-    "sdk",
-    "typescript",
-    "payments",
-    "invoicing",
-    "usage-based-billing",
-    "seat-licensing"
-  ],
-  "author": "Commet Team",
-  "license": "MIT",
   "devDependencies": {
-    "@types/inquirer": "^9.0.9",
+    "@biomejs/biome": "^1.9.4",
+    "@changesets/cli": "^2.27.1",
     "@types/node": "^20.10.0",
-    "@vitest/coverage-v8": "^1.0.4",
-    "tsup": "^8.0.1",
-    "typescript": "^5.3.3",
-    "vitest": "^1.0.4"
+    "turbo": "^2.0.0",
+    "typescript": "^5.3.3"
   },
-  "dependencies": {
-    "chalk": "^5.3.0",
-    "commander": "^12.0.0",
-    "inquirer": "^9.2.0",
-    "open": "^10.0.0",
-    "ora": "^7.0.1",
-    "zod": "^3.22.4"
-  },
-  "peerDependencies": {
-    "typescript": ">=5.0.0"
-  },
+  "packageManager": "pnpm@9.0.0",
   "engines": {
     "node": ">=18.0.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/commet-labs/commet-node.git"
-  },
-  "bugs": {
-    "url": "https://github.com/commet-labs/commet-node/issues"
-  },
-  "homepage": "https://docs.commet.co/docs/sdk"
+  }
 }

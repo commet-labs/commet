@@ -1,47 +1,33 @@
 name: CI
 
 on:
-  push:
-    branches: [main, develop]
   pull_request:
+  push:
     branches: [main]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        
-      - name: Setup Node.js
-        uses: actions/setup-node@v5
-        with:
-          node-version: '20'
-          
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      - uses: actions/checkout@v4
+      
+      - uses: pnpm/action-setup@v4
         with:
           version: 9
-          
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-        
+      
       - name: Type check
         run: pnpm typecheck
-        
-      - name: Build package
+      
+      - name: Lint
+        run: pnpm lint
+      
+      - name: Build
         run: pnpm build
-        
-      - name: Check build output
-        run: |
-          if [ ! -d "dist" ]; then
-            echo "Build failed: dist directory not found"
-            exit 1
-          fi
-          if [ ! -f "dist/index.js" ] || [ ! -f "dist/index.mjs" ] || [ ! -f "dist/index.d.ts" ]; then
-            echo "Build failed: required files not found in dist"
-            exit 1
-          fi
-          echo "Build successful: all required files present"
-

@@ -27,6 +27,10 @@ out/
 build
 dist
 
+# Changesets
+.changeset/*.md
+!.changeset/README.md
+
 
 # Debug
 npm-debug.log*

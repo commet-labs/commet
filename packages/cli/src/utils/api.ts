@@ -32,7 +32,10 @@ export async function apiRequest<T>(
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+      const errorData = (await response.json().catch(() => ({}))) as {
+        message?: string;
+        error?: string;
+      };
       return {
         error:
           errorData.message ||
@@ -41,7 +44,7 @@ export async function apiRequest<T>(
       };
     }
 
-    const data = await response.json();
+    const data = (await response.json()) as T;
     return { data };
   } catch (error) {
     return {
