@@ -4,7 +4,11 @@ export function getBaseURL(environment: 'sandbox' | 'production'): string {
   if (environment === 'production') {
     return 'https://billing.commet.co';
   }
-  return 'https://billing.commet.co'; // Same for now, can be changed later
+  // Sandbox uses the same domain for now - in future could be sandbox.commet.co
+  return 'https://billing.commet.co';
+  
+  // NOTE: The environment is determined by the API key used, not the URL
+  // API keys are scoped to either sandbox or production in the backend
 }
 
 export async function apiRequest<T>(
