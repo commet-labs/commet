@@ -105,3 +105,39 @@ export interface RequestOptions {
   idempotencyKey?: string;
   timeout?: number;
 }
+
+/**
+ * Generated types interface - augmented by CLI after 'commet pull'
+ *
+ * This interface gets filled by module augmentation when you run `commet pull`.
+ * The CLI generates a .commet.d.ts file that augments this interface with your
+ * organization's specific event and seat types.
+ *
+ * @example
+ * // After running `commet pull`, TypeScript will automatically know your types:
+ * await commet.usage.events.create({
+ *   eventType: 'api_call', // Autocomplete works!
+ *   customerId: 'cus_123'
+ * });
+ */
+
+// biome-ignore lint/suspicious/noEmptyInterface: <explanation>
+export interface CommetGeneratedTypes {}
+
+/**
+ * Helper type that provides fallback to string if types are not generated
+ */
+export type GeneratedEventType = CommetGeneratedTypes extends {
+  eventType: infer T;
+}
+  ? T
+  : string;
+
+/**
+ * Helper type that provides fallback to string if types are not generated
+ */
+export type GeneratedSeatType = CommetGeneratedTypes extends {
+  seatType: infer T;
+}
+  ? T
+  : string;

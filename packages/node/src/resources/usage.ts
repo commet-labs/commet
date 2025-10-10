@@ -2,6 +2,7 @@ import type {
   ApiResponse,
   CustomerID,
   EventID,
+  GeneratedEventType,
   ListParams,
   RequestOptions,
 } from "../types/common";
@@ -11,7 +12,7 @@ export interface UsageEvent {
   id: EventID;
   organizationId: string;
   customerId: CustomerID;
-  eventType: string;
+  eventType: GeneratedEventType;
   idempotencyKey?: string;
   ts: string;
   properties?: UsageEventProperty[];
@@ -27,7 +28,7 @@ export interface UsageEventProperty {
 }
 
 export interface CreateUsageEventParams {
-  eventType: string;
+  eventType: GeneratedEventType;
   customerId: CustomerID;
   idempotencyKey?: string; // For idempotency
   timestamp?: string; // ISO string, defaults to now
@@ -52,7 +53,7 @@ export interface BatchResult<T> {
 
 export interface ListUsageEventsParams extends ListParams {
   customerId?: CustomerID;
-  eventType?: string;
+  eventType?: GeneratedEventType;
   idempotencyKey?: string;
 }
 
@@ -103,7 +104,7 @@ export interface UsageMetric {
   id: string;
   organizationId: string;
   name: string;
-  eventType: string;
+  eventType: GeneratedEventType;
   aggregation: "count" | "unique" | "sum";
   property?: string;
   filters?: UsageMetricFilter[];

@@ -1,6 +1,7 @@
 import type {
   ApiResponse,
   CustomerID,
+  GeneratedSeatType,
   ListParams,
   RequestOptions,
 } from "../types/common";
@@ -10,7 +11,7 @@ export interface SeatBalance {
   id: string;
   organizationId: string;
   customerId: CustomerID;
-  seatType: string;
+  seatType: GeneratedSeatType;
   balance: number;
   asOf: string;
   createdAt: string;
@@ -21,7 +22,7 @@ export interface SeatEvent {
   id: string;
   organizationId: string;
   customerId: CustomerID;
-  seatType: string;
+  seatType: GeneratedSeatType;
   eventType: "add" | "remove" | "set";
   quantity: number;
   previousBalance?: number;
@@ -41,7 +42,7 @@ export interface BulkSeatUpdate {
 
 export interface ListSeatEventsParams extends ListParams {
   customerId?: CustomerID;
-  seatType?: string;
+  seatType?: GeneratedSeatType;
   eventType?: "add" | "remove" | "set";
 }
 
@@ -53,7 +54,7 @@ export class SeatsResource {
 
   async add(
     customerId: CustomerID,
-    seatType: string,
+    seatType: GeneratedSeatType,
     count: number,
     options?: RequestOptions,
   ): Promise<ApiResponse<SeatEvent>> {
@@ -66,7 +67,7 @@ export class SeatsResource {
 
   async remove(
     customerId: CustomerID,
-    seatType: string,
+    seatType: GeneratedSeatType,
     count: number,
     options?: RequestOptions,
   ): Promise<ApiResponse<SeatEvent>> {
@@ -79,7 +80,7 @@ export class SeatsResource {
 
   async set(
     customerId: CustomerID,
-    seatType: string,
+    seatType: GeneratedSeatType,
     count: number,
     options?: RequestOptions,
   ): Promise<ApiResponse<SeatEvent>> {
@@ -104,7 +105,7 @@ export class SeatsResource {
 
   async getBalance(
     customerId: CustomerID,
-    seatType: string,
+    seatType: GeneratedSeatType,
   ): Promise<ApiResponse<SeatBalanceResponse>> {
     return this.httpClient.get(
       `/customers/${customerId}/seats/${seatType}/balance`,
@@ -119,7 +120,7 @@ export class SeatsResource {
 
   async getHistory(
     customerId: CustomerID,
-    seatType: string,
+    seatType: GeneratedSeatType,
     params?: ListSeatEventsParams,
   ): Promise<ApiResponse<SeatEvent[]>> {
     const queryParams = {

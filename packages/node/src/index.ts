@@ -6,6 +6,9 @@ export { Commet } from "./client";
 // Type exports
 export type {
   CommetConfig,
+  CommetGeneratedTypes,
+  GeneratedEventType,
+  GeneratedSeatType,
   Environment,
   ApiResponse,
   PaginatedResponse,
