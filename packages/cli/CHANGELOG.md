@@ -1,5 +1,11 @@
 # commet
 
+## 0.4.4
+
+### Patch Changes
+
+- ba5f638: Fix TypeScript module augmentation for inquirer theme in generator utility
+
 ## 0.4.3
 
 ### Patch Changes
