@@ -10,6 +10,7 @@ import {
   projectConfigExists,
   saveProjectConfig,
 } from "../utils/config";
+import { updateGitignore } from "../utils/gitignore-updater";
 import { promptTheme } from "../utils/prompt-theme";
 
 interface Organization {
@@ -114,13 +115,19 @@ export const linkCommand = new Command("link")
       environment: auth.environment,
     });
 
-    console.log(chalk.green("\n✓ Project linked successfully!"));
-    console.log(chalk.dim("\nProject configuration:"));
-    console.log(chalk.dim(`  Organization: ${selectedOrg.name}`));
-    console.log(chalk.dim(`  Environment: ${auth.environment}`));
-    console.log(
-      chalk.dim(
-        "\nNext step:\n  Run `commet pull` to generate TypeScript types",
-      ),
-    );
+    // Update .gitignore
+    const gitignoreResult = updateGitignore(".commet/");
+
+    console.log(chalk.green("\n✓ Project linked successfully"));
+    console.log(chalk.dim(`Organization: ${selectedOrg.name}`));
+    console.log(chalk.dim(`Environment: ${auth.environment}`));
+
+    if (gitignoreResult.success) {
+      console.log(chalk.green("✓ Updated .gitignore"));
+    } else {
+      console.log(chalk.yellow("⚠ No .gitignore found"));
+      console.log(chalk.dim("Add .commet/ to your .gitignore file"));
+    }
+
+    console.log(chalk.dim("\nRun 'commet pull' to generate TypeScript types"));
   });

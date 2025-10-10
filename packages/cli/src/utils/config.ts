@@ -23,6 +23,10 @@ function getAuthPath(): string {
 }
 
 function getProjectConfigPath(): string {
+  return path.join(process.cwd(), ".commet", "config.json");
+}
+
+function getProjectConfigDir(): string {
   return path.join(process.cwd(), ".commet");
 }
 
@@ -76,13 +80,21 @@ export function loadProjectConfig(): ProjectConfig | null {
 }
 
 export function saveProjectConfig(data: ProjectConfig): void {
+  const configDir = getProjectConfigDir();
   const configPath = getProjectConfigPath();
+  
+  // Create .commet directory if it doesn't exist
+  fs.mkdirSync(configDir, { recursive: true });
+  
+  // Write config file
   fs.writeFileSync(configPath, JSON.stringify(data, null, 2), "utf8");
 }
 
 export function clearProjectConfig(): void {
-  const configPath = getProjectConfigPath();
-  if (fs.existsSync(configPath)) {
-    fs.unlinkSync(configPath);
+  const configDir = getProjectConfigDir();
+  
+  // Remove entire .commet directory
+  if (fs.existsSync(configDir)) {
+    fs.rmSync(configDir, { recursive: true, force: true });
   }
 }

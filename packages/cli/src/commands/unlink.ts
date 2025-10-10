@@ -14,5 +14,8 @@ export const unlinkCommand = new Command("unlink")
 
     clearProjectConfig();
     console.log(chalk.green("✓ Project unlinked successfully"));
-    console.log(chalk.dim("Run `commet link` to connect to an organization"));
+    console.log(chalk.dim("✓ Removed .commet/ directory"));
+    console.log(
+      chalk.dim("\nRun `commet link` to connect to a different organization"),
+    );
   });

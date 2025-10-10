@@ -18,10 +18,13 @@ yarn global add commet
 # 1. Authenticate with Commet
 commet login
 
-# 2. Link your project to an organization
+# 2. Navigate to your project directory
+cd apps/dashboard  # Recommended: use TypeScript project with tsconfig.json
+
+# 3. Link your project to an organization
 commet link
 
-# 3. Generate TypeScript types
+# 4. Generate TypeScript types (automatically updates tsconfig.json and .gitignore if found)
 commet pull
 ```
 
@@ -68,10 +71,13 @@ commet whoami
 Link the current directory to a Commet organization.
 
 ```bash
+cd apps/dashboard
 commet link
 ```
 
-Creates `.commet` file in the current directory with organization configuration.
+**What it does:**
+- Creates `.commet/config.json` with organization configuration
+- Works anywhere, but for best experience use a TypeScript project directory
 
 #### `commet unlink`
 
@@ -104,36 +110,47 @@ commet info
 Generate TypeScript type definitions from your Commet configuration.
 
 ```bash
+cd apps/dashboard  # Recommended: TypeScript project directory
 commet pull
-# or specify output file
-commet pull -o types/commet.d.ts
 ```
 
-Creates `.commet.d.ts` with your event and seat types:
+**What it does:**
+1. Generates `.commet/types.d.ts` with your event and seat types
+2. Automatically updates `tsconfig.json` to include the types file (if found)
+3. Automatically updates `.gitignore` to exclude `.commet/` directory
+
+**Note:** Works anywhere, but if no `tsconfig.json` is found, you'll need to manually configure TypeScript to include the generated types.
+
+**Generated types:**
 
 ```typescript
-// .commet.d.ts
-export type CommetEventType = "api_call" | "email_sent" | "payment_processed";
-export type CommetSeatType = "admin" | "editor" | "viewer";
+// .commet/types.d.ts
+declare module '@commet/node' {
+  interface CommetGeneratedTypes {
+    eventType: "api_call" | "email_sent" | "payment_processed";
+    seatType: "admin" | "editor" | "viewer";
+  }
+}
+
+export {};
 ```
 
-Use with the SDK:
+**Usage with the SDK:**
 
 ```typescript
 import { Commet } from '@commet/node';
-import type { CommetEventType, CommetSeatType } from './.commet';
 
 const commet = new Commet({ apiKey: '...' });
 
-// Type-safe event tracking
-await commet.usage.events.create<CommetEventType>({
+// Type-safe event tracking - autocomplete works automatically!
+await commet.usage.events.create({
   customerId: 'cus_123',
   eventType: 'api_call', // Autocomplete works!
   timestamp: new Date().toISOString(),
 });
 
 // Type-safe seat management
-await commet.seats.add<CommetSeatType>('cus_123', 'admin', 5);
+await commet.seats.add('cus_123', 'admin', 5);
 ```
 
 ### Type Inspection
@@ -171,7 +188,7 @@ Stores authentication credentials. Created by `commet login`.
 
 The `environment` field determines which platform your authentication is for (sandbox or production).
 
-### Project Config (`.commet`)
+### Project Config (`.commet/config.json`)
 
 Stores project-specific configuration. Created by `commet link`.
 
@@ -183,7 +200,11 @@ Stores project-specific configuration. Created by `commet link`.
 }
 ```
 
-**Note:** Add `.commet` to `.gitignore` if different developers use different organizations.
+**Note:** The `.commet/` directory is automatically added to `.gitignore` by `commet pull`. This directory contains:
+- `config.json` - Project configuration
+- `types.d.ts` - Generated TypeScript type definitions
+
+Add `.commet/` to `.gitignore` if different developers use different organizations.
 
 ## Environments
 
@@ -206,20 +227,23 @@ Typical development workflow:
 
 ```bash
 # 1. One-time setup (Sandbox)
-commet login  # Select "Sandbox"
-commet link   # Choose your organization
+commet login           # Select "Sandbox"
+cd apps/dashboard      # Navigate to your TypeScript project (must have tsconfig.json)
+commet link            # Choose your organization
+commet pull            # Generate types (auto-updates tsconfig.json and .gitignore)
 
-# 2. Generate types when you add/change event or seat types
-commet pull
+# 2. Develop with type-safe autocomplete
+# Your IDE now has full autocomplete for event and seat types!
 
-# 3. Use types in your code with autocomplete
-# (see TypeScript examples above)
+# 3. When you add/change event or seat types in dashboard
+commet pull            # Regenerate types
 
 # 4. When ready for production
 commet logout
-commet login  # Select "Production"
-commet link   # Link to production organization
-commet pull   # Generate production types
+commet login           # Select "Production"
+cd apps/dashboard      # Same TypeScript project directory
+commet link            # Link to production organization
+commet pull            # Generate production types
 ```
 
 ## Troubleshooting
@@ -228,6 +252,20 @@ commet pull   # Generate production types
 
 Run `commet login` to authenticate.
 
+### "No tsconfig.json found" (Warning)
+
+This is just a warning - the CLI will still work, but won't automatically update your `tsconfig.json`.
+
+For the best experience, run commands from a TypeScript project directory:
+
+```bash
+cd apps/dashboard  # Directory with tsconfig.json
+commet link
+commet pull
+```
+
+The CLI will automatically add `.commet/types.d.ts` to your TypeScript configuration.
+
 ### "Project not linked"
 
 Run `commet link` to connect your project to an organization.
@@ -235,6 +273,16 @@ Run `commet link` to connect your project to an organization.
 ### "No types found"
 
 Create event types and seat types in your Commet dashboard first, then run `commet pull`.
+
+### "Could not update tsconfig.json"
+
+The CLI will show a warning but continue. Manually add `.commet/types.d.ts` to your `tsconfig.json`:
+
+```json
+{
+  "include": [".commet/types.d.ts", "src/**/*"]
+}
+```
 
 ### Authentication expired
 
