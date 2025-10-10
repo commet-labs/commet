@@ -1,6 +1,6 @@
 {
   "name": "@commet/node",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Commet SDK for Node.js - Billing and usage tracking",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -59,4 +59,3 @@
     "provenance": true
   }
 }
-
