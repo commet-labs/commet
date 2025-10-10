@@ -1,23 +1,25 @@
 #!/usr/bin/env node
 
-import { Command } from 'commander';
-import chalk from 'chalk';
-import { loginCommand } from './commands/login';
-import { logoutCommand } from './commands/logout';
-import { whoamiCommand } from './commands/whoami';
-import { linkCommand } from './commands/link';
-import { unlinkCommand } from './commands/unlink';
-import { switchCommand } from './commands/switch';
-import { pullCommand } from './commands/pull';
-import { listCommand } from './commands/list';
-import { infoCommand } from './commands/info';
+import chalk from "chalk";
+import { Command } from "commander";
+import { infoCommand } from "./commands/info";
+import { linkCommand } from "./commands/link";
+import { listCommand } from "./commands/list";
+import { loginCommand } from "./commands/login";
+import { logoutCommand } from "./commands/logout";
+import { pullCommand } from "./commands/pull";
+import { switchCommand } from "./commands/switch";
+import { unlinkCommand } from "./commands/unlink";
+import { whoamiCommand } from "./commands/whoami";
 
 const program = new Command();
 
 program
-  .name('commet')
-  .description('Commet CLI - Manage your billing platform from the command line')
-  .version('0.3.0');
+  .name("commet")
+  .description(
+    "Commet CLI - Manage your billing platform from the command line",
+  )
+  .version("0.3.0");
 
 // Authentication commands
 program.addCommand(loginCommand);
@@ -41,11 +43,11 @@ try {
   program.parse(process.argv);
 } catch (error) {
   if (error instanceof Error) {
-    if (error.message.includes('outputHelp')) {
+    if (error.message.includes("outputHelp")) {
       // Help was displayed, exit cleanly
       process.exit(0);
     }
-    console.error(chalk.red('Error:'), error.message);
+    console.error(chalk.red("Error:"), error.message);
   }
   process.exit(1);
 }
@@ -54,4 +56,3 @@ try {
 if (!process.argv.slice(2).length) {
   program.outputHelp();
 }
-

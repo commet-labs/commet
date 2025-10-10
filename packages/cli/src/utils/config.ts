@@ -1,28 +1,29 @@
-import * as fs from 'node:fs';
-import * as os from 'node:os';
-import * as path from 'node:path';
+import * as fs from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
 
 // ~/.commet/auth.json structure
 interface AuthConfig {
   token: string;
   refreshToken?: string;
   expiresAt?: number;
+  environment: "sandbox" | "production";
 }
 
 // .commet (project config) structure
 interface ProjectConfig {
   orgId: string;
   orgName: string;
-  environment: 'sandbox' | 'production';
+  environment: "sandbox" | "production";
 }
 
 // Get paths
 function getAuthPath(): string {
-  return path.join(os.homedir(), '.commet', 'auth.json');
+  return path.join(os.homedir(), ".commet", "auth.json");
 }
 
 function getProjectConfigPath(): string {
-  return path.join(process.cwd(), '.commet');
+  return path.join(process.cwd(), ".commet");
 }
 
 // Auth config functions
@@ -36,7 +37,7 @@ export function loadAuth(): AuthConfig | null {
     if (!fs.existsSync(authPath)) {
       return null;
     }
-    const data = fs.readFileSync(authPath, 'utf8');
+    const data = fs.readFileSync(authPath, "utf8");
     return JSON.parse(data) as AuthConfig;
   } catch {
     return null;
@@ -46,7 +47,7 @@ export function loadAuth(): AuthConfig | null {
 export function saveAuth(data: AuthConfig): void {
   const authPath = getAuthPath();
   fs.mkdirSync(path.dirname(authPath), { recursive: true });
-  fs.writeFileSync(authPath, JSON.stringify(data, null, 2), 'utf8');
+  fs.writeFileSync(authPath, JSON.stringify(data, null, 2), "utf8");
 }
 
 export function clearAuth(): void {
@@ -67,7 +68,7 @@ export function loadProjectConfig(): ProjectConfig | null {
     if (!fs.existsSync(configPath)) {
       return null;
     }
-    const data = fs.readFileSync(configPath, 'utf8');
+    const data = fs.readFileSync(configPath, "utf8");
     return JSON.parse(data) as ProjectConfig;
   } catch {
     return null;
@@ -76,7 +77,7 @@ export function loadProjectConfig(): ProjectConfig | null {
 
 export function saveProjectConfig(data: ProjectConfig): void {
   const configPath = getProjectConfigPath();
-  fs.writeFileSync(configPath, JSON.stringify(data, null, 2), 'utf8');
+  fs.writeFileSync(configPath, JSON.stringify(data, null, 2), "utf8");
 }
 
 export function clearProjectConfig(): void {
@@ -85,4 +86,3 @@ export function clearProjectConfig(): void {
     fs.unlinkSync(configPath);
   }
 }
-

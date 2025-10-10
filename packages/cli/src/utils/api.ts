@@ -1,14 +1,10 @@
-import { loadAuth } from './config';
+import { loadAuth } from "./config";
 
-export function getBaseURL(environment: 'sandbox' | 'production'): string {
-  if (environment === 'production') {
-    return 'https://billing.commet.co';
+export function getBaseURL(environment: "sandbox" | "production"): string {
+  if (environment === "production") {
+    return "https://billing.commet.co";
   }
-  // Sandbox uses the same domain for now - in future could be sandbox.commet.co
-  return 'https://billing.commet.co';
-  
-  // NOTE: The environment is determined by the API key used, not the URL
-  // API keys are scoped to either sandbox or production in the backend
+  return "https://sandbox.commet.co";
 }
 
 export async function apiRequest<T>(
@@ -18,7 +14,7 @@ export async function apiRequest<T>(
   const auth = loadAuth();
 
   if (!auth) {
-    return { error: 'Not authenticated. Run `commet login` first.' };
+    return { error: "Not authenticated. Run `commet login` first." };
   }
 
   try {
@@ -27,7 +23,7 @@ export async function apiRequest<T>(
       headers: {
         ...options.headers,
         Authorization: `Bearer ${auth.token}`,
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
 
@@ -48,8 +44,7 @@ export async function apiRequest<T>(
     return { data };
   } catch (error) {
     return {
-      error: error instanceof Error ? error.message : 'Unknown error occurred',
+      error: error instanceof Error ? error.message : "Unknown error occurred",
     };
   }
 }
-

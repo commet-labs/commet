@@ -37,7 +37,13 @@ Authenticate with Commet using OAuth device flow.
 commet login
 ```
 
-Opens your browser to authenticate. Creates `~/.commet/auth.json` with your credentials.
+Prompts you to select an environment (Sandbox or Production), then opens your browser to authenticate. Creates `~/.commet/auth.json` with your credentials.
+
+**Important:** Sandbox and Production are completely isolated platforms with separate accounts:
+- **Sandbox**: `sandbox.commet.co` - Development and testing
+- **Production**: `billing.commet.co` - Live billing operations
+
+Make sure to login to the correct environment for your needs.
 
 #### `commet logout`
 
@@ -158,9 +164,12 @@ Stores authentication credentials. Created by `commet login`.
 {
   "token": "...",
   "refreshToken": "...",
-  "expiresAt": 1234567890
+  "expiresAt": 1234567890,
+  "environment": "sandbox"
 }
 ```
+
+The `environment` field determines which platform your authentication is for (sandbox or production).
 
 ### Project Config (`.commet`)
 
@@ -178,21 +187,27 @@ Stores project-specific configuration. Created by `commet link`.
 
 ## Environments
 
-Commet supports two environments:
+Commet supports two completely isolated environments:
 
-- **Sandbox**: Development and testing (default)
-- **Production**: Live billing operations
+- **Sandbox** (`sandbox.commet.co`): Development and testing with separate data
+- **Production** (`billing.commet.co`): Live billing operations with real customers
 
-Select environment during `commet link` or `commet switch`.
+**Important:** Each environment requires separate authentication because they are independent platforms. To work with both:
+
+1. Login to sandbox: `commet login` → Select "Sandbox"
+2. Do your work in sandbox
+3. When ready for production: `commet logout` → `commet login` → Select "Production"
+
+Organizations and data do NOT transfer between environments.
 
 ## Workflow
 
 Typical development workflow:
 
 ```bash
-# 1. One-time setup
-commet login
-commet link
+# 1. One-time setup (Sandbox)
+commet login  # Select "Sandbox"
+commet link   # Choose your organization
 
 # 2. Generate types when you add/change event or seat types
 commet pull
@@ -200,8 +215,11 @@ commet pull
 # 3. Use types in your code with autocomplete
 # (see TypeScript examples above)
 
-# 4. Switch environments when needed
-commet switch  # Select production
+# 4. When ready for production
+commet logout
+commet login  # Select "Production"
+commet link   # Link to production organization
+commet pull   # Generate production types
 ```
 
 ## Troubleshooting
