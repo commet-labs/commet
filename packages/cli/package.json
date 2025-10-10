@@ -1,11 +1,15 @@
 {
   "name": "commet",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Commet CLI - Manage your billing platform from the command line",
   "bin": {
     "commet": "./bin/commet"
   },
-  "files": ["dist", "bin", "README.md"],
+  "files": [
+    "dist",
+    "bin",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
@@ -13,7 +17,12 @@
     "lint:fix": "biome lint --apply src/",
     "typecheck": "tsc --noEmit"
   },
-  "keywords": ["billing", "cli", "typescript", "commet"],
+  "keywords": [
+    "billing",
+    "cli",
+    "typescript",
+    "commet"
+  ],
   "author": "Commet Team",
   "license": "MIT",
   "dependencies": {
