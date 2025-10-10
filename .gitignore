@@ -28,8 +28,9 @@ build
 dist
 
 # Changesets
-.changeset/*.md
-!.changeset/README.md
+# Note: .changeset/*.md files MUST be committed
+# Only ignore them AFTER they're processed
+# .changeset/*.md
 
 
 # Debug
