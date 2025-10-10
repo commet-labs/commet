@@ -27,6 +27,9 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           cache: 'pnpm'
       
+      - name: Update npm to 11.5.1+ for OIDC
+        run: npm install -g npm@latest
+      
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       
@@ -43,6 +46,4 @@ jobs:
           title: 'chore: version packages'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
