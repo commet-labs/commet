@@ -1,5 +1,12 @@
 # commet
 
+## 0.5.1
+
+### Patch Changes
+
+- Updated dependencies [f207723]
+  - @commet/node@0.6.0
+
 ## 0.5.0
 
 ### Minor Changes
