@@ -58,6 +58,13 @@ export type {
   SeatEvent,
   SeatBalanceResponse,
   BulkSeatUpdate,
+  AddSeatsParams,
+  RemoveSeatsParams,
+  SetSeatsParams,
+  BulkUpdateSeatsParams,
+  GetBalanceParams,
+  GetAllBalancesParams,
+  GetHistoryParams,
   ListSeatEventsParams,
 } from "./resources/seats";
 

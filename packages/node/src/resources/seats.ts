@@ -40,6 +40,43 @@ export interface BulkSeatUpdate {
   [seatType: string]: number;
 }
 
+export interface AddSeatsParams {
+  customerId: CustomerID;
+  seatType: GeneratedSeatType;
+  count: number;
+}
+
+export interface RemoveSeatsParams {
+  customerId: CustomerID;
+  seatType: GeneratedSeatType;
+  count: number;
+}
+
+export interface SetSeatsParams {
+  customerId: CustomerID;
+  seatType: GeneratedSeatType;
+  count: number;
+}
+
+export interface BulkUpdateSeatsParams {
+  customerId: CustomerID;
+  seats: BulkSeatUpdate;
+}
+
+export interface GetBalanceParams {
+  customerId: CustomerID;
+  seatType: GeneratedSeatType;
+}
+
+export interface GetAllBalancesParams {
+  customerId: CustomerID;
+}
+
+export interface GetHistoryParams extends ListParams {
+  customerId: CustomerID;
+  seatType: GeneratedSeatType;
+}
+
 export interface ListSeatEventsParams extends ListParams {
   customerId?: CustomerID;
   seatType?: GeneratedSeatType;
@@ -53,84 +90,70 @@ export class SeatsResource {
   constructor(private httpClient: CommetHTTPClient) {}
 
   async add(
-    customerId: CustomerID,
-    seatType: GeneratedSeatType,
-    count: number,
+    params: AddSeatsParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<SeatEvent>> {
     return this.httpClient.post(
-      `/customers/${customerId}/seats/${seatType}/add`,
-      { count },
+      `/customers/${params.customerId}/seats/${params.seatType}/add`,
+      { count: params.count },
       options,
     );
   }
 
   async remove(
-    customerId: CustomerID,
-    seatType: GeneratedSeatType,
-    count: number,
+    params: RemoveSeatsParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<SeatEvent>> {
     return this.httpClient.post(
-      `/customers/${customerId}/seats/${seatType}/remove`,
-      { count },
+      `/customers/${params.customerId}/seats/${params.seatType}/remove`,
+      { count: params.count },
       options,
     );
   }
 
   async set(
-    customerId: CustomerID,
-    seatType: GeneratedSeatType,
-    count: number,
+    params: SetSeatsParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<SeatEvent>> {
     return this.httpClient.post(
-      `/customers/${customerId}/seats/${seatType}/set`,
-      { count },
+      `/customers/${params.customerId}/seats/${params.seatType}/set`,
+      { count: params.count },
       options,
     );
   }
 
   async bulkUpdate(
-    customerId: CustomerID,
-    seats: BulkSeatUpdate,
+    params: BulkUpdateSeatsParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<SeatEvent[]>> {
     return this.httpClient.post(
-      `/customers/${customerId}/seats/bulk-update`,
-      { seats },
+      `/customers/${params.customerId}/seats/bulk-update`,
+      { seats: params.seats },
       options,
     );
   }
 
   async getBalance(
-    customerId: CustomerID,
-    seatType: GeneratedSeatType,
+    params: GetBalanceParams,
   ): Promise<ApiResponse<SeatBalanceResponse>> {
     return this.httpClient.get(
-      `/customers/${customerId}/seats/${seatType}/balance`,
+      `/customers/${params.customerId}/seats/${params.seatType}/balance`,
     );
   }
 
   async getAllBalances(
-    customerId: CustomerID,
+    params: GetAllBalancesParams,
   ): Promise<ApiResponse<Record<string, SeatBalanceResponse>>> {
-    return this.httpClient.get(`/customers/${customerId}/seats/balances`);
+    return this.httpClient.get(`/customers/${params.customerId}/seats/balances`);
   }
 
   async getHistory(
-    customerId: CustomerID,
-    seatType: GeneratedSeatType,
-    params?: ListSeatEventsParams,
+    params: GetHistoryParams,
   ): Promise<ApiResponse<SeatEvent[]>> {
-    const queryParams = {
-      ...params,
-      customerId,
-      seatType,
-    };
+    const { customerId, seatType, ...queryParams } = params;
     return this.httpClient.get(
       `/customers/${customerId}/seats/history`,
-      queryParams,
+      { ...queryParams, seatType },
     );
   }
 

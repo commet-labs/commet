@@ -59,23 +59,41 @@ const events = await commet.usage.events.list({
 
 ```typescript
 // Add seats
-await commet.seats.add('cus_123', 'admin_seat', 5);
+await commet.seats.add({
+  customerId: 'cus_123',
+  seatType: 'admin_seat',
+  count: 5
+});
 
 // Remove seats
-await commet.seats.remove('cus_123', 'admin_seat', 2);
+await commet.seats.remove({
+  customerId: 'cus_123',
+  seatType: 'admin_seat',
+  count: 2
+});
 
 // Set exact count
-await commet.seats.set('cus_123', 'admin_seat', 10);
+await commet.seats.set({
+  customerId: 'cus_123',
+  seatType: 'admin_seat',
+  count: 10
+});
 
 // Get balance
-const balance = await commet.seats.getBalance('cus_123', 'admin_seat');
-console.log(balance.current); // 10
+const balance = await commet.seats.getBalance({
+  customerId: 'cus_123',
+  seatType: 'admin_seat'
+});
+console.log(balance.data.current); // 10
 
 // Bulk update
-await commet.seats.bulkUpdate('cus_123', {
-  admin_seat: 5,
-  editor_seat: 20,
-  viewer_seat: 100
+await commet.seats.bulkUpdate({
+  customerId: 'cus_123',
+  seats: {
+    admin_seat: 5,
+    editor_seat: 20,
+    viewer_seat: 100
+  }
 });
 ```
 
