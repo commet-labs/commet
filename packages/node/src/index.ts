@@ -49,8 +49,6 @@ export type {
   CreateBatchUsageEventsParams,
   BatchResult,
   ListUsageEventsParams,
-  UsageMetric,
-  UsageMetricFilter,
 } from "./resources/usage";
 
 export type {
@@ -64,7 +62,6 @@ export type {
   BulkUpdateSeatsParams,
   GetBalanceParams,
   GetAllBalancesParams,
-  GetHistoryParams,
   ListSeatEventsParams,
 } from "./resources/seats";
 

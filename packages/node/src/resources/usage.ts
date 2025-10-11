@@ -60,7 +60,7 @@ export interface ListUsageEventsParams extends ListParams {
 /**
  * Usage Events resource - Track business events for usage-based billing
  */
-export class UsageEventsResource {
+export class UsageResource {
   constructor(private httpClient: CommetHTTPClient) {}
 
   async create(
@@ -96,55 +96,10 @@ export class UsageEventsResource {
     eventId: EventID,
     options?: RequestOptions,
   ): Promise<ApiResponse<{ deleted: boolean }>> {
-    return this.httpClient.delete(`/usage/events/${eventId}`, options);
-  }
-}
-
-export interface UsageMetric {
-  id: string;
-  organizationId: string;
-  name: string;
-  eventType: GeneratedEventType;
-  aggregation: "count" | "unique" | "sum";
-  property?: string;
-  filters?: UsageMetricFilter[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface UsageMetricFilter {
-  id: string;
-  usageMetricId: string;
-  property: string;
-  operator: "equals" | "not_equals" | "greater_than" | "less_than" | "contains";
-  value: string;
-  createdAt: string;
-}
-
-/**
- * Usage Metrics resource - Read-only access to metrics
- */
-export class UsageMetricsResource {
-  constructor(private httpClient: CommetHTTPClient) {}
-
-  async list(): Promise<ApiResponse<UsageMetric[]>> {
-    return this.httpClient.get("/usage/metrics");
-  }
-
-  async retrieve(metricId: string): Promise<ApiResponse<UsageMetric>> {
-    return this.httpClient.get(`/usage/metrics/${metricId}`);
-  }
-}
-
-/**
- * Usage resource combining events and metrics
- */
-export class UsageResource {
-  public readonly events: UsageEventsResource;
-  public readonly metrics: UsageMetricsResource;
-
-  constructor(httpClient: CommetHTTPClient) {
-    this.events = new UsageEventsResource(httpClient);
-    this.metrics = new UsageMetricsResource(httpClient);
+    return this.httpClient.delete(
+      `/usage/events/${eventId}`,
+      undefined,
+      options,
+    );
   }
 }

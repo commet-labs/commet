@@ -30,7 +30,7 @@ const commet = new Commet({
 
 ```typescript
 // Send a single event
-await commet.usage.events.create({
+await commet.usage.create({
   eventType: 'api_call',
   customerId: 'cus_123',
   timestamp: new Date().toISOString(),
@@ -41,7 +41,7 @@ await commet.usage.events.create({
 });
 
 // Batch events
-await commet.usage.events.createBatch({
+await commet.usage.createBatch({
   events: [
     { eventType: 'api_call', customerId: 'cus_123' },
     { eventType: 'api_call', customerId: 'cus_456' },
@@ -49,7 +49,7 @@ await commet.usage.events.createBatch({
 });
 
 // List events
-const events = await commet.usage.events.list({
+const events = await commet.usage.list({
   customerId: 'cus_123',
   limit: 100
 });
@@ -61,39 +61,50 @@ const events = await commet.usage.events.list({
 // Add seats
 await commet.seats.add({
   customerId: 'cus_123',
-  seatType: 'admin_seat',
+  seatType: 'admin',
   count: 5
 });
 
 // Remove seats
 await commet.seats.remove({
   customerId: 'cus_123',
-  seatType: 'admin_seat',
+  seatType: 'admin',
   count: 2
 });
 
 // Set exact count
 await commet.seats.set({
   customerId: 'cus_123',
-  seatType: 'admin_seat',
+  seatType: 'admin',
   count: 10
 });
 
 // Get balance
 const balance = await commet.seats.getBalance({
   customerId: 'cus_123',
-  seatType: 'admin_seat'
+  seatType: 'admin'
 });
 console.log(balance.data.current); // 10
 
-// Bulk update
+// Get all balances for a customer
+const allBalances = await commet.seats.getAllBalances({
+  customerId: 'cus_123'
+});
+
+// Bulk update multiple seat types
 await commet.seats.bulkUpdate({
   customerId: 'cus_123',
   seats: {
-    admin_seat: 5,
-    editor_seat: 20,
-    viewer_seat: 100
+    admin: 5,
+    editor: 20,
+    viewer: 100
   }
+});
+
+// List seat events
+const events = await commet.seats.listEvents({
+  customerId: 'cus_123',
+  limit: 50
 });
 ```
 
@@ -148,8 +159,7 @@ interface CommetConfig {
 
 ### Resources
 
-- `commet.usage.events` - Usage event tracking
-- `commet.usage.metrics` - Usage metrics (read-only)
+- `commet.usage` - Usage event tracking
 - `commet.seats` - Seat management
 - `commet.customers` - Customer CRUD operations
 
@@ -159,7 +169,7 @@ interface CommetConfig {
 import { CommetAPIError, CommetValidationError } from '@commet/node';
 
 try {
-  await commet.usage.events.create({ ... });
+  await commet.usage.create({ ... });
 } catch (error) {
   if (error instanceof CommetValidationError) {
     console.error('Validation errors:', error.validationErrors);

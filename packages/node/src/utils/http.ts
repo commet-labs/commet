@@ -60,9 +60,10 @@ export class CommetHTTPClient {
 
   async delete<T = unknown>(
     endpoint: string,
+    data?: unknown,
     options?: RequestOptions,
   ): Promise<ApiResponse<T>> {
-    return this.request("DELETE", endpoint, undefined, options);
+    return this.request("DELETE", endpoint, data, options);
   }
 
   /**
