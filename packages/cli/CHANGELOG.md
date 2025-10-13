@@ -1,5 +1,12 @@
 # commet
 
+## 0.5.2
+
+### Patch Changes
+
+- Updated dependencies [911a17f]
+  - @commet/node@0.6.1
+
 ## 0.5.1
 
 ### Patch Changes
