@@ -29,7 +29,7 @@ const commet = new Commet({
 ### Usage Events (Consumption-Based Billing)
 
 ```typescript
-// Send a single event
+// Send a single event using customerId (Commet's ID)
 await commet.usage.create({
   eventType: 'api_call',
   customerId: 'cus_123',
@@ -40,17 +40,28 @@ await commet.usage.create({
   ]
 });
 
+// OR use your own externalId
+await commet.usage.create({
+  eventType: 'api_call',
+  externalId: 'my-customer-123', // Your own customer ID
+  timestamp: new Date().toISOString(),
+  properties: [
+    { property: 'endpoint', value: '/api/users' },
+    { property: 'method', value: 'GET' }
+  ]
+});
+
 // Batch events
 await commet.usage.createBatch({
   events: [
-    { eventType: 'api_call', customerId: 'cus_123' },
+    { eventType: 'api_call', externalId: 'my-customer-123' },
     { eventType: 'api_call', customerId: 'cus_456' },
   ]
 });
 
 // List events
 const events = await commet.usage.list({
-  customerId: 'cus_123',
+  externalId: 'my-customer-123', // Or use customerId
   limit: 100
 });
 ```
@@ -58,42 +69,42 @@ const events = await commet.usage.list({
 ### Seat Management (Per-Seat Licensing)
 
 ```typescript
-// Add seats
+// Add seats using customerId or externalId
 await commet.seats.add({
-  customerId: 'cus_123',
+  externalId: 'my-customer-123', // Or use customerId: 'cus_123'
   seatType: 'admin',
   count: 5
 });
 
 // Remove seats
 await commet.seats.remove({
-  customerId: 'cus_123',
+  externalId: 'my-customer-123',
   seatType: 'admin',
   count: 2
 });
 
 // Set exact count
 await commet.seats.set({
-  customerId: 'cus_123',
+  externalId: 'my-customer-123',
   seatType: 'admin',
   count: 10
 });
 
 // Get balance
 const balance = await commet.seats.getBalance({
-  customerId: 'cus_123',
+  externalId: 'my-customer-123',
   seatType: 'admin'
 });
 console.log(balance.data.current); // 10
 
 // Get all balances for a customer
 const allBalances = await commet.seats.getAllBalances({
-  customerId: 'cus_123'
+  externalId: 'my-customer-123'
 });
 
 // Bulk update multiple seat types
 await commet.seats.bulkUpdate({
-  customerId: 'cus_123',
+  externalId: 'my-customer-123',
   seats: {
     admin: 5,
     editor: 20,
@@ -103,7 +114,7 @@ await commet.seats.bulkUpdate({
 
 // List seat events
 const events = await commet.seats.listEvents({
-  customerId: 'cus_123',
+  externalId: 'my-customer-123',
   limit: 50
 });
 ```

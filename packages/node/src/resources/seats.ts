@@ -41,39 +41,46 @@ export interface BulkSeatUpdate {
 }
 
 export interface AddSeatsParams {
-  customerId: CustomerID;
+  customerId?: CustomerID;
+  externalId?: string;
   seatType: GeneratedSeatType;
   count: number;
 }
 
 export interface RemoveSeatsParams {
-  customerId: CustomerID;
+  customerId?: CustomerID;
+  externalId?: string;
   seatType: GeneratedSeatType;
   count: number;
 }
 
 export interface SetSeatsParams {
-  customerId: CustomerID;
+  customerId?: CustomerID;
+  externalId?: string;
   seatType: GeneratedSeatType;
   count: number;
 }
 
 export interface BulkUpdateSeatsParams {
-  customerId: CustomerID;
+  customerId?: CustomerID;
+  externalId?: string;
   seats: BulkSeatUpdate;
 }
 
 export interface GetBalanceParams {
-  customerId: CustomerID;
+  customerId?: CustomerID;
+  externalId?: string;
   seatType: GeneratedSeatType;
 }
 
 export interface GetAllBalancesParams {
-  customerId: CustomerID;
+  customerId?: CustomerID;
+  externalId?: string;
 }
 
 export interface ListSeatEventsParams extends ListParams {
   customerId?: CustomerID;
+  externalId?: string;
   seatType?: GeneratedSeatType;
   eventType?: "add" | "remove" | "set";
 }
@@ -92,6 +99,7 @@ export class SeatsResource {
       "/seats",
       {
         customerId: params.customerId,
+        externalId: params.externalId,
         seatType: params.seatType,
         count: params.count,
       },
@@ -107,6 +115,7 @@ export class SeatsResource {
       "/seats",
       {
         customerId: params.customerId,
+        externalId: params.externalId,
         seatType: params.seatType,
         count: params.count,
       },
@@ -122,6 +131,7 @@ export class SeatsResource {
       "/seats",
       {
         customerId: params.customerId,
+        externalId: params.externalId,
         seatType: params.seatType,
         count: params.count,
       },
@@ -135,7 +145,11 @@ export class SeatsResource {
   ): Promise<ApiResponse<SeatEvent[]>> {
     return this.httpClient.put(
       "/seats/bulk",
-      { customerId: params.customerId, seats: params.seats },
+      {
+        customerId: params.customerId,
+        externalId: params.externalId,
+        seats: params.seats,
+      },
       options,
     );
   }
@@ -145,6 +159,7 @@ export class SeatsResource {
   ): Promise<ApiResponse<SeatBalanceResponse>> {
     return this.httpClient.get("/seats/balance", {
       customerId: params.customerId,
+      externalId: params.externalId,
       seatType: params.seatType,
     });
   }
@@ -154,6 +169,7 @@ export class SeatsResource {
   ): Promise<ApiResponse<Record<string, SeatBalanceResponse>>> {
     return this.httpClient.get("/seats/balances", {
       customerId: params.customerId,
+      externalId: params.externalId,
     });
   }
 

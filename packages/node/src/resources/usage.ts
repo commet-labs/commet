@@ -29,7 +29,8 @@ export interface UsageEventProperty {
 
 export interface CreateUsageEventParams {
   eventType: GeneratedEventType;
-  customerId: CustomerID;
+  customerId?: CustomerID;
+  externalId?: string;
   idempotencyKey?: string; // For idempotency
   timestamp?: string; // ISO string, defaults to now
   properties?: Array<{
@@ -53,6 +54,7 @@ export interface BatchResult<T> {
 
 export interface ListUsageEventsParams extends ListParams {
   customerId?: CustomerID;
+  externalId?: string;
   eventType?: GeneratedEventType;
   idempotencyKey?: string;
 }
