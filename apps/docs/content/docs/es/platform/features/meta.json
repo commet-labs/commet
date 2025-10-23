@@ -1,5 +1,5 @@
 {
   "title": "Features",
   "description": "Core capabilities of the Commet platform",
-  "pages": ["products",  "usage-metrics", "seats", "clients", "payouts"]
+  "pages": ["products", "usage-metrics", "seats", "clients", "payouts"]
 }

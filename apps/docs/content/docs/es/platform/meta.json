@@ -2,5 +2,13 @@
   "title": "Guías de la plataforma",
   "description": "Aprende qué es Commet y cómo funciona",
   "root": true,
-  "pages": ["index","overview","comparision","onboarding","products","merchant-of-record","features"]
+  "pages": [
+    "index",
+    "overview",
+    "comparision",
+    "onboarding",
+    "products",
+    "merchant-of-record",
+    "features"
+  ]
 }
