@@ -10,7 +10,7 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "lint": "biome lint src/",
-    "lint:fix": "biome lint --apply src/",
+    "lint:fix": "biome lint --write src/",
     "typecheck": "tsc --noEmit"
   },
   "keywords": ["billing", "cli", "typescript", "commet"],
