@@ -3,8 +3,8 @@ import { i18n } from "@/lib/i18n";
 import { Analytics } from "@vercel/analytics/next";
 import { defineI18nUI } from "fumadocs-ui/i18n";
 import { RootProvider } from "fumadocs-ui/provider";
-import { Inter } from "next/font/google";
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 
 const inter = Inter({
   subsets: ["latin"],
