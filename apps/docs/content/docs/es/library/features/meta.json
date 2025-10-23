@@ -1,6 +1,5 @@
 {
   "title": "Características",
   "description": "Capacidades principales del SDK",
-  "icon": "Zap",
   "pages": ["products", "usage-events", "seat-management", "customers"]
 }
