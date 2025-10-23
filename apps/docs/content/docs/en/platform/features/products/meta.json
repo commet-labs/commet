@@ -1,8 +1,5 @@
 {
   "title": "Products",
   "description": "Everything go-to-market teams need to run pricing in Commet",
-  "pages": [
-    "usage-based-pricing",
-    "seat-based-pricing"
-  ]
+  "pages": ["usage-based-pricing", "seat-based-pricing"]
 }
