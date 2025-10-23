@@ -1,6 +1,5 @@
 {
   "title": "Seats",
   "description": "Everything you need to know about events in Commet",
-  "icon": "User",
   "pages": ["seats-overview"]
 }

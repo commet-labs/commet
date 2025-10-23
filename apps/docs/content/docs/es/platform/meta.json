@@ -1,7 +1,6 @@
 {
   "title": "Guías de la plataforma",
   "description": "Aprende qué es Commet y cómo funciona",
-  "icon": "Cuboid",
   "root": true,
   "pages": [
     "index",
