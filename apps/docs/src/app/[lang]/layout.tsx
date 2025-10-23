@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { defineI18nUI } from "fumadocs-ui/i18n";
 import { RootProvider } from "fumadocs-ui/provider";
 import { Inter } from "next/font/google";
+import type { Metadata } from "next";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -19,6 +20,13 @@ const { provider } = defineI18nUI(i18n, {
     },
   },
 });
+
+export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL || "https://docs.commet.co",
+  ),
+};
+
 export default async function RootLayout({
   children,
   params,
