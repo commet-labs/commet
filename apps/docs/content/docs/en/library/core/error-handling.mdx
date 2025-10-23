@@ -1,0 +1,440 @@
+---
+title: Error Handling
+description: Comprehensive error handling with automatic retries and detailed error types
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Error Handling
+
+Commet SDK provides comprehensive error handling with automatic retries, detailed error types, and graceful failure modes.
+
+## Error Types
+
+The SDK provides specific error classes for different scenarios:
+
+### CommetError
+
+Base error class for all SDK errors:
+
+```typescript
+import { CommetError } from 'commet'
+
+try {
+  await commet.customers.create(invalidData)
+} catch (error) {
+  if (error instanceof CommetError) {
+    console.log('SDK Error:', error.message)
+    console.log('Error Code:', error.code)
+    console.log('Status Code:', error.statusCode)
+  }
+}
+```
+
+### CommetAPIError
+
+API-specific errors with HTTP status codes:
+
+```typescript
+import { CommetAPIError } from 'commet'
+
+try {
+  await commet.customers.retrieve('invalid_id')
+} catch (error) {
+  if (error instanceof CommetAPIError) {
+    console.log('API Error:', error.message)
+    console.log('Status Code:', error.statusCode) // 404, 500, etc.
+    console.log('Error Code:', error.code)         // CUSTOMER_NOT_FOUND
+    console.log('Details:', error.details)
+  }
+}
+```
+
+### CommetValidationError
+
+Validation errors with field-specific details:
+
+```typescript
+import { CommetValidationError } from 'commet'
+
+try {
+  await commet.customers.create({
+    legalName: '', // Required field missing
+    currency: 'INVALID' // Invalid currency
+  })
+} catch (error) {
+  if (error instanceof CommetValidationError) {
+    console.log('Validation failed:', error.message)
+    console.log('Field errors:', error.validationErrors)
+    // {
+    //   legalName: ['Legal name is required'],
+    //   currency: ['Invalid currency code']
+    // }
+  }
+}
+```
+
+## Error Codes
+
+Common error codes and their meanings:
+
+<Tabs items={['Customer Errors', 'Usage Errors', 'Seat Errors', 'General Errors']}>
+<Tab value="Customer Errors">
+```typescript
+// Customer not found
+catch (error) {
+  if (error.code === 'CUSTOMER_NOT_FOUND') {
+    console.log('Customer does not exist')
+  }
+}
+
+// Invalid address
+catch (error) {
+  if (error.code === 'INVALID_ADDRESS') {
+    console.log('Address validation failed')
+  }
+}
+
+// Unsupported currency
+catch (error) {
+  if (error.code === 'UNSUPPORTED_CURRENCY') {
+    console.log('Currency not supported')
+  }
+}
+```
+</Tab>
+<Tab value="Usage Errors">
+```typescript
+// Invalid event type
+catch (error) {
+  if (error.code === 'INVALID_EVENT_TYPE') {
+    console.log('Event type not configured')
+  }
+}
+
+// Duplicate event (idempotency)
+catch (error) {
+  if (error.code === 'DUPLICATE_EVENT') {
+    console.log('Event already processed')
+  }
+}
+
+// Invalid timestamp
+catch (error) {
+  if (error.code === 'INVALID_TIMESTAMP') {
+    console.log('Timestamp is too far in the past')
+  }
+}
+```
+</Tab>
+<Tab value="Seat Errors">
+```typescript
+// Insufficient seats
+catch (error) {
+  if (error.code === 'INSUFFICIENT_SEATS') {
+    console.log('Cannot remove more seats than available')
+  }
+}
+
+// Seat type not found
+catch (error) {
+  if (error.code === 'SEAT_TYPE_NOT_FOUND') {
+    console.log('Seat type not configured for customer')
+  }
+}
+
+// Invalid seat count
+catch (error) {
+  if (error.code === 'INVALID_SEAT_COUNT') {
+    console.log('Seat count must be positive')
+  }
+}
+```
+</Tab>
+<Tab value="General Errors">
+```typescript
+// Authentication errors
+catch (error) {
+  if (error.code === 'UNAUTHORIZED') {
+    console.log('Invalid or missing API key')
+  }
+}
+
+// Rate limiting
+catch (error) {
+  if (error.code === 'RATE_LIMITED') {
+    console.log('Too many requests, please slow down')
+  }
+}
+
+// Network errors
+catch (error) {
+  if (error.code === 'NETWORK_ERROR') {
+    console.log('Network connection failed')
+  }
+}
+```
+</Tab>
+</Tabs>
+
+## Automatic Retries
+
+The SDK automatically retries failed requests with exponential backoff:
+
+### Default Retry Configuration
+
+```typescript
+const commet = new Commet({
+  apiKey: process.env.COMMET_API_KEY!,
+  retries: 3,      // Maximum retry attempts (default)
+  timeout: 30000   // Request timeout in milliseconds
+})
+```
+
+### Retryable Conditions
+
+Automatic retries are triggered for:
+
+- **HTTP Status Codes:** 408, 429, 500, 502, 503, 504
+- **Network Errors:** Connection timeouts, DNS failures
+- **Temporary Failures:** Service unavailable, gateway timeouts
+
+```typescript
+// This request will be retried up to 3 times
+try {
+  await commet.usage.events.create({
+    eventType: 'api_call',
+    customerId: 'cus_123'
+  })
+} catch (error) {
+  // Only thrown after all retries are exhausted
+  console.log('Request failed after retries:', error.message)
+}
+```
+
+### Retry Configuration
+
+Customize retry behavior:
+
+```typescript
+const commet = new Commet({
+  apiKey: process.env.COMMET_API_KEY!,
+  retries: 5,        // More aggressive retries
+  timeout: 60000,    // Longer timeout
+  debug: true        // See retry attempts in logs
+})
+
+// Console output shows retry attempts:
+// [Commet SDK] Retrying in 1000ms (attempt 1/5)
+// [Commet SDK] Retrying in 2000ms (attempt 2/5)
+// [Commet SDK] Retrying in 4000ms (attempt 3/5)
+```
+
+## Error Handling Patterns
+
+### Comprehensive Error Handling
+
+Handle all error types systematically:
+
+```typescript
+import { CommetError, CommetAPIError, CommetValidationError } from 'commet'
+
+async function createCustomerSafely(customerData) {
+  try {
+    const customer = await commet.customers.create(customerData)
+    return { success: true, customer: customer.data }
+  } catch (error) {
+    if (error instanceof CommetValidationError) {
+      return {
+        success: false,
+        type: 'validation',
+        errors: error.validationErrors
+      }
+    } else if (error instanceof CommetAPIError) {
+      return {
+        success: false,
+        type: 'api',
+        statusCode: error.statusCode,
+        message: error.message
+      }
+    } else if (error instanceof CommetError) {
+      return {
+        success: false,
+        type: 'sdk',
+        message: error.message
+      }
+    } else {
+      return {
+        success: false,
+        type: 'unknown',
+        message: 'An unexpected error occurred'
+      }
+    }
+  }
+}
+```
+
+### Graceful Degradation
+
+Don't let billing errors break your application:
+
+```typescript
+async function trackUsageGracefully(eventType: string, customerId: string) {
+  try {
+    await commet.usage.events.create({
+      eventType,
+      customerId,
+      quantity: 1
+    })
+    console.log('Usage tracked successfully')
+  } catch (error) {
+    // Log error but continue with application flow
+    console.error('Failed to track usage:', error.message)
+    
+    // Optional: Queue for retry later
+    // await queueForRetry({ eventType, customerId })
+    
+    // Don't throw - let application continue
+  }
+}
+```
+
+### Specific Error Handling
+
+Handle specific business scenarios:
+
+```typescript
+async function addSeatsWithValidation(customerId: string, seatType: string, count: number) {
+  try {
+    const result = await commet.seats.add(customerId, seatType, count)
+    return result.data
+  } catch (error) {
+    if (error.code === 'CUSTOMER_NOT_FOUND') {
+      throw new Error('Please create customer account first')
+    } else if (error.code === 'SEAT_TYPE_NOT_FOUND') {
+      throw new Error(`Seat type '${seatType}' not available for this plan`)
+    } else if (error.code === 'RATE_LIMITED') {
+      // Wait and retry once
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await commet.seats.add(customerId, seatType, count)
+    } else {
+      throw new Error(`Failed to add seats: ${error.message}`)
+    }
+  }
+}
+```
+
+## Best Practices
+
+### Non-Blocking Operations
+
+Make billing operations non-blocking:
+
+```typescript
+// ✅ Non-blocking usage tracking
+const processApiRequest = async (request) => {
+  // Process the main request first
+  const result = await handleApiRequest(request)
+  
+  // Track usage asynchronously (don't await)
+  commet.usage.events.create({
+    eventType: 'api_call',
+    customerId: request.customerId
+  }).catch(error => {
+    console.error('Usage tracking failed:', error.message)
+  })
+  
+  return result
+}
+
+// ❌ Blocking operation
+const processApiRequest = async (request) => {
+  const result = await handleApiRequest(request)
+  
+  // This could delay the response
+  await commet.usage.events.create({
+    eventType: 'api_call',
+    customerId: request.customerId
+  })
+  
+  return result
+}
+```
+
+### Error Logging
+
+Implement comprehensive error logging:
+
+```typescript
+const logBillingError = (operation: string, error: any, context: any) => {
+  const errorInfo = {
+    timestamp: new Date().toISOString(),
+    operation,
+    error: {
+      message: error.message,
+      code: error.code,
+      statusCode: error.statusCode,
+      stack: error.stack
+    },
+    context
+  }
+  
+  console.error('Billing Error:', JSON.stringify(errorInfo, null, 2))
+  
+  // Send to error tracking service
+  // sendToErrorTracker(errorInfo)
+}
+
+// Usage
+try {
+  await commet.customers.create(customerData)
+} catch (error) {
+  logBillingError('create_customer', error, { customerData })
+  throw error
+}
+```
+
+## Troubleshooting
+
+### Debug Mode
+
+Enable debug mode to see detailed error information:
+
+```typescript
+const commet = new Commet({
+  apiKey: process.env.COMMET_API_KEY!,
+  debug: true
+})
+
+// Shows full request/response details for errors
+try {
+  await commet.usage.events.create(invalidData)
+} catch (error) {
+  // Console will show:
+  // [Commet SDK] POST https://api.commet.co/api/usage/events
+  // [Commet SDK] Response status: 400 Bad Request
+  // [Commet SDK] Error response: { message: '...', errors: {...} }
+}
+```
+
+### Network Diagnostics
+
+Test network connectivity:
+
+```typescript
+const testConnection = async () => {
+  try {
+    await commet.customers.list({ limit: 1 })
+    console.log('Connection successful')
+  } catch (error) {
+    if (error.message.includes('fetch')) {
+      console.log('Network connection failed')
+    } else if (error.statusCode === 401) {
+      console.log('Authentication failed - check API key')
+    } else {
+      console.log('API error:', error.message)
+    }
+  }
+}
+```

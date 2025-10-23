@@ -1,15 +1,17 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
   "vcs": {
-    "enabled": true,
+    "enabled": false,
     "clientKind": "git",
-    "useIgnoreFile": true
+    "useIgnoreFile": false
   },
   "files": {
     "ignoreUnknown": false,
     "ignore": [
       "node_modules",
+      ".next",
       ".turbo",
+      ".source",
       "dist",
       "build",
       "coverage",
@@ -26,16 +28,25 @@
     "enabled": true
   },
   "linter": {
+    "ignore": ["node_modules", ".next", "packages/tsconfig"],
     "enabled": true,
     "rules": {
-      "recommended": true
+      "recommended": true,
+      "a11y": {
+        "noSvgWithoutTitle": "off"
+      },
+      "style": {
+        "noNonNullAssertion": "off"
+      },
+      "correctness": {
+        "useExhaustiveDependencies": "off"
+      }
     }
   },
   "javascript": {
     "formatter": {
       "indentStyle": "space",
-      "indentWidth": 2,
-      "semicolons": "always"
+      "indentWidth": 2
     }
   }
 }

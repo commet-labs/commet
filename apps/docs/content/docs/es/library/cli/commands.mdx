@@ -1,0 +1,392 @@
+---
+title: Comandos del CLI
+description: Referencia completa de todos los comandos del CLI de Commet
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Referencia de Comandos del CLI
+
+Referencia completa de todos los comandos disponibles en el CLI de Commet.
+
+## Comandos de Autenticación
+
+### `commet login`
+
+Autenticar con Commet usando flujo de autorización de dispositivo OAuth.
+
+```bash
+commet login
+```
+
+**Qué hace:**
+1. Te pide seleccionar el entorno (Sandbox o Producción)
+2. Abre tu navegador para autenticación
+3. Almacena credenciales en `~/.commet/auth.json`
+
+**Salida de ejemplo:**
+```
+? Selecciona entorno para iniciar sesión:
+❯ Sandbox (Desarrollo)
+  Producción
+
+✓ Abriendo navegador para autenticación...
+✓ ¡Autenticado exitosamente!
+  
+Entorno: sandbox
+Usuario: john@example.com
+```
+
+<Callout type="info">
+**Selección de Entorno**: Elige Sandbox para desarrollo/pruebas o Producción para facturación en vivo. Cada uno requiere autenticación separada.
+</Callout>
+
+---
+
+### `commet logout`
+
+Remover credenciales de autenticación almacenadas.
+
+```bash
+commet logout
+```
+
+**Qué hace:**
+- Elimina `~/.commet/auth.json`
+- Requiere re-autenticación con `commet login`
+
+**Salida de ejemplo:**
+```
+✓ Sesión cerrada exitosamente
+```
+
+---
+
+### `commet whoami`
+
+Mostrar autenticación actual y estado del proyecto.
+
+```bash
+commet whoami
+```
+
+**Salida de ejemplo:**
+```
+Estado de Autenticación
+  ✓ Sesión iniciada
+  Entorno: sandbox
+  Usuario: john@example.com
+
+Configuración del Proyecto
+  ✓ Vinculado
+  Organización: Acme Corp
+  Entorno: sandbox
+```
+
+**Casos de uso:**
+- Verificar estado de autenticación
+- Verificar a qué organización estás vinculado
+- Confirmar entorno antes de operaciones
+
+---
+
+## Comandos de Gestión de Proyecto
+
+### `commet link`
+
+Vincular el directorio actual a una organización de Commet.
+
+```bash
+commet link
+```
+
+**Qué hace:**
+1. Obtiene tus organizaciones del entorno autenticado
+2. Te pide seleccionar una organización
+3. Crea archivo `.commet` con configuración
+
+**Salida de ejemplo:**
+```
+✓ Obteniendo organizaciones...
+
+? Selecciona organización:
+❯ Acme Corp (acme-corp)
+  Beta Inc (beta-inc)
+
+✓ ¡Proyecto vinculado exitosamente!
+
+Configuración del proyecto:
+  Organización: Acme Corp
+  Entorno: sandbox
+
+Siguiente paso:
+  Ejecuta `commet pull` para generar tipos TypeScript
+```
+
+**Prerrequisitos:**
+- Debe estar autenticado (`commet login`)
+- Debe estar en un directorio de proyecto
+
+<Callout type="warn">
+**Vínculos Existentes**: Si el proyecto ya está vinculado, necesitarás ejecutar `commet unlink` primero.
+</Callout>
+
+---
+
+### `commet unlink`
+
+Desvincular el directorio actual de Commet.
+
+```bash
+commet unlink
+```
+
+**Qué hace:**
+- Remueve archivo de configuración `.commet`
+- El proyecto permanece autenticado pero no vinculado
+
+**Salida de ejemplo:**
+```
+✓ Proyecto desvinculado exitosamente
+```
+
+---
+
+### `commet switch`
+
+Cambiar a una organización diferente.
+
+```bash
+commet switch
+```
+
+**Qué hace:**
+- Muestra lista de tus organizaciones
+- Actualiza `.commet` con nueva organización
+- El entorno permanece igual (del token de autenticación)
+
+**Salida de ejemplo:**
+```
+✓ Obteniendo organizaciones...
+
+? Selecciona organización:
+  Acme Corp (acme-corp)
+❯ Beta Inc (beta-inc)
+
+✓ ¡Organización cambiada exitosamente!
+
+Nueva configuración:
+  Organización: Beta Inc
+  Entorno: sandbox
+
+Ejecuta `commet pull` para actualizar tipos TypeScript para esta organización
+```
+
+<Callout type="info">
+**Bloqueo de Entorno**: Switch solo cambia organización dentro del mismo entorno. Para cambiar entornos, usa `commet logout` luego `commet login`.
+</Callout>
+
+---
+
+### `commet info`
+
+Mostrar información detallada sobre el proyecto actual.
+
+```bash
+commet info
+```
+
+**Salida de ejemplo:**
+```
+Información del Proyecto
+  Organización: Acme Corp (org_A1b2C3d4E5f6G7h8)
+  Entorno: sandbox
+  
+Archivo de Configuración
+  Ubicación: /Users/john/projects/my-app/.commet
+  
+Tipos de Evento: 3
+  - api_call
+  - email_sent
+  - payment_processed
+
+Tipos de Asiento: 2
+  - admin
+  - user
+```
+
+**Casos de uso:**
+- Vista rápida de configuración del proyecto
+- Verificar tipos de evento y asiento antes de pull
+- Depurar problemas de configuración
+
+---
+
+## Comandos de Generación de Tipos
+
+### `commet pull`
+
+Generar definiciones de tipos TypeScript desde tu configuración de Commet.
+
+```bash
+commet pull [opciones]
+```
+
+**Opciones:**
+- `-o, --output <ruta>` - Ruta del archivo de salida (por defecto: `.commet.d.ts`)
+
+**Ejemplos:**
+
+<Tabs items={['Por Defecto', 'Salida Personalizada', 'Subdirectorio']}>
+<Tab value="Por Defecto">
+```bash
+commet pull
+```
+Crea `.commet.d.ts` en el directorio actual.
+</Tab>
+<Tab value="Salida Personalizada">
+```bash
+commet pull -o types/commet.d.ts
+```
+Crea `types/commet.d.ts`.
+</Tab>
+<Tab value="Subdirectorio">
+```bash
+commet pull -o src/types/billing.d.ts
+```
+Crea `src/types/billing.d.ts`.
+</Tab>
+</Tabs>
+
+**Ejemplo de archivo generado:**
+```typescript
+// .commet.d.ts
+export type CommetEventType = "api_call" | "email_sent" | "payment_processed";
+export type CommetSeatType = "admin" | "user" | "viewer";
+```
+
+**Usar en código:**
+```typescript
+import type { CommetEventType, CommetSeatType } from './.commet';
+
+// Eventos type-safe
+await commet.usage.events.create<CommetEventType>({
+  customerId: 'cus_123',
+  eventType: 'api_call', // ¡Autocompletado funciona!
+});
+
+// Asientos type-safe
+await commet.seats.add<CommetSeatType>('cus_123', 'admin', 5);
+```
+
+**Prerrequisitos:**
+- Debe estar autenticado y vinculado
+- La organización debe tener tipos de evento o asiento configurados
+
+<Callout type="info">
+**Integración con Git**: Agrega `.commet.d.ts` al control de versiones para que los miembros del equipo tengan tipos consistentes.
+</Callout>
+
+---
+
+### `commet list events`
+
+Listar todos los tipos de evento configurados en tu organización.
+
+```bash
+commet list events
+```
+
+**Salida de ejemplo:**
+```
+Tipos de Evento (3)
+  
+  api_call
+    Descripción: Llamadas a endpoints de API
+    
+  email_sent
+    Descripción: Eventos de entrega de email
+    
+  payment_processed
+    Descripción: Transacciones de pago
+```
+
+---
+
+### `commet list seats`
+
+Listar todos los tipos de asiento configurados en tu organización.
+
+```bash
+commet list seats
+```
+
+**Salida de ejemplo:**
+```
+Tipos de Asiento (3)
+  
+  admin
+    Descripción: Acceso de administrador
+    
+  user
+    Descripción: Acceso de usuario estándar
+    
+  viewer
+    Descripción: Acceso de solo lectura
+```
+
+---
+
+## Opciones Globales
+
+Todos los comandos soportan estas opciones globales:
+
+```bash
+commet [comando] [opciones]
+```
+
+**Opciones:**
+- `--version` - Mostrar versión del CLI
+- `--help` - Mostrar ayuda para comando
+
+**Ejemplos:**
+```bash
+commet --version
+commet login --help
+commet pull --help
+```
+
+---
+
+## Códigos de Salida
+
+El CLI usa códigos de salida estándar:
+
+- `0` - Éxito
+- `1` - Error (autenticación, validación, red, etc.)
+- `130` - Usuario canceló (Ctrl+C)
+
+**Usar en scripts:**
+```bash
+#!/bin/bash
+
+if commet pull; then
+  echo "Tipos actualizados exitosamente"
+else
+  echo "Falló al actualizar tipos"
+  exit 1
+fi
+```
+
+---
+
+## Alias de Comandos
+
+Algunos comandos tienen alias más cortos:
+
+| Comando Completo | Alias |
+|--------------|-------|
+| `commet list events` | `commet ls events` |
+| `commet list seats` | `commet ls seats` |
+

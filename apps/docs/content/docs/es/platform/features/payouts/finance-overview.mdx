@@ -1,0 +1,47 @@
+---
+title: Finanzas
+description: Cómo fluye el dinero a través de Commet - balances, pagos y transacciones
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
+import { Callout } from 'fumadocs-ui/components/callout'
+
+## Resumen
+
+El módulo de finanzas maneja tres funciones principales:
+
+* **Seguimiento de balance** - Dónde está tu dinero
+* **Pagos** - Sacar dinero
+* **Historial de transacciones** - Qué pasó y cuándo
+
+## Estados del Balance
+
+Tu dinero existe en uno de cuatro estados:
+
+* **Retenido** - Dinero que estamos reteniendo (generalmente por razones de cumplimiento/riesgo)
+
+* **Pendiente** - Dinero de transacciones que aún se está procesando
+
+* **Disponible** - Dinero listo para retirar
+
+* **Pagado** - Dinero ya enviado a tu cuenta bancaria
+
+<Callout type="warning">
+El dinero que permanece en Disponible por 90+ días se envía automáticamente a tu cuenta.
+</Callout>
+
+## Pagos
+
+<Callout type="info">
+Se requiere verificación de cuenta antes de los pagos.
+</Callout>
+
+Una vez verificado, solicita pagos por cualquier cantidad ≥ $10. El dinero llega a tu cuenta bancaria en 2-3 días hábiles.
+
+<Callout type="info">
+Tarifa de pago: 0.25% + $0.25 (costo de Stripe, no nuestro)
+</Callout>
+
+## Historial de Transacciones
+
+Registro completo de auditoría de todo el movimiento de dinero - pagos entrantes y pagos salientes con seguimiento de estado.

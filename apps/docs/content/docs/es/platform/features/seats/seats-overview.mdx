@@ -1,0 +1,56 @@
+---
+title: Gestión de Asientos
+description: Rastrea y gestiona asientos de usuarios - agregar, eliminar, monitorear
+---
+
+Las asientos son eventos especiales con manejo único. Los gestionamos por separado para mejor control.
+
+Usa el SDK para crear, eliminar o ajustar conteos de asientos. Siempre conoce tu conteo de usuarios activos.
+
+## Tipos de Asientos
+
+Crea diferentes tipos de asientos para roles o niveles de precios (pagados vs gratuitos).
+
+**Crear tipo de asiento**: Ve a Asientos → Tipos → + Agregar tipo de asiento
+
+## Seguimiento de Balance
+
+Monitorea la evolución de asientos a lo largo del tiempo, tanto total como por cliente. Útil para análisis de crecimiento sin dashboards personalizados.
+
+## Agregar Asientos
+
+Incrementa el conteo de asientos para un cliente:
+
+```typescript
+const result = await commet.seats.add({
+  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
+  seatType: 'admin',
+  quantity: 5
+})
+
+console.log(`Agregados ${result.data.quantity} asientos admin`)
+```
+
+## Eliminar Asientos
+
+Disminuye el conteo de asientos:
+
+```typescript
+const result = await commet.seats.remove({
+  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
+  seatType: 'admin',
+  quantity: 2
+})
+
+console.log(`Eliminados ${result.data.quantity} asientos admin`)
+```
+
+### Aprende más
+
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <div className="border rounded-lg p-4">
+    <h3 className="font-semibold mt-0">Casos de uso comunes de asientos</h3>
+    <p className="text-sm text-muted-foreground">Ver ejemplos de productos basados en asientos</p>
+    <p className="text-sm">[Aprende más →](./platform/features/products/seat-based-pricing)</p>
+  </div>
+</div>

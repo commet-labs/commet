@@ -1,0 +1,117 @@
+---
+title: Resumen del CLI
+description: Interfaz de línea de comandos para gestionar proyectos de Commet
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Resumen del CLI de Commet
+
+El CLI de Commet proporciona herramientas poderosas para autenticar, gestionar proyectos y generar definiciones de tipos TypeScript para tu plataforma de facturación.
+
+## ¿Qué es el CLI de Commet?
+
+La interfaz de línea de comandos (CLI) te permite interactuar con la plataforma Commet directamente desde tu terminal, permitiéndote:
+
+- **Autenticar** con Commet usando flujo de dispositivo OAuth seguro
+- **Vincular proyectos** a organizaciones para integración sin problemas
+- **Generar tipos TypeScript** desde tus configuraciones de eventos y asientos
+- **Gestionar entornos** entre sandbox y producción
+- **Inspeccionar configuraciones** y estado del proyecto
+
+<Callout type="info">
+**Prerrequisitos**: Necesitarás una cuenta de Commet. [Regístrate en sandbox](https://sandbox.commet.co) o [producción](https://billing.commet.co).
+</Callout>
+
+## Características Clave
+
+### Autenticación OAuth
+
+Flujo de autorización de dispositivo seguro con autenticación basada en navegador:
+
+```bash
+commet login
+```
+
+Elige entre entornos sandbox y producción, luego autentica en tu navegador.
+
+### Vinculación de Proyecto
+
+Conecta tu proyecto local a una organización de Commet:
+
+```bash
+commet link
+```
+
+Selecciona tu organización y el CLI crea un archivo de configuración `.commet`.
+
+### Generación de Tipos
+
+Genera definiciones TypeScript desde tu configuración de Commet:
+
+```bash
+commet pull
+```
+
+Crea `.commet.d.ts` con definiciones type-safe para tus tipos de evento y asiento.
+
+### Gestión de Entornos
+
+Trabaja sin problemas entre entornos sandbox y producción con aislamiento completo.
+
+## Ejemplo Rápido
+
+```bash
+# Autenticar
+commet login
+
+# Vincular a organización
+commet link
+
+# Generar tipos
+commet pull
+
+# Verificar estado
+commet whoami
+```
+
+## Comandos Disponibles
+
+### Autenticación
+- [`commet login`](/es/docs/library/cli/commands#commet-login) - Autenticar con Commet
+- [`commet logout`](/es/docs/library/cli/commands#commet-logout) - Remover credenciales
+- [`commet whoami`](/es/docs/library/cli/commands#commet-whoami) - Mostrar estado de autenticación
+
+### Gestión de Proyecto
+- [`commet link`](/es/docs/library/cli/commands#commet-link) - Vincular proyecto a organización
+- [`commet unlink`](/es/docs/library/cli/commands#commet-unlink) - Desvincular proyecto
+- [`commet switch`](/es/docs/library/cli/commands#commet-switch) - Cambiar organización
+- [`commet info`](/es/docs/library/cli/commands#commet-info) - Mostrar detalles del proyecto
+
+### Generación de Tipos
+- [`commet pull`](/es/docs/library/cli/commands#commet-pull) - Generar tipos TypeScript
+- [`commet list`](/es/docs/library/cli/commands#commet-list) - Listar tipos de evento/asiento
+
+## Instalación
+
+Instala globalmente vía tu gestor de paquetes preferido:
+
+```bash
+npm install -g commet
+# o
+pnpm add -g commet
+# o
+yarn global add commet
+```
+
+Ver [Guía de Instalación](/es/docs/library/cli/installation) para instrucciones detalladas de configuración.
+
+## Archivos de Configuración
+
+El CLI usa dos archivos de configuración:
+
+- **`~/.commet/auth.json`**: Credenciales de autenticación globales
+- **`.commet`**: Configuración de organización específica del proyecto
+
+Ver [Configuración](/es/docs/library/cli/configuration) para detalles.
+

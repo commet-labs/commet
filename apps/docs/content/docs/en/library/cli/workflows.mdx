@@ -1,0 +1,491 @@
+---
+title: CLI Workflows
+description: Common patterns and workflows using the Commet CLI
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+import { Steps, Step } from 'fumadocs-ui/components/steps'
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
+
+# CLI Workflows
+
+Common patterns and workflows for using the Commet CLI effectively.
+
+## Initial Project Setup
+
+<Steps>
+<Step>
+
+### Install CLI
+
+```bash
+npm install -g commet
+```
+
+</Step>
+
+<Step>
+
+### Authenticate
+
+```bash
+commet login
+```
+
+Select "Sandbox" for development.
+
+</Step>
+
+<Step>
+
+### Link Project
+
+```bash
+cd your-project
+commet link
+```
+
+Select your organization.
+
+</Step>
+
+<Step>
+
+### Generate Types
+
+```bash
+commet pull
+```
+
+Creates `.commet.d.ts` with your event and seat types.
+
+</Step>
+
+<Step>
+
+### Use Types in Code
+
+```typescript
+import type { CommetEventType } from './.commet';
+
+await commet.usage.events.create<CommetEventType>({
+  customerId: 'cus_123',
+  eventType: 'api_call', // Autocomplete!
+});
+```
+
+</Step>
+</Steps>
+
+---
+
+## Development Workflow
+
+### Daily Development
+
+```bash
+# 1. Check status
+commet whoami
+
+# 2. Pull latest types (if dashboard changes)
+commet pull
+
+# 3. Develop and test locally
+# Your code here...
+
+# 4. Verify configuration
+commet info
+```
+
+### After Adding Event Types
+
+```bash
+# 1. Add event types in Commet dashboard
+# (e.g., api_call, email_sent, payment_processed)
+
+# 2. Pull updated types
+commet pull
+
+# 3. Use new types immediately
+import type { CommetEventType } from './.commet';
+
+// TypeScript knows about your new event types!
+await commet.usage.events.create<CommetEventType>({
+  customerId: 'cus_123',
+  eventType: 'payment_processed', // New type with autocomplete
+});
+```
+
+### After Adding Seat Types
+
+```bash
+# 1. Add seat types in Commet dashboard
+# (e.g., admin, user, viewer)
+
+# 2. Pull updated types
+commet pull
+
+# 3. Use new seat types
+import type { CommetSeatType } from './.commet';
+
+await commet.seats.add<CommetSeatType>('cus_123', 'viewer', 10);
+```
+
+---
+
+## Multi-Environment Workflow
+
+### Sandbox Development
+
+```bash
+# Authenticate to sandbox
+commet login  # Select "Sandbox"
+
+# Link to sandbox organization
+commet link
+
+# Generate sandbox types
+commet pull
+
+# Develop and test
+# Your development work...
+```
+
+### Production Deployment
+
+```bash
+# Switch to production
+commet logout
+commet login  # Select "Production"
+
+# Link to production organization  
+commet link
+
+# Generate production types
+commet pull
+
+# Deploy to production
+git add .commet .commet.d.ts
+git commit -m "Update production config"
+git push production main
+```
+
+<Callout type="warn">
+**Important**: Always verify you're in the correct environment before operations:
+```bash
+commet whoami
+```
+</Callout>
+
+---
+
+## Team Collaboration
+
+### New Team Member Onboarding
+
+<Steps>
+<Step>
+
+### Install CLI
+
+```bash
+npm install -g commet
+```
+
+</Step>
+
+<Step>
+
+### Authenticate
+
+```bash
+commet login
+```
+
+Use team's Commet account credentials.
+
+</Step>
+
+<Step>
+
+### Link to Team Organization
+
+```bash
+cd project-repo
+commet link
+```
+
+Select the team's organization.
+
+</Step>
+
+<Step>
+
+### Pull Types
+
+```bash
+commet pull
+```
+
+Get latest event and seat type definitions.
+
+</Step>
+</Steps>
+
+### Keeping Types in Sync
+
+**Option 1: Commit types** (Recommended)
+
+```bash
+# After updating types
+commet pull
+git add .commet.d.ts
+git commit -m "Update event and seat types"
+git push
+```
+
+Team members pull and get updated types automatically.
+
+**Option 2: Each developer pulls**
+
+```bash title=".gitignore"
+# .gitignore
+.commet.d.ts
+```
+
+Each developer runs `commet pull` after dashboard changes.
+
+---
+
+## Organization Switching
+
+### Switch Between Projects
+
+```bash
+# In project A
+cd ~/projects/project-a
+commet switch  # Select Organization A
+
+# In project B  
+cd ~/projects/project-b
+commet switch  # Select Organization B
+```
+
+### Multiple Organizations Workflow
+
+```bash
+# Client A project
+cd ~/clients/client-a
+commet link  # Link to Client A org
+commet pull
+
+# Client B project
+cd ~/clients/client-b
+commet link  # Link to Client B org
+commet pull
+```
+
+Each project has its own `.commet` file with different organizations.
+
+---
+
+## CI/CD Integration
+
+### GitHub Actions Example
+
+```yaml
+name: Type Check
+
+on: [push, pull_request]
+
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Install CLI
+        run: npm install -g commet
+      
+      - name: Generate Types
+        run: |
+          # Option 1: Use committed .commet.d.ts
+          # (No CLI commands needed)
+          
+          # Option 2: Generate from API
+          echo '{"token":"${{ secrets.COMMET_TOKEN }}","environment":"sandbox"}' > ~/.commet/auth.json
+          commet pull
+      
+      - name: TypeScript Check
+        run: npm run typecheck
+```
+
+<Callout type="info">
+**Best Practice**: Commit `.commet.d.ts` to version control for CI/CD. Avoids API calls during builds.
+</Callout>
+
+### Vercel Deployment
+
+```bash
+# .vercel/project.json
+{
+  "projectId": "...",
+  "orgId": "..."
+}
+
+# Build command in vercel.json or dashboard
+{
+  "buildCommand": "npm run build"
+}
+```
+
+Commit `.commet` and `.commet.d.ts` for consistent builds.
+
+---
+
+## Troubleshooting Workflows
+
+### Reset Everything
+
+```bash
+# 1. Unlink project
+commet unlink
+
+# 2. Logout
+commet logout
+
+# 3. Re-authenticate
+commet login
+
+# 4. Re-link
+commet link
+
+# 5. Regenerate types
+commet pull
+```
+
+### Fix Type Mismatches
+
+```bash
+# Types out of sync with dashboard
+commet pull --force  # Regenerate types
+
+# Or delete and regenerate
+rm .commet.d.ts
+commet pull
+```
+
+### Debug Authentication
+
+```bash
+# Check auth status
+commet whoami
+
+# Check stored credentials
+cat ~/.commet/auth.json
+
+# Re-authenticate if expired
+commet logout
+commet login
+```
+
+---
+
+## Advanced Workflows
+
+### Script Type Updates
+
+```bash
+#!/bin/bash
+# update-types.sh
+
+# Pull latest types
+commet pull
+
+# Run type checker
+npm run typecheck
+
+# If successful, commit
+if [ $? -eq 0 ]; then
+  git add .commet.d.ts
+  git commit -m "chore: update commet types"
+  echo "✓ Types updated and committed"
+else
+  echo "✗ Type check failed"
+  exit 1
+fi
+```
+
+### Pre-commit Hook
+
+```bash
+# .git/hooks/pre-commit
+#!/bin/bash
+
+# Ensure types are up to date
+if [ -f .commet ]; then
+  commet pull --quiet
+  
+  # Add updated types to commit
+  git add .commet.d.ts
+fi
+```
+
+### Multiple Output Locations
+
+```bash
+# Generate types in multiple locations
+commet pull -o src/types/commet.d.ts
+commet pull -o apps/web/types/commet.d.ts
+commet pull -o packages/shared/types/commet.d.ts
+```
+
+---
+
+## Best Practices
+
+### Regular Type Updates
+
+```bash
+# Weekly: Pull latest types
+commet pull
+
+# Before major releases: Verify types
+commet info
+commet pull
+npm run typecheck
+```
+
+### Environment Verification
+
+Always verify environment before critical operations:
+
+```bash
+# Before production deploy
+commet whoami | grep "Environment: production"
+
+# Before sandbox testing
+commet whoami | grep "Environment: sandbox"
+```
+
+### Backup Before Switching
+
+```bash
+# Before major changes
+cp .commet .commet.backup
+cp .commet.d.ts .commet.d.ts.backup
+
+# Make changes
+commet switch
+commet pull
+
+# If issues, restore
+mv .commet.backup .commet
+mv .commet.d.ts.backup .commet.d.ts
+```

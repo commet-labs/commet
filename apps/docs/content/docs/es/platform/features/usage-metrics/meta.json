@@ -1,0 +1,6 @@
+{
+    "title": "Eventos",
+    "description": "Todo lo que necesitas saber sobre eventos en Commet",
+    "icon": "Activity",
+    "pages": ["events", "metrics"]
+  }

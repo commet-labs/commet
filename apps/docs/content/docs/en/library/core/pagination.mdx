@@ -1,0 +1,356 @@
+---
+title: Pagination
+description: Efficiently retrieve large datasets with cursor-based pagination
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Pagination
+
+Commet API uses cursor-based pagination to efficiently retrieve large datasets. This approach provides consistent results even when data is being added or modified during pagination.
+
+## How It Works
+
+Cursor-based pagination uses timestamps to determine the next page of results. Instead of using page numbers (which can skip or duplicate results when data changes), each response includes a cursor pointing to the next batch of data.
+
+**Key benefits:**
+- **Consistent results**: No duplicates or skipped items during pagination
+- **Efficient**: Database queries remain fast regardless of page depth
+- **Real-time safe**: Works correctly even as new data is added
+
+## Basic Usage
+
+Fetch the first page of results:
+
+```typescript
+const firstPage = await commet.customers.list({ limit: 25 });
+
+console.log(firstPage.data);      // Array of customers
+console.log(firstPage.hasMore);   // true if more pages exist
+console.log(firstPage.nextCursor); // Cursor for next page
+```
+
+If more pages exist, fetch the next page:
+
+```typescript
+if (firstPage.hasMore) {
+  const secondPage = await commet.customers.list({ 
+    limit: 25,
+    cursor: firstPage.nextCursor 
+  });
+}
+```
+
+<Callout type="info">
+**Pagination works across all list operations**: customers, usage events, and seats all support the same pagination parameters.
+</Callout>
+
+## Fetching All Pages
+
+For batch operations where you need all records, iterate through all pages:
+
+```typescript
+const allCustomers = [];
+let cursor = undefined;
+
+do {
+  const page = await commet.customers.list({ limit: 100, cursor });
+  allCustomers.push(...page.data);
+  cursor = page.nextCursor;
+} while (page.hasMore);
+
+console.log(`Total customers: ${allCustomers.length}`);
+```
+
+<Callout type="warn">
+**Performance consideration**: Be careful when fetching all pages for large datasets. Consider using filters to reduce the total number of records.
+</Callout>
+
+## Pagination Parameters
+
+### limit
+
+Number of items to return per page.
+
+- **Default**: 25
+- **Maximum**: 100
+- **Type**: number
+
+```typescript
+// Fetch 50 customers per page
+const page = await commet.customers.list({ limit: 50 });
+```
+
+### cursor
+
+Timestamp cursor for the next page of results.
+
+- **Type**: string (ISO 8601 timestamp)
+- **Obtained from**: Previous response's `nextCursor` field
+
+```typescript
+// Get next page using cursor
+const nextPage = await commet.customers.list({ 
+  cursor: page.nextCursor 
+});
+```
+
+## Response Format
+
+All paginated endpoints return the following structure:
+
+```typescript
+{
+  success: true,
+  message: "Customers retrieved successfully",
+  data: [...],           // Array of results
+  hasMore: true,         // Whether more pages exist
+  nextCursor: "2024-01-15T10:30:00Z"  // Cursor for next page
+}
+```
+
+### Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `data` | Array | Results for current page |
+| `hasMore` | boolean | `true` if more pages exist, `false` if this is the last page |
+| `nextCursor` | string \| undefined | ISO timestamp cursor for next page. `undefined` if no more pages |
+
+## Combining with Filters
+
+Pagination works seamlessly with filters:
+
+<Tabs items={['Customers', 'Usage Events', 'Seats']}>
+<Tab value="Customers">
+```typescript
+// Filter by currency and paginate
+const page = await commet.customers.list({
+  currency: "USD",
+  isActive: true,
+  limit: 50
+});
+
+if (page.hasMore) {
+  const nextPage = await commet.customers.list({
+    currency: "USD",
+    isActive: true,
+    limit: 50,
+    cursor: page.nextCursor  // Maintain filters across pages
+  });
+}
+```
+</Tab>
+<Tab value="Usage Events">
+```typescript
+// Filter by event type and date range
+const page = await commet.usage.events.list({
+  eventType: "api_call",
+  startDate: "2024-01-01",
+  endDate: "2024-01-31",
+  limit: 100
+});
+```
+</Tab>
+<Tab value="Seats">
+```typescript
+// Paginate through seat types
+const page = await commet.seats.list({
+  limit: 25
+});
+```
+</Tab>
+</Tabs>
+
+## Complete Examples
+
+### Export All Customer Data
+
+```typescript
+async function exportAllCustomers() {
+  const allCustomers = [];
+  let cursor = undefined;
+  let pageCount = 0;
+
+  do {
+    console.log(`Fetching page ${++pageCount}...`);
+    
+    const page = await commet.customers.list({ 
+      limit: 100, 
+      cursor 
+    });
+    
+    allCustomers.push(...page.data);
+    cursor = page.nextCursor;
+  } while (page.hasMore);
+
+  console.log(`Exported ${allCustomers.length} customers in ${pageCount} pages`);
+  return allCustomers;
+}
+```
+
+### Process Usage Events in Batches
+
+```typescript
+async function processUsageEvents(
+  processCallback: (events: UsageEvent[]) => Promise<void>
+) {
+  let cursor = undefined;
+
+  do {
+    const page = await commet.usage.events.list({ 
+      limit: 100, 
+      cursor 
+    });
+    
+    // Process current batch
+    await processCallback(page.data);
+    
+    cursor = page.nextCursor;
+  } while (page.hasMore);
+}
+
+// Usage
+await processUsageEvents(async (events) => {
+  for (const event of events) {
+    console.log(`Processing event ${event.id}`);
+    // Your processing logic
+  }
+});
+```
+
+### Search with Pagination
+
+```typescript
+async function findCustomersByDomain(domain: string) {
+  let cursor = undefined;
+  const matches = [];
+
+  do {
+    const page = await commet.customers.list({ 
+      limit: 100, 
+      cursor 
+    });
+    
+    // Filter results client-side
+    const domainMatches = page.data.filter(
+      c => c.domain === domain
+    );
+    
+    matches.push(...domainMatches);
+    cursor = page.nextCursor;
+  } while (page.hasMore);
+
+  return matches;
+}
+```
+
+## Best Practices
+
+### Use Maximum Limit for Batch Operations
+
+When processing all records, use the maximum limit to reduce API calls:
+
+```typescript
+// ✅ Efficient - fewer API calls
+const page = await commet.customers.list({ limit: 100 });
+
+// ❌ Inefficient - 4x more API calls
+const page = await commet.customers.list({ limit: 25 });
+```
+
+### Store Cursor for Resumable Operations
+
+For long-running operations, store the cursor to resume later:
+
+```typescript
+async function processIncrementally() {
+  // Load last cursor from storage
+  let cursor = await storage.get('lastProcessedCursor');
+
+  const page = await commet.usage.events.list({ 
+    limit: 100, 
+    cursor 
+  });
+
+  // Process data
+  await processEvents(page.data);
+
+  // Save cursor for next run
+  await storage.set('lastProcessedCursor', page.nextCursor);
+}
+```
+
+### Always Check hasMore
+
+Don't assume there's a next page based on the number of results:
+
+```typescript
+// ✅ Correct - check hasMore
+if (page.hasMore) {
+  const nextPage = await commet.customers.list({ 
+    cursor: page.nextCursor 
+  });
+}
+
+// ❌ Incorrect - don't assume based on length
+if (page.data.length === 100) {  // May not be last page
+  // This could fail or return empty results
+}
+```
+
+### Handle Rate Limits
+
+When paginating through large datasets, implement backoff for rate limits:
+
+```typescript
+async function getAllCustomersWithBackoff() {
+  const allCustomers = [];
+  let cursor = undefined;
+
+  do {
+    try {
+      const page = await commet.customers.list({ 
+        limit: 100, 
+        cursor 
+      });
+      
+      allCustomers.push(...page.data);
+      cursor = page.nextCursor;
+    } catch (error) {
+      if (error.code === 'RATE_LIMITED') {
+        // Wait and retry
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        continue;
+      }
+      throw error;
+    }
+  } while (cursor);
+
+  return allCustomers;
+}
+```
+
+## Error Handling
+
+Handle pagination errors gracefully:
+
+```typescript
+try {
+  const page = await commet.customers.list({ 
+    limit: 50, 
+    cursor: invalidCursor 
+  });
+} catch (error) {
+  if (error instanceof CommetAPIError) {
+    if (error.statusCode === 400) {
+      console.error('Invalid cursor - may have expired');
+      // Restart from beginning
+      const page = await commet.customers.list({ limit: 50 });
+    }
+  }
+  throw error;
+}
+```
+

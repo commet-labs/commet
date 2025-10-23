@@ -1,0 +1,180 @@
+---
+title: Installing Commet CLI
+description: Get the CLI up and running on your system
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
+import { Callout } from 'fumadocs-ui/components/callout'
+import { Steps, Step } from 'fumadocs-ui/components/steps'
+
+# Installing Commet CLI
+
+Install the Commet CLI to authenticate, manage projects, and generate TypeScript types.
+
+## Requirements
+
+- **Node.js**: 18.0.0 or higher
+- **npm**, **pnpm**, or **yarn**
+
+## Global Installation
+
+Install the CLI globally to use it from any directory:
+
+<Tabs items={['npm', 'pnpm', 'yarn']}>
+<Tab value="npm">
+```bash
+npm install -g commet
+```
+</Tab>
+<Tab value="pnpm">
+```bash
+pnpm add -g commet
+```
+</Tab>
+<Tab value="yarn">
+```bash
+yarn global add commet
+```
+</Tab>
+</Tabs>
+
+## Verify Installation
+
+Check that the CLI is installed correctly:
+
+```bash
+commet --version
+```
+
+You should see the current version number.
+
+## First Time Setup
+
+<Steps>
+<Step>
+
+### Authenticate
+
+Login to your Commet account:
+
+```bash
+commet login
+```
+
+Select your environment (Sandbox or Production) and complete authentication in your browser.
+
+</Step>
+
+<Step>
+
+### Link Project
+
+Navigate to your project directory and link it to a Commet organization:
+
+```bash
+cd your-project
+commet link
+```
+
+Select your organization from the list.
+
+</Step>
+
+<Step>
+
+### Generate Types
+
+Pull TypeScript type definitions from your configuration:
+
+```bash
+commet pull
+```
+
+This creates `.commet.d.ts` with your event and seat types.
+
+</Step>
+</Steps>
+
+## Updating the CLI
+
+Update to the latest version:
+
+<Tabs items={['npm', 'pnpm', 'yarn']}>
+<Tab value="npm">
+```bash
+npm update -g commet
+```
+</Tab>
+<Tab value="pnpm">
+```bash
+pnpm update -g commet
+```
+</Tab>
+<Tab value="yarn">
+```bash
+yarn global upgrade commet
+```
+</Tab>
+</Tabs>
+
+The CLI will notify you when updates are available.
+
+## Uninstalling
+
+Remove the CLI from your system:
+
+<Tabs items={['npm', 'pnpm', 'yarn']}>
+<Tab value="npm">
+```bash
+npm uninstall -g commet
+```
+</Tab>
+<Tab value="pnpm">
+```bash
+pnpm remove -g commet
+```
+</Tab>
+<Tab value="yarn">
+```bash
+yarn global remove commet
+```
+</Tab>
+</Tabs>
+
+Your authentication and project configurations (`~/.commet/` directory) will remain on your system.
+
+## Troubleshooting
+
+### Permission Errors (npm)
+
+If you encounter permission errors with npm:
+
+```bash
+# Option 1: Use npx
+npx commet login
+
+# Option 2: Fix npm permissions
+npm config set prefix ~/.npm-global
+export PATH=~/.npm-global/bin:$PATH
+```
+
+See [npm's official guide](https://docs.npmjs.com/resolving-eacces-permissions-errors-when-installing-packages-globally) for details.
+
+### Command Not Found
+
+If `commet` command is not found after installation:
+
+1. **Verify installation path**: Run `npm list -g commet` (or equivalent for your package manager)
+2. **Check PATH**: Ensure your global npm/pnpm/yarn bin directory is in your PATH
+3. **Restart terminal**: Close and reopen your terminal to reload environment variables
+
+### Version Mismatch
+
+If the CLI behaves unexpectedly after an update:
+
+```bash
+# Clear npm cache and reinstall
+npm cache clean --force
+npm uninstall -g commet
+npm install -g commet
+```

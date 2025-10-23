@@ -1,0 +1,289 @@
+---
+title: Eventos de Uso
+description: Rastrea datos de uso para cálculos de facturación precisos
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Eventos de Uso
+
+Rastrea el uso del cliente para cálculos de facturación precisos. Envía eventos en tiempo real o agrúpalos para escenarios de alto volumen.
+
+<Callout type="info">
+**Prerrequisitos:** Inicializa tu cliente Commet con una clave API válida.
+</Callout>
+
+## Uso Básico
+
+Envía un solo evento de uso:
+
+```typescript
+const result = await commet.usage.create({
+  eventType: 'api_call',
+  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
+})
+
+console.log('Evento rastreado:', result.data.id)
+```
+
+<Callout type="info">
+**Identificación de Cliente**: Usa `customerId` (generado por Commet) o `externalId` (tu ID interno) para identificar clientes.
+</Callout>
+
+### Usando IDs Externos
+
+Referencia clientes con tus propios IDs:
+
+```typescript
+const result = await commet.usage.create({
+  eventType: 'api_call',
+  externalId: 'stripe_cus_abc123', // Tu ID interno de cliente
+})
+```
+
+## Tipos de Evento
+
+Tipos de evento comunes para facturación:
+
+<Tabs items={['Llamadas API', 'Almacenamiento', 'Cómputo', 'Personalizado']}>
+<Tab value="Llamadas API">
+```typescript
+await commet.usage.create({
+  eventType: 'api_call',
+  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
+  properties: [
+    { property: 'endpoint', value: '/api/users' },
+    { property: 'method', value: 'GET' }
+  ]
+})
+```
+</Tab>
+<Tab value="Almacenamiento">
+```typescript
+await commet.usage.create({
+  eventType: 'storage_gb',
+  externalId: 'stripe_cus_xyz', // Usando ID externo
+  properties: [
+    { property: 'quantity', value: '2.5' },
+    { property: 'region', value: 'us-east-1' },
+    { property: 'type', value: 'ssd' }
+  ]
+})
+```
+</Tab>
+<Tab value="Cómputo">
+```typescript
+await commet.usage.create({
+  eventType: 'compute_hours',
+  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
+  properties: [
+    { property: 'quantity', value: '0.25' },
+    { property: 'instance_type', value: 't3.micro' },
+    { property: 'region', value: 'us-west-2' }
+  ]
+})
+```
+</Tab>
+<Tab value="Personalizado">
+```typescript
+await commet.usage.create({
+  eventType: 'email_sent',
+  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
+  properties: [
+    { property: 'quantity', value: '100' },
+    { property: 'campaign_id', value: 'camp_abc123' },
+    { property: 'template', value: 'welcome' }
+  ]
+})
+```
+</Tab>
+</Tabs>
+
+## Procesamiento en Lotes
+
+Envía múltiples eventos eficientemente:
+
+```typescript
+const result = await commet.usage.createBatch({
+  events: [
+    {
+      eventType: 'api_call',
+      customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
+      timestamp: '2024-01-15T10:00:00Z'
+    },
+    {
+      eventType: 'api_call', 
+      externalId: 'stripe_cus_abc', // Mezcla customerId y externalId
+      timestamp: '2024-01-15T10:01:00Z'
+    }
+  ]
+})
+
+console.log(`Rastreados ${result.data.successful.length} eventos`)
+```
+
+## Opciones Avanzadas
+
+### Idempotencia
+
+Previene eventos duplicados con claves de idempotencia:
+
+```typescript
+await commet.usage.events.create({
+  eventType: 'api_call',
+  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
+  idempotencyKey: 'unique-key-123'
+})
+```
+
+### Timestamps Personalizados
+
+Rellena uso histórico:
+
+```typescript
+await commet.usage.events.create({
+  eventType: 'api_call',
+  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
+  timestamp: '2024-01-01T00:00:00Z'
+})
+```
+
+### Properties Enriquecidas
+
+Agrega contexto para reportes y debugging:
+
+```typescript
+await commet.usage.events.create({
+  eventType: 'api_call',
+  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
+  properties: [
+    { property: 'user_id', value: 'usr_789' },
+    { property: 'endpoint', value: '/api/analytics' },
+    { property: 'response_time_ms', value: '150' },
+    { property: 'status_code', value: '200' },
+    { property: 'region', value: 'us-east-1' }
+  ]
+})
+```
+
+## Manejo de Errores
+
+Maneja escenarios comunes:
+
+```typescript
+try {
+  const result = await commet.usage.create({
+    eventType: 'api_call',
+    externalId: 'stripe_cus_xyz',
+  })
+  
+  console.log('Evento rastreado:', result.data.id)
+} catch (error) {
+  if (error.code === 'CUSTOMER_NOT_FOUND') {
+    console.log('El cliente no existe')
+  } else if (error.code === 'INVALID_EVENT_TYPE') {
+    console.log('Tipo de evento no configurado')
+  } else {
+    console.log('Error inesperado:', error.message)
+  }
+}
+```
+
+## Listar Eventos de Uso
+
+Recupera historial de uso para análisis con paginación:
+
+```typescript
+// Filtrar por customerId o externalId
+const pagina1 = await commet.usage.list({
+  externalId: 'stripe_cus_xyz', // O usa customerId
+  eventType: 'api_call',
+  limit: 100
+})
+
+console.log(`Encontrados ${pagina1.data.length} eventos`)
+console.log(`Más páginas: ${pagina1.hasMore}`)
+
+// Obtener siguiente página
+if (pagina1.hasMore) {
+  const pagina2 = await commet.usage.list({
+    externalId: 'stripe_cus_xyz',
+    eventType: 'api_call',
+    limit: 100,
+    cursor: pagina1.nextCursor
+  })
+}
+
+// Obtener todos los eventos de un cliente
+const todosLosEventos = []
+let cursor = undefined
+
+do {
+  const pagina = await commet.usage.list({ 
+    customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
+    limit: 100, 
+    cursor 
+  })
+  todosLosEventos.push(...pagina.data)
+  cursor = pagina.nextCursor
+} while (pagina.hasMore)
+```
+
+<Callout type="info">
+**Paginación**: Los listados de eventos de uso soportan paginación basada en cursor para recorrer historiales de eventos grandes de manera eficiente. Ver [Guía de paginación](/library/core/pagination) para más ejemplos.
+</Callout>
+
+## Mejores Prácticas
+
+### Aplicaciones de Alto Volumen
+
+Para aplicaciones enviando >1000 eventos/minuto:
+
+```typescript
+// Buffer de eventos local
+const eventBuffer = []
+
+// Agregar al buffer con externalId
+eventBuffer.push({
+  eventType: 'api_call',
+  externalId: 'stripe_cus_xyz',
+  timestamp: new Date().toISOString()
+})
+
+// Vaciar buffer cada 10 segundos o 100 eventos
+if (eventBuffer.length >= 100) {
+  await commet.usage.createBatch({ events: eventBuffer })
+  eventBuffer.length = 0
+}
+```
+
+### Nomenclatura de Eventos
+
+Usa tipos de evento consistentes y descriptivos:
+
+```typescript
+// ✅ Bueno
+'api_call', 'storage_gb', 'compute_hours', 'email_sent'
+
+// ❌ Evita  
+'event1', 'usage', 'thing', 'api'
+```
+
+### Estructura de Properties
+
+Mantén properties planas y buscables:
+
+```typescript
+// ✅ Bueno
+properties: [
+  { property: 'endpoint', value: '/api/users' },
+  { property: 'method', value: 'GET' },
+  { property: 'user_id', value: 'usr_123' }
+]
+
+// ❌ Evita - objetos anidados no soportados
+properties: [
+  { property: 'request', value: JSON.stringify({ endpoint: '/api/users', method: 'GET' }) }
+]
+```

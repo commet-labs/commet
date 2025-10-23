@@ -1,0 +1,7 @@
+{
+  "title": "Platform and Guides",
+  "description": "Learn what Commet is and how it works",
+  "icon": "Book",
+  "root": true,
+  "pages": ["overview", "onboarding", "merchant-of-record","features"]
+}

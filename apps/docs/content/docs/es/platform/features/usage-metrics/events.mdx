@@ -1,0 +1,42 @@
+---
+title: Eventos de Uso
+description: Rastrea el uso del cliente para facturar en tiempo real o por batches
+---
+
+## Uso Básico
+
+Rastrea la actividad del usuario y cobra por ello. Casos de uso más comunes:
+
+- **Uso de tokens** - Mide el consumo de API tokens
+- **Conteo de conversaciones** - Rastrea el volumen de chat/mensajes  
+- **Seguimiento de pagos** - Cuenta eventos de transacciones
+
+<Callout type="info">
+Los asientos también usan eventos, pero se manejan de manera diferente. Ve la sección de [Gestión de Asientos](/library/features/seat-management).
+</Callout>
+
+Envía un evento de uso individual:
+
+```typescript
+const result = await commet.usage.create({
+  eventType: 'api_call',
+  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
+  quantity: 1,
+})
+
+console.log('Evento rastreado:', result.data.id)
+```
+
+## Tipos de Eventos
+
+Crea tipos de eventos en el dashboard de Commet primero. Esto hace que estos eventos estén disponibles en nuestro SDK para una integración más fácil.
+
+### Aprende más
+
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <div className="border rounded-lg p-4">
+    <h3 className="font-semibold mt-0">Librería de eventos de uso</h3>
+    <p className="text-sm text-muted-foreground">Cómo integrar eventos con nuestro SDK</p>
+    <p className="text-sm">[Aprende más →](./library/features/usage-events)</p>
+  </div>
+</div>

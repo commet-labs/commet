@@ -1,0 +1,6 @@
+{
+    "title": "Asientos",
+    "description": "Todo lo que necesitas saber sobre eventos en Commet",
+    "icon": "User",
+    "pages": ["seats-overview"]
+  }

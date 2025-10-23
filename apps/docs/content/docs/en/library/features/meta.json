@@ -1,0 +1,6 @@
+{
+  "title": "Features",
+  "description": "Core SDK capabilities",
+  "icon": "Zap",
+  "pages": ["usage-events", "seat-management", "customers"]
+}

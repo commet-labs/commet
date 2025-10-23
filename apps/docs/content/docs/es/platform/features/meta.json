@@ -1,0 +1,6 @@
+{
+    "title": "Features",
+    "description": "Core capabilities of the Commet platform",
+    "icon": "Zap",
+        "pages": ["products","seats", "clients", "payouts", "usage-metrics"]
+  }

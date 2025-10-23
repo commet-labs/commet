@@ -1,0 +1,127 @@
+---
+title: Quick Start
+description: Get started with Commet SDK in under 5 minutes
+icon: Album
+---
+
+import { Steps, Step } from 'fumadocs-ui/components/steps'
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Quick Start
+
+Get your billing system running in under 5 minutes.
+
+<Callout type="info">
+**Prerequisites:** Node.js 18+ and a Commet account. [Sign up here](https://sandbox.commet.co) if needed.
+</Callout>
+
+<Steps>
+<Step>
+
+## Install the SDK
+
+<Tabs items={['npm', 'pnpm', 'yarn']}>
+<Tab value="npm">
+```bash
+npm install @commet/node
+```
+</Tab>
+<Tab value="pnpm">
+```bash
+pnpm add @commet/node
+```
+</Tab>
+<Tab value="yarn">
+```bash
+yarn add @commet/node
+```
+</Tab>
+</Tabs>
+
+</Step>
+
+<Step>
+
+## Link your project
+
+Use the CLI to connect your project and sync types:
+
+```bash
+npx commet link
+```
+
+Select your organization and project. The CLI generates TypeScript types for your event types and seat types automatically.
+
+<Callout type="info">
+**Type Safety:** The CLI creates typed wrappers for your billing events, preventing runtime errors.
+</Callout>
+
+</Step>
+
+<Step>
+
+## Initialize the client
+
+Create your Commet client with environment variables:
+
+```typescript
+import { Commet } from '@commet/node'
+
+const commet = new Commet({
+  apiKey: process.env.COMMET_API_KEY!
+})
+```
+
+<Callout type="warn">
+**Security:** Store your API key in `.env` and never commit it. The CLI adds `.commet/` to `.gitignore` automatically.
+</Callout>
+
+</Step>
+
+<Step>
+
+## Track usage events
+
+Send usage data with type-safe methods:
+
+```typescript
+// Track API calls (type-safe after CLI link)
+await commet.usage.create({
+  eventType: 'api_call',
+  customerId: 'cus_xyz', // Or use externalId
+  properties: [
+    { property: 'endpoint', value: '/users' },
+    { property: 'method', value: 'GET' }
+  ]
+})
+```
+
+</Step>
+
+<Step>
+
+## Manage seats
+
+Add, remove, or set seat counts:
+
+```typescript
+// Add seats
+await commet.seats.add({
+  externalId: 'stripe_cus_abc', // Use your own IDs
+  seatType: 'admin',
+  count: 5
+})
+
+// Set exact count
+await commet.seats.set({
+  customerId: 'cus_xyz',
+  seatType: 'admin',
+  count: 10
+})
+```
+
+</Step>
+</Steps>
+
+**Need help?** [support@commet.co](mailto:support@commet.co)

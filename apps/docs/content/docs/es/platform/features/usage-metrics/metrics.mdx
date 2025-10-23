@@ -1,0 +1,48 @@
+---
+title: Métricas
+description: Agrupa eventos en métricas que alimentan productos
+---
+
+## Definir Métrica de Uso
+
+Crea una métrica de uso que rastree el comportamiento específico del cliente:
+
+```json
+{
+  "id": "api-calls-metric-uuid",
+  "name": "API Calls",
+  "key": "api_calls",
+  "aggregationType": "sum",
+  "unitLabel": "calls"
+}
+```
+
+## Tipos de Agregación
+
+- **Suma** - Total de unidades consumidas (llamadas a una API, GB de almacenamiento, horas de cómputo)
+- **Máximo** - Uso concurrente pico (máximas conexiones simultáneas, cómputo pico)
+- **Único** - Conteo único (usuarios activos mensuales, claves API únicas utilizadas)
+- **Conteo** - Número de eventos (transacciones, deploys)
+
+## Crear Métricas
+
+Haz clic en "Crear Métrica" y configura:
+
+* **Tipo de evento** - Qué eventos rastrear
+* **Tipo de agregación** - Cómo agruparlos (suma, conteo, etc.)
+* **Filtros de metadatos** - Condiciones opcionales para filtrar eventos específicos
+
+## Ver Métricas
+
+Analiza métricas a lo largo del tiempo y filtra por cliente. Obtén visibilidad sobre cómo los usuarios consumen tu plataforma.
+
+### Aprende más
+
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <div className="border rounded-lg p-4">
+    <h3 className="font-semibold mt-0">Casos de Uso Comunes</h3>
+
+    <p className="text-sm text-muted-foreground">Ver ejemplos de productos basados en uso</p>
+    <p className="text-sm">[Aprende más →](./platform/features/products/usage-based-pricing)</p>
+  </div>
+</div>

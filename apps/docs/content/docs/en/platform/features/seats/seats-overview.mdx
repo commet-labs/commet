@@ -1,0 +1,56 @@
+---
+title: Seat Management
+description: Track and manage user seats - add, remove, monitor
+---
+
+Seats are special events with unique handling. We manage them separately for better control.
+
+Use the SDK to create, remove, or adjust seat counts. Always know your active user count.
+
+## Seat Types
+
+Create different seat types for roles or pricing tiers (paid vs free).
+
+**Create seat type**: Go to Seats → Types → + Add seat type
+
+## Balance Tracking
+
+Monitor seat evolution over time, both total and per-customer. Useful for growth analysis without custom dashboards.
+
+## Add Seats
+
+Increase seat count for a customer:
+
+```typescript
+const result = await commet.seats.add({
+  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
+  seatType: 'admin',
+  quantity: 5
+})
+
+console.log(`Added ${result.data.quantity} admin seats`)
+```
+
+## Remove Seats
+
+Decrease seat count:
+
+```typescript
+const result = await commet.seats.remove({
+  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
+  seatType: 'admin',
+  quantity: 2
+})
+
+console.log(`Removed ${result.data.quantity} admin seats`)
+```
+
+### Learn more
+
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <div className="border rounded-lg p-4">
+    <h3 className="font-semibold mt-0">Common seat use cases</h3>
+    <p className="text-sm text-muted-foreground">See seats-based product examples</p>
+    <p className="text-sm">[Learn more →](./platform/features/products/seat-based-pricing)</p>
+  </div>
+</div>

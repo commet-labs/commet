@@ -1,0 +1,329 @@
+---
+title: Configuración del CLI
+description: Entendiendo archivos de configuración y ajustes del CLI de Commet
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
+
+# Configuración del CLI
+
+El CLI de Commet usa dos archivos de configuración para gestionar autenticación y configuración de proyecto.
+
+## Archivos de Configuración
+
+### Configuración de Autenticación Global
+
+**Ubicación**: `~/.commet/auth.json`
+
+**Propósito**: Almacena credenciales de autenticación para la plataforma Commet.
+
+**Creado por**: `commet login`
+
+**Estructura**:
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "environment": "sandbox"
+}
+```
+
+**Campos**:
+- `token`: Token de acceso para autenticación de API
+- `environment`: Ya sea `"sandbox"` o `"production"`
+
+<Callout type="warn">
+**Seguridad**: Nunca compartas o comitees este archivo. El token de acceso proporciona acceso completo a tu cuenta de Commet.
+</Callout>
+
+**Gestionado automáticamente por**:
+- `commet login` - Crea/actualiza el archivo
+- `commet logout` - Elimina el archivo
+
+---
+
+### Configuración de Proyecto
+
+**Ubicación**: `.commet` (en raíz del proyecto)
+
+**Propósito**: Vincula el proyecto actual a una organización específica de Commet.
+
+**Creado por**: `commet link`
+
+**Estructura**:
+```json
+{
+  "orgId": "org_A1b2C3d4E5f6G7h8I9j0K1l2",
+  "orgName": "Acme Corporation",
+  "environment": "sandbox"
+}
+```
+
+**Campos**:
+- `orgId`: Identificador único de organización
+- `orgName`: Nombre legible de organización
+- `environment`: Debe coincidir con el entorno del token de autenticación
+
+<Callout type="info">
+**Control de Versiones**: Considera agregar `.commet` a `.gitignore` si los miembros del equipo usan diferentes organizaciones o entornos.
+</Callout>
+
+**Gestionado automáticamente por**:
+- `commet link` - Crea el archivo
+- `commet switch` - Actualiza `orgId` y `orgName`
+- `commet unlink` - Elimina el archivo
+
+---
+
+## Manejo de Entornos
+
+### Sandbox vs Producción
+
+Commet opera dos entornos completamente aislados:
+
+<Tabs items={['Sandbox', 'Producción']}>
+<Tab value="Sandbox">
+**Entorno Sandbox**
+
+- **URL**: `sandbox.commet.co`
+- **Propósito**: Desarrollo y pruebas
+- **Datos**: Completamente separado de producción
+- **Autenticación**: Requiere cuenta separada
+
+**Usar para**:
+- Desarrollo local
+- Pruebas CI/CD
+- Pruebas de integración
+- Despliegues de staging
+</Tab>
+<Tab value="Producción">
+**Entorno de Producción**
+
+- **URL**: `billing.commet.co`
+- **Propósito**: Operaciones de facturación en vivo
+- **Datos**: Datos reales de clientes y facturas
+- **Autenticación**: Requiere cuenta separada
+
+**Usar para**:
+- Despliegues de producción
+- Facturación de clientes en vivo
+- Generación de facturas reales
+</Tab>
+</Tabs>
+
+### Cambio de Entorno
+
+Para cambiar entre entornos:
+
+```bash
+# Actualmente en sandbox
+commet whoami
+# Salida: Entorno: sandbox
+
+# Cambiar a producción
+commet logout
+commet login  # Selecciona "Producción"
+commet link   # Vincular a organización de producción
+
+# Verificar
+commet whoami
+# Salida: Entorno: production
+```
+
+<Callout type="warn">
+**Importante**: Solo puedes estar autenticado a un entorno a la vez. Cambiar requiere logout y re-login.
+</Callout>
+
+---
+
+## Precedencia de Configuración
+
+El CLI usa este orden para determinar configuraciones:
+
+1. **Argumentos de línea de comandos** (prioridad más alta)
+2. **Configuración de proyecto** (`.commet`)
+3. **Configuración global** (`~/.commet/auth.json`)
+4. **Variables de entorno**
+5. **Valores por defecto** (prioridad más baja)
+
+**Ejemplo**:
+```bash
+# Usa orgId del archivo .commet
+commet pull
+
+# Sobrescribe ruta de salida con opción de comando
+commet pull -o custom/path.d.ts
+```
+
+---
+
+## Configuración Manual
+
+### Editar Configuración Global
+
+Aunque no se recomienda, puedes editar manualmente `~/.commet/auth.json`:
+
+```json
+{
+  "token": "tu-token-de-acceso",
+  "environment": "sandbox"
+}
+```
+
+<Callout type="warn">
+**Advertencia**: Las ediciones manuales pueden romper la autenticación. Usa `commet login` en su lugar.
+</Callout>
+
+### Editar Configuración de Proyecto
+
+Puedes editar manualmente `.commet` para cambiar organizaciones:
+
+```json
+{
+  "orgId": "org_NewOrganization123",
+  "orgName": "Nueva Organización",
+  "environment": "sandbox"
+}
+```
+
+**Casos de uso**:
+- Scripting de configuración de proyecto
+- Cambios de organización en lote
+- Configuración de CI/CD
+
+---
+
+## Validación de Configuración
+
+### Verificar Configuración Actual
+
+```bash
+# Ver estado de autenticación
+commet whoami
+
+# Ver detalles del proyecto
+commet info
+```
+
+### Problemas Comunes
+
+**"No autenticado"**
+```bash
+# Solución
+commet login
+```
+
+**"Proyecto no vinculado"**
+```bash
+# Solución
+commet link
+```
+
+**"Desajuste de entorno"**
+```bash
+# El entorno de .commet no coincide con el token de autenticación
+# Solución: Logout y re-login al entorno correcto
+commet logout
+commet login  # Selecciona entorno coincidente
+```
+
+---
+
+## Integración con Git
+
+### `.gitignore` Recomendado
+
+```bash title=".gitignore"
+# Commet CLI
+.commet          # Si usas diferentes orgs por desarrollador
+.commet.d.ts     # Opcional: comitea para consistencia del equipo
+```
+
+### ¿Comitear o Ignorar?
+
+<Tabs items={['Archivo .commet', 'Definiciones de Tipos']}>
+<Tab value="Archivo .commet">
+**Comitear `.commet` cuando**:
+- Todos los miembros del equipo usan la misma organización
+- La organización es consistente entre entornos
+- Quieres configuración de proyecto estandarizada
+
+**Ignorar `.commet` cuando**:
+- Los desarrolladores usan organizaciones sandbox personales
+- Diferentes organizaciones staging/producción
+- El desarrollo local varía por desarrollador
+</Tab>
+<Tab value="Definiciones de Tipos">
+**Comitear `.commet.d.ts` cuando**:
+- Quieres consistencia de tipos en el equipo
+- Autocompletado TypeScript para todos los desarrolladores
+- Los tipos son estables y versionados
+
+**Ignorar `.commet.d.ts` cuando**:
+- Los tipos cambian frecuentemente durante desarrollo
+- Los desarrolladores trabajan en diferentes características
+- Cada desarrollador gestiona sus propios tipos
+</Tab>
+</Tabs>
+
+---
+
+## Mejores Prácticas de Seguridad
+
+### Proteger Credenciales
+
+```bash
+# Verificar permisos (Unix/Linux/Mac)
+ls -la ~/.commet/
+# Debería ser legible solo por ti
+
+# Establecer permisos apropiados si es necesario
+chmod 600 ~/.commet/auth.json
+```
+
+### Rotar Tokens
+
+```bash
+# Refrescar autenticación periódicamente
+commet logout
+commet login
+```
+
+### Autenticación en CI/CD
+
+Para entornos automatizados, usa claves API en lugar de autenticación CLI:
+
+```typescript
+// En CI/CD, usa SDK con clave API
+import { Commet } from '@commet/node';
+
+const commet = new Commet({
+  apiKey: process.env.COMMET_API_KEY,
+  environment: 'sandbox'
+});
+```
+
+---
+
+## Respaldo y Recuperación
+
+### Respaldar Configuración
+
+```bash
+# Respaldar configuración de autenticación
+cp ~/.commet/auth.json ~/.commet/auth.json.backup
+
+# Respaldar configuración de proyecto
+cp .commet .commet.backup
+```
+
+### Restaurar Configuración
+
+```bash
+# Restaurar configuración de autenticación
+cp ~/.commet/auth.json.backup ~/.commet/auth.json
+
+# O simplemente re-autenticar
+commet login
+```
+

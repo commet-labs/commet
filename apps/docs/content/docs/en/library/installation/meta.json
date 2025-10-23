@@ -1,0 +1,6 @@
+{
+  "title": "Installation",
+  "description": "Framework-specific setup guides",
+  "icon": "Download",
+  "pages": ["nextjs"]
+}

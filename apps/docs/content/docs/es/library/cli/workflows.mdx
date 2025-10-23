@@ -1,0 +1,492 @@
+---
+title: Flujos de Trabajo del CLI
+description: Patrones y flujos de trabajo comunes usando el CLI de Commet
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+import { Steps, Step } from 'fumadocs-ui/components/steps'
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
+
+# Flujos de Trabajo del CLI
+
+Patrones y flujos de trabajo comunes para usar el CLI de Commet efectivamente.
+
+## Configuración Inicial del Proyecto
+
+<Steps>
+<Step>
+
+### Instalar CLI
+
+```bash
+npm install -g commet
+```
+
+</Step>
+
+<Step>
+
+### Autenticar
+
+```bash
+commet login
+```
+
+Selecciona "Sandbox" para desarrollo.
+
+</Step>
+
+<Step>
+
+### Vincular Proyecto
+
+```bash
+cd tu-proyecto
+commet link
+```
+
+Selecciona tu organización.
+
+</Step>
+
+<Step>
+
+### Generar Tipos
+
+```bash
+commet pull
+```
+
+Crea `.commet.d.ts` con tus tipos de evento y asiento.
+
+</Step>
+
+<Step>
+
+### Usar Tipos en Código
+
+```typescript
+import type { CommetEventType } from './.commet';
+
+await commet.usage.events.create<CommetEventType>({
+  customerId: 'cus_123',
+  eventType: 'api_call', // ¡Autocompletado!
+});
+```
+
+</Step>
+</Steps>
+
+---
+
+## Flujo de Trabajo de Desarrollo
+
+### Desarrollo Diario
+
+```bash
+# 1. Verificar estado
+commet whoami
+
+# 2. Obtener últimos tipos (si hay cambios en dashboard)
+commet pull
+
+# 3. Desarrollar y probar localmente
+# Tu código aquí...
+
+# 4. Verificar configuración
+commet info
+```
+
+### Después de Agregar Tipos de Evento
+
+```bash
+# 1. Agregar tipos de evento en dashboard de Commet
+# (ej., api_call, email_sent, payment_processed)
+
+# 2. Obtener tipos actualizados
+commet pull
+
+# 3. Usar nuevos tipos inmediatamente
+import type { CommetEventType } from './.commet';
+
+// ¡TypeScript conoce tus nuevos tipos de evento!
+await commet.usage.events.create<CommetEventType>({
+  customerId: 'cus_123',
+  eventType: 'payment_processed', // Nuevo tipo con autocompletado
+});
+```
+
+### Después de Agregar Tipos de Asiento
+
+```bash
+# 1. Agregar tipos de asiento en dashboard de Commet
+# (ej., admin, user, viewer)
+
+# 2. Obtener tipos actualizados
+commet pull
+
+# 3. Usar nuevos tipos de asiento
+import type { CommetSeatType } from './.commet';
+
+await commet.seats.add<CommetSeatType>('cus_123', 'viewer', 10);
+```
+
+---
+
+## Flujo de Trabajo Multi-Entorno
+
+### Desarrollo en Sandbox
+
+```bash
+# Autenticar a sandbox
+commet login  # Selecciona "Sandbox"
+
+# Vincular a organización sandbox
+commet link
+
+# Generar tipos sandbox
+commet pull
+
+# Desarrollar y probar
+# Tu trabajo de desarrollo...
+```
+
+### Despliegue a Producción
+
+```bash
+# Cambiar a producción
+commet logout
+commet login  # Selecciona "Producción"
+
+# Vincular a organización de producción  
+commet link
+
+# Generar tipos de producción
+commet pull
+
+# Desplegar a producción
+git add .commet .commet.d.ts
+git commit -m "Actualizar configuración de producción"
+git push production main
+```
+
+<Callout type="warn">
+**Importante**: Siempre verifica que estés en el entorno correcto antes de operaciones:
+```bash
+commet whoami
+```
+</Callout>
+
+---
+
+## Colaboración en Equipo
+
+### Onboarding de Nuevo Miembro del Equipo
+
+<Steps>
+<Step>
+
+### Instalar CLI
+
+```bash
+npm install -g commet
+```
+
+</Step>
+
+<Step>
+
+### Autenticar
+
+```bash
+commet login
+```
+
+Usa las credenciales de cuenta de Commet del equipo.
+
+</Step>
+
+<Step>
+
+### Vincular a Organización del Equipo
+
+```bash
+cd proyecto-repo
+commet link
+```
+
+Selecciona la organización del equipo.
+
+</Step>
+
+<Step>
+
+### Obtener Tipos
+
+```bash
+commet pull
+```
+
+Obtén las últimas definiciones de tipos de evento y asiento.
+
+</Step>
+</Steps>
+
+### Mantener Tipos en Sincronía
+
+**Opción 1: Comitear tipos** (Recomendado)
+
+```bash
+# Después de actualizar tipos
+commet pull
+git add .commet.d.ts
+git commit -m "Actualizar tipos de evento y asiento"
+git push
+```
+
+Los miembros del equipo hacen pull y obtienen tipos actualizados automáticamente.
+
+**Opción 2: Cada desarrollador hace pull**
+
+```bash title=".gitignore"
+# .gitignore
+.commet.d.ts
+```
+
+Cada desarrollador ejecuta `commet pull` después de cambios en dashboard.
+
+---
+
+## Cambio de Organización
+
+### Cambiar Entre Proyectos
+
+```bash
+# En proyecto A
+cd ~/proyectos/proyecto-a
+commet switch  # Selecciona Organización A
+
+# En proyecto B  
+cd ~/proyectos/proyecto-b
+commet switch  # Selecciona Organización B
+```
+
+### Flujo de Trabajo con Múltiples Organizaciones
+
+```bash
+# Proyecto Cliente A
+cd ~/clientes/cliente-a
+commet link  # Vincular a org Cliente A
+commet pull
+
+# Proyecto Cliente B
+cd ~/clientes/cliente-b
+commet link  # Vincular a org Cliente B
+commet pull
+```
+
+Cada proyecto tiene su propio archivo `.commet` con diferentes organizaciones.
+
+---
+
+## Integración CI/CD
+
+### Ejemplo GitHub Actions
+
+```yaml
+name: Type Check
+
+on: [push, pull_request]
+
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Instalar CLI
+        run: npm install -g commet
+      
+      - name: Generar Tipos
+        run: |
+          # Opción 1: Usar .commet.d.ts comiteado
+          # (No se necesitan comandos CLI)
+          
+          # Opción 2: Generar desde API
+          echo '{"token":"${{ secrets.COMMET_TOKEN }}","environment":"sandbox"}' > ~/.commet/auth.json
+          commet pull
+      
+      - name: TypeScript Check
+        run: npm run typecheck
+```
+
+<Callout type="info">
+**Mejor Práctica**: Comitea `.commet.d.ts` al control de versiones para CI/CD. Evita llamadas API durante builds.
+</Callout>
+
+### Despliegue Vercel
+
+```bash
+# .vercel/project.json
+{
+  "projectId": "...",
+  "orgId": "..."
+}
+
+# Comando de build en vercel.json o dashboard
+{
+  "buildCommand": "npm run build"
+}
+```
+
+Comitea `.commet` y `.commet.d.ts` para builds consistentes.
+
+---
+
+## Flujos de Trabajo de Resolución de Problemas
+
+### Resetear Todo
+
+```bash
+# 1. Desvincular proyecto
+commet unlink
+
+# 2. Logout
+commet logout
+
+# 3. Re-autenticar
+commet login
+
+# 4. Re-vincular
+commet link
+
+# 5. Regenerar tipos
+commet pull
+```
+
+### Arreglar Desajustes de Tipos
+
+```bash
+# Tipos fuera de sincronía con dashboard
+commet pull --force  # Regenerar tipos
+
+# O eliminar y regenerar
+rm .commet.d.ts
+commet pull
+```
+
+### Depurar Autenticación
+
+```bash
+# Verificar estado de autenticación
+commet whoami
+
+# Verificar credenciales almacenadas
+cat ~/.commet/auth.json
+
+# Re-autenticar si expiró
+commet logout
+commet login
+```
+
+---
+
+## Flujos de Trabajo Avanzados
+
+### Script de Actualización de Tipos
+
+```bash
+#!/bin/bash
+# update-types.sh
+
+# Obtener últimos tipos
+commet pull
+
+# Ejecutar verificador de tipos
+npm run typecheck
+
+# Si es exitoso, comitear
+if [ $? -eq 0 ]; then
+  git add .commet.d.ts
+  git commit -m "chore: actualizar tipos commet"
+  echo "✓ Tipos actualizados y comiteados"
+else
+  echo "✗ Verificación de tipos falló"
+  exit 1
+fi
+```
+
+### Hook Pre-commit
+
+```bash
+# .git/hooks/pre-commit
+#!/bin/bash
+
+# Asegurar que tipos estén actualizados
+if [ -f .commet ]; then
+  commet pull --quiet
+  
+  # Agregar tipos actualizados al commit
+  git add .commet.d.ts
+fi
+```
+
+### Múltiples Ubicaciones de Salida
+
+```bash
+# Generar tipos en múltiples ubicaciones
+commet pull -o src/types/commet.d.ts
+commet pull -o apps/web/types/commet.d.ts
+commet pull -o packages/shared/types/commet.d.ts
+```
+
+---
+
+## Mejores Prácticas
+
+### Actualizaciones Regulares de Tipos
+
+```bash
+# Semanalmente: Obtener últimos tipos
+commet pull
+
+# Antes de releases mayores: Verificar tipos
+commet info
+commet pull
+npm run typecheck
+```
+
+### Verificación de Entorno
+
+Siempre verifica el entorno antes de operaciones críticas:
+
+```bash
+# Antes de deploy a producción
+commet whoami | grep "Entorno: production"
+
+# Antes de pruebas en sandbox
+commet whoami | grep "Entorno: sandbox"
+```
+
+### Respaldo Antes de Cambiar
+
+```bash
+# Antes de cambios mayores
+cp .commet .commet.backup
+cp .commet.d.ts .commet.d.ts.backup
+
+# Hacer cambios
+commet switch
+commet pull
+
+# Si hay problemas, restaurar
+mv .commet.backup .commet
+mv .commet.d.ts.backup .commet.d.ts
+```
+

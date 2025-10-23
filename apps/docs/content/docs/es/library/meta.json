@@ -1,0 +1,7 @@
+{
+  "title": "Librería",
+  "description": "Aprende a usar el SDK de Commet",
+  "icon": "Library",
+  "root": true,
+  "pages": ["quickstart", "installation", "features", "core", "cli"]
+}

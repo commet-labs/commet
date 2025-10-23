@@ -1,0 +1,439 @@
+---
+title: Gestión de Clientes
+description: Gestión completa del ciclo de vida del cliente con direcciones y tributación
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Gestión de Clientes
+
+Gestiona el ciclo de vida completo del cliente con cálculos automáticos de impuestos basados en dirección y soporte multi-moneda.
+
+<Callout type="info">
+**Prerrequisitos:** Inicializa tu cliente Commet con una clave API válida.
+</Callout>
+
+## Operaciones Básicas
+
+### Crear Cliente
+
+Crea un cliente con información mínima para comenzar facturación:
+
+```typescript
+const customer = await commet.customers.create({
+  legalName: 'Acme Corporation',
+  billingEmail: 'billing@acme.com',
+  currency: 'USD'
+})
+
+console.log('Cliente creado:', customer.data.id)
+```
+
+<Callout type="info">
+**La dirección es opcional** al crear. Agrégala después cuando se necesite para cálculo de impuestos o antes de generar facturas con requisitos fiscales.
+</Callout>
+
+### Vincular con Tu Sistema
+
+Usa `externalId` para conectar clientes de Commet con tu base de datos de usuarios existente:
+
+```typescript
+const customer = await commet.customers.create({
+  externalId: user.id, // ID de usuario de tu sistema
+  legalName: 'Acme Corporation',
+  billingEmail: user.email,
+  currency: 'USD'
+})
+
+// Después, busca por tu ID sin almacenar el de Commet
+const customers = await commet.customers.list({
+  externalId: user.id
+})
+```
+
+<Callout type="info">
+**External ID** es único por organización. Úsalo para sincronizar clientes sin almacenar IDs de Commet en tu base de datos.
+</Callout>
+
+### Recuperar Cliente
+
+Obtén detalles del cliente por ID:
+
+```typescript
+const customer = await commet.customers.retrieve('cus_A1b2C3d4E5f6G7h8I9j0K1l2')
+
+console.log('Cliente:', customer.data.legalName)
+```
+
+### Actualizar Cliente
+
+Modifica información del cliente:
+
+```typescript
+const updated = await commet.customers.update('cus_A1b2C3d4E5f6G7h8I9j0K1l2', {
+  displayName: 'Acme Corporation Ltd',
+  billingEmail: 'accounts@acme.com'
+})
+```
+
+### Listar Clientes
+
+Recupera clientes con filtrado y paginación:
+
+```typescript
+// Primera página
+const pagina1 = await commet.customers.list({
+  currency: 'USD',
+  isActive: true,
+  limit: 50
+})
+
+console.log(`Encontrados ${pagina1.data.length} clientes`)
+console.log(`Más páginas: ${pagina1.hasMore}`)
+
+// Obtener siguiente página si está disponible
+if (pagina1.hasMore) {
+  const pagina2 = await commet.customers.list({
+    currency: 'USD',
+    isActive: true,
+    limit: 50,
+    cursor: pagina1.nextCursor
+  })
+}
+
+// Obtener todos los clientes
+const todosLosClientes = []
+let cursor = undefined
+
+do {
+  const pagina = await commet.customers.list({ 
+    limit: 100, 
+    cursor 
+  })
+  todosLosClientes.push(...pagina.data)
+  cursor = pagina.nextCursor
+} while (pagina.hasMore)
+
+console.log(`Total: ${todosLosClientes.length} clientes`)
+```
+
+<Callout type="info">
+**Paginación**: Todas las operaciones de listado soportan paginación basada en cursor. Ver [Guía de paginación](/library/core/pagination) para ejemplos detallados.
+</Callout>
+
+## Configuración de Impuestos
+
+Configura manejo de impuestos según requisitos del negocio. Por defecto es `NOT_APPLICABLE` (estándar B2B).
+
+<Tabs items={['No Aplicable', 'Gravado', 'Exento de Impuestos', 'Cargo Inverso']}>
+<Tab value="No Aplicable">
+```typescript
+// Por defecto para B2B - cliente maneja cumplimiento fiscal
+await commet.customers.create({
+  legalName: 'Business Client Corp',
+  billingEmail: 'billing@client.com',
+  currency: 'USD'
+  // taxStatus: 'NOT_APPLICABLE' (por defecto)
+})
+```
+</Tab>
+<Tab value="Gravado">
+```typescript
+// Plataforma recauda y remite impuestos - requiere dirección
+await commet.customers.create({
+  legalName: 'Standard Corp',
+  taxStatus: 'TAXED',
+  currency: 'USD',
+  address: {
+    line1: '456 Commerce Ave',
+    city: 'New York',
+    state: 'NY',
+    postalCode: '10001',
+    country: 'US'
+  }
+})
+```
+</Tab>
+<Tab value="Exento de Impuestos">
+```typescript
+// Entidad exenta de impuestos
+await commet.customers.create({
+  legalName: 'Organización Sin Fines de Lucro',
+  taxStatus: 'TAX_EXEMPT',
+  currency: 'USD',
+  metadata: {
+    tax_exempt_id: '501c3-12345'
+  }
+})
+```
+</Tab>
+<Tab value="Cargo Inverso">
+```typescript
+// Mecanismo de cargo inverso de la UE
+await commet.customers.create({
+  legalName: 'European Business Ltd',
+  taxStatus: 'REVERSE_CHARGE',
+  currency: 'EUR',
+  address: {
+    line1: 'Business Park 1',
+    city: 'Amsterdam',
+    postalCode: '1000 AA',
+    country: 'NL'
+  }
+})
+```
+</Tab>
+</Tabs>
+
+<Callout type="warning">
+**Validación fiscal:** Clientes con `taxStatus: 'TAXED'` requieren dirección completa antes de facturar. Agrega dirección durante onboarding o antes del primer ciclo de facturación.
+</Callout>
+
+## Soporte Multi-Moneda
+
+Crea clientes en diferentes monedas:
+
+```typescript
+// Cliente USD
+const usdCustomer = await commet.customers.create({
+  legalName: 'Empresa US',
+  currency: 'USD',
+  address: { 
+    line1: '123 Main St',
+    city: 'New York',
+    state: 'NY',
+    postalCode: '10001',
+    country: 'US'
+  }
+})
+
+// Cliente EUR  
+const eurCustomer = await commet.customers.create({
+  legalName: 'German GmbH',
+  currency: 'EUR',
+  address: {
+    line1: 'Hauptstraße 1',
+    city: 'Berlin',
+    postalCode: '10115',
+    country: 'DE'
+  }
+})
+
+// Cliente LATAM
+const brlCustomer = await commet.customers.create({
+  legalName: 'Empresa Brasil Ltda',
+  currency: 'BRL',
+  language: 'pt',
+  address: {
+    line1: 'Rua Principal 123',
+    city: 'São Paulo',
+    state: 'SP',
+    postalCode: '01000-000',
+    country: 'BR'
+  }
+})
+```
+
+## Propiedades del Cliente
+
+### Campos Requeridos
+
+```typescript
+await commet.customers.create({
+  legalName: 'Nombre de Empresa Requerido'  // Único campo requerido
+  // Todo lo demás es opcional
+})
+```
+
+### Agregar Dirección Después
+
+Completa el perfil del cliente cuando la información esté disponible:
+
+```typescript
+await commet.customers.update(customerId, {
+  address: {
+    line1: '123 Business St',
+    city: 'San Francisco',
+    state: 'CA',
+    postalCode: '94105',
+    country: 'US'  // Formato ISO-2
+  }
+})
+```
+
+### Ejemplo Completo
+
+```typescript
+await commet.customers.create({
+  externalId: 'usr_123',                    // Tu ID de usuario
+  legalName: 'Full Example Corp',
+  displayName: 'Full Example',
+  domain: 'example.com',
+  website: 'https://example.com',
+  taxStatus: 'NOT_APPLICABLE',              // Por defecto
+  currency: 'USD',
+  address: {
+    line1: '123 Business St',
+    line2: 'Suite 100',
+    city: 'San Francisco',
+    state: 'CA',
+    postalCode: '94105',
+    country: 'US',
+    region: 'North America'
+  },
+  billingEmail: 'billing@example.com',
+  paymentTerms: 'net_30',
+  timezone: 'America/Los_Angeles',
+  language: 'en',
+  industry: 'software',
+  employeeCount: '11-50',
+  metadata: {
+    user_id: 'usr_123',
+    plan: 'enterprise'
+  }
+})
+```
+
+## Características Avanzadas
+
+### Buscar por External ID
+
+Encuentra clientes usando el identificador de tu sistema:
+
+```typescript
+const customers = await commet.customers.list({
+  externalId: user.id
+})
+
+const customer = customers.data[0]
+```
+
+### Buscar Clientes
+
+Filtra clientes por atributos:
+
+```typescript
+const results = await commet.customers.list({
+  currency: 'USD',
+  taxStatus: 'NOT_APPLICABLE',
+  isActive: true,
+  limit: 50
+})
+```
+
+### Metadata Personalizada
+
+Almacena datos adicionales con clientes:
+
+```typescript
+await commet.customers.update('cus_A1b2C3d4E5f6G7h8I9j0K1l2', {
+  metadata: {
+    crm_id: 'sf_123456',
+    tier: 'enterprise',
+    onboarding_date: '2024-01-15',
+    account_manager: 'john.doe@company.com'
+  }
+})
+```
+
+### Desactivar Cliente
+
+Eliminación suave de clientes cuando sea necesario:
+
+```typescript
+// Desactivar cliente
+await commet.customers.deactivate('cus_A1b2C3d4E5f6G7h8I9j0K1l2')
+
+// Reactivar cliente  
+await commet.customers.update('cus_A1b2C3d4E5f6G7h8I9j0K1l2', {
+  isActive: true
+})
+```
+
+## Manejo de Errores
+
+Maneja escenarios comunes de gestión de clientes:
+
+```typescript
+try {
+  const customer = await commet.customers.create({
+    legalName: 'Nuevo Cliente',
+    currency: 'USD',
+    address: {
+      line1: '123 Main St',
+      city: 'Anytown',
+      postalCode: '12345',
+      country: 'US'
+    }
+  })
+} catch (error) {
+  if (error instanceof CommetValidationError) {
+    console.log('Errores de validación:', error.validationErrors)
+  } else if (error instanceof CommetAPIError) {
+    console.log('Error de API:', error.statusCode, error.message)
+  }
+}
+```
+
+## Mejores Prácticas
+
+### Onboarding Progresivo
+
+Crea clientes inmediatamente, agrega detalles después:
+
+```typescript
+// Paso 1: Registro inicial
+const customer = await commet.customers.create({
+  externalId: user.id,
+  legalName: user.companyName,
+  billingEmail: user.email,
+  currency: 'USD'
+})
+
+// Paso 2: Completa perfil cuando la información esté disponible
+await commet.customers.update(customer.data.id, {
+  address: {
+    line1: '123 Business St',
+    city: 'San Francisco',
+    state: 'CA',
+    postalCode: '94105',
+    country: 'US'
+  },
+  taxStatus: 'TAXED'  // Habilita cálculo de impuestos
+})
+```
+
+### Consistencia de Moneda
+
+Haz coincidir la moneda del cliente con su región de facturación:
+
+```typescript
+// ✅ Consistente
+{ currency: 'EUR', address: { country: 'DE' }}
+{ currency: 'BRL', address: { country: 'BR' }}
+{ currency: 'USD', address: { country: 'US' }}
+
+// ⚠️ Puede necesitar revisión
+{ currency: 'USD', address: { country: 'DE' }}
+```
+
+### Metadata Estructurada
+
+Mantén metadata plana y buscable:
+
+```typescript
+// ✅ Buena estructura
+metadata: {
+  crm_id: 'sf_12345',
+  tier: 'enterprise',
+  industry: 'fintech'
+}
+
+// ❌ Evita objetos anidados
+metadata: {
+  crm: {
+    salesforce: { id: 'sf_12345' }
+  }
+}
+```

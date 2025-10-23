@@ -1,0 +1,47 @@
+---
+title: Finance Overview
+description: How money flows through Commet - balances, payouts, and transactions
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
+import { Callout } from 'fumadocs-ui/components/callout'
+
+## Overview
+
+The finance module handles three core functions:
+
+* **Balance tracking** - Where your money sits
+* **Payouts** - Getting money out
+* **Transaction history** - What happened when
+
+## Balance States
+
+Your money exists in one of four states:
+
+* **Held** - Money we're holding (usually for compliance/risk reasons)
+
+* **Pending** - Money from transactions that's still processing
+
+* **Available** - Money ready to withdraw
+
+* **Paid Out** - Money already sent to your bank account
+
+<Callout type="warning">
+Money sitting in Available for 90+ days gets auto-payout to your account.
+</Callout>
+
+## Payouts
+
+<Callout type="info">
+Account verification required before payouts.
+</Callout>
+
+Once verified, request payouts for any amount ≥ $10. Money hits your bank account in 2-3 business days.
+
+<Callout type="info">
+Payout fee: 0.25% + $0.25 (Stripe's cost, not ours)
+</Callout>
+
+## Transaction History
+
+Complete audit trail of all money movement - incoming payments and outgoing payouts with status tracking.

@@ -1,0 +1,362 @@
+---
+title: Entornos
+description: Gestiona entornos sandbox y producción de manera efectiva
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Entornos
+
+Commet SDK proporciona gestión robusta de entornos con servidores sandbox y producción separados para pruebas seguras y operaciones de facturación en vivo.
+
+<Callout type="info">
+**Seguro por Defecto:** El entorno sandbox se usa por defecto para prevenir cambios accidentales a datos de producción.
+</Callout>
+
+## Tipos de Entorno
+
+El SDK soporta dos entornos principales:
+
+### Entorno Sandbox (Por Defecto)
+
+Entorno seguro para desarrollo y pruebas con llamadas API reales al servidor sandbox:
+
+```typescript
+const commet = new Commet({
+  apiKey: 'ck_xxx1234567890abcdef',
+  environment: 'sandbox' // Por defecto - usa sandbox.commet.co
+})
+
+console.log(commet.getEnvironment()) // 'sandbox'
+console.log(commet.isSandbox())      // true
+console.log(commet.isProduction())   // false
+```
+
+### Entorno de Producción
+
+Entorno en vivo para operaciones de facturación reales:
+
+```typescript
+const commet = new Commet({
+  apiKey: 'ck_xxx1234567890abcdef',
+  environment: 'production' // Usa billing.commet.co
+})
+
+console.log(commet.getEnvironment()) // 'production'
+console.log(commet.isSandbox())      // false
+console.log(commet.isProduction())   // true
+```
+
+## Configuración de Entorno
+
+### Configuración Explícita
+
+Siempre especifica tu entorno explícitamente para claridad:
+
+<Tabs items={['Sandbox', 'Producción', 'Verificar Entorno']}>
+<Tab value="Sandbox">
+```typescript
+const commet = new Commet({
+  apiKey: process.env.COMMET_API_KEY!,
+  environment: 'sandbox', // Sandbox explícito
+  debug: true
+})
+
+// Usa sandbox.commet.co
+```
+</Tab>
+<Tab value="Producción">
+```typescript
+const commet = new Commet({
+  apiKey: process.env.COMMET_API_KEY!,
+  environment: 'production' // Producción explícita
+})
+
+// Usa billing.commet.co
+```
+</Tab>
+<Tab value="Verificar Entorno">
+```typescript
+const commet = new Commet({
+  apiKey: process.env.COMMET_API_KEY!
+  // Por defecto es 'sandbox' si no se especifica
+})
+
+console.log('Entorno:', commet.getEnvironment())
+console.log('Es Sandbox:', commet.isSandbox())
+console.log('Es Producción:', commet.isProduction())
+```
+</Tab>
+</Tabs>
+
+## Configuración de Entorno
+
+### Variables de Entorno
+
+Configura configuraciones específicas por entorno:
+
+<Tabs items={['Desarrollo', 'Producción', 'Multi-Entorno']}>
+<Tab value="Desarrollo">
+```bash title=".env.local"
+NODE_ENV=development
+COMMET_API_KEY=ck_xxx1234567890abcdef
+COMMET_ENV=sandbox
+```
+
+```typescript title="lib/commet.ts"
+import { Commet } from 'commet'
+
+export const commet = new Commet({
+  apiKey: process.env.COMMET_API_KEY!,
+  environment: 'sandbox',
+  debug: true
+})
+```
+</Tab>
+<Tab value="Producción">
+```bash title=".env.production"
+NODE_ENV=production
+COMMET_API_KEY=ck_xxx1234567890abcdef
+COMMET_ENV=production
+```
+
+```typescript title="lib/commet.ts"
+export const commet = new Commet({
+  apiKey: process.env.COMMET_API_KEY!,
+  environment: 'production'
+})
+```
+</Tab>
+<Tab value="Multi-Entorno">
+```typescript title="lib/commet.ts"
+const getConfig = () => {
+  const env = process.env.NODE_ENV
+  
+  if (env === 'production') {
+    return {
+      apiKey: process.env.COMMET_API_KEY!,
+      environment: 'production' as const,
+      debug: false
+    }
+  }
+  
+  return {
+    apiKey: process.env.COMMET_API_KEY!,
+    environment: 'sandbox' as const,
+    debug: true
+  }
+}
+
+export const commet = new Commet(getConfig())
+```
+</Tab>
+</Tabs>
+
+## Estrategias de Despliegue
+
+### Despliegue Next.js
+
+Configura para diferentes entornos de despliegue:
+
+<Tabs items={['Desarrollo', 'Preview', 'Producción']}>
+<Tab value="Desarrollo">
+```typescript title="lib/commet.ts"
+import { Commet } from 'commet'
+
+const isDev = process.env.NODE_ENV === 'development'
+
+export const commet = new Commet({
+  apiKey: process.env.COMMET_API_KEY!,
+  environment: 'sandbox',
+  debug: isDev
+})
+```
+</Tab>
+<Tab value="Preview">
+```typescript title="lib/commet.ts"
+// Para despliegues Preview de Vercel
+const isPreview = process.env.VERCEL_ENV === 'preview'
+
+export const commet = new Commet({
+  apiKey: process.env.COMMET_API_KEY!,
+  environment: isPreview ? 'sandbox' : 'production',
+  debug: isPreview
+})
+```
+</Tab>
+<Tab value="Producción">
+```typescript title="lib/commet.ts"
+// Configuración lista para producción
+export const commet = new Commet({
+  apiKey: process.env.COMMET_API_KEY!,
+  environment: 'production',
+  timeout: 30000,
+  retries: 3
+})
+```
+</Tab>
+</Tabs>
+
+## Comportamiento Específico por Entorno
+
+### Entorno Sandbox
+
+Entorno de pruebas seguro con llamadas API reales al servidor sandbox:
+
+```typescript
+const commet = new Commet({
+  apiKey: process.env.COMMET_API_KEY!,
+  environment: 'sandbox'
+})
+
+// Hace peticiones API reales a sandbox.commet.co
+const result = await commet.usage.events.create({
+  eventType: 'api_call',
+  customerId: 'cus_sandbox_123'
+})
+
+console.log('Evento creado en sandbox:', result.data.id)
+```
+
+### Entorno de Producción
+
+Entorno en vivo con llamadas API reales al servidor de producción:
+
+```typescript
+const commet = new Commet({
+  apiKey: process.env.COMMET_API_KEY!,
+  environment: 'production'
+})
+
+// Hace peticiones API reales a billing.commet.co
+const result = await commet.usage.events.create({
+  eventType: 'api_call',
+  customerId: 'cus_prod_456'
+})
+
+console.log('Evento creado en producción:', result.data.id)
+```
+
+## Pruebas Across Entornos
+
+### Prueba de Entorno
+
+Prueba tu configuración de entorno:
+
+```typescript
+const testEnvironment = () => {
+  const commet = new Commet({
+    apiKey: process.env.COMMET_API_KEY!,
+    debug: true
+  })
+  
+  console.log('Entorno:', commet.getEnvironment())
+  console.log('Es Sandbox:', commet.isSandbox())
+  console.log('Es Producción:', commet.isProduction())
+  console.log('NODE_ENV:', process.env.NODE_ENV)
+  
+  return {
+    environment: commet.getEnvironment(),
+    nodeEnv: process.env.NODE_ENV
+  }
+}
+
+// Ejecutar en diferentes entornos
+console.log(testEnvironment())
+```
+
+## Mejores Prácticas
+
+### Separación de Entornos
+
+Mantén entornos completamente separados:
+
+```typescript
+// ✅ Configuración específica por entorno
+const getCommetClient = () => {
+  const env = process.env.NODE_ENV
+  
+  if (env === 'production') {
+    return new Commet({
+      apiKey: process.env.COMMET_API_KEY!,
+      environment: 'production',
+      timeout: 30000
+    })
+  }
+  
+  return new Commet({
+    apiKey: process.env.COMMET_API_KEY!,
+    environment: 'sandbox',
+    debug: true
+  })
+}
+```
+
+### Validación de Configuración
+
+Valida configuración al inicio:
+
+```typescript
+const validateConfig = () => {
+  const requiredEnvVars = ['NODE_ENV', 'COMMET_API_KEY']
+  
+  for (const envVar of requiredEnvVars) {
+    if (!process.env[envVar]) {
+      throw new Error(`Variable de entorno requerida faltante: ${envVar}`)
+    }
+  }
+  
+  const apiKey = process.env.COMMET_API_KEY!
+  const isProduction = process.env.NODE_ENV === 'production'
+  
+  if (!apiKey.startsWith('ck_')) {
+    console.warn('ADVERTENCIA: Formato de clave API inválido')
+  }
+}
+
+// Ejecutar validación antes de inicializar SDK
+validateConfig()
+export const commet = new Commet({
+  apiKey: process.env.COMMET_API_KEY!
+})
+```
+
+### Lista de Verificación para Despliegue
+
+Antes de desplegar a producción:
+
+- [ ] Configurar `NODE_ENV=production`
+- [ ] Establecer `environment: 'production'` explícitamente
+- [ ] Usar clave API de producción
+- [ ] Deshabilitar logging de debug
+- [ ] Configurar timeouts y reintentos apropiados
+- [ ] Validar que todas las variables de entorno estén configuradas
+
+```bash title="pre-deployment-check.sh"
+#!/bin/bash
+
+echo "Lista de verificación pre-despliegue..."
+
+# Verificar NODE_ENV
+if [ "$NODE_ENV" != "production" ]; then
+  echo "❌ NODE_ENV no está configurado a production"
+  exit 1
+fi
+
+# Verificar formato de clave API
+if [[ ! $COMMET_API_KEY =~ ^ck_ ]]; then
+  echo "❌ COMMET_API_KEY debería comenzar con ck_"
+  exit 1
+fi
+
+# Verificar variables requeridas
+for var in NODE_ENV COMMET_API_KEY; do
+  if [ -z "${!var}" ]; then
+    echo "❌ Variable de entorno requerida faltante: $var"
+    exit 1
+  fi
+done
+
+echo "✅ Configuración de entorno validada"
+```

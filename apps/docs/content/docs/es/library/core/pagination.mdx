@@ -1,0 +1,355 @@
+---
+title: Paginación
+description: Recupera grandes conjuntos de datos eficientemente con paginación basada en cursor
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Paginación
+
+La API de Commet usa paginación basada en cursor para recuperar grandes conjuntos de datos eficientemente. Este enfoque proporciona resultados consistentes incluso cuando se están agregando o modificando datos durante la paginación.
+
+## Cómo Funciona
+
+La paginación basada en cursor usa timestamps para determinar la siguiente página de resultados. En lugar de usar números de página (que pueden omitir o duplicar resultados cuando los datos cambian), cada respuesta incluye un cursor que apunta al siguiente lote de datos.
+
+**Beneficios clave:**
+- **Resultados consistentes**: Sin duplicados ni elementos omitidos durante la paginación
+- **Eficiente**: Las consultas a la base de datos permanecen rápidas independientemente de la profundidad de la página
+- **Seguro en tiempo real**: Funciona correctamente incluso mientras se agregan nuevos datos
+
+## Uso Básico
+
+Obtén la primera página de resultados:
+
+```typescript
+const primeraPagina = await commet.customers.list({ limit: 25 });
+
+console.log(primeraPagina.data);      // Array de clientes
+console.log(primeraPagina.hasMore);   // true si existen más páginas
+console.log(primeraPagina.nextCursor); // Cursor para la siguiente página
+```
+
+Si existen más páginas, obtén la siguiente página:
+
+```typescript
+if (primeraPagina.hasMore) {
+  const segundaPagina = await commet.customers.list({ 
+    limit: 25,
+    cursor: primeraPagina.nextCursor 
+  });
+}
+```
+
+<Callout type="info">
+**La paginación funciona en todas las operaciones de listado**: clientes, eventos de uso y asientos todos soportan los mismos parámetros de paginación.
+</Callout>
+
+## Obtener Todas las Páginas
+
+Para operaciones por lote donde necesitas todos los registros, itera a través de todas las páginas:
+
+```typescript
+const todosLosClientes = [];
+let cursor = undefined;
+
+do {
+  const pagina = await commet.customers.list({ limit: 100, cursor });
+  todosLosClientes.push(...pagina.data);
+  cursor = pagina.nextCursor;
+} while (pagina.hasMore);
+
+console.log(`Total de clientes: ${todosLosClientes.length}`);
+```
+
+<Callout type="warn">
+**Consideración de rendimiento**: Ten cuidado al obtener todas las páginas para conjuntos de datos grandes. Considera usar filtros para reducir el número total de registros.
+</Callout>
+
+## Parámetros de Paginación
+
+### limit
+
+Número de elementos a retornar por página.
+
+- **Por defecto**: 25
+- **Máximo**: 100
+- **Tipo**: number
+
+```typescript
+// Obtener 50 clientes por página
+const pagina = await commet.customers.list({ limit: 50 });
+```
+
+### cursor
+
+Cursor de timestamp para la siguiente página de resultados.
+
+- **Tipo**: string (timestamp ISO 8601)
+- **Obtenido de**: Campo `nextCursor` de la respuesta anterior
+
+```typescript
+// Obtener siguiente página usando cursor
+const siguientePagina = await commet.customers.list({ 
+  cursor: pagina.nextCursor 
+});
+```
+
+## Formato de Respuesta
+
+Todos los endpoints paginados retornan la siguiente estructura:
+
+```typescript
+{
+  success: true,
+  message: "Clientes recuperados exitosamente",
+  data: [...],           // Array de resultados
+  hasMore: true,         // Si existen más páginas
+  nextCursor: "2024-01-15T10:30:00Z"  // Cursor para siguiente página
+}
+```
+
+### Campos de Respuesta
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `data` | Array | Resultados para la página actual |
+| `hasMore` | boolean | `true` si existen más páginas, `false` si esta es la última página |
+| `nextCursor` | string \| undefined | Cursor de timestamp ISO para la siguiente página. `undefined` si no hay más páginas |
+
+## Combinando con Filtros
+
+La paginación funciona perfectamente con filtros:
+
+<Tabs items={['Clientes', 'Eventos de Uso', 'Asientos']}>
+<Tab value="Clientes">
+```typescript
+// Filtrar por moneda y paginar
+const pagina = await commet.customers.list({
+  currency: "USD",
+  isActive: true,
+  limit: 50
+});
+
+if (pagina.hasMore) {
+  const siguientePagina = await commet.customers.list({
+    currency: "USD",
+    isActive: true,
+    limit: 50,
+    cursor: pagina.nextCursor  // Mantener filtros entre páginas
+  });
+}
+```
+</Tab>
+<Tab value="Eventos de Uso">
+```typescript
+// Filtrar por tipo de evento y rango de fechas
+const pagina = await commet.usage.events.list({
+  eventType: "api_call",
+  startDate: "2024-01-01",
+  endDate: "2024-01-31",
+  limit: 100
+});
+```
+</Tab>
+<Tab value="Asientos">
+```typescript
+// Paginar a través de tipos de asiento
+const pagina = await commet.seats.list({
+  limit: 25
+});
+```
+</Tab>
+</Tabs>
+
+## Ejemplos Completos
+
+### Exportar Todos los Datos de Clientes
+
+```typescript
+async function exportarTodosLosClientes() {
+  const todosLosClientes = [];
+  let cursor = undefined;
+  let numeroPagina = 0;
+
+  do {
+    console.log(`Obteniendo página ${++numeroPagina}...`);
+    
+    const pagina = await commet.customers.list({ 
+      limit: 100, 
+      cursor 
+    });
+    
+    todosLosClientes.push(...pagina.data);
+    cursor = pagina.nextCursor;
+  } while (pagina.hasMore);
+
+  console.log(`Exportados ${todosLosClientes.length} clientes en ${numeroPagina} páginas`);
+  return todosLosClientes;
+}
+```
+
+### Procesar Eventos de Uso en Lotes
+
+```typescript
+async function procesarEventosDeUso(
+  procesoCallback: (events: UsageEvent[]) => Promise<void>
+) {
+  let cursor = undefined;
+
+  do {
+    const pagina = await commet.usage.events.list({ 
+      limit: 100, 
+      cursor 
+    });
+    
+    // Procesar lote actual
+    await procesoCallback(pagina.data);
+    
+    cursor = pagina.nextCursor;
+  } while (pagina.hasMore);
+}
+
+// Uso
+await procesarEventosDeUso(async (eventos) => {
+  for (const evento of eventos) {
+    console.log(`Procesando evento ${evento.id}`);
+    // Tu lógica de procesamiento
+  }
+});
+```
+
+### Buscar con Paginación
+
+```typescript
+async function encontrarClientesPorDominio(dominio: string) {
+  let cursor = undefined;
+  const coincidencias = [];
+
+  do {
+    const pagina = await commet.customers.list({ 
+      limit: 100, 
+      cursor 
+    });
+    
+    // Filtrar resultados del lado del cliente
+    const coincidenciasDominio = pagina.data.filter(
+      c => c.domain === dominio
+    );
+    
+    coincidencias.push(...coincidenciasDominio);
+    cursor = pagina.nextCursor;
+  } while (pagina.hasMore);
+
+  return coincidencias;
+}
+```
+
+## Mejores Prácticas
+
+### Usar Límite Máximo para Operaciones por Lote
+
+Cuando proceses todos los registros, usa el límite máximo para reducir llamadas a la API:
+
+```typescript
+// ✅ Eficiente - menos llamadas a la API
+const pagina = await commet.customers.list({ limit: 100 });
+
+// ❌ Ineficiente - 4x más llamadas a la API
+const pagina = await commet.customers.list({ limit: 25 });
+```
+
+### Almacenar Cursor para Operaciones Reanudables
+
+Para operaciones de larga duración, almacena el cursor para reanudar después:
+
+```typescript
+async function procesarIncrementalmente() {
+  // Cargar último cursor del almacenamiento
+  let cursor = await storage.get('ultimoCursorProcesado');
+
+  const pagina = await commet.usage.events.list({ 
+    limit: 100, 
+    cursor 
+  });
+
+  // Procesar datos
+  await procesarEventos(pagina.data);
+
+  // Guardar cursor para próxima ejecución
+  await storage.set('ultimoCursorProcesado', pagina.nextCursor);
+}
+```
+
+### Siempre Verificar hasMore
+
+No asumas que hay una siguiente página basándote en el número de resultados:
+
+```typescript
+// ✅ Correcto - verificar hasMore
+if (pagina.hasMore) {
+  const siguientePagina = await commet.customers.list({ 
+    cursor: pagina.nextCursor 
+  });
+}
+
+// ❌ Incorrecto - no asumir basándose en longitud
+if (pagina.data.length === 100) {  // Puede no ser la última página
+  // Esto podría fallar o retornar resultados vacíos
+}
+```
+
+### Manejar Límites de Tasa
+
+Al paginar a través de grandes conjuntos de datos, implementa backoff para límites de tasa:
+
+```typescript
+async function obtenerTodosClientesConBackoff() {
+  const todosLosClientes = [];
+  let cursor = undefined;
+
+  do {
+    try {
+      const pagina = await commet.customers.list({ 
+        limit: 100, 
+        cursor 
+      });
+      
+      todosLosClientes.push(...pagina.data);
+      cursor = pagina.nextCursor;
+    } catch (error) {
+      if (error.code === 'RATE_LIMITED') {
+        // Esperar y reintentar
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        continue;
+      }
+      throw error;
+    }
+  } while (cursor);
+
+  return todosLosClientes;
+}
+```
+
+## Manejo de Errores
+
+Maneja errores de paginación con gracia:
+
+```typescript
+try {
+  const pagina = await commet.customers.list({ 
+    limit: 50, 
+    cursor: cursorInvalido 
+  });
+} catch (error) {
+  if (error instanceof CommetAPIError) {
+    if (error.statusCode === 400) {
+      console.error('Cursor inválido - puede haber expirado');
+      // Reiniciar desde el principio
+      const pagina = await commet.customers.list({ limit: 50 });
+    }
+  }
+  throw error;
+}
+```

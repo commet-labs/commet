@@ -1,0 +1,41 @@
+---
+title: Usage Events
+description: Track customer usage for billing - real-time or batch
+---
+## Basic Usage
+
+Track user activity and bill for it. Common use cases:
+
+- **Token usage** - Measure API token consumption
+- **Conversation count** - Track chat/message volume  
+- **Payment tracking** - Count transaction events
+
+<Callout type="info">
+Seats use events too, but are handled differently. See the [Seat Management](/library/features/seat-management) section.
+</Callout>
+
+Send a single usage event:
+
+```typescript
+const result = await commet.usage.create({
+  eventType: 'api_call',
+  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
+  quantity: 1,
+})
+
+console.log('Event tracked:', result.data.id)
+```
+
+## Event Types
+
+Create event types in the Commet dashboard first. This makes them available in our SDK for easier integration.
+
+### Learn more
+
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <div className="border rounded-lg p-4">
+    <h3 className="font-semibold mt-0">Usage events library</h3>
+    <p className="text-sm text-muted-foreground">How to integrate events with our SDK</p>
+    <p className="text-sm">[Learn more →](./library/features/usage-events)</p>
+  </div>
+</div>

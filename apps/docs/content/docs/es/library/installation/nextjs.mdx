@@ -1,0 +1,457 @@
+---
+title: Configuración Next.js
+description: Integración completa de Next.js con Commet SDK
+---
+
+import { Steps, Step } from 'fumadocs-ui/components/steps'
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Configuración Next.js
+
+Guía completa para integrar Commet SDK con aplicaciones Next.js.
+
+<Callout type="info">
+**Requisitos:** Next.js 13.4+ con soporte para App Router o Pages Router.
+</Callout>
+
+<Steps>
+<Step>
+
+## Instalar el SDK
+
+<Tabs items={['npm', 'pnpm', 'yarn']}>
+<Tab value="npm">
+```bash
+npm install commet
+```
+</Tab>
+<Tab value="pnpm">
+```bash
+pnpm add commet
+```
+</Tab>
+<Tab value="yarn">
+```bash
+yarn add commet
+```
+</Tab>
+</Tabs>
+
+</Step>
+
+<Step>
+
+## Configurar Variables de Entorno
+
+Agrega tu clave API a `.env.local`:
+
+```bash title=".env.local"
+COMMET_API_KEY=tu_clave_api_aqui
+```
+
+<Callout type="warn">
+**Seguridad:** Nunca expongas tu clave API en código del lado del cliente. Siempre usa rutas del lado del servidor o rutas API.
+</Callout>
+
+</Step>
+
+<Step>
+
+## Inicializar el Cliente
+
+Crea una instancia del cliente del lado del servidor:
+
+<Tabs items={['App Router', 'Pages Router']}>
+<Tab value="App Router">
+```typescript title="lib/commet.ts"
+import { Commet } from 'commet'
+
+export const commet = new Commet({
+  apiKey: process.env.COMMET_API_KEY!,
+})
+```
+</Tab>
+<Tab value="Pages Router">
+```typescript title="lib/commet.ts"
+import { Commet } from 'commet'
+
+export const commet = new Commet({
+  apiKey: process.env.COMMET_API_KEY!,
+})
+```
+</Tab>
+</Tabs>
+
+</Step>
+
+<Step>
+
+## Crear Rutas API
+
+Configura endpoints de facturación en tu aplicación:
+
+<Tabs items={['App Router', 'Pages Router']}>
+<Tab value="App Router">
+```typescript title="app/api/billing/usage/route.ts"
+import { NextRequest, NextResponse } from 'next/server'
+import { commet } from '@/lib/commet'
+
+export async function POST(request: NextRequest) {
+  try {
+    const { eventType, customerId, quantity } = await request.json()
+    
+    const result = await commet.usage.create({
+      eventType,
+      customerId,
+      quantity,
+    })
+    
+    return NextResponse.json(result.data)
+  } catch (error) {
+    console.error('Error de rastreo de uso:', error)
+    return NextResponse.json(
+      { error: 'Falló al rastrear uso' },
+      { status: 500 }
+    )
+  }
+}
+```
+</Tab>
+<Tab value="Pages Router">
+```typescript title="pages/api/billing/usage.ts"
+import type { NextApiRequest, NextApiResponse } from 'next'
+import { commet } from '@/lib/commet'
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Método no permitido' })
+  }
+
+  try {
+    const { eventType, customerId, quantity } = req.body
+    
+    const result = await commet.usage.create({
+      eventType,
+      customerId,
+      quantity,
+    })
+    
+    res.status(200).json(result.data)
+  } catch (error) {
+    console.error('Error de rastreo de uso:', error)
+    res.status(500).json({ error: 'Falló al rastrear uso' })
+  }
+}
+```
+</Tab>
+</Tabs>
+
+</Step>
+
+<Step>
+
+## Rastrear Uso desde Componentes
+
+Crea funciones del lado del cliente para rastrear uso:
+
+<Tabs items={['App Router', 'Pages Router']}>
+<Tab value="App Router">
+```typescript title="app/actions/billing.ts"
+'use server'
+
+import { commet } from '@/lib/commet'
+
+export async function trackUsage(
+  eventType: string,
+  customerId: string,
+  quantity: number = 1
+) {
+  try {
+    const result = await commet.usage.create({
+      eventType,
+      customerId,
+      quantity,
+    })
+    
+    return { success: true, data: result.data }
+  } catch (error) {
+    console.error('Error de rastreo de uso:', error)
+    return { success: false, error: 'Falló al rastrear uso' }
+  }
+}
+```
+
+Usar en componentes:
+```typescript title="app/dashboard/page.tsx"
+import { trackUsage } from '@/app/actions/billing'
+
+export default function Dashboard() {
+  const handleApiCall = async () => {
+    // Tu lógica de API aquí
+    
+    // Rastrear uso
+    await trackUsage('api_call', 'cus_A1b2C3d4E5f6G7h8I9j0K1l2')
+  }
+
+  return (
+    <button onClick={handleApiCall}>
+      Hacer Llamada API
+    </button>
+  )
+}
+```
+</Tab>
+<Tab value="Pages Router">
+```typescript title="hooks/useBilling.ts"
+import { useState } from 'react'
+
+export function useBilling() {
+  const [loading, setLoading] = useState(false)
+
+  const trackUsage = async (
+    eventType: string,
+    customerId: string,
+    quantity: number = 1
+  ) => {
+    setLoading(true)
+    
+    try {
+      const response = await fetch('/api/billing/usage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ eventType, customerId, quantity }),
+      })
+      
+      if (!response.ok) throw new Error('Falló al rastrear uso')
+      
+      const data = await response.json()
+      return { success: true, data }
+    } catch (error) {
+      console.error('Error de rastreo de uso:', error)
+      return { success: false, error: 'Falló al rastrear uso' }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return { trackUsage, loading }
+}
+```
+
+Usar en componentes:
+```typescript title="components/Dashboard.tsx"
+import { useBilling } from '@/hooks/useBilling'
+
+export default function Dashboard() {
+  const { trackUsage, loading } = useBilling()
+
+  const handleApiCall = async () => {
+    // Tu lógica de API aquí
+    
+    // Rastrear uso
+    await trackUsage('api_call', 'cus_A1b2C3d4E5f6G7h8I9j0K1l2')
+  }
+
+  return (
+    <button onClick={handleApiCall} disabled={loading}>
+      {loading ? 'Procesando...' : 'Hacer Llamada API'}
+    </button>
+  )
+}
+```
+</Tab>
+</Tabs>
+
+</Step>
+</Steps>
+
+## Integración Avanzada
+
+### Integración con Middleware
+
+Rastrea uso automáticamente con middleware de Next.js:
+
+```typescript title="middleware.ts"
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+import { commet } from '@/lib/commet'
+
+export async function middleware(request: NextRequest) {
+  // Solo rastrear rutas API
+  if (request.nextUrl.pathname.startsWith('/api/')) {
+    const customerId = request.headers.get('x-customer-id')
+    
+    if (customerId) {
+      // Rastrear uso de forma asíncrona
+      commet.usage.create({
+        eventType: 'api_call',
+        customerId,
+        quantity: 1,
+        metadata: {
+          endpoint: request.nextUrl.pathname,
+          method: request.method,
+        }
+      }).catch(console.error)
+    }
+  }
+
+  return NextResponse.next()
+}
+
+export const config = {
+  matcher: '/api/:path*',
+}
+```
+
+### Server Components
+
+Usa Commet SDK directamente en Server Components:
+
+```typescript title="app/billing/page.tsx"
+import { commet } from '@/lib/commet'
+
+export default async function BillingPage({
+  searchParams,
+}: {
+  searchParams: { customerId: string }
+}) {
+  const usage = await commet.usage.list({
+    customerId: searchParams.customerId,
+    limit: 10,
+  })
+
+  return (
+    <div>
+      <h1>Historial de Uso</h1>
+      {usage.data.map(event => (
+        <div key={event.id}>
+          {event.eventType}: {event.quantity}
+        </div>
+      ))}
+    </div>
+  )
+}
+```
+
+### Error Boundaries
+
+Maneja errores de facturación elegantemente:
+
+```typescript title="components/BillingErrorBoundary.tsx"
+'use client'
+
+import { Component, ReactNode } from 'react'
+
+interface Props {
+  children: ReactNode
+}
+
+interface State {
+  hasError: boolean
+}
+
+export class BillingErrorBoundary extends Component<Props, State> {
+  constructor(props: Props) {
+    super(props)
+    this.state = { hasError: false }
+  }
+
+  static getDerivedStateFromError(): State {
+    return { hasError: true }
+  }
+
+  componentDidCatch(error: Error) {
+    console.error('Error de facturación:', error)
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="p-4 border border-red-200 rounded">
+          <h3>Error de Facturación</h3>
+          <p>Rastreo de uso temporalmente no disponible.</p>
+        </div>
+      )
+    }
+
+    return this.props.children
+  }
+}
+```
+
+## Configuración TypeScript
+
+Mejora la seguridad de tipos con tipos personalizados:
+
+```typescript title="types/billing.ts"
+export interface UsageEvent {
+  eventType: string
+  customerId: string
+  quantity: number
+  metadata?: Record<string, any>
+}
+
+export interface SeatUpdate {
+  customerId: string
+  seatType: string
+  quantity: number
+}
+```
+
+## Mejores Prácticas
+
+### Gestión de Entornos
+
+Usa diferentes claves API para diferentes entornos:
+
+```bash title=".env.local"
+# Desarrollo
+COMMET_API_KEY=sk_test_...
+
+# Producción (en despliegue)
+COMMET_API_KEY=sk_live_...
+```
+
+### Manejo de Errores
+
+Implementa manejo comprensivo de errores:
+
+```typescript
+try {
+  await commet.usage.create({
+    eventType: 'api_call',
+    customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
+    quantity: 1,
+  })
+} catch (error) {
+  // Log para debugging
+  console.error('Error de facturación:', error)
+  
+  // No bloquear experiencia del usuario
+  // Continuar con flujo de aplicación
+}
+```
+
+### Rendimiento
+
+Usa rastreo asíncrono para evitar bloquear peticiones:
+
+```typescript
+// ✅ No bloqueante
+commet.usage.create({
+  eventType: 'api_call',
+  customerId: 'cus_1234567890',
+  quantity: 1,
+}).catch(console.error)
+
+// ❌ Bloqueante
+await commet.usage.create({
+  eventType: 'api_call',
+  customerId: 'cus_1234567890',
+  quantity: 1,
+})
+```

@@ -1,0 +1,48 @@
+---
+title: Metrics
+description: Group events into metrics that power products
+---
+
+## Define Usage Metric
+
+Create a usage metric that tracks specific customer behavior:
+
+```json
+{
+  "id": "api-calls-metric-uuid",
+  "name": "API Calls",
+  "key": "api_calls",
+  "aggregationType": "sum",
+  "unitLabel": "calls"
+}
+```
+
+## Aggregation Types
+
+- **Sum** - Total units consumed (API calls, storage GB, compute hours)
+- **Max** - Peak concurrent usage (max simultaneous connections, peak compute)
+- **Unique** - Distinct count (monthly active users, unique API keys used)
+- **Count** - Number of events (transactions, deployments, builds)
+
+## Create Metrics
+
+Click "Create Metric" and configure:
+
+* **Event type** - Which events to track
+* **Aggregation type** - How to group them (sum, count, etc.)
+* **Metadata filters** - Optional conditions to filter specific events
+
+## View Metrics
+
+Analyze metrics over time and filter by customer. Get visibility into how users consume your platform.
+
+### Learn more
+
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <div className="border rounded-lg p-4">
+    <h3 className="font-semibold mt-0">Common Use Cases</h3>
+
+    <p className="text-sm text-muted-foreground">See usage-based product examples</p>
+    <p className="text-sm">[Learn more →](./platform/features/products/usage-based-pricing)</p>
+  </div>
+</div>

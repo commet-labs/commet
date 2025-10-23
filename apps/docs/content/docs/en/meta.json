@@ -1,0 +1,5 @@
+{
+  "title": "Commet Documentation",
+  "description": "B2B SaaS billing platform for Latin America",
+  "pages": ["index", "platform", "library", "openapi"]
+}
