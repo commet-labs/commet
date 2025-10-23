@@ -18,7 +18,7 @@
 
 ## Commet
 
-Commet is a modern billing platform for B2B SaaS companies. This monorepo contains tools, templates, and documentation to help you integrate complex billing operations into your applications.
+Commet is an all-in-one billing and payments platform. The easiest way to integrate global payments and get paid anywhere with just a few lines of code. This monorepo contains tools, templates, and documentation to help you integrate complex billing and payments operations into your applications.
 
 ## Get Started
 
