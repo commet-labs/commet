@@ -5,9 +5,9 @@ import ora from "ora";
 import { apiRequest, getBaseURL } from "../utils/api";
 import {
   authExists,
+  loadAuth,
   projectConfigExists,
   saveProjectConfig,
-  loadAuth,
 } from "../utils/config";
 import { promptTheme } from "../utils/prompt-theme";
 

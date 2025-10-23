@@ -9,7 +9,7 @@ interface UpdateResult {
 /**
  * Updates .gitignore to include a new entry
  * Simple search in current directory only - creates .gitignore if it doesn't exist
- * 
+ *
  * @param entry - The entry to add to .gitignore (e.g., ".commet/")
  * @returns Result object with success status and optional error message
  */
@@ -56,4 +56,3 @@ export function updateGitignore(entry: string): UpdateResult {
     };
   }
 }
-

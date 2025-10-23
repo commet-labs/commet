@@ -1,7 +1,6 @@
 {
-    "title": "Finance",
-    "description": "Everything you need to know about finance module in Commet",
-    "icon": "DollarSign",
-    "pages": ["finance-overview", "payouts-verification"]
-  }
-  
+  "title": "Finance",
+  "description": "Everything you need to know about finance module in Commet",
+  "icon": "DollarSign",
+  "pages": ["finance-overview", "payouts-verification"]
+}

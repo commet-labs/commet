@@ -1,6 +1,6 @@
 {
-    "title": "Finanzas",
-    "description": "Todo lo que necesitas saber sobre el módulo de finanzas en Commet",
-    "icon": "DollarSign",
-    "pages": ["finance-overview", "payouts-verification"]
-  }
+  "title": "Finanzas",
+  "description": "Todo lo que necesitas saber sobre el módulo de finanzas en Commet",
+  "icon": "DollarSign",
+  "pages": ["finance-overview", "payouts-verification"]
+}

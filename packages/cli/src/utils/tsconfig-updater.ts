@@ -10,7 +10,7 @@ interface UpdateResult {
 /**
  * Updates tsconfig.json to include a new entry in the include array
  * Preserves comments and formatting using jsonc-parser
- * 
+ *
  * @param entry - The entry to add to the include array (e.g., ".commet/types.d.ts")
  * @returns Result object with success status and optional error message
  */
@@ -69,4 +69,3 @@ export function updateTsConfig(entry: string): UpdateResult {
     };
   }
 }
-
