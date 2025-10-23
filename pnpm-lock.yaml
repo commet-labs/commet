@@ -124,9 +124,6 @@ importers:
         specifier: ^7.0.1
         version: 7.0.1
     devDependencies:
-      '@biomejs/biome':
-        specifier: ^1.9.4
-        version: 1.9.4
       '@types/node':
         specifier: ^20.10.0
         version: 20.19.20
@@ -143,9 +140,6 @@ importers:
         specifier: ^3.22.4
         version: 3.25.76
     devDependencies:
-      '@biomejs/biome':
-        specifier: ^1.9.4
-        version: 1.9.4
       '@types/node':
         specifier: ^20.10.0
         version: 20.19.20
