@@ -30,7 +30,6 @@
     "shiki": "3.12.2"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.9.4",
     "@tailwindcss/postcss": "4.1.12",
     "@types/mdx": "2.0.13",
     "@types/node": "24.3.0",

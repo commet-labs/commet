@@ -72,9 +72,6 @@ importers:
         specifier: 3.12.2
         version: 3.12.2
     devDependencies:
-      '@biomejs/biome':
-        specifier: 1.9.4
-        version: 1.9.4
       '@tailwindcss/postcss':
         specifier: 4.1.12
         version: 4.1.12
