@@ -1,5 +1,27 @@
 # @commet/node
 
+## 0.7.0
+
+### Minor Changes
+
+- e128940: API endpoint migration to NestJS infrastructure
+
+  **Breaking Changes:**
+  - Base URLs updated to new API domains:
+    - Sandbox: `https://sandbox.commet.co` → `https://api.sandbox.commet.co`
+    - Production: `https://billing.commet.co` → `https://api.commet.co`
+  - No code changes required on user side - only internal URL changes
+
+  **What Changed:**
+  - HTTP client now points to new API infrastructure
+  - All endpoints remain the same, only domain changed
+  - Debug logging shows updated URLs
+  - CLI now connects to new API endpoints
+
+  **Migration:**
+
+  Users need to update to the latest version to continue using the SDK. No changes to your code are required. CLI users may need to re-authenticate with `commet login` if experiencing connection issues.
+
 ## 0.6.1
 
 ### Patch Changes
@@ -7,7 +29,6 @@
 - 911a17f: Add externalId support to all resource methods. All customer-related operations now accept either `customerId` or `externalId` as an alternative identifier, allowing users to reference customers using their own internal IDs.
 
   **Changes:**
-
   - Seats: `add()`, `remove()`, `set()`, `bulkUpdate()`, `getBalance()`, `getAllBalances()`, `listEvents()` now accept `externalId`
   - Usage: `create()`, `createBatch()`, `list()` now accept `externalId`
   - Customers: Already supported `externalId` in create, update, and list operations
@@ -36,7 +57,6 @@
 - f207723: **Simplified and RESTful API structure**
 
   ## Usage Events API
-
   - **BREAKING**: Removed `UsageMetricsResource` - metrics are no longer accessible via SDK
   - **BREAKING**: Simplified `UsageResource` - methods now directly on `commet.usage` instead of `commet.usage.events`
     - `commet.usage.events.create()` → `commet.usage.create()`
@@ -46,14 +66,11 @@
     - `commet.usage.events.createBatch()` → `commet.usage.createBatch()`
 
   ## Seats API
-
   - **BREAKING**: Simplified endpoints to follow RESTful conventions
-
     - All operations now use `/api/seats` endpoint with proper HTTP verbs
     - `customerId` and `seatType` now sent in request body instead of URL path
 
   - **Endpoint changes**:
-
     - `POST /customers/{id}/seats/{type}/add` → `POST /seats` with body `{ customerId, seatType, action: "add", count }`
     - `POST /customers/{id}/seats/{type}/remove` → `DELETE /seats` with body `{ customerId, seatType, count }`
     - `POST /customers/{id}/seats/{type}/set` → `PUT /seats` with body `{ customerId, seatType, count }`
@@ -64,7 +81,6 @@
   - **BREAKING**: Removed `getHistory()` method - use `listEvents()` instead
 
   ## HTTP Client
-
   - Enhanced `delete()` method to support request body (valid per HTTP spec)
   - Signature: `delete(endpoint, data?, options?)` instead of `delete(endpoint, options?)`
 
@@ -121,7 +137,6 @@
 - 836b309: Convert to monorepo structure with independent packages
 
   **Breaking Changes:**
-
   - SDK package renamed from `commet` to `@commet/node`
   - CLI remains as `commet` but is now a separate package
 
@@ -137,7 +152,6 @@
   CLI users have no changes - all commands remain the same.
 
   **New Features:**
-
   - Independent versioning for SDK and CLI
   - Smaller SDK package (no CLI dependencies)
   - Turbo-powered parallel builds
