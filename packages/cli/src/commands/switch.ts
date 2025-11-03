@@ -2,7 +2,7 @@ import { select } from "@inquirer/prompts";
 import chalk from "chalk";
 import { Command } from "commander";
 import ora from "ora";
-import { apiRequest, getBaseURL } from "../utils/api";
+import { apiRequest, getApiBaseURL } from "../utils/api";
 import {
   authExists,
   loadAuth,
@@ -51,9 +51,9 @@ export const switchCommand = new Command("switch")
       return;
     }
 
-    const baseURL = getBaseURL(auth.environment);
+    const baseURL = getApiBaseURL(auth.environment);
     const result = await apiRequest<OrganizationsResponse>(
-      `${baseURL}/api/cli/organizations`,
+      `${baseURL}/cli/organizations`,
     );
 
     if (result.error || !result.data) {

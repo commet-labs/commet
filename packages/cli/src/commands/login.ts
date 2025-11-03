@@ -3,7 +3,7 @@ import chalk from "chalk";
 import { Command } from "commander";
 import open from "open";
 import ora from "ora";
-import { getBaseURL } from "../utils/api";
+import { getWebBaseURL } from "../utils/api";
 import { authExists, loadAuth, saveAuth } from "../utils/config";
 import { promptTheme } from "../utils/prompt-theme";
 
@@ -47,7 +47,7 @@ export const loginCommand = new Command("login")
     }
 
     const spinner = ora("Initiating login flow...").start();
-    const baseURL = getBaseURL(environment);
+    const baseURL = getWebBaseURL(environment);
 
     try {
       // 1. Request device code from Better Auth
