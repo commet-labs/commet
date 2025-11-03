@@ -43,8 +43,8 @@ commet login
 Prompts you to select an environment (Sandbox or Production), then opens your browser to authenticate. Creates `~/.commet/auth.json` with your credentials.
 
 **Important:** Sandbox and Production are completely isolated platforms with separate accounts:
-- **Sandbox**: `sandbox.commet.co` - Development and testing
-- **Production**: `billing.commet.co` - Live billing operations
+- **Sandbox**: `api.sandbox.commet.co` - Development and testing
+- **Production**: `api.commet.co` - Live billing operations
 
 Make sure to login to the correct environment for your needs.
 
@@ -210,8 +210,8 @@ Add `.commet/` to `.gitignore` if different developers use different organizatio
 
 Commet supports two completely isolated environments:
 
-- **Sandbox** (`sandbox.commet.co`): Development and testing with separate data
-- **Production** (`billing.commet.co`): Live billing operations with real customers
+- **Sandbox** (`api.sandbox.commet.co`): Development and testing with separate data
+- **Production** (`api.commet.co`): Live billing operations with real customers
 
 **Important:** Each environment requires separate authentication because they are independent platforms. To work with both:
 

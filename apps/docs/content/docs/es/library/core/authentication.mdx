@@ -75,7 +75,7 @@ Entorno seguro para desarrollo y pruebas con llamadas API reales al servidor san
 ```typescript
 const commet = new Commet({
   apiKey: process.env.COMMET_API_KEY!,
-  environment: 'sandbox' // Por defecto - usa sandbox.commet.co
+  environment: 'sandbox' // Por defecto - usa api.sandbox.commet.co
 })
 
 console.log(commet.getEnvironment()) // 'sandbox'
@@ -89,7 +89,7 @@ Entorno en vivo para operaciones de facturación reales:
 ```typescript
 const commet = new Commet({
   apiKey: process.env.COMMET_API_KEY!,
-  environment: 'production' // Usa billing.commet.co
+  environment: 'production' // Usa api.commet.co
 })
 
 console.log(commet.getEnvironment()) // 'production'
@@ -124,7 +124,7 @@ const commet = new Commet({
 // Salida en consola:
 // [Commet SDK] Inicializado en modo sandbox
 // Clave API: ck_xxx12345...
-// URL Base: https://sandbox.commet.co
+// URL Base: https://api.sandbox.commet.co
 ```
 
 ## Validación

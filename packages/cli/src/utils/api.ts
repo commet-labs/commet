@@ -2,9 +2,9 @@ import { loadAuth } from "./config";
 
 export function getBaseURL(environment: "sandbox" | "production"): string {
   if (environment === "production") {
-    return "https://billing.commet.co";
+    return "https://api.commet.co";
   }
-  return "https://sandbox.commet.co";
+  return "https://api.sandbox.commet.co";
 }
 
 export async function apiRequest<T>(

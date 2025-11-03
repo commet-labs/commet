@@ -39,8 +39,8 @@ export class Commet {
       console.log("API Key:", `${config.apiKey.substring(0, 12)}...`);
       const baseURL =
         this.environment === "production"
-          ? "https://billing.commet.co"
-          : "https://sandbox.commet.co";
+          ? "https://api.commet.co"
+          : "https://api.sandbox.commet.co";
       console.log("Base URL:", baseURL);
     }
   }

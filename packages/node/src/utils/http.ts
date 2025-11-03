@@ -248,8 +248,8 @@ export class CommetHTTPClient {
    */
   private getBaseURL(): string {
     return this.environment === "production"
-      ? "https://billing.commet.co"
-      : "https://sandbox.commet.co";
+      ? "https://api.commet.co"
+      : "https://api.sandbox.commet.co";
   }
 
   /**
@@ -258,8 +258,8 @@ export class CommetHTTPClient {
   private buildURL(endpoint: string, params?: Record<string, unknown>): string {
     const baseURL = this.getBaseURL();
 
-    // Construct full path with /api prefix
-    const fullPath = `/api${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
+    // Construct full path (no /api prefix needed - it's in the domain now)
+    const fullPath = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
 
     // Debug logging
     if (this.config.debug) {
