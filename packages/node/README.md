@@ -26,6 +26,55 @@ const commet = new Commet({
 
 ## Usage Examples
 
+### Subscriptions (Simple API)
+
+```typescript
+// Create subscription - Minimal (fixed product)
+await commet.subscriptions.create({
+  productId: 'prod_enterprise_plan',
+  customerId: 'cus_acme'
+});
+// Backend auto-configures: quantity=1, billingDay=today
+
+// Create with custom quantity
+await commet.subscriptions.create({
+  productId: 'prod_api_platform',
+  externalId: 'my-customer-123', // Use your own ID
+  quantity: 5,
+  status: 'active' // Generate invoice immediately
+});
+
+// Usage-based product (no quantity needed)
+await commet.subscriptions.create({
+  productId: 'prod_api_calls',
+  customerId: 'cus_startup'
+});
+// Backend uses usageMetricId from product
+// Send events: commet.usage.create(...)
+
+// Seat-based product
+await commet.subscriptions.create({
+  productId: 'prod_saas_licenses',
+  customerId: 'cus_tech_company',
+  initialSeats: 10,
+  name: 'Tech Company - SaaS Plan'
+});
+// Backend uses seatTypeId from product
+// Adjust seats: commet.seats.add(...)
+
+// List subscriptions
+const subs = await commet.subscriptions.list({
+  customerId: 'cus_acme',
+  status: 'active'
+});
+
+// Get subscription
+const sub = await commet.subscriptions.retrieve('sub_abc123');
+
+// Cancel subscription
+await commet.subscriptions.cancel('sub_abc123');
+```
+
 ### Usage Events (Consumption-Based Billing)
 
 ```typescript
@@ -170,6 +219,7 @@ interface CommetConfig {
 
 ### Resources
 
+- `commet.subscriptions` - Simple subscription management
 - `commet.usage` - Usage event tracking
 - `commet.seats` - Seat management
 - `commet.customers` - Customer CRUD operations
@@ -205,6 +255,8 @@ Fully typed with TypeScript. All API responses and parameters are type-safe.
 
 ```typescript
 import type {
+  Subscription,
+  CreateSubscriptionParams,
   Customer,
   UsageEvent,
   SeatBalance,

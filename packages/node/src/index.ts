@@ -52,18 +52,24 @@ export type {
 } from "./resources/usage";
 
 export type {
-  SeatBalance,
-  SeatEvent,
-  SeatBalanceResponse,
-  BulkSeatUpdate,
-  AddSeatsParams,
-  RemoveSeatsParams,
-  SetSeatsParams,
-  BulkUpdateSeatsParams,
-  GetBalanceParams,
-  GetAllBalancesParams,
-  ListSeatEventsParams,
+	SeatBalance,
+	SeatEvent,
+	SeatBalanceResponse,
+	BulkSeatUpdate,
+	AddSeatsParams,
+	RemoveSeatsParams,
+	SetSeatsParams,
+	BulkUpdateSeatsParams,
+	GetBalanceParams,
+	GetAllBalancesParams,
+	ListSeatEventsParams,
 } from "./resources/seats";
+
+export type {
+	Subscription,
+	CreateSubscriptionParams,
+	ListSubscriptionsParams,
+} from "./resources/subscriptions";
 
 // Utility exports
 export { isSandbox, isProduction } from "./utils/environment";
