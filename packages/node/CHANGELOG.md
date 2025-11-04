@@ -1,5 +1,11 @@
 # @commet/node
 
+## 0.8.0
+
+### Minor Changes
+
+- 694275a: Add simple subscriptions API - Create subscriptions with just productId and customerId. Backend auto-configures pricing, quantities, and billing based on product configuration. Supports fixed, usage-based, and seat-based products.
+
 ## 0.7.2
 
 ### Patch Changes
