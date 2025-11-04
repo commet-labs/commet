@@ -11,6 +11,7 @@ import { pullCommand } from "./commands/pull";
 import { switchCommand } from "./commands/switch";
 import { unlinkCommand } from "./commands/unlink";
 import { whoamiCommand } from "./commands/whoami";
+import packageJson from "../package.json" with { type: "json" };
 
 const program = new Command();
 
@@ -19,7 +20,7 @@ program
   .description(
     "Commet CLI - Manage your billing platform from the command line",
   )
-  .version("0.3.0");
+  .version(packageJson.version);
 
 // Authentication commands
 program.addCommand(loginCommand);
