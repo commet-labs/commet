@@ -1,223 +1,244 @@
 ---
 title: Subscriptions
-description: Create and manage subscriptions with the ultra-simple API
+description: Simple subscription management with automatic configuration
 ---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
+import { Callout } from 'fumadocs-ui/components/callout'
 
 # Subscriptions
 
-The Commet subscriptions API provides an ultra-simple way to create subscriptions. Just pass a `productId` and `customerId`, and the system automatically handles pricing, quantities, and configuration based on your product setup.
+Create subscriptions with just a product ID and customer ID. The system automatically handles pricing, quantities, and billing configuration based on your product setup.
 
-## Why Simple Subscriptions?
+<Callout type="info">
+**Prerequisites:** Initialize your Commet client with a valid API key.
+</Callout>
 
-- **2 required fields** instead of 10+ complex parameters
-- **Smart defaults** based on product configuration
-- **Works for all product types**: fixed, usage-based, and seat-based billing
-- **Automatic billing** - generates invoices immediately when activated
+## Basic Usage
 
-## Quick Start
+Create a subscription with minimal information:
 
 ```typescript
-import { Commet } from '@commet/node';
-
-const commet = new Commet({
-  apiKey: process.env.COMMET_API_KEY!,
-  environment: 'production'
-});
-
-// Create subscription - that's it!
 const subscription = await commet.subscriptions.create({
-  productId: 'prod_enterprise_plan',
-  customerId: 'cus_acme'
-});
+  productId: 'prod_A1b2C3d4E5f6G7h8I9j0K1l2',
+  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2'
+})
+
+console.log('Subscription created:', subscription.data.id)
 ```
 
-## How It Works
+<Callout type="info">
+**Auto-configuration**: Backend automatically selects the default list price, configures quantities based on product type, and sets billing day to today.
+</Callout>
 
-When you create a subscription, the backend:
+### Using External IDs
 
-1. **Finds the default list price** for the product (or the first available)
-2. **Detects the product type** from the `quantitySource`:
-   - `fixed` - Fixed quantity products (licenses, plans)
-   - `usage_metric` - Consumption-based (API calls, emails)
-   - `seat_balance` - Per-seat licensing (user accounts)
-3. **Auto-configures everything**:
-   - Quantities and metrics
-   - Billing day (today or custom start date)
-   - Phase structure (invisible to you)
-   - Invoice generation (if status is active)
+Reference customers with your own IDs:
+
+```typescript
+const subscription = await commet.subscriptions.create({
+  productId: 'prod_A1b2C3d4E5f6G7h8I9j0K1l2',
+  externalId: 'stripe_cus_abc123' // Your internal customer ID
+})
+```
 
 ## Product Types
 
-### Fixed Quantity Products
+The SDK supports three product types with smart defaults:
 
-Products with a fixed quantity like Enterprise Plans, one-time licenses, etc.
-
+<Tabs items={['Fixed', 'Usage-Based', 'Seat-Based']}>
+<Tab value="Fixed">
 ```typescript
-// Use default quantity (1)
-await commet.subscriptions.create({
+// Fixed quantity product (licenses, plans)
+const subscription = await commet.subscriptions.create({
   productId: 'prod_enterprise_plan',
-  customerId: 'cus_acme'
-});
+  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2'
+})
+// Backend sets: fixedQuantity = 1
 
-// Or specify custom quantity
-await commet.subscriptions.create({
+// Custom quantity
+const subscription = await commet.subscriptions.create({
   productId: 'prod_api_platform',
   externalId: 'my-customer-123',
   quantity: 5 // 5 units
-});
+})
 ```
-
-**Backend configures**: `fixedQuantity = 1` (or your specified quantity)
-
-### Usage-Based Products
-
-Products where quantity comes from usage events (API calls, emails sent, etc).
-
+</Tab>
+<Tab value="Usage-Based">
 ```typescript
-// Create subscription
-await commet.subscriptions.create({
+// Usage-based product (API calls, emails)
+const subscription = await commet.subscriptions.create({
   productId: 'prod_api_calls',
-  customerId: 'cus_startup'
-});
+  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2'
+})
+// Backend uses usageMetricId from product
 
-// Then send usage events
+// Then track usage events
 await commet.usage.create({
   eventType: 'api_call',
-  customerId: 'cus_startup',
-  timestamp: new Date().toISOString()
-});
+  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2'
+})
 ```
-
-**Backend configures**: Uses the `usageMetricId` from the product's list price. No `quantity` needed - it comes from events.
-
-### Seat-Based Products
-
-Products billed per seat/user/license.
-
+</Tab>
+<Tab value="Seat-Based">
 ```typescript
-// Start with initial seats
-await commet.subscriptions.create({
+// Seat-based product (user licenses)
+const subscription = await commet.subscriptions.create({
   productId: 'prod_saas_licenses',
-  customerId: 'cus_tech_company',
+  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
   initialSeats: 10 // Start with 10 seats
-});
+})
+// Backend uses seatTypeId from product
 
-// Add seats later
+// Then manage seats
 await commet.seats.add({
-  customerId: 'cus_tech_company',
+  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
   seatType: 'editor',
   count: 5
-});
+})
 ```
+</Tab>
+</Tabs>
 
-**Backend configures**: Uses the `seatTypeId` from the product's list price. `initialSeats` defaults to 0 if not specified.
+<Callout type="info">
+**No quantity needed for usage-based**: Quantity comes from usage events. For seat-based, `initialSeats` defaults to 0 if not specified.
+</Callout>
 
-## API Reference
+## Subscription Operations
 
-### Create Subscription
+### Create with Options
+
+Customize subscription creation:
 
 ```typescript
-await commet.subscriptions.create(params);
+const subscription = await commet.subscriptions.create({
+  productId: 'prod_A1b2C3d4E5f6G7h8I9j0K1l2',
+  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
+  name: 'Custom Subscription Name',
+  startDate: '2025-01-15T00:00:00Z',
+  status: 'active', // Generate invoice immediately
+  quantity: 5 // For fixed products
+})
 ```
 
-**Required Parameters**:
-- `productId` (string) - Product UUID
-- `customerId` (string) OR `externalId` (string) - Customer identifier
+<Callout type="info">
+**Default status is active**: Subscriptions generate invoices immediately unless status is set to `draft`.
+</Callout>
 
-**Optional Parameters**:
-- `name` (string) - Subscription name. Default: `"Subscription for [Customer Name]"`
-- `startDate` (string) - ISO datetime. Default: now
-- `status` ("draft" | "active") - Default: `"active"` (generates invoice immediately)
-- `quantity` (number) - For fixed products. Default: 1
-- `initialSeats` (number) - For seat-based products. Default: 0
+### Retrieve Subscription
 
-**Auto-calculated**:
-- `billingDayOfMonth` - Taken from today's date or `startDate`
-- Phase structure - Auto-generated "Phase 1"
+Get subscription details:
 
-**Response**:
 ```typescript
-{
-  success: true,
-  message: "Subscription created successfully",
-  data: {
-    id: "sub_abc123", // publicId
-    customerId: "cus_xxx",
-    productId: "prod_xxx",
-    name: "Subscription for Acme Corp",
-    status: "active",
-    startDate: "2025-11-04T00:00:00Z",
-    endDate: "2125-11-04T00:00:00Z",
-    billingDayOfMonth: 4,
-    createdAt: "2025-11-04T10:30:00Z",
-    updatedAt: "2025-11-04T10:30:00Z"
-  }
-}
+const subscription = await commet.subscriptions.retrieve('sub_A1b2C3d4E5f6G7h8I9j0K1l2')
+
+console.log('Subscription:', subscription.data.name)
+console.log('Status:', subscription.data.status)
 ```
 
 ### List Subscriptions
 
+Filter subscriptions by customer or status:
+
 ```typescript
-await commet.subscriptions.list({
-  customerId: 'cus_xxx',
+// By customer ID
+const subscriptions = await commet.subscriptions.list({
+  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
   status: 'active'
-});
-```
+})
 
-**Parameters**:
-- `customerId` (string) - Filter by customer ID
-- `externalId` (string) - Filter by external ID
-- `status` ("draft" | "active" | "completed" | "canceled") - Filter by status
+// By external ID
+const subscriptions = await commet.subscriptions.list({
+  externalId: 'stripe_cus_abc123'
+})
 
-### Retrieve Subscription
-
-```typescript
-await commet.subscriptions.retrieve('sub_abc123');
+console.log(`Found ${subscriptions.data.length} subscriptions`)
 ```
 
 ### Cancel Subscription
 
+Cancel an active subscription:
+
 ```typescript
-await commet.subscriptions.cancel('sub_abc123');
+const result = await commet.subscriptions.cancel('sub_A1b2C3d4E5f6G7h8I9j0K1l2')
+
+console.log('Subscription canceled:', result.data.status)
+```
+
+## Advanced Usage
+
+### Draft Subscriptions
+
+Create subscription for review before activation:
+
+```typescript
+const draft = await commet.subscriptions.create({
+  productId: 'prod_enterprise',
+  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
+  quantity: 10,
+  status: 'draft' // No invoice generated
+})
+
+// Review in platform UI, then activate manually
+```
+
+<Callout type="warn">
+**Draft subscriptions**: Don't generate invoices until manually activated in the platform or updated via API.
+</Callout>
+
+### Custom Start Date
+
+Schedule subscriptions for future billing:
+
+```typescript
+const subscription = await commet.subscriptions.create({
+  productId: 'prod_monthly_plan',
+  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
+  startDate: '2025-02-01T00:00:00Z', // Future date
+  status: 'active'
+})
+
+// Billing day set to: February 1st
+console.log('Billing day:', subscription.data.billingDayOfMonth) // 1
 ```
 
 ## Complete Examples
 
-### SaaS Platform (Seat-Based)
+### SaaS Platform (Seats)
 
 ```typescript
-// Create subscription with seats
+// Create subscription with initial seats
 const sub = await commet.subscriptions.create({
   productId: 'prod_saas_platform',
   externalId: 'startup-xyz',
   initialSeats: 5,
   name: 'Startup XYZ - Growth Plan',
   status: 'active'
-});
+})
 
 // User adds team members
 await commet.seats.add({
   externalId: 'startup-xyz',
   seatType: 'editor',
   count: 3
-});
+})
 
-// Check current seats
+// Check current balance
 const balance = await commet.seats.getBalance({
   externalId: 'startup-xyz',
   seatType: 'editor'
-});
-console.log(balance.data.current); // 8 (5 initial + 3 added)
+})
+console.log('Total seats:', balance.data.current) // 8
 ```
 
-### API Platform (Usage-Based)
+### API Platform (Usage)
 
 ```typescript
 // Create subscription
 await commet.subscriptions.create({
   productId: 'prod_api_platform',
   customerId: 'cus_fintech_app'
-});
+})
 
 // Track API usage
 await commet.usage.createBatch({
@@ -225,61 +246,69 @@ await commet.usage.createBatch({
     {
       eventType: 'api_call',
       customerId: 'cus_fintech_app',
-      timestamp: new Date().toISOString(),
       properties: [
         { property: 'endpoint', value: '/api/transactions' },
         { property: 'method', value: 'POST' }
       ]
-    },
-    // ... more events
+    }
   ]
-});
+})
 ```
 
-### Enterprise (Fixed + Draft Review)
+### Enterprise Deal (Fixed)
 
 ```typescript
 // Create as draft for sales review
 const draft = await commet.subscriptions.create({
   productId: 'prod_enterprise',
   customerId: 'cus_big_corp',
-  quantity: 10,
+  quantity: 100,
   name: 'Big Corp - Custom Enterprise Deal',
-  status: 'draft' // Don't bill yet
-});
+  status: 'draft'
+})
 
-// Review in UI, then activate manually
-// (or via API when approved)
+// After approval, activate in platform UI
 ```
 
 ## Error Handling
+
+Handle common errors gracefully:
 
 ```typescript
 try {
   await commet.subscriptions.create({
     productId: 'prod_xxx',
     customerId: 'cus_xxx'
-  });
+  })
 } catch (error) {
   if (error.statusCode === 404) {
-    console.error('Product or customer not found');
+    console.error('Product or customer not found')
   } else if (error.statusCode === 400) {
-    console.error('Product has no list prices configured');
+    console.error('Product has no list prices configured')
   }
 }
 ```
 
 ## Best Practices
 
-1. **Use `externalId`** if you have your own customer IDs - it's simpler
-2. **Default to `status: "active"`** unless you need manual approval
-3. **Let the backend auto-configure** - don't overthink quantity sources
-4. **For seats, start with 0** and add seats as users sign up
-5. **For usage, create subscription first** then track events separately
+<Callout type="info">
+**Use External IDs**: Connect with your existing system for simpler integration.
+</Callout>
 
-## Next Steps
+<Callout type="info">
+**Default to Active**: Use `status: "active"` unless manual approval is required.
+</Callout>
 
-- [Usage Events](/docs/en/usage) - Track consumption for usage-based billing
-- [Seat Management](/docs/en/seats) - Manage per-seat licensing
-- [Customers](/docs/en/customers) - Create and manage customers
+<Callout type="info">
+**Auto-configuration**: Let the backend handle quantity sources - don't overthink the setup.
+</Callout>
 
+<Callout type="info">
+**Seats Start at Zero**: For seat-based products, set `initialSeats: 0` and add seats as users sign up.
+</Callout>
+
+## Related Resources
+
+- [Usage Events](/docs/en/library/features/usage-events) - Track consumption for usage-based billing
+- [Seat Management](/docs/en/library/features/seat-management) - Manage per-seat licensing
+- [Customers](/docs/en/library/features/customers) - Create and manage customers
