@@ -1,5 +1,5 @@
 {
   "title": "Características",
   "description": "Capacidades principales del SDK",
-  "pages": ["products", "usage-events", "seat-management", "customers"]
+  "pages": ["subscriptions", "usage-events", "seat-management", "customers"]
 }

@@ -1,5 +1,5 @@
 {
   "title": "Features",
   "description": "Core SDK capabilities",
-  "pages": ["usage-events", "seat-management", "customers"]
+  "pages": ["subscriptions", "usage-events", "seat-management", "customers"]
 }
