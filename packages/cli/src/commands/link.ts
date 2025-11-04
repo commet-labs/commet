@@ -61,7 +61,7 @@ export const linkCommand = new Command("link")
 
     const baseURL = getBaseURL(auth.environment);
     const result = await apiRequest<OrganizationsResponse>(
-      `${baseURL}/cli/organizations`,
+      `${baseURL}/api/cli/organizations`,
     );
 
     if (result.error || !result.data) {

@@ -68,7 +68,7 @@ export const pullCommand = new Command("pull")
     // Fetch types from API
     const baseURL = getBaseURL(projectConfig.environment);
     const result = await apiRequest<TypesResponse>(
-      `${baseURL}/cli/types?orgId=${projectConfig.orgId}`,
+      `${baseURL}/api/cli/types?orgId=${projectConfig.orgId}`,
     );
 
     if (result.error || !result.data) {

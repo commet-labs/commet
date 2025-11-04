@@ -258,8 +258,9 @@ export class CommetHTTPClient {
   private buildURL(endpoint: string, params?: Record<string, unknown>): string {
     const baseURL = this.getBaseURL();
 
-    // Construct full path (no /api prefix needed - it's in the domain now)
-    const fullPath = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+    // Construct full path with /api prefix
+    const normalizedEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+    const fullPath = `/api${normalizedEndpoint}`;
 
     // Debug logging
     if (this.config.debug) {
