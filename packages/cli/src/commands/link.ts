@@ -2,7 +2,7 @@ import { select } from "@inquirer/prompts";
 import chalk from "chalk";
 import { Command } from "commander";
 import ora from "ora";
-import { apiRequest, getApiBaseURL } from "../utils/api";
+import { apiRequest, getBaseURL } from "../utils/api";
 import {
   authExists,
   loadAuth,
@@ -59,7 +59,7 @@ export const linkCommand = new Command("link")
       return;
     }
 
-    const baseURL = getApiBaseURL(auth.environment);
+    const baseURL = getBaseURL(auth.environment);
     const result = await apiRequest<OrganizationsResponse>(
       `${baseURL}/cli/organizations`,
     );
@@ -76,7 +76,7 @@ export const linkCommand = new Command("link")
       spinner.stop();
       console.log(chalk.yellow("⚠ No organizations found"));
       console.log(
-        chalk.dim("Create an organization at https://billing.commet.co first"),
+        chalk.dim("Create an organization at https://commet.co first"),
       );
       return;
     }

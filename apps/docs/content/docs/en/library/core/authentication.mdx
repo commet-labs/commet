@@ -75,7 +75,7 @@ Safe environment for development and testing with real API calls to sandbox serv
 ```typescript
 const commet = new Commet({
   apiKey: process.env.COMMET_API_KEY!,
-  environment: 'sandbox' // Default - uses api.sandbox.commet.co
+  environment: 'sandbox' // Default - uses sandbox.commet.co
 })
 
 console.log(commet.getEnvironment()) // 'sandbox'
@@ -89,7 +89,7 @@ Live environment for real billing operations:
 ```typescript
 const commet = new Commet({
   apiKey: process.env.COMMET_API_KEY!,
-  environment: 'production' // Uses api.commet.co
+  environment: 'production' // Uses commet.co
 })
 
 console.log(commet.getEnvironment()) // 'production'
@@ -124,7 +124,7 @@ const commet = new Commet({
 // Console output:
 // [Commet SDK] Initialized in sandbox mode
 // API Key: ck_xxx12345...
-// Base URL: https://api.sandbox.commet.co
+// Base URL: https://sandbox.commet.co
 ```
 
 ## Validation

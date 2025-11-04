@@ -248,8 +248,8 @@ export class CommetHTTPClient {
    */
   private getBaseURL(): string {
     return this.environment === "production"
-      ? "https://api.commet.co"
-      : "https://api.sandbox.commet.co";
+      ? "https://commet.co"
+      : "https://sandbox.commet.co";
   }
 
   /**

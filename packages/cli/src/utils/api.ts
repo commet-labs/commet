@@ -1,30 +1,13 @@
 import { loadAuth } from "./config";
 
 /**
- * Get base URL for web app (for device auth flow)
- */
-export function getWebBaseURL(environment: "sandbox" | "production"): string {
-  if (environment === "production") {
-    return "https://billing.commet.co";
-  }
-  return "https://sandbox.commet.co";
-}
-
-/**
- * Get base URL for API (for CLI endpoints after auth)
- */
-export function getApiBaseURL(environment: "sandbox" | "production"): string {
-  if (environment === "production") {
-    return "https://api.commet.co";
-  }
-  return "https://api.sandbox.commet.co";
-}
-
-/**
- * @deprecated Use getWebBaseURL or getApiBaseURL instead
+ * Get base URL for Commet platform
  */
 export function getBaseURL(environment: "sandbox" | "production"): string {
-  return getWebBaseURL(environment);
+  if (environment === "production") {
+    return "https://commet.co";
+  }
+  return "https://sandbox.commet.co";
 }
 
 export async function apiRequest<T>(
