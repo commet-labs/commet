@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://vercel.com">
-    <img src="https://commet.co/logo_circle.png" height="96">
+    <img src="https://commet.co/logo-bg-dark.png" height="96">
     <h3 align="center">Commet</h3>
   </a>
 </p>
