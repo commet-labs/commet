@@ -1,6 +1,10 @@
 "use client";
 
 import { signIn } from "@/lib/auth-client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -31,9 +35,6 @@ export default function LoginPage() {
         return;
       }
 
-      // Check if user has paid
-      // If not paid, redirect to checkout
-      // If paid, redirect to dashboard
       router.push("/dashboard");
       router.refresh();
     } catch (err) {
@@ -43,73 +44,57 @@ export default function LoginPage() {
   }
 
   return (
-    <div>
-      <div className="text-center">
-        <h2 className="text-3xl font-bold text-gray-900">Sign in to your account</h2>
-        <p className="mt-2 text-sm text-gray-600">
+    <Card className="w-full">
+      <CardHeader className="text-center">
+        <CardTitle className="text-3xl">Sign in to your account</CardTitle>
+        <CardDescription>
           Welcome back! Please enter your details
-        </p>
-      </div>
-
-      <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email address
-            </label>
-            <input
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          <div className="space-y-2">
+            <Label htmlFor="email">Email address</Label>
+            <Input
               id="email"
               name="email"
               type="email"
               autoComplete="email"
               required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               placeholder="you@example.com"
             />
           </div>
 
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Password
-            </label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
               id="password"
               name="password"
               type="password"
               autoComplete="current-password"
               required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               placeholder="••••••••"
             />
           </div>
-        </div>
 
-        {error && (
-          <div className="p-4 rounded-md bg-red-50 text-red-800">
-            <p className="text-sm">{error}</p>
-          </div>
-        )}
+          {error && (
+            <div className="p-4 rounded-lg text-sm bg-destructive/10 text-destructive border border-destructive/20">
+              {error}
+            </div>
+          )}
 
-        <div>
-          <button
-            type="submit"
-            disabled={isPending}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
+          <Button type="submit" disabled={isPending} className="w-full">
             {isPending ? "Signing in..." : "Sign in"}
-          </button>
-        </div>
+          </Button>
 
-        <div className="text-center">
-          <p className="text-sm text-gray-600">
+          <p className="text-center text-sm text-muted-foreground">
             Don't have an account?{" "}
-            <Link href="/signup" className="font-medium text-blue-600 hover:text-blue-500">
+            <Link href="/signup" className="font-medium text-primary hover:underline">
               Sign up
             </Link>
           </p>
-        </div>
-      </form>
-    </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 }
-
