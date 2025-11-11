@@ -20,16 +20,13 @@
 
 Commet is an all-in-one billing and payments platform. The easiest way to integrate global payments and get paid anywhere with just a few lines of code. This monorepo contains tools, templates, and documentation to help you integrate complex billing and payments operations into your applications.
 
-## Get Started
-
-Start by installing the SDK, exploring our [examples](https://commet.co/examples), or using the [Commet CLI](https://docs.commet.co/cli). Then, `git push` to automate your billing.
 
 ## Documentation
 
-For details on how to use Commet, check out our [documentation](https://docs.commet.co).
+For details on how to use Commet, check out our [documentation](https://docs.commet.co/docs).
 
 ## Reference
 
 - [Apache 2.0 License](./LICENSE)
-- [SDK Documentation](./packages/node/README.md)
-- [CLI Documentation](./packages/cli/README.md)
+- [CLI Documentation](https://docs.commet.co/docs/library/cli/overview)
+- [SDK Reference](https://docs.commet.co/docs/library/quickstart)
