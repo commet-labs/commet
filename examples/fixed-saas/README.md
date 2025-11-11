@@ -16,9 +16,9 @@ This example demonstrates the **complete billing flow** for a SaaS application:
 
 ### Tech Stack
 
-- **Next.js 15** - App Router with Server Components
+- **Next.js 16** - App Router with Server Components
 - **Better Auth** - Authentication with email/password
-- **SQLite** - Local database for user data
+- **Drizzle ORM + PostgreSQL** - Database for user data
 - **Commet SDK** - Billing and subscription management
 - **Tailwind CSS** - Styling
 
@@ -36,8 +36,9 @@ This example demonstrates the **complete billing flow** for a SaaS application:
 ### Prerequisites
 
 1. **Node.js** 18+ and pnpm installed
-2. **Commet Account** - Sign up at [commet.co](https://commet.co)
-3. **Commet Product** - Create a fixed price product ($50/month) in your Commet dashboard
+2. **Docker & Docker Compose** (recommended) - Or PostgreSQL installed locally
+3. **Commet Account** - Sign up at [commet.co](https://commet.co)
+4. **Commet Product** - Create a fixed price product ($50/month) in your Commet dashboard
 
 ### Installation
 
@@ -63,6 +64,9 @@ cp .env.example .env
 Edit `.env` with your values:
 
 ```bash
+# Database (PostgreSQL)
+DATABASE_URL=postgresql://localhost:5432/fixed_saas
+
 # Better Auth
 BETTER_AUTH_SECRET=$(openssl rand -base64 32)
 BETTER_AUTH_URL=http://localhost:3000
@@ -72,6 +76,42 @@ NEXT_PUBLIC_BETTER_AUTH_URL=http://localhost:3000
 COMMET_API_KEY=ck_sandbox_your_api_key_here
 COMMET_ENVIRONMENT=sandbox
 COMMET_PRICE_ID=your_price_id_here
+```
+
+4. **Set up the database**:
+
+**Option A: Using Docker (Recommended)**
+```bash
+# Start PostgreSQL with Docker Compose
+docker-compose up -d
+
+# Wait for DB to be ready (health check)
+# Push schema to database
+pnpm db:push
+
+# Optional: Access Adminer UI at http://localhost:8080
+# Server: postgres, User: postgres, Password: postgres, Database: fixed_saas
+```
+
+**Option B: Local PostgreSQL**
+```bash
+# Create PostgreSQL database
+createdb fixed_saas
+
+# Or using psql
+psql -U postgres -c "CREATE DATABASE fixed_saas;"
+
+# Push schema to database
+pnpm db:push
+```
+
+**Option C: Hosted Database (Supabase, Neon, Railway)**
+```bash
+# Just update DATABASE_URL in .env with your connection string
+# Example: postgresql://user:pass@host:5432/dbname
+
+# Push schema to database
+pnpm db:push
 ```
 
 ### Getting Your Commet Credentials
@@ -169,10 +209,34 @@ In your Commet dashboard:
 
 ### Database Issues
 
-Delete and recreate the SQLite database:
+**Using Docker:**
 ```bash
-rm -rf data/
-pnpm dev
+# Restart database
+docker-compose restart postgres
+
+# View logs
+docker-compose logs postgres
+
+# Reset database (WARNING: deletes all data)
+docker-compose down -v
+docker-compose up -d
+pnpm db:push
+```
+
+**View Database with Adminer:**
+```bash
+# Access http://localhost:8080
+# Server: postgres
+# User: postgres
+# Password: postgres
+# Database: fixed_saas
+```
+
+**Using Drizzle Studio:**
+```bash
+# Launch visual database editor
+pnpm db:studio
+# Opens at http://localhost:4983
 ```
 
 ## 🚧 Missing Features (See GAPS.md)

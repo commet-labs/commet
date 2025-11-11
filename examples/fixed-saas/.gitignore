@@ -36,8 +36,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Better Auth SQLite database
-/data/
-*.db
-*.db-shm
-*.db-wal
+# Database
+drizzle/
