@@ -68,6 +68,7 @@ export type {
 
 export type {
 	Subscription,
+	SubscriptionItem,
 	CreateSubscriptionParams,
 	ListSubscriptionsParams,
 } from "./resources/subscriptions";
