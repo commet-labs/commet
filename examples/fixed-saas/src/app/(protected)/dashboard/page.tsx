@@ -1,4 +1,4 @@
-import { checkSubscriptionStatus } from "@/app/actions/check-subscription-action";
+import { checkSubscriptionStatus } from "@/actions/check-subscription-action";
 import { auth } from "@/lib/auth";
 import { commet } from "@/lib/commet";
 import { headers } from "next/headers";
@@ -24,7 +24,7 @@ export default async function DashboardPage({
   let subscriptionDetails = null;
   if (subscriptionStatus.subscriptionId) {
     const result = await commet.subscriptions.retrieve(
-      subscriptionStatus.subscriptionId
+      subscriptionStatus.subscriptionId,
     );
     if (result.success) {
       subscriptionDetails = result.data;
@@ -38,9 +38,7 @@ export default async function DashboardPage({
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="text-2xl font-bold text-blue-600">SaaSPro</div>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600">
-              {user?.email}
-            </span>
+            <span className="text-sm text-gray-600">{user?.email}</span>
             <form action="/api/auth/sign-out" method="POST">
               <button
                 type="submit"
@@ -75,7 +73,8 @@ export default async function DashboardPage({
                     Payment Simulated Successfully!
                   </h3>
                   <p className="text-sm text-green-700">
-                    In production, this would be triggered by a real Commet webhook.
+                    In production, this would be triggered by a real Commet
+                    webhook.
                   </p>
                 </div>
               </div>
@@ -124,11 +123,14 @@ export default async function DashboardPage({
                             {subscriptionDetails.id}
                           </p>
                           <p>
-                            <strong>Status:</strong> {subscriptionDetails.status}
+                            <strong>Status:</strong>{" "}
+                            {subscriptionDetails.status}
                           </p>
                           <p>
                             <strong>Started:</strong>{" "}
-                            {new Date(subscriptionDetails.startDate).toLocaleDateString()}
+                            {new Date(
+                              subscriptionDetails.startDate,
+                            ).toLocaleDateString()}
                           </p>
                         </div>
                       )}
@@ -272,7 +274,8 @@ export default async function DashboardPage({
               💡 About This Example
             </h3>
             <p className="text-sm text-blue-700 mb-3">
-              This is a demonstration of Commet's billing integration. This example shows:
+              This is a demonstration of Commet's billing integration. This
+              example shows:
             </p>
             <ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
               <li>User signup with Better Auth</li>
@@ -287,4 +290,3 @@ export default async function DashboardPage({
     </div>
   );
 }
-
