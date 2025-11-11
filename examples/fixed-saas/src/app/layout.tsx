@@ -3,7 +3,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "SaaSPro - Powered by Commet",
-  description: "A simple SaaS platform demonstrating Commet billing integration",
+  description:
+    "A simple SaaS platform demonstrating Commet billing integration",
 };
 
 export default function RootLayout({
@@ -13,7 +14,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className="antialiased bg-background text-foreground">{children}</body>
+      <body className="antialiased bg-background text-foreground">
+        {children}
+      </body>
     </html>
   );
 }

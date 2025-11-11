@@ -15,7 +15,7 @@ export default function SignUpPage() {
   });
 
   return (
-    <Card className="w-full">
+    <Card>
       <CardHeader className="text-center">
         <CardTitle className="text-3xl">Create your account</CardTitle>
         <CardDescription>

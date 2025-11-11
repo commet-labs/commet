@@ -35,7 +35,7 @@ export default async function DashboardPage({
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+        <div className="mx-auto px-4 py-4 flex justify-between items-center">
           <div className="text-2xl font-bold text-blue-600">SaaSPro</div>
           <div className="flex items-center gap-4">
             <span className="text-sm text-gray-600">{user?.email}</span>
@@ -52,7 +52,7 @@ export default async function DashboardPage({
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-12">
+      <main className="mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
           {paymentSuccess && (
             <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">

@@ -8,7 +8,7 @@ export default function Home() {
     <div className="min-h-screen">
       {/* Header */}
       <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between">
+        <div className="flex h-16 items-center justify-between mx-auto max-w-7xl">
           <div className="text-2xl font-bold">SaaSPro</div>
           <div className="flex items-center gap-4">
             <Button variant="ghost" asChild>
@@ -22,7 +22,7 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <main className="container py-20">
+      <main className="py-20 mx-auto max-w-7xl">
         <div className="mx-auto max-w-4xl text-center">
           <Badge variant="secondary" className="mb-6">
             Powered by Commet
@@ -55,7 +55,7 @@ export default function Home() {
         </div>
 
         {/* Features */}
-        <div className="mt-32 grid gap-6 md:grid-cols-3 max-w-6xl mx-auto">
+        <div className="mt-32 grid gap-6 md:grid-cols-3 mx-auto">
           <Card>
             <CardContent className="pt-6">
               <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
@@ -133,8 +133,8 @@ export default function Home() {
         </div>
 
         {/* Pricing */}
-        <div className="mt-32 max-w-md mx-auto">
-          <Card className="border-primary/20">
+        <div className="mt-32 mx-auto">
+          <Card>
             <CardContent className="pt-6">
               <div className="text-center">
                 <h3 className="text-2xl font-bold mb-2">Pro Plan</h3>
@@ -148,7 +148,7 @@ export default function Home() {
                 <ul className="text-left space-y-3 mb-8">
                   <li className="flex items-center gap-2">
                     <svg
-                      className="h-5 w-5 text-primary flex-shrink-0"
+                      className="h-5 w-5 text-primary shrink-0"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -162,7 +162,7 @@ export default function Home() {
                   </li>
                   <li className="flex items-center gap-2">
                     <svg
-                      className="h-5 w-5 text-primary flex-shrink-0"
+                      className="h-5 w-5 text-primary shrink-0"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -176,7 +176,7 @@ export default function Home() {
                   </li>
                   <li className="flex items-center gap-2">
                     <svg
-                      className="h-5 w-5 text-primary flex-shrink-0"
+                      className="h-5 w-5 text-primary shrink-0"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -200,7 +200,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="border-t mt-32">
-        <div className="container py-8 text-center text-muted-foreground">
+        <div className="py-8 text-center text-muted-foreground mx-auto max-w-7xl">
           <p>
             Built with{" "}
             <a
