@@ -4,7 +4,9 @@ This document outlines the missing features discovered while building the Fixed 
 
 ## 🔴 Critical Gaps
 
-### 1. Missing `checkoutUrl` in Subscription Response
+### 1. ✅ RESOLVED: `checkoutUrl` in Subscription Response
+
+**Status:** ✅ Implemented in SDK v0.x.x
 
 **Current Behavior:**
 ```json
@@ -22,19 +24,31 @@ This document outlines the missing features discovered while building the Fixed 
 }
 ```
 
-**Expected Behavior:**
+**✅ Implemented Behavior:**
 ```json
 {
   "success": true,
   "data": {
     "id": "sub_xxx",
     "customerId": "cus_xxx",
-    "status": "draft",
+    "status": "pending_payment",
     "startDate": "2024-01-01T00:00:00Z",
-    "checkoutUrl": "https://checkout.commet.co/sub_xxx?token=secure_token",
+    "checkoutUrl": "https://app.commet.co/checkout/sub_xxx",
     ...
   }
 }
+```
+
+**Usage:**
+```typescript
+const subscription = await commet.subscriptions.create({
+  externalId: "user_123",
+  items: [{ priceId: "price_xxx", quantity: 1 }],
+  status: "pending_payment" // This generates the checkoutUrl
+});
+
+// Redirect user to payment
+window.location.href = subscription.data.checkoutUrl;
 ```
 
 **Impact:**
@@ -244,9 +258,9 @@ const pdf = await commet.invoices.downloadPdf("inv_xxx");
 ## 🔧 Implementation Priority
 
 ### Phase 1 (Critical - Blocks Production Use)
-1. ✅ **checkoutUrl in subscription response**
-2. ✅ **Basic webhook system**
-3. ✅ **Webhook signature verification**
+1. ✅ **DONE: checkoutUrl in subscription response** - Implemented with `pending_payment` status
+2. ⏳ **Basic webhook system** - In Progress
+3. ⏳ **Webhook signature verification** - Pending
 
 ### Phase 2 (Important - Quality of Life)
 4. Customer portal

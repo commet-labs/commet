@@ -12,7 +12,7 @@ export interface Subscription {
   customerId: string;
   name: string;
   description?: string;
-  status: "draft" | "active" | "completed" | "canceled";
+  status: "draft" | "pending_payment" | "active" | "completed" | "canceled";
   startDate: string; // ISO datetime
   endDate?: string; // ISO datetime (puede ser null)
   billingDayOfMonth: number; // 1-31
@@ -20,6 +20,7 @@ export interface Subscription {
   poNumber?: string;
   reference?: string;
   isTemplate?: boolean;
+  checkoutUrl?: string; // Secure checkout URL for pending payment subscriptions
   createdAt: string;
   updatedAt: string;
 }
@@ -39,13 +40,13 @@ export type CreateSubscriptionParams = CustomerIdentifier & {
   items: SubscriptionItem[];
   name?: string;
   startDate?: string;
-  status?: "draft" | "active";
+  status?: "draft" | "pending_payment" | "active";
 };
 
 export interface ListSubscriptionsParams extends ListParams {
   customerId?: string;
   externalId?: string;
-  status?: "draft" | "active" | "completed" | "canceled";
+  status?: "draft" | "pending_payment" | "active" | "completed" | "canceled";
 }
 
 /**

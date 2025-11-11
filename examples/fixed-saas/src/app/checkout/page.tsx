@@ -23,7 +23,11 @@ export default async function CheckoutPage() {
     });
 
     // Create customer if doesn't exist
-    if (!customerCheck.success || !customerCheck.data || customerCheck.data.length === 0) {
+    if (
+      !customerCheck.success ||
+      !customerCheck.data ||
+      customerCheck.data.length === 0
+    ) {
       await commet.customers.create({
         externalId: user.id,
         legalName: user.name || user.email,
@@ -122,7 +126,7 @@ export default async function CheckoutPage() {
           quantity: 1,
         },
       ],
-      status: "draft", // Keep as draft until payment
+      status: "pending_payment", // Generates checkout URL
     });
 
     if (!subscriptionResult.success || !subscriptionResult.data) {
