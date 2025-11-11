@@ -13,7 +13,9 @@ export default function SignUpPage() {
   return (
     <div>
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-gray-900">Create your account</h2>
+        <h2 className="text-3xl font-bold text-gray-900">
+          Create your account
+        </h2>
         <p className="mt-2 text-sm text-gray-600">
           Start your journey with our SaaS platform
         </p>
@@ -22,7 +24,10 @@ export default function SignUpPage() {
       <form className="mt-8 space-y-6" action={formAction}>
         <div className="space-y-4">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-gray-700"
+            >
               Full Name
             </label>
             <input
@@ -36,7 +41,10 @@ export default function SignUpPage() {
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700"
+            >
               Email address
             </label>
             <input
@@ -51,7 +59,10 @@ export default function SignUpPage() {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700"
+            >
               Password
             </label>
             <input
@@ -93,7 +104,10 @@ export default function SignUpPage() {
         <div className="text-center">
           <p className="text-sm text-gray-600">
             Already have an account?{" "}
-            <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500">
+            <Link
+              href="/login"
+              className="font-medium text-blue-600 hover:text-blue-500"
+            >
               Sign in
             </Link>
           </p>
@@ -102,4 +116,3 @@ export default function SignUpPage() {
     </div>
   );
 }
-
