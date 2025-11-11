@@ -21,13 +21,74 @@ export default async function CheckoutPage() {
     externalId: user.id,
   });
 
-  if (existingSubscriptions.success && existingSubscriptions.data && existingSubscriptions.data.length > 0) {
+  if (
+    existingSubscriptions.success &&
+    existingSubscriptions.data &&
+    existingSubscriptions.data.length > 0
+  ) {
     const activeSubscription = existingSubscriptions.data.find(
       (sub) => sub.status === "active",
     );
     if (activeSubscription) {
       redirect("/dashboard");
     }
+  }
+
+  // Validate COMMET_PRICE_ID
+  if (COMMET_PRICE_ID === "build_placeholder" || !COMMET_PRICE_ID) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg
+                className="w-8 h-8 text-yellow-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                />
+              </svg>
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              Configuration Required
+            </h1>
+            <p className="text-gray-600 mb-6">
+              Please configure{" "}
+              <code className="bg-gray-100 px-2 py-1 rounded">
+                COMMET_PRICE_ID
+              </code>{" "}
+              in your{" "}
+              <code className="bg-gray-100 px-2 py-1 rounded">.env</code> file
+              with a valid price ID from your Commet dashboard.
+            </p>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-left">
+              <p className="text-sm text-blue-800 mb-2 font-semibold">
+                How to get your Price ID:
+              </p>
+              <ol className="text-sm text-blue-700 space-y-1 list-decimal list-inside">
+                <li>Go to your Commet dashboard</li>
+                <li>Navigate to Products</li>
+                <li>Create or select a product</li>
+                <li>Copy the Price ID</li>
+                <li>Update COMMET_PRICE_ID in .env</li>
+              </ol>
+            </div>
+            <Link
+              href="/"
+              className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Return to Home
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   // Create a new subscription
@@ -168,8 +229,13 @@ export default async function CheckoutPage() {
                         Missing Feature: Checkout URL
                       </h3>
                       <p className="text-sm text-yellow-700">
-                        The Commet subscription was created (ID: {subscription.id}),
-                        but the API response doesn't include a <code className="bg-yellow-100 px-1 py-0.5 rounded">checkoutUrl</code>.
+                        The Commet subscription was created (ID:{" "}
+                        {subscription.id}), but the API response doesn't include
+                        a{" "}
+                        <code className="bg-yellow-100 px-1 py-0.5 rounded">
+                          checkoutUrl
+                        </code>
+                        .
                       </p>
                     </div>
                   </div>
@@ -183,7 +249,7 @@ export default async function CheckoutPage() {
                     After creating a subscription, the API should return:
                   </p>
                   <pre className="bg-blue-100 text-blue-900 p-2 rounded text-xs overflow-x-auto">
-{`{
+                    {`{
   "success": true,
   "data": {
     "id": "${subscription.id}",
@@ -199,7 +265,11 @@ export default async function CheckoutPage() {
                     For now, we'll simulate the payment flow
                   </p>
                   <form action="/api/webhooks/commet/simulate" method="POST">
-                    <input type="hidden" name="subscriptionId" value={subscription.id} />
+                    <input
+                      type="hidden"
+                      name="subscriptionId"
+                      value={subscription.id}
+                    />
                     <input type="hidden" name="userId" value={user.id} />
                     <button
                       type="submit"
@@ -233,6 +303,30 @@ export default async function CheckoutPage() {
   } catch (error) {
     console.error("Checkout error:", error);
 
+    // Better error messages based on error type
+    let errorMessage = "An unexpected error occurred";
+    let errorDetails = "";
+
+    if (error instanceof Error) {
+      errorMessage = error.message;
+
+      // Check for common errors
+      if (errorMessage.includes("not found") || errorMessage.includes("404")) {
+        errorMessage = "Price ID not found in Commet";
+        errorDetails = `The price ID "${COMMET_PRICE_ID}" doesn't exist in your Commet dashboard.`;
+      } else if (errorMessage.includes("customer")) {
+        errorMessage = "Customer not found";
+        errorDetails =
+          "The Commet customer wasn't created properly during signup.";
+      } else if (
+        errorMessage.includes("unauthorized") ||
+        errorMessage.includes("401")
+      ) {
+        errorMessage = "Invalid API credentials";
+        errorDetails = "Check your COMMET_API_KEY in .env file.";
+      }
+    }
+
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
         <div className="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
@@ -255,19 +349,32 @@ export default async function CheckoutPage() {
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
               Checkout Error
             </h1>
-            <p className="text-gray-600 mb-6">
-              {error instanceof Error ? error.message : "An error occurred"}
-            </p>
-            <Link
-              href="/"
-              className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Return to Home
-            </Link>
+            <p className="text-gray-800 font-medium mb-2">{errorMessage}</p>
+            {errorDetails && (
+              <p className="text-gray-600 text-sm mb-4">{errorDetails}</p>
+            )}
+            <div className="bg-gray-50 rounded-lg p-4 mb-6 text-left">
+              <p className="text-xs text-gray-700 font-mono break-all">
+                {error instanceof Error ? error.message : String(error)}
+              </p>
+            </div>
+            <div className="flex flex-col gap-3">
+              <Link
+                href="/"
+                className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Return to Home
+              </Link>
+              <Link
+                href="/dashboard"
+                className="inline-block px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Go to Dashboard
+              </Link>
+            </div>
           </div>
         </div>
       </div>
     );
   }
 }
-

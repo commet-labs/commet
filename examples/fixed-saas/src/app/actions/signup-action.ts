@@ -33,13 +33,14 @@ export async function signUpAction(
       };
     }
 
-    // Step 1: Create Better Auth user
+    // Step 1: Create Better Auth user and session
     const userResult = await auth.api.signUpEmail({
       body: {
         email,
         password,
         name,
       },
+      headers: await import("next/headers").then((m) => m.headers()),
     });
 
     if (!userResult || !userResult.user) {
