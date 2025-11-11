@@ -12,10 +12,7 @@
       "require": "./dist/index.js"
     }
   },
-  "files": [
-    "dist",
-    "README.md"
-  ],
+  "files": ["dist", "README.md"],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
@@ -48,6 +45,7 @@
   "engines": {
     "node": ">=18.0.0"
   },
+  "homepage": "https://commet.co",
   "repository": {
     "type": "git",
     "url": "https://github.com/commet-labs/commet.git",
