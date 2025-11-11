@@ -9,6 +9,7 @@ export type {
   CommetGeneratedTypes,
   GeneratedEventType,
   GeneratedSeatType,
+  GeneratedProductId,
   Environment,
   ApiResponse,
   PaginatedResponse,

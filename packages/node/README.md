@@ -1,15 +1,22 @@
-# @commet/node
+<div align="center">
+  <p align="center">
+    <a href="https://commet.co">
+      <img src="https://commet.co/logo-bg-dark.png" height="96">
+      <h3 align="center">Commet</h3>
+    </a>
+  </p>
+  <p>TypeScript SDK for Commet billing platform</p>
 
-TypeScript SDK for Commet billing platform - track usage, manage seats, and handle customers.
+  <a href="https://www.npmjs.com/package/@commet/node"><img alt="NPM version" src="https://img.shields.io/npm/v/@commet/node.svg?style=for-the-badge&labelColor=000000"></a>
+  <a href="https://docs.commet.co/docs/library/quickstart"><img alt="Documentation" src="https://img.shields.io/badge/docs-SDK-blue.svg?style=for-the-badge&labelColor=000000"></a>
+</div>
+
+<br/>
 
 ## Installation
 
 ```bash
 npm install @commet/node
-# or
-pnpm add @commet/node
-# or
-yarn add @commet/node
 ```
 
 ## Quick Start
@@ -18,260 +25,70 @@ yarn add @commet/node
 import { Commet } from '@commet/node';
 
 const commet = new Commet({
-  apiKey: process.env.COMMET_API_KEY!,
-  environment: 'production', // or 'sandbox' (default)
-  debug: false, // Enable debug logging
+  apiKey: process.env.COMMET_API_KEY,
+  environment: 'production' // or 'sandbox'
 });
 ```
 
-## Usage Examples
-
-### Subscriptions (Simple API)
+## Usage
 
 ```typescript
-// Create subscription - Minimal (fixed product)
-await commet.subscriptions.create({
-  productId: 'prod_enterprise_plan',
-  customerId: 'cus_acme'
-});
-// Backend auto-configures: quantity=1, billingDay=today
-
-// Create with custom quantity
-await commet.subscriptions.create({
-  productId: 'prod_api_platform',
-  externalId: 'my-customer-123', // Use your own ID
-  quantity: 5,
-  status: 'active' // Generate invoice immediately
-});
-
-// Usage-based product (no quantity needed)
-await commet.subscriptions.create({
-  productId: 'prod_api_calls',
-  customerId: 'cus_startup'
-});
-// Backend uses usageMetricId from product
-// Send events: commet.usage.create(...)
-
-// Seat-based product
-await commet.subscriptions.create({
-  productId: 'prod_saas_licenses',
-  customerId: 'cus_tech_company',
-  initialSeats: 10,
-  name: 'Tech Company - SaaS Plan'
-});
-// Backend uses seatTypeId from product
-// Adjust seats: commet.seats.add(...)
-
-// List subscriptions
-const subs = await commet.subscriptions.list({
-  customerId: 'cus_acme',
-  status: 'active'
-});
-
-// Get subscription
-const sub = await commet.subscriptions.retrieve('sub_abc123');
-
-// Cancel subscription
-await commet.subscriptions.cancel('sub_abc123');
-```
-
-### Usage Events (Consumption-Based Billing)
-
-```typescript
-// Send a single event using customerId (Commet's ID)
+// Track usage events
 await commet.usage.create({
   eventType: 'api_call',
-  customerId: 'cus_123',
-  timestamp: new Date().toISOString(),
-  properties: [
-    { property: 'endpoint', value: '/api/users' },
-    { property: 'method', value: 'GET' }
-  ]
+  customerId: 'cus_123'
 });
 
-// OR use your own externalId
-await commet.usage.create({
-  eventType: 'api_call',
-  externalId: 'my-customer-123', // Your own customer ID
-  timestamp: new Date().toISOString(),
-  properties: [
-    { property: 'endpoint', value: '/api/users' },
-    { property: 'method', value: 'GET' }
-  ]
-});
-
-// Batch events
-await commet.usage.createBatch({
-  events: [
-    { eventType: 'api_call', externalId: 'my-customer-123' },
-    { eventType: 'api_call', customerId: 'cus_456' },
-  ]
-});
-
-// List events
-const events = await commet.usage.list({
-  externalId: 'my-customer-123', // Or use customerId
-  limit: 100
-});
-```
-
-### Seat Management (Per-Seat Licensing)
-
-```typescript
-// Add seats using customerId or externalId
+// Manage seats
 await commet.seats.add({
-  externalId: 'my-customer-123', // Or use customerId: 'cus_123'
+  customerId: 'cus_123',
   seatType: 'admin',
   count: 5
 });
 
-// Remove seats
-await commet.seats.remove({
-  externalId: 'my-customer-123',
-  seatType: 'admin',
-  count: 2
+// Create subscriptions
+await commet.subscriptions.create({
+  productId: 'prod_xxx',
+  customerId: 'cus_123',
+  status: 'active'
 });
 
-// Set exact count
-await commet.seats.set({
-  externalId: 'my-customer-123',
-  seatType: 'admin',
-  count: 10
-});
-
-// Get balance
-const balance = await commet.seats.getBalance({
-  externalId: 'my-customer-123',
-  seatType: 'admin'
-});
-console.log(balance.data.current); // 10
-
-// Get all balances for a customer
-const allBalances = await commet.seats.getAllBalances({
-  externalId: 'my-customer-123'
-});
-
-// Bulk update multiple seat types
-await commet.seats.bulkUpdate({
-  externalId: 'my-customer-123',
-  seats: {
-    admin: 5,
-    editor: 20,
-    viewer: 100
-  }
-});
-
-// List seat events
-const events = await commet.seats.listEvents({
-  externalId: 'my-customer-123',
-  limit: 50
-});
-```
-
-### Customer Management
-
-```typescript
-// Create customer
-const customer = await commet.customers.create({
-  legalName: 'Acme Corporation',
-  displayName: 'Acme',
-  currency: 'USD',
-  taxStatus: 'TAXED',
-  address: {
-    line1: '123 Main St',
-    city: 'San Francisco',
-    state: 'CA',
-    postalCode: '94105',
-    country: 'US'
-  },
+// Manage customers
+await commet.customers.create({
+  legalName: 'Acme Corp',
   billingEmail: 'billing@acme.com'
 });
-
-// Update customer
-await commet.customers.update('cus_123', {
-  displayName: 'Acme Inc',
-  billingEmail: 'finance@acme.com'
-});
-
-// List customers
-const customers = await commet.customers.list({
-  isActive: true,
-  limit: 50
-});
-
-// Deactivate customer
-await commet.customers.deactivate('cus_123');
 ```
 
-## API Reference
+## Type Safety
 
-### Configuration
+Use the [Commet CLI](https://www.npmjs.com/package/commet) to generate TypeScript types from your organization:
 
-```typescript
-interface CommetConfig {
-  apiKey: string;           // Required: Your Commet API key
-  environment?: 'sandbox' | 'production'; // Default: 'sandbox'
-  debug?: boolean;          // Default: false
-  timeout?: number;         // Request timeout in ms (default: 30000)
-  retries?: number;         // Max retry attempts (default: 3)
-}
+```bash
+npm install -g commet
+commet login
+commet link
+commet pull
 ```
 
-### Resources
+This generates type-safe autocomplete for your event types, seat types, and products.
 
-- `commet.subscriptions` - Simple subscription management
-- `commet.usage` - Usage event tracking
-- `commet.seats` - Seat management
-- `commet.customers` - Customer CRUD operations
+## Documentation
 
-### Error Handling
+Visit [docs.commet.co/docs/library/quickstart](https://docs.commet.co/docs/library/quickstart) for:
 
-```typescript
-import { CommetAPIError, CommetValidationError } from '@commet/node';
+- Complete API reference
+- Advanced usage examples
+- Error handling
+- Best practices
 
-try {
-  await commet.usage.create({ ... });
-} catch (error) {
-  if (error instanceof CommetValidationError) {
-    console.error('Validation errors:', error.validationErrors);
-  } else if (error instanceof CommetAPIError) {
-    console.error('API error:', error.statusCode, error.message);
-  }
-}
-```
+## Resources
 
-## Environment Detection
-
-```typescript
-// Check environment
-console.log(commet.getEnvironment()); // 'sandbox' | 'production'
-console.log(commet.isSandbox());      // boolean
-console.log(commet.isProduction());   // boolean
-```
-
-## TypeScript Support
-
-Fully typed with TypeScript. All API responses and parameters are type-safe.
-
-```typescript
-import type {
-  Subscription,
-  CreateSubscriptionParams,
-  Customer,
-  UsageEvent,
-  SeatBalance,
-  Currency
-} from '@commet/node';
-```
-
-## Links
-
-- [Documentation](https://docs.commet.co)
-- [API Reference](https://docs.commet.co/api)
-- [GitHub](https://github.com/commet-labs/commet-node)
-- [Issues](https://github.com/commet-labs/commet-node/issues)
+- [CLI Documentation](https://docs.commet.co/docs/library/cli/overview)
+- [SDK Reference](https://docs.commet.co/docs/library/quickstart)
+- [GitHub](https://github.com/commet-labs/commet)
+- [Issues](https://github.com/commet-labs/commet/issues)
 
 ## License
 
 MIT
-

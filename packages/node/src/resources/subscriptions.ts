@@ -1,5 +1,6 @@
 import type {
   ApiResponse,
+  GeneratedProductId,
   ListParams,
   RequestOptions,
   RetrieveOptions,
@@ -30,7 +31,7 @@ type CustomerIdentifier =
   | { customerId?: never; externalId: string };
 
 export type CreateSubscriptionParams = CustomerIdentifier & {
-  productId: string;
+  productId: GeneratedProductId;
   name?: string;
   startDate?: string;
   status?: "draft" | "active";

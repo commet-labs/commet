@@ -29,10 +29,17 @@ interface SeatType {
   isFree: boolean;
 }
 
+interface Product {
+  publicId: string;
+  name: string;
+  description?: string;
+}
+
 interface TypesResponse {
   success: boolean;
   eventTypes: EventType[];
   seatTypes: SeatType[];
+  products: Product[];
 }
 
 export const pullCommand = new Command("pull")
@@ -77,10 +84,10 @@ export const pullCommand = new Command("pull")
       return;
     }
 
-    const { eventTypes, seatTypes } = result.data;
+    const { eventTypes, seatTypes, products } = result.data;
 
     // Generate TypeScript definitions
-    const typeDefinitions = generateTypes(eventTypes, seatTypes);
+    const typeDefinitions = generateTypes(eventTypes, seatTypes, products);
 
     // Write to .commet/types.d.ts
     const commetDir = path.resolve(process.cwd(), ".commet");
@@ -137,12 +144,21 @@ export const pullCommand = new Command("pull")
         `  Seat types: ${seatTypes.length > 0 ? seatTypes.map((s) => s.code).join(", ") : "none"}`,
       ),
     );
+    console.log(
+      chalk.dim(
+        `  Products: ${products.length > 0 ? products.map((p) => p.publicId).join(", ") : "none"}`,
+      ),
+    );
     console.log(chalk.dim(`\nOutput: ${outputPath}`));
 
-    if (eventTypes.length === 0 && seatTypes.length === 0) {
+    if (
+      eventTypes.length === 0 &&
+      seatTypes.length === 0 &&
+      products.length === 0
+    ) {
       console.log(
         chalk.yellow(
-          "\n⚠ No types found. Create event types and seat types in your Commet dashboard.",
+          "\n⚠ No types found. Create event types, seat types, and products in your Commet dashboard.",
         ),
       );
     }
