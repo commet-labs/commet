@@ -16,6 +16,27 @@ export default async function CheckoutPage() {
 
   const user = session.user;
 
+  // Ensure customer exists in Commet
+  try {
+    const customerCheck = await commet.customers.list({
+      externalId: user.id,
+    });
+
+    // Create customer if doesn't exist
+    if (!customerCheck.success || !customerCheck.data || customerCheck.data.length === 0) {
+      await commet.customers.create({
+        externalId: user.id,
+        legalName: user.name || user.email,
+        billingEmail: user.email,
+        taxStatus: "NOT_APPLICABLE",
+        currency: "USD",
+      });
+    }
+  } catch (error) {
+    console.error("Failed to ensure Commet customer:", error);
+    // Continue anyway - subscription creation will fail if customer doesn't exist
+  }
+
   // Check if user already has a subscription
   const existingSubscriptions = await commet.subscriptions.list({
     externalId: user.id,

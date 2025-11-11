@@ -1,18 +1,62 @@
 "use client";
 
-import { signUpAction } from "@/actions/signup-action";
+import { signUp } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import Link from "next/link";
-import { useActionState } from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function SignUpPage() {
-  const [state, formAction, isPending] = useActionState(signUpAction, {
-    success: false,
-    message: "",
-  });
+  const router = useRouter();
+  const [error, setError] = useState("");
+  const [isPending, setIsPending] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError("");
+    setIsPending(true);
+
+    const formData = new FormData(e.currentTarget);
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    try {
+      // Better Auth handles EVERYTHING automatically
+      const result = await signUp.email({
+        name,
+        email,
+        password,
+        callbackURL: "/checkout",
+      });
+
+      if (result.error) {
+        setError(result.error.message || "Failed to create account");
+        setIsPending(false);
+        return;
+      }
+
+      // Success! Better Auth already:
+      // ✅ Created user in database
+      // ✅ Hashed password
+      // ✅ Set session cookies
+      // Now redirect to checkout
+      router.push("/checkout");
+      router.refresh();
+    } catch (err) {
+      setError("An error occurred. Please try again.");
+      setIsPending(false);
+    }
+  }
 
   return (
     <Card>
@@ -23,7 +67,7 @@ export default function SignUpPage() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form className="space-y-4" action={formAction}>
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-2">
             <Label htmlFor="name">Full Name</Label>
             <Input
@@ -58,18 +102,14 @@ export default function SignUpPage() {
               minLength={8}
               placeholder="••••••••"
             />
-            <p className="text-xs text-muted-foreground">Minimum 8 characters</p>
+            <p className="text-xs text-muted-foreground">
+              Minimum 8 characters
+            </p>
           </div>
 
-          {state?.message && (
-            <div
-              className={`p-4 rounded-lg text-sm ${
-                state.success
-                  ? "bg-green-500/10 text-green-500 border border-green-500/20"
-                  : "bg-destructive/10 text-destructive border border-destructive/20"
-              }`}
-            >
-              {state.message}
+          {error && (
+            <div className="p-4 rounded-lg text-sm bg-destructive/10 text-destructive border border-destructive/20">
+              {error}
             </div>
           )}
 
