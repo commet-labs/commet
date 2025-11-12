@@ -10,10 +10,9 @@ import type { CommetHTTPClient } from "../utils/http";
 export interface Subscription {
   id: string; // publicId (e.g., "sub_xxx")
   customerId: string;
-  productId?: string;
   name: string;
   description?: string;
-  status: "draft" | "active" | "completed" | "canceled";
+  status: "draft" | "pending_payment" | "active" | "completed" | "canceled";
   startDate: string; // ISO datetime
   endDate?: string; // ISO datetime (puede ser null)
   billingDayOfMonth: number; // 1-31
@@ -21,8 +20,15 @@ export interface Subscription {
   poNumber?: string;
   reference?: string;
   isTemplate?: boolean;
+  checkoutUrl?: string; // Secure checkout URL for pending payment subscriptions
   createdAt: string;
   updatedAt: string;
+}
+
+export interface SubscriptionItem {
+  priceId: string; // List price ID
+  quantity?: number; // For fixed pricing
+  initialSeats?: number; // For seat-based pricing
 }
 
 // Customer identifier: mutually exclusive customerId or externalId
@@ -31,18 +37,16 @@ type CustomerIdentifier =
   | { customerId?: never; externalId: string };
 
 export type CreateSubscriptionParams = CustomerIdentifier & {
-  productId: GeneratedProductId;
+  items: SubscriptionItem[];
   name?: string;
   startDate?: string;
-  status?: "draft" | "active";
-  quantity?: number;
-  initialSeats?: number;
+  status?: "draft" | "pending_payment" | "active";
 };
 
 export interface ListSubscriptionsParams extends ListParams {
   customerId?: string;
   externalId?: string;
-  status?: "draft" | "active" | "completed" | "canceled";
+  status?: "draft" | "pending_payment" | "active" | "completed" | "canceled";
 }
 
 /**
@@ -52,29 +56,29 @@ export class SubscriptionsResource {
   constructor(private httpClient: CommetHTTPClient) {}
 
   /**
-   * Create a simple subscription with smart defaults
+   * Create a subscription with multiple items (products)
    *
    * @example
    * ```typescript
-   * // Minimal - Fixed product
+   * // Free plan - Multiple products
    * await commet.subscriptions.create({
-   *   productId: "prod_xxx",
-   *   customerId: "cus_xxx"
+   *   externalId: "org_123",
+   *   items: [
+   *     { priceId: "price_tasks_free", quantity: 1 },
+   *     { priceId: "price_usage_free" },
+   *     { priceId: "price_seats_free", initialSeats: 1 }
+   *   ]
    * });
    *
-   * // With custom quantity
+   * // Pro plan upgrade
    * await commet.subscriptions.create({
-   *   productId: "prod_xxx",
-   *   externalId: "my-customer-123",
-   *   quantity: 5,
-   *   status: "active"
-   * });
-   *
-   * // Seat-based product
-   * await commet.subscriptions.create({
-   *   productId: "prod_saas",
    *   customerId: "cus_xxx",
-   *   initialSeats: 10
+   *   items: [
+   *     { priceId: "price_tasks_pro" },
+   *     { priceId: "price_usage_pro" },
+   *     { priceId: "price_seats_pro", initialSeats: 5 }
+   *   ],
+   *   status: "active"
    * });
    * ```
    */
