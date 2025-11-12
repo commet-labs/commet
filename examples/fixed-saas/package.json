@@ -15,7 +15,7 @@
     "docker:logs": "docker-compose logs -f postgres"
   },
   "dependencies": {
-    "@commet/node": "^0.10.0",
+    "@commet/node": "0.9.0",
     "@radix-ui/react-avatar": "^1.1.11",
     "@radix-ui/react-label": "^2.1.8",
     "@radix-ui/react-separator": "^1.1.8",
