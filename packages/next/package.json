@@ -14,11 +14,9 @@
   },
   "files": ["dist", "README.md"],
   "scripts": {
-    "build": "tsup",
     "dev": "tsup --watch",
     "lint": "biome lint src/",
     "lint:fix": "biome lint --write src/",
-    "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"
   },
