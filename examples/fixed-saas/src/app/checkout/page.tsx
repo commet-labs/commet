@@ -1,5 +1,8 @@
 import { auth } from "@/lib/auth";
 import { COMMET_PRICE_ID, commet } from "@/lib/commet";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -62,56 +65,57 @@ export default async function CheckoutPage() {
   // Validate COMMET_PRICE_ID
   if (COMMET_PRICE_ID === "build_placeholder" || !COMMET_PRICE_ID) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
-        <div className="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
-          <div className="text-center">
-            <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg
-                className="w-8 h-8 text-yellow-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                />
-              </svg>
-            </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              Configuration Required
-            </h1>
-            <p className="text-gray-600 mb-6">
-              Please configure{" "}
-              <code className="bg-gray-100 px-2 py-1 rounded">
-                COMMET_PRICE_ID
-              </code>{" "}
-              in your{" "}
-              <code className="bg-gray-100 px-2 py-1 rounded">.env</code> file
-              with a valid price ID from your Commet dashboard.
-            </p>
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-left">
-              <p className="text-sm text-blue-800 mb-2 font-semibold">
-                How to get your Price ID:
+      <div className="min-h-screen flex items-center justify-center py-12 px-4">
+        <Card className="max-w-md w-full">
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg
+                  className="w-8 h-8 text-yellow-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  />
+                </svg>
+              </div>
+              <h1 className="text-2xl font-bold mb-2">
+                Configuration Required
+              </h1>
+              <p className="text-muted-foreground mb-6">
+                Please configure{" "}
+                <code className="bg-muted px-2 py-1 rounded text-sm">
+                  COMMET_PRICE_ID
+                </code>{" "}
+                in your{" "}
+                <code className="bg-muted px-2 py-1 rounded text-sm">.env</code>{" "}
+                file with a valid price ID from your Commet dashboard.
               </p>
-              <ol className="text-sm text-blue-700 space-y-1 list-decimal list-inside">
-                <li>Go to your Commet dashboard</li>
-                <li>Navigate to Products</li>
-                <li>Create or select a product</li>
-                <li>Copy the Price ID</li>
-                <li>Update COMMET_PRICE_ID in .env</li>
-              </ol>
+              <Card className="border-primary/50 bg-primary/5 mb-6 text-left">
+                <CardContent className="pt-6">
+                  <p className="text-sm font-semibold mb-2">
+                    How to get your Price ID:
+                  </p>
+                  <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
+                    <li>Go to your Commet dashboard</li>
+                    <li>Navigate to Products</li>
+                    <li>Create or select a product</li>
+                    <li>Copy the Price ID</li>
+                    <li>Update COMMET_PRICE_ID in .env</li>
+                  </ol>
+                </CardContent>
+              </Card>
+              <Button asChild>
+                <Link href="/">Return to Home</Link>
+              </Button>
             </div>
-            <Link
-              href="/"
-              className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Return to Home
-            </Link>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -140,13 +144,13 @@ export default async function CheckoutPage() {
     const checkoutUrl = (subscription as { checkoutUrl?: string }).checkoutUrl;
 
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full">
-          <div className="bg-white rounded-lg shadow-xl p-8">
-            <div className="text-center mb-8">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <Card>
+            <CardHeader className="text-center">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg
-                  className="w-8 h-8 text-blue-600"
+                  className="w-8 h-8 text-primary"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -159,169 +163,165 @@ export default async function CheckoutPage() {
                   />
                 </svg>
               </div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              <CardTitle className="text-3xl mb-2">
                 Complete Your Purchase
-              </h1>
-              <p className="text-gray-600">
+              </CardTitle>
+              <p className="text-muted-foreground">
                 You're one step away from accessing SaaSPro
               </p>
-            </div>
+            </CardHeader>
 
-            <div className="border-t border-b border-gray-200 py-6 mb-6">
-              <div className="flex justify-between items-center mb-4">
-                <span className="text-gray-600">Pro Plan</span>
-                <span className="text-2xl font-bold text-gray-900">
-                  $50<span className="text-sm text-gray-500">/month</span>
-                </span>
-              </div>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li className="flex items-center gap-2">
-                  <svg
-                    className="w-4 h-4 text-green-500"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  Full platform access
-                </li>
-                <li className="flex items-center gap-2">
-                  <svg
-                    className="w-4 h-4 text-green-500"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  Priority support
-                </li>
-                <li className="flex items-center gap-2">
-                  <svg
-                    className="w-4 h-4 text-green-500"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  Advanced analytics
-                </li>
-              </ul>
-            </div>
-
-            {checkoutUrl ? (
-              // If checkoutUrl exists (future state)
-              <div>
-                <p className="text-sm text-gray-600 mb-4 text-center">
-                  Click below to complete your payment securely with Commet
-                </p>
-                <a
-                  href={checkoutUrl}
-                  className="block w-full px-6 py-3 bg-blue-600 text-white text-lg font-semibold rounded-lg hover:bg-blue-700 transition-colors text-center"
-                >
-                  Proceed to Payment
-                </a>
-              </div>
-            ) : (
-              // Current state: checkoutUrl doesn't exist yet
-              <div className="space-y-4">
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                  <div className="flex gap-3">
+            <CardContent>
+              <div className="border-t border-b py-6 mb-6">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-muted-foreground">Pro Plan</span>
+                  <span className="text-2xl font-bold">
+                    $50<span className="text-sm text-muted-foreground">/month</span>
+                  </span>
+                </div>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li className="flex items-center gap-2">
                     <svg
-                      className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5"
+                      className="w-4 h-4 text-green-500"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
                       <path
                         fillRule="evenodd"
-                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
                         clipRule="evenodd"
                       />
                     </svg>
-                    <div>
-                      <h3 className="text-sm font-semibold text-yellow-800 mb-1">
-                        Missing Feature: Checkout URL
-                      </h3>
-                      <p className="text-sm text-yellow-700">
-                        The Commet subscription was created (ID:{" "}
-                        {subscription.id}), but the API response doesn't include
-                        a{" "}
-                        <code className="bg-yellow-100 px-1 py-0.5 rounded">
-                          checkoutUrl
-                        </code>
-                        .
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                    Full platform access
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <svg
+                      className="w-4 h-4 text-green-500"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    Priority support
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <svg
+                      className="w-4 h-4 text-green-500"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    Advanced analytics
+                  </li>
+                </ul>
+              </div>
 
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <h3 className="text-sm font-semibold text-blue-800 mb-2">
-                    📝 Expected Behavior
-                  </h3>
-                  <p className="text-sm text-blue-700 mb-2">
-                    After creating a subscription, the API should return:
+              {checkoutUrl ? (
+                // If checkoutUrl exists (future state)
+                <div>
+                  <p className="text-sm text-muted-foreground mb-4 text-center">
+                    Click below to complete your payment securely with Commet
                   </p>
-                  <pre className="bg-blue-100 text-blue-900 p-2 rounded text-xs overflow-x-auto">
-                    {`{
+                  <Button size="lg" className="w-full" asChild>
+                    <a href={checkoutUrl}>Proceed to Payment</a>
+                  </Button>
+                </div>
+              ) : (
+                // Current state: checkoutUrl doesn't exist yet
+                <div className="space-y-4">
+                  <Card className="border-yellow-500/50 bg-yellow-500/10">
+                    <CardContent className="pt-6">
+                      <div className="flex gap-3">
+                        <svg
+                          className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        <div>
+                          <h3 className="text-sm font-semibold mb-1">
+                            Missing Feature: Checkout URL
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            The Commet subscription was created (ID: {subscription.id}), but
+                            the API response doesn't include a{" "}
+                            <code className="bg-muted px-1 py-0.5 rounded text-xs">
+                              checkoutUrl
+                            </code>
+                            .
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-primary/50 bg-primary/5">
+                    <CardContent className="pt-6">
+                      <h3 className="text-sm font-semibold mb-2">
+                        📝 Expected Behavior
+                      </h3>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        After creating a subscription, the API should return:
+                      </p>
+                      <pre className="bg-muted p-2 rounded text-xs overflow-x-auto">
+                        {`{
   "success": true,
   "data": {
     "id": "${subscription.id}",
-    "status": "draft",
+    "status": "pending_payment",
     "checkoutUrl": "https://checkout.commet.co/..."
   }
 }`}
-                  </pre>
-                </div>
+                      </pre>
+                    </CardContent>
+                  </Card>
 
-                <div className="text-center">
-                  <p className="text-sm text-gray-600 mb-4">
-                    For now, we'll simulate the payment flow
-                  </p>
-                  <form action="/api/webhooks/commet/simulate" method="POST">
-                    <input
-                      type="hidden"
-                      name="subscriptionId"
-                      value={subscription.id}
-                    />
-                    <input type="hidden" name="userId" value={user.id} />
-                    <button
-                      type="submit"
-                      className="w-full px-6 py-3 bg-green-600 text-white text-lg font-semibold rounded-lg hover:bg-green-700 transition-colors"
-                    >
-                      Simulate Payment (Demo Only)
-                    </button>
-                  </form>
-                </div>
+                  <div className="text-center">
+                    <p className="text-sm text-muted-foreground mb-4">
+                      For now, we'll simulate the payment flow
+                    </p>
+                    <form action="/api/webhooks/commet/simulate" method="POST">
+                      <input
+                        type="hidden"
+                        name="subscriptionId"
+                        value={subscription.id}
+                      />
+                      <input type="hidden" name="userId" value={user.id} />
+                      <Button type="submit" size="lg" variant="secondary" className="w-full">
+                        Simulate Payment (Demo Only)
+                      </Button>
+                    </form>
+                  </div>
 
-                <div className="text-center">
-                  <Link
-                    href="/"
-                    className="text-sm text-gray-600 hover:text-gray-900"
-                  >
-                    ← Back to home
-                  </Link>
+                  <div className="text-center">
+                    <Button variant="link" asChild>
+                      <Link href="/">← Back to home</Link>
+                    </Button>
+                  </div>
                 </div>
+              )}
+
+              <div className="mt-6 text-center">
+                <p className="text-xs text-muted-foreground">
+                  Subscription ID: {subscription.id}
+                </p>
               </div>
-            )}
-
-            <div className="mt-6 text-center">
-              <p className="text-xs text-gray-500">
-                Subscription ID: {subscription.id}
-              </p>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
@@ -353,52 +353,50 @@ export default async function CheckoutPage() {
     }
 
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
-        <div className="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
-          <div className="text-center">
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg
-                className="w-8 h-8 text-red-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
+      <div className="min-h-screen flex items-center justify-center py-12 px-4">
+        <Card className="max-w-md w-full">
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg
+                  className="w-8 h-8 text-destructive"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </div>
+              <h1 className="text-2xl font-bold mb-2">Checkout Error</h1>
+              <p className="font-medium mb-2">{errorMessage}</p>
+              {errorDetails && (
+                <p className="text-muted-foreground text-sm mb-4">
+                  {errorDetails}
+                </p>
+              )}
+              <Card className="bg-muted mb-6 text-left">
+                <CardContent className="pt-6">
+                  <p className="text-xs font-mono break-all">
+                    {error instanceof Error ? error.message : String(error)}
+                  </p>
+                </CardContent>
+              </Card>
+              <div className="flex flex-col gap-3">
+                <Button asChild>
+                  <Link href="/">Return to Home</Link>
+                </Button>
+                <Button variant="outline" asChild>
+                  <Link href="/dashboard">Go to Dashboard</Link>
+                </Button>
+              </div>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              Checkout Error
-            </h1>
-            <p className="text-gray-800 font-medium mb-2">{errorMessage}</p>
-            {errorDetails && (
-              <p className="text-gray-600 text-sm mb-4">{errorDetails}</p>
-            )}
-            <div className="bg-gray-50 rounded-lg p-4 mb-6 text-left">
-              <p className="text-xs text-gray-700 font-mono break-all">
-                {error instanceof Error ? error.message : String(error)}
-              </p>
-            </div>
-            <div className="flex flex-col gap-3">
-              <Link
-                href="/"
-                className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Return to Home
-              </Link>
-              <Link
-                href="/dashboard"
-                className="inline-block px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                Go to Dashboard
-              </Link>
-            </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
