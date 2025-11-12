@@ -1,6 +1,12 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { auth } from "@/lib/auth";
 import { COMMET_PRICE_ID, commet } from "@/lib/commet";
 import { headers } from "next/headers";
@@ -74,8 +80,8 @@ export default async function CheckoutPage() {
             <CardHeader>
               <CardTitle>Complete Your Payment</CardTitle>
               <CardDescription>
-                Your subscription is ready. Complete the payment to activate your
-                account.
+                Your subscription is ready. Complete the payment to activate
+                your account.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -88,9 +94,7 @@ export default async function CheckoutPage() {
                 </div>
               </div>
               <Button asChild className="w-full">
-                <a href={pendingSubscription.checkoutUrl}>
-                  Complete Payment
-                </a>
+                <a href={pendingSubscription.checkoutUrl}>Complete Payment</a>
               </Button>
             </CardContent>
           </Card>

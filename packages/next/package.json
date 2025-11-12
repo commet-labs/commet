@@ -1,0 +1,54 @@
+{
+  "name": "@commet/next",
+  "version": "0.1.0",
+  "description": "Next.js integration for Commet billing platform",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "README.md"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "biome lint src/",
+    "lint:fix": "biome lint --write src/",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": ["commet", "billing", "nextjs", "webhooks", "typescript"],
+  "author": "Commet Team",
+  "license": "MIT",
+  "dependencies": {
+    "@commet/node": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.1",
+    "next": "15.1.3",
+    "tsup": "8.5.0",
+    "typescript": "5.9.3",
+    "vitest": "2.1.8"
+  },
+  "peerDependencies": {
+    "next": ">=14.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "homepage": "https://commet.co",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/commet-labs/commet.git",
+    "directory": "packages/next"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}
