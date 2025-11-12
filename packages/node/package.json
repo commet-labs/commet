@@ -12,10 +12,7 @@
       "require": "./dist/index.js"
     }
   },
-  "files": [
-    "dist",
-    "README.md"
-  ],
+  "files": ["dist", "README.md"],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
@@ -35,12 +32,12 @@
   "author": "Commet Team",
   "license": "MIT",
   "dependencies": {
-    "zod": "^3.22.4"
+    "zod": "4.1.12"
   },
   "devDependencies": {
-    "@types/node": "^20.10.0",
-    "tsup": "^8.0.1",
-    "typescript": "^5.3.3"
+    "@types/node": "24.10.1",
+    "tsup": "8.5.0",
+    "typescript": "5.9.3"
   },
   "peerDependencies": {
     "typescript": ">=5.0.0"
