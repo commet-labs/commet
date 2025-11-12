@@ -1,5 +1,12 @@
 # commet
 
+## 0.8.1
+
+### Patch Changes
+
+- Updated dependencies [c9f67b7]
+  - @commet/node@0.10.0
+
 ## 0.8.0
 
 ### Minor Changes
