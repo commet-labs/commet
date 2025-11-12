@@ -100,8 +100,8 @@ importers:
   examples/fixed-saas:
     dependencies:
       '@commet/node':
-        specifier: workspace:*
-        version: link:../../packages/node
+        specifier: ^0.9.0
+        version: 0.9.0(typescript@5.9.2)
       '@radix-ui/react-avatar':
         specifier: ^1.1.11
         version: 1.1.11(@types/react-dom@19.1.9(@types/react@19.1.13))(@types/react@19.1.13)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -384,6 +384,12 @@ packages:
 
   '@changesets/write@0.4.0':
     resolution: {integrity: sha512-CdTLvIOPiCNuH71pyDu3rA+Q0n65cmAbXnwWH84rKGiFumFzkmHNT8KHTMEchcxN+Kl8I54xGUhJ7l3E7X396Q==}
+
+  '@commet/node@0.9.0':
+    resolution: {integrity: sha512-irQy1hDVTAkuB7lc286txj+8mWISmMzAWFMaozp2+PtG1C3+IUmUnJ3UY7iK8KEN9raASsgu8T+6f44f6kvI1w==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      typescript: '>=5.0.0'
 
   '@drizzle-team/brocli@0.10.2':
     resolution: {integrity: sha512-z33Il7l5dKjUgGULTqBsQBQwckHh5AbIuxhdsIxDDiZAzBOrZO6q9ogcWC65kU382AfynTfgNumVcNIjuIua6w==}
@@ -4557,6 +4563,11 @@ snapshots:
       fs-extra: 7.0.1
       human-id: 4.1.2
       prettier: 2.8.8
+
+  '@commet/node@0.9.0(typescript@5.9.2)':
+    dependencies:
+      typescript: 5.9.2
+      zod: 3.25.76
 
   '@drizzle-team/brocli@0.10.2': {}
 
