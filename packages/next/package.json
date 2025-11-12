@@ -26,7 +26,7 @@
   "author": "Commet Team",
   "license": "MIT",
   "dependencies": {
-    "@commet/node": "workspace:*"
+    "@commet/node": "0.10.1"
   },
   "devDependencies": {
     "@types/node": "24.10.1",
