@@ -73,6 +73,7 @@ export type {
   ListSubscriptionsParams,
 } from "./resources/subscriptions";
 
+export { Webhooks } from "./resources/webhooks";
 export type {
   WebhookPayload,
   WebhookData,
