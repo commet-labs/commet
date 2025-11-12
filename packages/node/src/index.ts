@@ -73,6 +73,12 @@ export type {
   ListSubscriptionsParams,
 } from "./resources/subscriptions";
 
+export type {
+  WebhookPayload,
+  WebhookData,
+  WebhookEvent,
+} from "./resources/webhooks";
+
 // Utility exports
 export { isSandbox, isProduction } from "./utils/environment";
 

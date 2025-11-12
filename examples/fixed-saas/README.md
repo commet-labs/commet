@@ -76,6 +76,7 @@ NEXT_PUBLIC_BETTER_AUTH_URL=http://localhost:3000
 COMMET_API_KEY=ck_sandbox_your_api_key_here
 COMMET_ENVIRONMENT=sandbox
 COMMET_PRICE_ID=your_price_id_here
+COMMET_WEBHOOK_SECRET=your_webhook_secret_from_commet_dashboard
 ```
 
 4. **Set up the database**:
@@ -128,6 +129,36 @@ pnpm db:push
 5. **Get your price ID**:
    - Go to Products → Select your product
    - Copy the **Price ID** (UUID format)
+
+### Configure Webhooks
+
+Webhooks allow your app to receive real-time notifications when subscriptions are activated or canceled.
+
+1. **Configure webhook endpoint** in Commet dashboard:
+   - Go to **Settings → Webhooks**
+   - Click **Add Endpoint**
+   - URL: `https://your-domain.com/api/webhooks/commet` (for development, use ngrok or similar tunnel)
+   - Events: Select `subscription.activated`, `subscription.canceled`, `subscription.created`, `subscription.updated`
+   - Copy the **Webhook Secret** and add it to your `.env` as `COMMET_WEBHOOK_SECRET`
+
+2. **For local development**, use ngrok to expose your webhook:
+   ```bash
+   # Install ngrok: https://ngrok.com
+   ngrok http 3000
+   
+   # Use the HTTPS URL in Commet dashboard
+   # Example: https://abc123.ngrok.io/api/webhooks/commet
+   ```
+
+3. **Test webhook delivery**:
+   - Complete a payment in your app
+   - Check Commet dashboard → Webhooks → Delivery Logs
+   - Verify your app logs show: `[Webhook] ✅ User xxx subscription activated`
+
+**Security Notes:**
+- Webhooks are verified using HMAC-SHA256 signatures
+- The `X-Commet-Signature` header is validated before processing
+- Invalid signatures are rejected with 401 Unauthorized
 
 ### Run the Application
 

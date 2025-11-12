@@ -1,55 +1,60 @@
-import { auth } from "@/lib/auth";
 import { commet } from "@/lib/commet";
+import { db } from "@/lib/db/connection";
+import { user } from "@/lib/db/schema";
+import type { WebhookPayload } from "@commet/node";
+import { eq } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";
 
-/**
- * Commet Webhook Handler
- *
- * This endpoint will receive webhook events from Commet when subscription
- * status changes (e.g., payment successful, subscription canceled, etc.)
- *
- * 🚧 CURRENT STATUS: Placeholder implementation
- *
- * Expected webhook payload from Commet:
- * {
- *   "event": "subscription.paid" | "subscription.canceled" | "subscription.updated",
- *   "subscriptionId": "sub_xxx",
- *   "customerId": "cus_xxx",
- *   "status": "active" | "canceled" | "past_due",
- *   "timestamp": "2024-01-01T00:00:00Z"
- * }
- *
- * Security:
- * - Webhook signature verification (COMMET_WEBHOOK_SECRET)
- * - Idempotency handling
- * - IP allowlist (optional)
- */
 export async function POST(request: NextRequest) {
   try {
-    // TODO: Verify webhook signature
-    // const signature = request.headers.get("x-commet-signature");
-    // const webhookSecret = process.env.COMMET_WEBHOOK_SECRET;
-    // if (!verifySignature(payload, signature, webhookSecret)) {
-    //   return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
-    // }
+    // 1. Verify webhook signature and parse payload
+    const rawBody = await request.text();
+    const signature = request.headers.get("x-commet-signature");
+    const webhookSecret = process.env.COMMET_WEBHOOK_SECRET;
 
-    const payload = await request.json();
+    if (!webhookSecret) {
+      console.error("[Webhook] COMMET_WEBHOOK_SECRET not configured");
+      return NextResponse.json(
+        { error: "Webhook not configured" },
+        { status: 500 },
+      );
+    }
 
-    console.log("Received Commet webhook:", payload);
+    // Use Commet SDK to verify and parse webhook
+    const payload = commet.webhooks.verifyAndParse(
+      rawBody,
+      signature,
+      webhookSecret,
+    );
 
-    // Validate payload structure
-    if (!payload.event || !payload.subscriptionId) {
+    if (!payload) {
+      console.error("[Webhook] Invalid signature or payload");
+      return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
+    }
+
+    // 2. Validate payload structure
+
+    console.log(`[Webhook] Received ${payload.event}:`, {
+      subscriptionId: payload.data.subscriptionId,
+      customerId: payload.data.customerId,
+      externalId: payload.data.externalId,
+    });
+
+    if (!payload.event || !payload.data) {
       return NextResponse.json(
         { error: "Invalid webhook payload" },
         { status: 400 },
       );
     }
 
-    // Handle different webhook events
+    // 3. Handle different webhook events
     switch (payload.event) {
-      case "subscription.paid":
-      case "subscription.active":
+      case "subscription.activated":
         await handleSubscriptionActivated(payload);
+        break;
+
+      case "subscription.created":
+        await handleSubscriptionCreated(payload);
         break;
 
       case "subscription.canceled":
@@ -61,12 +66,12 @@ export async function POST(request: NextRequest) {
         break;
 
       default:
-        console.log(`Unhandled webhook event: ${payload.event}`);
+        console.log(`[Webhook] Unhandled event: ${payload.event}`);
     }
 
     return NextResponse.json({ received: true });
   } catch (error) {
-    console.error("Webhook error:", error);
+    console.error("[Webhook] Processing error:", error);
     return NextResponse.json(
       { error: "Webhook processing failed" },
       { status: 500 },
@@ -75,75 +80,128 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * Handle subscription activation (payment successful)
+ * Get user ID from webhook payload
+ * Tries externalId first, falls back to customerId lookup
  */
-async function handleSubscriptionActivated(payload: {
-  subscriptionId: string;
-  customerId?: string;
-  externalId?: string;
-}) {
+async function getUserIdFromPayload(
+  payload: WebhookPayload,
+): Promise<string | null> {
+  // Try externalId first (most efficient)
+  if (payload.data.externalId) {
+    return payload.data.externalId;
+  }
+
+  // Fallback: look up by Commet customer ID
+  if (payload.data.customerId) {
+    const [existingUser] = await db
+      .select({ id: user.id })
+      .from(user)
+      .where(eq(user.commetCustomerId, payload.data.customerId))
+      .limit(1);
+
+    return existingUser?.id || null;
+  }
+
+  return null;
+}
+
+/**
+ * Handle subscription activation (payment successful)
+ * Updates user's isPaid status and stores subscription ID
+ */
+async function handleSubscriptionActivated(payload: WebhookPayload) {
   try {
-    // Get subscription details from Commet
-    const subscription = await commet.subscriptions.retrieve(
-      payload.subscriptionId,
-    );
+    const userId = await getUserIdFromPayload(payload);
 
-    if (!subscription.success || !subscription.data) {
-      throw new Error("Failed to retrieve subscription");
-    }
-
-    const customerId = subscription.data.customerId;
-
-    // Get customer details to find the user
-    const customer = await commet.customers.retrieve(
-      customerId as `cus_${string}`,
-    );
-
-    if (!customer.success || !customer.data) {
-      throw new Error("Failed to retrieve customer");
-    }
-
-    const externalId = customer.data.externalId;
-
-    if (!externalId) {
-      console.error("Customer has no externalId (user ID)");
+    if (!userId) {
+      console.error(
+        "[Webhook] Cannot find user for subscription:",
+        payload.data.subscriptionId,
+      );
       return;
     }
 
-    // Update user's isPaid status in Better Auth
-    // Note: Better Auth doesn't have a direct update API in server context
-    // In production, you'd update the database directly or use Better Auth's admin API
-    console.log(
-      `User ${externalId} subscription activated: ${payload.subscriptionId}`,
-    );
+    // Update user to paid status
+    await db
+      .update(user)
+      .set({
+        isPaid: true,
+        subscriptionId: payload.data.subscriptionId || null,
+        updatedAt: new Date(),
+      })
+      .where(eq(user.id, userId));
 
-    // TODO: Update user record in database
-    // await db.update(users).set({ isPaid: true, subscriptionId: payload.subscriptionId }).where(eq(users.id, externalId));
+    console.log(
+      `[Webhook] ✅ User ${userId} subscription activated: ${payload.data.subscriptionId}`,
+    );
   } catch (error) {
-    console.error("Error handling subscription activation:", error);
+    console.error("[Webhook] Error handling subscription activation:", error);
     throw error;
   }
 }
 
 /**
- * Handle subscription cancellation
+ * Handle subscription creation
+ * Logs the event but doesn't change user status (not yet paid)
  */
-async function handleSubscriptionCanceled(payload: {
-  subscriptionId: string;
-}) {
-  console.log(`Subscription canceled: ${payload.subscriptionId}`);
+async function handleSubscriptionCreated(payload: WebhookPayload) {
+  console.log(
+    `[Webhook] Subscription created: ${payload.data.subscriptionId} (status: ${payload.data.status})`,
+  );
+  // No action needed - user will be updated when payment is received
+}
 
-  // TODO: Update user's isPaid status to false
-  // Get subscription -> Get customer -> Get externalId -> Update user
+/**
+ * Handle subscription cancellation
+ * Revokes user access by setting isPaid to false
+ */
+async function handleSubscriptionCanceled(payload: WebhookPayload) {
+  try {
+    const userId = await getUserIdFromPayload(payload);
+
+    if (!userId) {
+      console.error(
+        "[Webhook] Cannot find user for subscription:",
+        payload.data.subscriptionId,
+      );
+      return;
+    }
+
+    // Revoke access
+    await db
+      .update(user)
+      .set({
+        isPaid: false,
+        updatedAt: new Date(),
+      })
+      .where(eq(user.id, userId));
+
+    console.log(
+      `[Webhook] ❌ User ${userId} subscription canceled: ${payload.data.subscriptionId}`,
+    );
+  } catch (error) {
+    console.error("[Webhook] Error handling subscription cancellation:", error);
+    throw error;
+  }
 }
 
 /**
  * Handle subscription updates
+ * Currently logs the event - extend as needed for plan changes, quantity updates, etc.
  */
-async function handleSubscriptionUpdated(payload: {
-  subscriptionId: string;
-}) {
-  console.log(`Subscription updated: ${payload.subscriptionId}`);
+async function handleSubscriptionUpdated(payload: WebhookPayload) {
+  console.log(
+    `[Webhook] Subscription updated: ${payload.data.subscriptionId} (status: ${payload.data.status})`,
+  );
 
-  // TODO: Handle plan changes, quantity updates, etc.
+  // If status changed to active, treat as activation
+  if (payload.data.status === "active") {
+    await handleSubscriptionActivated(payload);
+  }
+  // If status changed to canceled, treat as cancellation
+  else if (payload.data.status === "canceled") {
+    await handleSubscriptionCanceled(payload);
+  }
+
+  // Handle other updates as needed (plan changes, quantity, etc.)
 }

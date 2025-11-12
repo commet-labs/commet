@@ -2,6 +2,7 @@ import { CustomersResource } from "./resources/customers";
 import { SeatsResource } from "./resources/seats";
 import { SubscriptionsResource } from "./resources/subscriptions";
 import { UsageResource } from "./resources/usage";
+import { Webhooks } from "./resources/webhooks";
 import type { CommetConfig, Environment } from "./types/common";
 import { CommetHTTPClient } from "./utils/http";
 
@@ -16,6 +17,7 @@ export class Commet {
   public readonly usage: UsageResource;
   public readonly seats: SeatsResource;
   public readonly subscriptions: SubscriptionsResource;
+  public readonly webhooks: Webhooks;
 
   constructor(config: CommetConfig) {
     if (!config.apiKey) {
@@ -36,6 +38,7 @@ export class Commet {
     this.usage = new UsageResource(this.httpClient);
     this.seats = new SeatsResource(this.httpClient);
     this.subscriptions = new SubscriptionsResource(this.httpClient);
+    this.webhooks = new Webhooks();
 
     if (config.debug) {
       console.log(`[Commet SDK] Initialized in ${this.environment} mode`);
