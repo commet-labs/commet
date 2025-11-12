@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
 import { COMMET_PRICE_ID, commet } from "@/lib/commet";
 import { headers } from "next/headers";
@@ -54,11 +54,48 @@ export default async function CheckoutPage() {
     existingSubscriptions.data &&
     existingSubscriptions.data.length > 0
   ) {
+    // If active subscription exists, redirect to dashboard
     const activeSubscription = existingSubscriptions.data.find(
       (sub) => sub.status === "active",
     );
     if (activeSubscription) {
       redirect("/dashboard");
+    }
+
+    // If pending subscription exists, use it instead of creating a new one
+    const pendingSubscription = existingSubscriptions.data.find(
+      (sub) => sub.status === "pending_payment" && sub.checkoutUrl,
+    );
+    if (pendingSubscription) {
+      // Reuse existing pending subscription
+      return (
+        <div className="min-h-screen flex items-center justify-center py-12 px-4">
+          <Card className="max-w-md w-full">
+            <CardHeader>
+              <CardTitle>Complete Your Payment</CardTitle>
+              <CardDescription>
+                Your subscription is ready. Complete the payment to activate your
+                account.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="p-4 border rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-semibold">Pro Plan</p>
+                    <p className="text-sm text-muted-foreground">$50/month</p>
+                  </div>
+                </div>
+              </div>
+              <Button asChild className="w-full">
+                <a href={pendingSubscription.checkoutUrl}>
+                  Complete Payment
+                </a>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      );
     }
   }
 
