@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
 import { redirect } from "next/navigation";
+import { type NextRequest, NextResponse } from "next/server";
 
 /**
  * Simulate Payment Success
- * 
+ *
  * This is a demo endpoint that simulates a successful payment webhook from Commet.
  * In production, this would be replaced by actual Commet webhook events.
- * 
+ *
  * This demonstrates what the flow SHOULD be once Commet implements:
  * 1. checkoutUrl in subscription response
  * 2. Webhook events for payment confirmation
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     if (!subscriptionId || !userId) {
       return NextResponse.json(
         { error: "Missing required fields" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -42,15 +42,14 @@ export async function POST(request: NextRequest) {
     redirect("/dashboard?payment=success");
   } catch (error) {
     console.error("Simulate payment error:", error);
-    
+
     if (error instanceof Error && error.message === "NEXT_REDIRECT") {
       throw error;
     }
 
     return NextResponse.json(
       { error: "Payment simulation failed" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
-

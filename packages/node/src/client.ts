@@ -12,10 +12,10 @@ export class Commet {
   private httpClient: CommetHTTPClient;
   private environment: Environment;
 
-	public readonly customers: CustomersResource;
-	public readonly usage: UsageResource;
-	public readonly seats: SeatsResource;
-	public readonly subscriptions: SubscriptionsResource;
+  public readonly customers: CustomersResource;
+  public readonly usage: UsageResource;
+  public readonly seats: SeatsResource;
+  public readonly subscriptions: SubscriptionsResource;
 
   constructor(config: CommetConfig) {
     if (!config.apiKey) {
@@ -31,11 +31,11 @@ export class Commet {
     // Default to sandbox for safety
     this.environment = config.environment || "sandbox";
 
-		this.httpClient = new CommetHTTPClient(config, this.environment);
-		this.customers = new CustomersResource(this.httpClient);
-		this.usage = new UsageResource(this.httpClient);
-		this.seats = new SeatsResource(this.httpClient);
-		this.subscriptions = new SubscriptionsResource(this.httpClient);
+    this.httpClient = new CommetHTTPClient(config, this.environment);
+    this.customers = new CustomersResource(this.httpClient);
+    this.usage = new UsageResource(this.httpClient);
+    this.seats = new SeatsResource(this.httpClient);
+    this.subscriptions = new SubscriptionsResource(this.httpClient);
 
     if (config.debug) {
       console.log(`[Commet SDK] Initialized in ${this.environment} mode`);

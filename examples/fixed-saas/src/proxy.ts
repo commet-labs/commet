@@ -10,7 +10,10 @@ export async function proxy(request: NextRequest) {
   const isPublicRoute = publicRoutes.includes(pathname);
 
   // API routes and auth routes should be handled separately
-  if (pathname.startsWith("/api/auth") || pathname.startsWith("/api/webhooks")) {
+  if (
+    pathname.startsWith("/api/auth") ||
+    pathname.startsWith("/api/webhooks")
+  ) {
     return NextResponse.next();
   }
 

@@ -2,6 +2,7 @@
 
 import chalk from "chalk";
 import { Command } from "commander";
+import packageJson from "../package.json" with { type: "json" };
 import { infoCommand } from "./commands/info";
 import { linkCommand } from "./commands/link";
 import { listCommand } from "./commands/list";
@@ -11,7 +12,6 @@ import { pullCommand } from "./commands/pull";
 import { switchCommand } from "./commands/switch";
 import { unlinkCommand } from "./commands/unlink";
 import { whoamiCommand } from "./commands/whoami";
-import packageJson from "../package.json" with { type: "json" };
 
 const program = new Command();
 

@@ -259,7 +259,9 @@ export class CommetHTTPClient {
     const baseURL = this.getBaseURL();
 
     // Construct full path with /api prefix
-    const normalizedEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+    const normalizedEndpoint = endpoint.startsWith("/")
+      ? endpoint
+      : `/${endpoint}`;
     const fullPath = `/api${normalizedEndpoint}`;
 
     // Debug logging

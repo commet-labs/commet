@@ -1,9 +1,9 @@
 import { checkSubscriptionStatus } from "@/actions/check-subscription-action";
-import { auth } from "@/lib/auth";
-import { commet } from "@/lib/commet";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { auth } from "@/lib/auth";
+import { commet } from "@/lib/commet";
 import { headers } from "next/headers";
 import Link from "next/link";
 

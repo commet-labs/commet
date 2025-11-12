@@ -1,8 +1,8 @@
-import { auth } from "@/lib/auth";
-import { COMMET_PRICE_ID, commet } from "@/lib/commet";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { auth } from "@/lib/auth";
+import { COMMET_PRICE_ID, commet } from "@/lib/commet";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -176,7 +176,10 @@ export default async function CheckoutPage() {
                 <div className="flex justify-between items-center mb-4">
                   <span className="text-muted-foreground">Pro Plan</span>
                   <span className="text-2xl font-bold">
-                    $50<span className="text-sm text-muted-foreground">/month</span>
+                    $50
+                    <span className="text-sm text-muted-foreground">
+                      /month
+                    </span>
                   </span>
                 </div>
                 <ul className="space-y-2 text-sm text-muted-foreground">
@@ -257,8 +260,9 @@ export default async function CheckoutPage() {
                             Missing Feature: Checkout URL
                           </h3>
                           <p className="text-sm text-muted-foreground">
-                            The Commet subscription was created (ID: {subscription.id}), but
-                            the API response doesn't include a{" "}
+                            The Commet subscription was created (ID:{" "}
+                            {subscription.id}), but the API response doesn't
+                            include a{" "}
                             <code className="bg-muted px-1 py-0.5 rounded text-xs">
                               checkoutUrl
                             </code>
@@ -301,7 +305,12 @@ export default async function CheckoutPage() {
                         value={subscription.id}
                       />
                       <input type="hidden" name="userId" value={user.id} />
-                      <Button type="submit" size="lg" variant="secondary" className="w-full">
+                      <Button
+                        type="submit"
+                        size="lg"
+                        variant="secondary"
+                        className="w-full"
+                      >
                         Simulate Payment (Demo Only)
                       </Button>
                     </form>

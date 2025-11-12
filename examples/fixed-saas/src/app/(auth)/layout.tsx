@@ -1,5 +1,5 @@
-import type { ReactNode } from "react";
 import Link from "next/link";
+import type { ReactNode } from "react";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
@@ -11,4 +11,3 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
     </div>
   );
 }
-

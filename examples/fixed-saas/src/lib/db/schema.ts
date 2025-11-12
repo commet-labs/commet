@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core";
+import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 // Better Auth will generate its own tables
 // We only need to define our custom user fields here
@@ -10,7 +10,7 @@ export const user = pgTable("user", {
   image: text("image"),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
-  
+
   // Custom fields for Commet integration
   commetCustomerId: text("commetCustomerId"),
   subscriptionId: text("subscriptionId"),
@@ -56,4 +56,3 @@ export const verification = pgTable("verification", {
   createdAt: timestamp("createdAt").defaultNow(),
   updatedAt: timestamp("updatedAt").defaultNow(),
 });
-

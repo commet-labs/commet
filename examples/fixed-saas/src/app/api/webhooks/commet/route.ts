@@ -1,15 +1,15 @@
 import { auth } from "@/lib/auth";
 import { commet } from "@/lib/commet";
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 /**
  * Commet Webhook Handler
- * 
+ *
  * This endpoint will receive webhook events from Commet when subscription
  * status changes (e.g., payment successful, subscription canceled, etc.)
- * 
+ *
  * 🚧 CURRENT STATUS: Placeholder implementation
- * 
+ *
  * Expected webhook payload from Commet:
  * {
  *   "event": "subscription.paid" | "subscription.canceled" | "subscription.updated",
@@ -18,7 +18,7 @@ import { NextRequest, NextResponse } from "next/server";
  *   "status": "active" | "canceled" | "past_due",
  *   "timestamp": "2024-01-01T00:00:00Z"
  * }
- * 
+ *
  * Security:
  * - Webhook signature verification (COMMET_WEBHOOK_SECRET)
  * - Idempotency handling
@@ -34,14 +34,14 @@ export async function POST(request: NextRequest) {
     // }
 
     const payload = await request.json();
-    
+
     console.log("Received Commet webhook:", payload);
 
     // Validate payload structure
     if (!payload.event || !payload.subscriptionId) {
       return NextResponse.json(
         { error: "Invalid webhook payload" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
     console.error("Webhook error:", error);
     return NextResponse.json(
       { error: "Webhook processing failed" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -85,7 +85,7 @@ async function handleSubscriptionActivated(payload: {
   try {
     // Get subscription details from Commet
     const subscription = await commet.subscriptions.retrieve(
-      payload.subscriptionId
+      payload.subscriptionId,
     );
 
     if (!subscription.success || !subscription.data) {
@@ -95,7 +95,9 @@ async function handleSubscriptionActivated(payload: {
     const customerId = subscription.data.customerId;
 
     // Get customer details to find the user
-    const customer = await commet.customers.retrieve(customerId as `cus_${string}`);
+    const customer = await commet.customers.retrieve(
+      customerId as `cus_${string}`,
+    );
 
     if (!customer.success || !customer.data) {
       throw new Error("Failed to retrieve customer");
@@ -111,7 +113,9 @@ async function handleSubscriptionActivated(payload: {
     // Update user's isPaid status in Better Auth
     // Note: Better Auth doesn't have a direct update API in server context
     // In production, you'd update the database directly or use Better Auth's admin API
-    console.log(`User ${externalId} subscription activated: ${payload.subscriptionId}`);
+    console.log(
+      `User ${externalId} subscription activated: ${payload.subscriptionId}`,
+    );
 
     // TODO: Update user record in database
     // await db.update(users).set({ isPaid: true, subscriptionId: payload.subscriptionId }).where(eq(users.id, externalId));
@@ -128,7 +132,7 @@ async function handleSubscriptionCanceled(payload: {
   subscriptionId: string;
 }) {
   console.log(`Subscription canceled: ${payload.subscriptionId}`);
-  
+
   // TODO: Update user's isPaid status to false
   // Get subscription -> Get customer -> Get externalId -> Update user
 }
@@ -140,7 +144,6 @@ async function handleSubscriptionUpdated(payload: {
   subscriptionId: string;
 }) {
   console.log(`Subscription updated: ${payload.subscriptionId}`);
-  
+
   // TODO: Handle plan changes, quantity updates, etc.
 }
-

@@ -1,10 +1,16 @@
 "use client";
 
-import { signIn } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { signIn } from "@/lib/auth-client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -89,7 +95,10 @@ export default function LoginPage() {
 
           <p className="text-center text-sm text-muted-foreground">
             Don't have an account?{" "}
-            <Link href="/signup" className="font-medium text-primary hover:underline">
+            <Link
+              href="/signup"
+              className="font-medium text-primary hover:underline"
+            >
               Sign up
             </Link>
           </p>
