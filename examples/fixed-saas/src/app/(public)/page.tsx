@@ -1,6 +1,12 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import Link from "next/link";
 
 export default function Home() {
@@ -57,77 +63,32 @@ export default function Home() {
         {/* Features */}
         <div className="mt-32 grid gap-6 md:grid-cols-3 mx-auto">
           <Card>
-            <CardContent className="pt-6">
-              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                <svg
-                  className="h-6 w-6 text-primary"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M13 10V3L4 14h7v7l9-11h-7z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Fast Setup</h3>
-              <p className="text-muted-foreground">
-                Get started in minutes with our simple integration. No complex
-                configuration required.
-              </p>
+            <CardHeader>
+              <CardTitle>Fast Setup</CardTitle>
+            </CardHeader>
+            <CardContent>
+              Get started in minutes with our simple integration. No complex
+              configuration required.
             </CardContent>
           </Card>
 
           <Card>
-            <CardContent className="pt-6">
-              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                <svg
-                  className="h-6 w-6 text-primary"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Secure Billing</h3>
-              <p className="text-muted-foreground">
-                Commet handles all payment processing securely with complete
-                audit trails.
-              </p>
+            <CardHeader>
+              <CardTitle>Secure Billing</CardTitle>
+            </CardHeader>
+            <CardContent>
+              Commet handles all payment processing securely with complete audit
+              trails.
             </CardContent>
           </Card>
 
           <Card>
-            <CardContent className="pt-6">
-              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                <svg
-                  className="h-6 w-6 text-primary"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Usage Tracking</h3>
-              <p className="text-muted-foreground">
-                Track customer usage, seats, and subscriptions with real-time
-                analytics.
-              </p>
+            <CardHeader>
+              <CardTitle>Usage Tracking</CardTitle>
+            </CardHeader>
+            <CardContent>
+              Track customer usage, seats, and subscriptions with real-time
+              analytics.
             </CardContent>
           </Card>
         </div>
