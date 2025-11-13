@@ -37,7 +37,7 @@ export default async function DashboardPage({
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur">
         <div className="mx-auto max-w-7xl px-4 py-4 flex justify-between items-center">
           <Link href="/" className="text-2xl font-bold">
             SaaSPro
@@ -61,7 +61,7 @@ export default async function DashboardPage({
               <CardContent className="pt-6">
                 <div className="flex gap-3">
                   <svg
-                    className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5"
+                    className="w-5 h-5 text-green-500 mt-0.5"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -106,7 +106,7 @@ export default async function DashboardPage({
                     <CardContent className="pt-6">
                       <div className="flex items-start gap-3">
                         <svg
-                          className="w-6 h-6 text-green-500 flex-shrink-0"
+                          className="w-6 h-6 text-green-500"
                           fill="currentColor"
                           viewBox="0 0 20 20"
                         >
@@ -152,7 +152,7 @@ export default async function DashboardPage({
                     <CardContent className="pt-6">
                       <div className="flex items-start gap-3">
                         <svg
-                          className="w-6 h-6 text-yellow-500 flex-shrink-0"
+                          className="w-6 h-6 text-yellow-500"
                           fill="currentColor"
                           viewBox="0 0 20 20"
                         >

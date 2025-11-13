@@ -286,7 +286,7 @@ export default async function CheckoutPage() {
                     <CardContent className="pt-6">
                       <div className="flex gap-3">
                         <svg
-                          className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5"
+                          className="w-5 h-5 text-yellow-500 mt-0.5"
                           fill="currentColor"
                           viewBox="0 0 20 20"
                         >
