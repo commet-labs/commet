@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur">
         <div className="flex h-16 items-center justify-between mx-auto max-w-7xl">
           <div className="text-2xl font-bold">SaaSPro</div>
           <div className="flex items-center gap-4">
@@ -131,73 +131,7 @@ export default function Home() {
             </CardContent>
           </Card>
         </div>
-
-        {/* Pricing */}
-        <div className="mt-32 mx-auto">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-center">
-                <h3 className="text-2xl font-bold mb-2">Pro Plan</h3>
-                <div className="text-5xl font-bold mb-4">
-                  $50
-                  <span className="text-2xl text-muted-foreground">/month</span>
-                </div>
-                <p className="text-muted-foreground mb-6">
-                  Everything you need to run your SaaS business
-                </p>
-                <ul className="text-left space-y-3 mb-8">
-                  <li className="flex items-center gap-2">
-                    <svg
-                      className="h-5 w-5 text-primary shrink-0"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    <span>Full platform access</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <svg
-                      className="h-5 w-5 text-primary shrink-0"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    <span>Priority support</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <svg
-                      className="h-5 w-5 text-primary shrink-0"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    <span>Advanced analytics</span>
-                  </li>
-                </ul>
-                <Button size="lg" className="w-full" asChild>
-                  <Link href="/signup">Get Started Now</Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
       </main>
-
       {/* Footer */}
       <footer className="border-t mt-32">
         <div className="py-8 text-center text-muted-foreground mx-auto max-w-7xl">
