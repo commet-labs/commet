@@ -21,12 +21,7 @@ export async function getLLMText(page: InferPageType<typeof source>) {
   const basePath = page.path.endsWith(".mdx")
     ? page.path.slice(0, -4)
     : page.path;
-  const filePath = join(
-    process.cwd(),
-    "content",
-    "docs",
-    `${basePath}.mdx`,
-  );
+  const filePath = join(process.cwd(), "content", "docs", `${basePath}.mdx`);
 
   // Read the file content directly from the filesystem
   const fileContent = await readFile(filePath, "utf-8");
