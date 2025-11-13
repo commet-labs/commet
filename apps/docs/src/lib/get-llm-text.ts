@@ -11,10 +11,18 @@ const processor = remark()
   .use(remarkInclude)
   .use(remarkGfm);
 
+  
+
 export async function getLLMText(page: InferPageType<typeof source>) {
+    // Extendemos el tipo dinámicamente dentro de la función
+    const data = page.data as InferPageType<typeof source>["data"] & {
+      _file: { absolutePath: string };
+      content: string;
+    };
+
   const processed = await processor.process({
-    path: page.data._file.absolutePath,
-    value: page.data.content,
+    path: data._file.absolutePath,
+    value: data.content,
   });
 
   // note: it doesn't escape frontmatter, it's up to you.
