@@ -11,14 +11,12 @@ const processor = remark()
   .use(remarkInclude)
   .use(remarkGfm);
 
-  
-
 export async function getLLMText(page: InferPageType<typeof source>) {
-    // Extendemos el tipo dinámicamente dentro de la función
-    const data = page.data as InferPageType<typeof source>["data"] & {
-      _file: { absolutePath: string };
-      content: string;
-    };
+  // Extendemos el tipo dinámicamente dentro de la función
+  const data = page.data as InferPageType<typeof source>["data"] & {
+    _file: { absolutePath: string };
+    content: string;
+  };
 
   const processed = await processor.process({
     path: data._file.absolutePath,
