@@ -1,6 +1,6 @@
 import { docs } from "@/.source";
 import { loader } from "fumadocs-core/source";
-import { transformerOpenAPI } from "fumadocs-openapi/server";
+import { openapiPlugin } from "fumadocs-openapi/server";
 import { icons } from "lucide-react";
 import { createElement } from "react";
 import { i18n } from "./i18n";
@@ -17,6 +17,6 @@ export const source = loader({
   source: docs.toFumadocsSource(),
   pageTree: {
     // adds a badge to each page item in page tree
-    transformers: [transformerOpenAPI()],
   },
+  plugins: [openapiPlugin()],
 });
