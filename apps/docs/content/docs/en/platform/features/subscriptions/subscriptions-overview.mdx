@@ -1,0 +1,131 @@
+---
+title: Subscriptions
+description: Manage the complete lifecycle of your customer subscriptions from creation to recurring billing
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Subscription Management
+
+Subscriptions are the heart of Commet. They define how and how much to charge your customers on a recurring basis, connecting products, customers, and agreements in an automated billing flow.
+
+<Callout type="success">
+The Platform section is designed for go-to-market, finance, and operations teams. If you need implementation details, go to the [Developer Library](/docs/library/quickstart).
+</Callout>
+
+## Quick start example
+
+Here's how a typical SaaS company creates and manages subscriptions:
+
+1. **Create a customer**: Register customer information with their billing email
+2. **Select products**: Choose products and price variants from the catalog
+3. **Start subscription**: Generate the checkout and send the payment link to the customer
+4. **Automatic billing**: Once active, Commet automatically generates recurring invoices
+
+The billing engine handles the entire cycle: creation → checkout → activation → recurring billing.
+
+## Why subscriptions matter
+
+- **Automated recurring billing**: Once active, subscriptions automatically generate invoices each period without manual intervention
+- **Complete lifecycle control**: Manage states, start dates, cancellations, and renewals from a single place
+- **Full visibility**: Access invoice history, payments, and customer details in real time
+- **Operational flexibility**: Create subscriptions as drafts for review, schedule future dates, or activate immediately
+
+## Subscription lifecycle
+
+Subscriptions go through different states during their lifetime:
+
+| State | Description | When it occurs |
+| --- | --- | --- |
+| `Draft` | Subscription created but not started | When you create a subscription for review before sending to the customer |
+| `Pending payment` | Customer received the checkout but hasn't completed payment | Immediately after starting the subscription |
+| `Canceled` (Checkout expired) | Customer didn't complete payment within 24 hours | Automatically after 24 hours without payment |
+| `Active` | Customer completed payment and subscription is billing | After the first successful payment |
+
+## How to create a subscription
+
+### Step 1: Select or create customer
+
+Navigate to **Subscriptions** in the platform and click **Create Subscription**.
+
+If the customer already exists in your system, search for them by name or email. If it's a new customer, you can create them directly from the subscription creation flow.
+
+<Callout type="warning">
+**Important**: The customer's email is used as the delivery address for the payment link and cannot be modified in the checkout. Make sure to use the correct email from the start.
+</Callout>
+
+### Step 2: Add products
+
+Select the products you want to include in the subscription:
+
+- **Catalog products**: Choose from products you've previously created
+- **Price variants**: Select the specific variant for this customer (list price or custom variant)
+- **Custom adjustments**: If the customer requires discounts or special conditions, you can edit the product conditions and generate new variants on the spot
+
+<Callout type="info">
+**Automatic variants**: If you apply discounts or modify prices during creation, Commet automatically generates a price variant specific to this customer.
+</Callout>
+
+### Step 3: Start subscription
+
+When the subscription is ready, click **Start**. The subscription will be created in "Pending payment" status and a checkout link will be automatically generated that you can send to the customer.
+
+## Subscription details
+
+Each subscription includes complete information to manage the billing cycle:
+
+### Checkout link
+
+- **View current link**: Access the payment link generated for the customer
+- **Regenerate link**: If the checkout expired or you need a new link, you can regenerate it (only available if the subscription is not active)
+- **Share with customer**: Copy the link to send via email or integrate it into your onboarding flow
+
+### Generated invoices
+
+- **Complete history**: View all invoices generated for this subscription
+- **Automatic billing**: Each billing period automatically generates a new invoice
+- **Payment details**: Review payment status, due dates, and payment methods
+
+### Customer information
+
+- **Contact data**: Quickly access the associated customer information
+- **Subscription history**: View all active and historical subscriptions for the customer
+- **Billing configuration**: Review currency, payment terms, and billing address
+
+## Best practices
+
+- **Verify customer email**: Confirm the email before creating the customer, as it cannot be modified in the checkout
+- **Leverage price variants**: Use variants for permanent customer conditions instead of applying temporary discounts
+- **Monitor pending states**: Regularly review subscriptions in "Pending payment" for active follow-up
+- **Regenerate expired checkouts**: If a checkout expired, regenerate the link instead of creating a new subscription
+
+## Common errors to avoid
+
+- **Incorrect customer email**: Verify the email before creating the customer, as it's used for the checkout and cannot be changed
+- **Creating multiple subscriptions for the same customer**: If a checkout expired, regenerate the link instead of creating a new subscription
+- **Forgetting to activate drafts**: Draft subscriptions don't generate invoices until manually activated
+- **Not reviewing applied variants**: Confirm that the applied price variants are correct before starting the subscription
+
+## SDK integration
+
+All the steps described above can be performed programmatically through our SDK. This is the recommended way to integrate Commet directly into your application.
+
+<Callout type="info">
+**For in-app integrations**: If you're building an integration within your application, use the SDK instead of the platform interface. This allows you to completely automate the subscription flow and keep everything synchronized with your system.
+</Callout>
+
+### Advantages of using the SDK
+
+- **Complete automation**: Create and manage subscriptions directly from your code without manual intervention
+- **Real-time synchronization**: Keep your data synchronized with Commet automatically
+- **Improved user experience**: Integrate the checkout directly into your application without redirecting to external pages
+- **Scalability**: Manage thousands of subscriptions programmatically without interface limitations
+
+### Typical SDK flow
+
+1. **Create customer**: Use `commet.customers.create()` when a user registers in your application
+2. **Create subscription**: Call `commet.subscriptions.create()` when the user selects a plan
+3. **Get checkout**: Access the checkout link from the subscription response
+4. **Manage states**: Monitor state changes through webhooks or periodic queries
+
+For complete code examples and full API documentation, visit the [Developer Library](/docs/library/features/subscriptions).
