@@ -1,5 +1,11 @@
 {
   "title": "Features",
   "description": "Core SDK capabilities",
-  "pages": ["subscriptions", "usage-events", "seat-management", "customers", "portal-access"]
+  "pages": [
+    "subscriptions",
+    "usage-events",
+    "seat-management",
+    "customers",
+    "portal-access"
+  ]
 }
