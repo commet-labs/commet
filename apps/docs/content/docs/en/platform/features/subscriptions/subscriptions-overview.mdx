@@ -110,6 +110,10 @@ Each subscription includes complete information to manage the billing cycle:
 
 All the steps described above can be performed programmatically through our SDK. This is the recommended way to integrate Commet directly into your application.
 
+The following sequence diagram illustrates the complete subscription flow when integrating Commet into your application. Note that this diagram assumes you already have customers and products created in your system. It shows the interaction between your frontend, backend, and Commet's services: starting from when a user initiates a subscription, through the checkout process where they enter their payment method, to the final activation where Commet sends a webhook to your backend to enable user features.
+
+![Subscription lifecycle sequence diagram](/images/platform/subs-sequence-diagram.png)
+
 <Callout type="info">
 **For in-app integrations**: If you're building an integration within your application, use the SDK instead of the platform interface. This allows you to completely automate the subscription flow and keep everything synchronized with your system.
 </Callout>
