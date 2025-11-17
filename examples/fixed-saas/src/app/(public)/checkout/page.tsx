@@ -1,4 +1,3 @@
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -7,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { SubscribeButton } from "@/components/subscribe-button";
 import { auth } from "@/lib/auth";
 import { COMMET_PRICE_ID, commet } from "@/lib/commet";
 import { headers } from "next/headers";
@@ -24,31 +24,6 @@ export default async function CheckoutPage() {
   }
 
   const user = session.user;
-
-  // Ensure customer exists in Commet
-  try {
-    const customerCheck = await commet.customers.list({
-      externalId: user.id,
-    });
-
-    // Create customer if doesn't exist
-    if (
-      !customerCheck.success ||
-      !customerCheck.data ||
-      customerCheck.data.length === 0
-    ) {
-      await commet.customers.create({
-        externalId: user.id,
-        legalName: user.name || user.email,
-        billingEmail: user.email,
-        taxStatus: "NOT_APPLICABLE",
-        currency: "USD",
-      });
-    }
-  } catch (error) {
-    console.error("Failed to ensure Commet customer:", error);
-    // Continue anyway - subscription creation will fail if customer doesn't exist
-  }
 
   // Check if user already has a subscription
   const existingSubscriptions = await commet.subscriptions.list({
@@ -68,38 +43,12 @@ export default async function CheckoutPage() {
       redirect("/dashboard");
     }
 
-    // If pending subscription exists, use it instead of creating a new one
+    // If pending subscription exists, redirect to pending page
     const pendingSubscription = existingSubscriptions.data.find(
-      (sub) => sub.status === "pending_payment" && sub.checkoutUrl,
+      (sub) => sub.status === "pending_payment",
     );
     if (pendingSubscription) {
-      // Reuse existing pending subscription
-      return (
-        <div className="min-h-screen flex items-center justify-center py-12 px-4">
-          <Card className="max-w-md w-full">
-            <CardHeader>
-              <CardTitle>Complete Your Payment</CardTitle>
-              <CardDescription>
-                Your subscription is ready. Complete the payment to activate
-                your account.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="p-4 border rounded-lg">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-semibold">Pro Plan</p>
-                    <p className="text-sm text-muted-foreground">$50/month</p>
-                  </div>
-                </div>
-              </div>
-              <Button asChild className="w-full">
-                <a href={pendingSubscription.checkoutUrl}>Complete Payment</a>
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      );
+      redirect(`/checkout/pending?subscriptionId=${pendingSubscription.id}`);
     }
   }
 
@@ -161,29 +110,7 @@ export default async function CheckoutPage() {
     );
   }
 
-  // Create a new subscription
-  try {
-    const subscriptionResult = await commet.subscriptions.create({
-      externalId: user.id,
-      items: [
-        {
-          priceId: COMMET_PRICE_ID,
-          quantity: 1,
-        },
-      ],
-      status: "pending_payment", // Generates checkout URL
-    });
-
-    if (!subscriptionResult.success || !subscriptionResult.data) {
-      throw new Error("Failed to create subscription");
-    }
-
-    const subscription = subscriptionResult.data;
-
-    // 🔍 DISCOVERY: Check if checkoutUrl exists in the response
-    // According to the API response analysis, it does NOT exist yet
-    const checkoutUrl = (subscription as { checkoutUrl?: string }).checkoutUrl;
-
+  // Show checkout page
     return (
       <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full">
@@ -218,9 +145,7 @@ export default async function CheckoutPage() {
                   <span className="text-muted-foreground">Pro Plan</span>
                   <span className="text-2xl font-bold">
                     $50
-                    <span className="text-sm text-muted-foreground">
-                      /month
-                    </span>
+                  <span className="text-sm text-muted-foreground">/month</span>
                   </span>
                 </div>
                 <ul className="space-y-2 text-sm text-muted-foreground">
@@ -269,185 +194,16 @@ export default async function CheckoutPage() {
                 </ul>
               </div>
 
-              {checkoutUrl ? (
-                // If checkoutUrl exists (future state)
-                <div>
-                  <p className="text-sm text-muted-foreground mb-4 text-center">
-                    Click below to complete your payment securely with Commet
-                  </p>
-                  <Button size="lg" className="w-full" asChild>
-                    <a href={checkoutUrl}>Proceed to Payment</a>
-                  </Button>
-                </div>
-              ) : (
-                // Current state: checkoutUrl doesn't exist yet
-                <div className="space-y-4">
-                  <Card className="border-yellow-500/50 bg-yellow-500/10">
-                    <CardContent className="pt-6">
-                      <div className="flex gap-3">
-                        <svg
-                          className="w-5 h-5 text-yellow-500 mt-0.5"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        <div>
-                          <h3 className="text-sm font-semibold mb-1">
-                            Missing Feature: Checkout URL
-                          </h3>
-                          <p className="text-sm text-muted-foreground">
-                            The Commet subscription was created (ID:{" "}
-                            {subscription.id}), but the API response doesn't
-                            include a{" "}
-                            <code className="bg-muted px-1 py-0.5 rounded text-xs">
-                              checkoutUrl
-                            </code>
-                            .
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+            <SubscribeButton />
 
-                  <Card className="border-primary/50 bg-primary/5">
-                    <CardContent className="pt-6">
-                      <h3 className="text-sm font-semibold mb-2">
-                        📝 Expected Behavior
-                      </h3>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        After creating a subscription, the API should return:
-                      </p>
-                      <pre className="bg-muted p-2 rounded text-xs overflow-x-auto">
-                        {`{
-  "success": true,
-  "data": {
-    "id": "${subscription.id}",
-    "status": "pending_payment",
-    "checkoutUrl": "https://checkout.commet.co/..."
-  }
-}`}
-                      </pre>
-                    </CardContent>
-                  </Card>
-
-                  <div className="text-center">
-                    <p className="text-sm text-muted-foreground mb-4">
-                      For now, we'll simulate the payment flow
-                    </p>
-                    <form action="/api/webhooks/commet/simulate" method="POST">
-                      <input
-                        type="hidden"
-                        name="subscriptionId"
-                        value={subscription.id}
-                      />
-                      <input type="hidden" name="userId" value={user.id} />
-                      <Button
-                        type="submit"
-                        size="lg"
-                        variant="secondary"
-                        className="w-full"
-                      >
-                        Simulate Payment (Demo Only)
-                      </Button>
-                    </form>
-                  </div>
-
-                  <div className="text-center">
+            <div className="mt-6 text-center">
                     <Button variant="link" asChild>
                       <Link href="/">← Back to home</Link>
                     </Button>
-                  </div>
-                </div>
-              )}
-
-              <div className="mt-6 text-center">
-                <p className="text-xs text-muted-foreground">
-                  Subscription ID: {subscription.id}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
-  } catch (error) {
-    console.error("Checkout error:", error);
-
-    // Better error messages based on error type
-    let errorMessage = "An unexpected error occurred";
-    let errorDetails = "";
-
-    if (error instanceof Error) {
-      errorMessage = error.message;
-
-      // Check for common errors
-      if (errorMessage.includes("not found") || errorMessage.includes("404")) {
-        errorMessage = "Price ID not found in Commet";
-        errorDetails = `The price ID "${COMMET_PRICE_ID}" doesn't exist in your Commet dashboard.`;
-      } else if (errorMessage.includes("customer")) {
-        errorMessage = "Customer not found";
-        errorDetails =
-          "The Commet customer wasn't created properly during signup.";
-      } else if (
-        errorMessage.includes("unauthorized") ||
-        errorMessage.includes("401")
-      ) {
-        errorMessage = "Invalid API credentials";
-        errorDetails = "Check your COMMET_API_KEY in .env file.";
-      }
-    }
-
-    return (
-      <div className="min-h-screen flex items-center justify-center py-12 px-4">
-        <Card className="max-w-md w-full">
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg
-                  className="w-8 h-8 text-destructive"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </div>
-              <h1 className="text-2xl font-bold mb-2">Checkout Error</h1>
-              <p className="font-medium mb-2">{errorMessage}</p>
-              {errorDetails && (
-                <p className="text-muted-foreground text-sm mb-4">
-                  {errorDetails}
-                </p>
-              )}
-              <Card className="bg-muted mb-6 text-left">
-                <CardContent className="pt-6">
-                  <p className="text-xs font-mono break-all">
-                    {error instanceof Error ? error.message : String(error)}
-                  </p>
-                </CardContent>
-              </Card>
-              <div className="flex flex-col gap-3">
-                <Button asChild>
-                  <Link href="/">Return to Home</Link>
-                </Button>
-                <Button variant="outline" asChild>
-                  <Link href="/dashboard">Go to Dashboard</Link>
-                </Button>
-              </div>
             </div>
           </CardContent>
         </Card>
       </div>
+      </div>
     );
-  }
 }
