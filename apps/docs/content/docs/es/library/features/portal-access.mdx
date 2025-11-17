@@ -1,0 +1,193 @@
+---
+title: Acceso al Portal de Cliente
+description: Genera URLs seguras del portal para que los clientes vean su información de facturación
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Acceso al Portal de Cliente
+
+Genera URLs del portal seguras y de tiempo limitado que permiten a tus clientes ver suscripciones, facturas y datos de uso.
+
+<Callout type="info">
+**Prerequisitos:** Inicializa tu cliente Commet con una clave API válida.
+</Callout>
+
+## Solicitar Acceso al Portal
+
+### External ID (Recomendado)
+
+```typescript
+const portal = await commet.portal.requestAccess({
+  externalId: 'my-customer-123'
+})
+```
+
+<Callout type="tip">
+Usa `externalId` para evitar almacenar los IDs de cliente de Commet en tu base de datos.
+</Callout>
+
+### Customer ID
+
+```typescript
+const portal = await commet.portal.requestAccess({
+  customerId: 'cus_abc123'
+})
+```
+
+### Email
+
+```typescript
+const portal = await commet.portal.requestAccess({
+  email: 'customer@example.com'
+})
+```
+
+## Autocompletado de TypeScript
+
+El SDK fuerza parámetros mutuamente exclusivos. TypeScript previene combinaciones inválidas:
+
+<Tabs items={['Válido', 'Inválido']}>
+<Tab value="Válido">
+```typescript
+// ✅ External ID
+await commet.portal.requestAccess({
+  externalId: 'my-customer-123'
+})
+
+// ✅ Customer ID
+await commet.portal.requestAccess({
+  customerId: 'cus_abc123'
+})
+
+// ✅ Email
+await commet.portal.requestAccess({
+  email: 'customer@example.com'
+})
+```
+</Tab>
+<Tab value="Inválido">
+```typescript
+// ❌ No se puede mezclar identificadores
+await commet.portal.requestAccess({
+  customerId: 'cus_abc123',
+  externalId: 'my-customer-123'
+})
+
+await commet.portal.requestAccess({
+  customerId: 'cus_abc123',
+  email: 'customer@example.com'
+})
+```
+</Tab>
+</Tabs>
+
+## Patrones de Integración
+
+### Enviar por Email
+
+```typescript
+async function sendPortalToCustomer(customerId: string) {
+  const portal = await commet.portal.requestAccess({
+    externalId: customerId
+  })
+
+  if (portal.success && portal.data) {
+    await sendEmail({
+      to: customerEmail,
+      subject: 'Access Your Billing Portal',
+      body: `View your billing information: ${portal.data.portalUrl}`
+    })
+  }
+}
+```
+
+### Incrustar en Tu App
+
+```typescript
+export async function GET(request: Request) {
+  const userId = getUserFromSession(request)
+
+  const portal = await commet.portal.requestAccess({
+    externalId: userId
+  })
+
+  if (portal.success && portal.data) {
+    return Response.redirect(portal.data.portalUrl)
+  }
+}
+```
+
+### Integración con Express.js
+
+```typescript
+app.post('/api/customer-portal', async (req, res) => {
+  const { customerId } = req.body
+
+  const portal = await commet.portal.requestAccess({
+    externalId: customerId
+  })
+
+  if (portal.success && portal.data) {
+    res.json({ portalUrl: portal.data.portalUrl })
+  }
+})
+```
+
+## Manejo de Errores
+
+```typescript
+try {
+  const portal = await commet.portal.requestAccess({
+    externalId: 'customer-123'
+  })
+
+  if (portal.success && portal.data) {
+    console.log('Portal generated:', portal.data.portalUrl)
+  }
+} catch (error) {
+  if (error.statusCode === 404) {
+    console.error('Customer not found')
+  } else if (error.statusCode === 400) {
+    console.error('Invalid identifier or validation error')
+  } else if (error.statusCode === 429) {
+    console.error('Rate limit exceeded')
+  }
+}
+```
+
+## Características de Seguridad
+
+Las URLs del portal incluyen medidas de seguridad automáticas:
+
+- **Tokens de Tiempo Limitado**: Las URLs expiran después de un período configurado
+- **Verificación de Email**: El email del cliente debe coincidir con el registro de la cuenta
+- **Aislamiento de Organización**: Los clientes solo ven sus propios datos
+- **Limitación de Tasa**: Previene abuso de la generación del portal
+
+<Callout type="warning">
+**Las URLs del portal son sensibles:** Trátalas como contraseñas. Envía por canales seguros y nunca las registres en texto plano.
+</Callout>
+
+## Formato de Respuesta
+
+La generación exitosa del portal retorna:
+
+```typescript
+{
+  success: true,
+  message: "Portal access created successfully",
+  data: {
+    success: true,
+    message: "Portal access created successfully",
+    portalUrl: "https://app.commet.co/acme/portal/overview?customer_session_token=..."
+  }
+}
+```
+
+## ¿Qué Sigue?
+
+- [Gestión de Clientes](/docs/library/features/customers) - Administra datos de clientes
+- [Suscripciones](/docs/library/features/subscriptions) - Ve lo que los clientes ven en el portal
+
