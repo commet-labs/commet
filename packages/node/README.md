@@ -58,6 +58,11 @@ await commet.customers.create({
   legalName: 'Acme Corp',
   billingEmail: 'billing@acme.com'
 });
+
+// Generate customer portal access
+await commet.portal.requestAccess({
+  externalId: 'my-customer-123'
+});
 ```
 
 ## Type Safety

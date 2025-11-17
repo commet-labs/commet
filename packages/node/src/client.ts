@@ -1,4 +1,5 @@
 import { CustomersResource } from "./resources/customers";
+import { PortalResource } from "./resources/portal";
 import { SeatsResource } from "./resources/seats";
 import { SubscriptionsResource } from "./resources/subscriptions";
 import { UsageResource } from "./resources/usage";
@@ -17,6 +18,7 @@ export class Commet {
   public readonly usage: UsageResource;
   public readonly seats: SeatsResource;
   public readonly subscriptions: SubscriptionsResource;
+  public readonly portal: PortalResource;
   public readonly webhooks: Webhooks;
 
   constructor(config: CommetConfig) {
@@ -38,6 +40,7 @@ export class Commet {
     this.usage = new UsageResource(this.httpClient);
     this.seats = new SeatsResource(this.httpClient);
     this.subscriptions = new SubscriptionsResource(this.httpClient);
+    this.portal = new PortalResource(this.httpClient);
     this.webhooks = new Webhooks();
 
     if (config.debug) {

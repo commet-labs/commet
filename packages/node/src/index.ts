@@ -73,6 +73,11 @@ export type {
   ListSubscriptionsParams,
 } from "./resources/subscriptions";
 
+export type {
+  PortalAccess,
+  RequestAccessParams,
+} from "./resources/portal";
+
 export { Webhooks } from "./resources/webhooks";
 export type {
   WebhookPayload,
