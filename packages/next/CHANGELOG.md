@@ -1,5 +1,12 @@
 # @commet/next
 
+## 0.1.1
+
+### Patch Changes
+
+- Updated dependencies [bb2e7b2]
+  - @commet/node@0.11.0
+
 ## 0.1.0
 
 ### Initial Release
@@ -13,4 +20,3 @@
   - `subscription.canceled`
   - `subscription.created`
   - `subscription.updated`
-
