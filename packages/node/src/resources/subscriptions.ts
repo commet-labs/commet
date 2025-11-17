@@ -16,9 +16,6 @@ export interface Subscription {
   startDate: string; // ISO datetime
   endDate?: string; // ISO datetime (puede ser null)
   billingDayOfMonth: number; // 1-31
-  totalContractValue?: number;
-  poNumber?: string;
-  reference?: string;
   isTemplate?: boolean;
   checkoutUrl?: string; // Secure checkout URL for pending payment subscriptions
   createdAt: string;
