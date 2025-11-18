@@ -1,0 +1,271 @@
+---
+title: Lógica de Negocio del Catálogo de Productos
+description: Profundiza en la arquitectura de precios, reglas de gobernanza e integraciones de facturación que impulsan el catálogo de productos de Commet.
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Lógica de negocio y diseño
+
+Esta página conecta la estrategia detrás del Catálogo de Productos con los sistemas que la ejecutan. Úsala cuando necesites traducir ideas comerciales en configuración del catálogo o cuando debas explicar la lógica de precios a las partes interesadas.
+
+<Callout type="info">
+La documentación de plataforma está dirigida a operadores de negocio. Para SDKs, endpoints y ejemplos de código, dirígete a la [Guía de Inicio Rápido de la Librería de Desarrolladores](/docs/library/quickstart).
+</Callout>
+
+## Acceder al catálogo de productos
+
+El catálogo de productos está disponible a través de la sección **Productos** en tu plataforma Commet. Desde aquí puedes:
+
+- **Ver todos los productos**: Navega por tu portafolio completo de productos con SKUs, descripciones y categorías de impuestos
+- **Gestionar precios de lista**: Crea y edita precios estándar para cada producto en diferentes monedas y segmentos
+- **Configurar variantes de precio**: Establece precios específicos para clientes con descuentos, recargos o términos personalizados
+- **Vincular a acuerdos**: Ve qué acuerdos hacen referencia a precios o variantes específicas
+
+## Por qué existe el catálogo
+
+El catálogo resuelve la gestión de complejidad de precios para plataformas de facturación que manejan múltiples modelos de precios y términos específicos para clientes.
+
+**Problemas que elimina**
+
+- Código personalizado para cada nuevo precio o promoción.
+- Ventas preguntando "¿Cuál es el precio oficial?" vs. "¿Qué estamos ofreciendo a este cliente?"
+- Falta de análisis sobre la adopción de descuentos o precios premium.
+- Sin flujo de aprobación para concesiones empresariales grandes.
+- Actualizaciones de precios bloqueadas detrás de colas de ingeniería.
+
+**Resultados comerciales**
+
+- Conversaciones claras sobre precio de lista vs. precio del cliente.
+- Análisis precisos de márgenes, descuentos y rendimiento del producto.
+- Guías de negociación que combinan niveles de lista y variantes aprobadas.
+- Gobernanza automatizada que marca descuentos más allá de la política.
+- Libertad para soportar cualquier modelo de negocio sin cambios de código.
+
+## Cuatro capas de precios trabajando juntas
+
+Los precios actúan como los bloques de construcción principales en Commet. Cada precio define el costo unitario, modelo de precios, moneda, frecuencia de facturación y tipo de facturación. Estos precios pueden reutilizarse en múltiples clientes, haciendo que la gestión del catálogo sea eficiente y escalable.
+
+```
+Productos describen los servicios que vendes:
+├── Plataforma API → Acceso a API con límite de velocidad
+├── Dashboard de Analytics → Reportes e insights
+├── Soporte Premium → Ayuda 24/7 con SLA
+├── Almacenamiento de Datos → Almacenamiento escalable
+└── Procesamiento IA → Servicios de machine learning
+```
+
+```
+Producto: Plataforma API
+├── Precio de Lista: Starter → $50/mes, 10K llamadas incluidas
+├── Precio de Lista: Professional → $200/mes, 100K llamadas incluidas
+├── Precio de Lista: Enterprise → $500/mes, 1M llamadas incluidas
+└── Precio de Lista: Pago por uso → $0.10 por llamada, sin mínimo
+```
+
+```
+Precio de Lista: Enterprise ($500/mes)
+├── Variante de Precio: Acme Corp → 20% descuento = $400/mes
+├── Variante de Precio: MercadoLibre → $500/mes, 2M llamadas incluidas
+├── Variante de Precio: Startup Beta → 50% descuento = $250/mes
+└── Variante de Precio: Enterprise Plus → 10% recargo = $550/mes
+```
+
+```
+Acuerdo: Acme Corp – Q1 2025
+├── Item 1: Plataforma API → Plan Enterprise (variante 20%)
+├── Item 2: Dashboard de Analytics → Plan Professional (precio de lista)
+├── Item 3: Soporte Premium → Variante de precio personalizada
+└── Descuento del contrato: 5% promoción para Q1
+```
+
+Cada capa mantiene los análisis intactos y separa la configuración permanente (variantes) de las herramientas de negociación temporales (descuentos de acuerdo).
+
+### Reutilización e identificación de precios
+
+Cada precio en el catálogo tiene un `price_id` único que sirve como su identificador en toda la plataforma. Esto te permite:
+
+- **Reutilizar precios estándar** en múltiples clientes sin duplicación
+- **Rastrear cambios de precios** y mantener precisión histórica
+- **Referenciar precios** consistentemente en acuerdos, facturas y análisis
+- **Crear variantes** desde precios de lista existentes preservando la relación
+
+## Catálogos del mundo real
+
+<Tabs items={['SaaS Escalonado', 'Pagos', 'IA y ML', 'Métricas de Uso']}>
+<Tab value="SaaS Escalonado">
+**Empresa**: DevTools Inc. – Plataforma de desarrollo API
+
+1. Comienza con precios de lista Gratis → Starter → Pro → Enterprise.
+2. Complementos como Analytics o Soporte Prioritario viven como productos separados.
+3. Acuerdos empresariales agregan variantes de precio (20% descuento, asientos extra).
+4. El acuerdo agrupa todo para que la facturación pueda generar facturas precisas.
+</Tab>
+<Tab value="Pagos">
+**Empresa**: PayFlow – Procesador de pagos
+
+- Los precios de lista capturan tarifas de transacción estándar, por volumen y empresariales.
+- Las variantes de precio almacenan tasas porcentuales negociadas y compromisos mínimos.
+- Productos adicionales cubren tarifas transfronterizas y seguro de contracargos.
+- Los acuerdos combinan paquetes multi-producto con aprobaciones basadas en volumen.
+</Tab>
+<Tab value="IA y ML">
+**Empresa**: AIFlow – Plataforma de machine learning
+
+- Productos: horas de cómputo, asientos de científico de datos, hosting de modelos.
+- Los precios de lista mezclan ofertas de uso bajo demanda, reservadas y spot.
+- Las variantes rastrean descuentos de asientos de alto volumen y paquetes de GPU personalizados.
+- Los acuerdos aplican promociones temporales mientras las variantes gestionan términos a largo plazo.
+</Tab>
+<Tab value="Métricas de Uso">
+**Entendiendo el Pricing Basado en Uso**
+
+Las métricas de uso son la base de los modelos de precios basados en consumo. Rastrean la actividad del cliente y la convierten en unidades facturables.
+
+**Cómo funcionan las métricas de uso:**
+
+1. **Define la métrica**: Crea una métrica de uso que rastree el comportamiento específico del cliente (llamadas a API, GB de almacenamiento, horas de cómputo, transacciones procesadas).
+2. **Envía eventos de uso**: Tu aplicación reporta eventos de uso a Commet en tiempo real o por lotes.
+3. **Agrega consumo**: El motor de facturación agrega datos de uso para cada período de facturación.
+4. **Aplica reglas de precios**: Tu modelo de precios configurado (lineal, por niveles, empaquetado) calcula el cargo.
+5. **Genera facturas**: Los cargos por uso aparecen como elementos de línea con detalles de consumo.
+
+**Ejemplos comunes de métricas de uso:**
+
+- **Plataformas API**: Llamadas a API, solicitudes por minuto, GB de transferencia de datos
+- **Infraestructura**: Horas de cómputo, GB de almacenamiento, ancho de banda consumido
+- **Comunicaciones**: SMS enviados, minutos de teléfono, entregas de correo
+- **IA/ML**: Predicciones de modelos, horas de entrenamiento, tokens procesados
+- **Procesamiento de Pagos**: Volumen de transacciones, conteo de pagos
+
+**Flexibilidad de precios con métricas de uso:**
+
+Las métricas de uso pueden combinarse con múltiples modelos de precios:
+- **Lineal**: $0.10 por llamada a API
+- **Niveles graduados**: Primeras 100K llamadas @ $0.10, siguientes 400K @ $0.08, 500K+ @ $0.05
+- **Niveles por volumen**: 0-100K @ $0.10, 100K+ @ $0.07 (el cliente paga solo la tasa de su nivel)
+- **Empaquetado**: $25 por 1,000 llamadas a API
+- **Con unidades incluidas**: Primeras 10K llamadas gratis, luego $0.10 por llamada
+- **Consumo de créditos**: Paquete de 50K créditos de API, 1 llamada = 5 créditos
+
+
+**Mejores prácticas:**
+
+- Nombra las métricas claramente (ej., "api-calls" no "metric-1")
+- Elige la agregación apropiada (suma para llamadas a API, máximo para usuarios concurrentes, único para usuarios activos mensuales)
+- Configura alertas para patrones de consumo inusuales
+- Proporciona a los clientes dashboards de uso en tiempo real
+- Incluye detalles de uso en las facturas para transparencia
+</Tab>
+</Tabs>
+
+## Modelos de precios soportados
+
+| Modelo | Caso de uso | Ejemplo |
+| --- | --- | --- |
+| **Fijo / suscripción** | Ingresos predecibles, tarifas mensuales o únicas. | Tarifa de plataforma $500/mes, onboarding $2,500 |
+| **Uso lineal** | Pago por uso con unidades incluidas. | $0.10 por llamada a API después de 1,000 llamadas gratis |
+| **Basado en porcentaje** | Pagos o reparto de ingresos con salvaguardas. | 2.9% del valor de la transacción con $0.30 min / $10 max |
+| **Niveles por volumen** | El cliente paga la tasa del nivel en el que cae. | 0–100 unidades @ $1 + $20 fijo, 101+ @ $0.75 + $50 |
+| **Niveles graduados** | Precios progresivos como tramos fiscales. | Primeros 100 GB @ $1, restantes @ $0.75 |
+| **Empaquetado / escalonado** | Vende paquetes de unidades. | $10 por 250 SMS enviados |
+| **Basado en asientos** | Facturación vinculada a balances de asientos. | $50 por asiento admin por mes |
+| **Tarifas mínimas** | Garantiza ingresos base. | Mínimo mensual de $500 aplicado a precios de uso |
+| **Consumo de créditos** | Créditos prepagados con transferencia. | Paquete de 2,500 créditos, 10 créditos por llamada a API |
+
+Los ejemplos amigables para código viven en la documentación de desarrolladores, pero la UI del catálogo expone cada modelo como opciones configurables.
+
+## Reglas de gobernanza
+
+**Cuándo crear un producto**
+
+1. Nueva propuesta de valor o línea de servicio.
+2. Tratamiento fiscal diferente.
+3. Necesidades de reporte separadas.
+
+**Cuándo publicar un precio de lista**
+
+1. Nuevo segmento o posicionamiento de mercado.
+2. Período de compromiso diferente o unidades incluidas.
+3. Cambiar modelos de precios (fijo vs. uso vs. niveles).
+
+**Cuándo usar una variante de precio**
+
+1. Descuento o moneda específica del cliente.
+2. Cambios de unidades contratadas o compromisos de volumen.
+3. Términos personalizados de larga duración (no promociones temporales).
+
+**Cuándo aplicar descuentos de acuerdo**
+
+- Fases de rampa, promociones trimestrales o incentivos de tiempo limitado.
+- Superpuestos sobre precios de lista y variantes sin romper los análisis.
+
+## Flexibilidad multi-tenant
+
+Cada organización que ejecuta en Commet puede configurar su propio catálogo:
+
+- **Catálogo de startup**: un solo producto principal con 4 planes, un par de complementos, variantes mínimas.
+- **Catálogo empresarial**: múltiples productos, servicios profesionales, docenas de variantes con aprobaciones, políticas de descuento agresivas.
+
+El catálogo soporta ambos extremos en la misma infraestructura, manteniendo la segmentación, políticas de descuento y reportes separados.
+
+## Integración con el motor de facturación
+
+Todas las internas de facturación viven en `billing-engine.md`, pero aquí está el handshake de alto nivel:
+
+- Los productos proporcionan categorías de impuestos y descripciones para facturas.
+- Los precios de lista actúan como la línea base oficial para negociaciones.
+- Las variantes de precio inyectan personalización permanente del cliente.
+- Los modelos de precios (fijo, uso, asientos, niveles) alimentan la calculadora de facturación.
+- Los acuerdos combinan todo y lo pasan aguas abajo para la generación de facturas.
+
+```typescript
+function resolveFinalPricing(agreementItem: AgreementItem) {
+  const listPrice = getListPrice(agreementItem.listPriceId);
+  let finalAmount = listPrice.unitAmount;
+
+  if (agreementItem.priceVariantId) {
+    const variant = getPriceVariant(agreementItem.priceVariantId);
+    finalAmount = applyVariantPricing(finalAmount, variant);
+  }
+
+  if (agreementItem.agreementDiscountType) {
+    finalAmount = applyAgreementDiscount(finalAmount, agreementItem);
+  }
+
+  return { listPrice, finalAmount };
+}
+```
+
+## Puntos de integración con otros módulos
+
+- **Módulo de uso**: `price_variant.usage_metric_id → usage_metric.id` para rastrear consumo.
+- **Módulo de asientos**: `agreement_item.quantity_source = 'seat_balance'` extrae conteos de asientos automáticamente.
+- **Módulo de impuestos**: `product.tax_category_id → tax_category.id` aplica tasas correctas por producto.
+- **Módulo de clientes**: opcional `price_variant.customer_id` para vincular precios personalizados a una cuenta específica.
+
+## Flujo de extremo a extremo
+
+1. **Configuración del catálogo**: define el portafolio de productos y asigna categorías de impuestos.
+2. **Diseño de precio de lista**: marketing de productos publica precios oficiales para cada segmento.
+3. **Negociación**: ventas crea variantes de precio con aprobaciones para acuerdos personalizados.
+4. **Firma de contrato**: los acuerdos hacen referencia a precios de lista, variantes y descuentos temporales.
+5. **Automatización de facturación**: el motor de facturación ejecuta la cascada y produce recibos transparentes.
+
+## Métricas clave de éxito
+
+- Cero errores de precios en facturas.
+- Cobertura completa de modelos de precios sin participación de ingeniería.
+- Cálculos de precios en menos de dos segundos incluso con niveles complejos.
+- Sin ajustes manuales debido a limitaciones del catálogo.
+
+## Solución de problemas de escenarios comunes
+
+| Escenario | Causa raíz | Solución |
+| --- | --- | --- |
+| La factura muestra precio incorrecto | Variante o descuento de acuerdo no aplicado | Verifica que `agreement_item` vincule el `price_variant_id` correcto y la configuración de descuentos |
+| Cálculo de impuestos faltante | Producto sin `tax_category_id` | Asigna categoría de impuestos al producto antes de crear precios de lista |
+| Timeout de resolución de precios | Cálculos de niveles complejos con muchas variantes | Optimiza la estructura de niveles o cachea rutas de precios usadas frecuentemente |
+| Aprobación de descuento omitida | Sin aplicación de políticas en la creación de variantes | Habilita flujos de aprobación en la configuración de RevOps |
+
