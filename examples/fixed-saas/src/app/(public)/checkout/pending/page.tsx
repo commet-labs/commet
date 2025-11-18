@@ -34,7 +34,8 @@ export default async function PendingCheckoutPage({
   }
 
   // Get subscription details
-  const subscriptionResult = await commet.subscriptions.retrieve(subscriptionId);
+  const subscriptionResult =
+    await commet.subscriptions.retrieve(subscriptionId);
 
   if (!subscriptionResult.success || !subscriptionResult.data) {
     redirect("/checkout");
@@ -141,4 +142,3 @@ export default async function PendingCheckoutPage({
     </div>
   );
 }
-

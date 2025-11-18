@@ -29,9 +29,7 @@ export function SubscribeButton() {
       }
 
       // Otherwise, show the subscription was created (demo mode)
-      router.push(
-        `/checkout/pending?subscriptionId=${result.subscriptionId}`,
-      );
+      router.push(`/checkout/pending?subscriptionId=${result.subscriptionId}`);
     } catch (err) {
       console.error("Subscribe error:", err);
       setError("An unexpected error occurred");
@@ -50,10 +48,7 @@ export function SubscribeButton() {
       >
         {isLoading ? "Creating subscription..." : "Subscribe Now"}
       </Button>
-      {error && (
-        <p className="text-sm text-destructive text-center">{error}</p>
-      )}
+      {error && <p className="text-sm text-destructive text-center">{error}</p>}
     </div>
   );
 }
-

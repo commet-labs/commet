@@ -1,5 +1,11 @@
 {
   "title": "Core",
   "description": "Fundamental SDK concepts and patterns",
-  "pages": ["authentication", "environments", "testing", "error-handling", "pagination"]
+  "pages": [
+    "authentication",
+    "environments",
+    "testing",
+    "error-handling",
+    "pagination"
+  ]
 }

@@ -1,8 +1,8 @@
 import { checkSubscriptionStatus } from "@/actions/check-subscription-action";
+import { ManageBillingButton } from "@/components/manage-billing-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ManageBillingButton } from "@/components/manage-billing-button";
 import { auth } from "@/lib/auth";
 import { commet } from "@/lib/commet";
 import { headers } from "next/headers";
