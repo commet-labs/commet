@@ -1,6 +1,6 @@
 ---
 title: Quick Start
-description: Get started with Commet SDK in under 5 minutes
+description: Get started with Commet SDK in 5 minutes
 ---
 
 import { Steps, Step } from 'fumadocs-ui/components/steps'
@@ -9,18 +9,18 @@ import { Callout } from 'fumadocs-ui/components/callout'
 
 # Quick Start
 
-Get your billing system running in under 5 minutes.
+Get your billing system running in 5 minutes.
 
 <Callout type="info">
-**Prerequisites:** Node.js 18+ and a Commet account. [Sign up here](https://sandbox.commet.co) if needed.
+**Prerequisites:** Node.js 18+ and a [Commet account](https://sandbox.commet.co).
 </Callout>
 
 <Steps>
 <Step>
 
-## Install the SDK
+## Install
 
-<Tabs items={['npm', 'pnpm', 'yarn']}>
+<Tabs items={['npm', 'pnpm', 'yarn', 'bun']}>
 <Tab value="npm">
 ```bash
 npm install @commet/node
@@ -36,59 +36,39 @@ pnpm add @commet/node
 yarn add @commet/node
 ```
 </Tab>
+<Tab value="bun">
+```bash
+bun add @commet/node
+```
+</Tab>
 </Tabs>
 
 </Step>
 
 <Step>
 
-## Link your project
-
-Use the CLI to connect your project and sync types:
-
-```bash
-npx commet link
-```
-
-Select your organization and project. The CLI generates TypeScript types for your event types and seat types automatically.
-
-<Callout type="info">
-**Type Safety:** The CLI creates typed wrappers for your billing events, preventing runtime errors.
-</Callout>
-
-</Step>
-
-<Step>
-
-## Initialize the client
-
-Create your Commet client with environment variables:
+## Initialize
 
 ```typescript
 import { Commet } from '@commet/node'
 
 const commet = new Commet({
-  apiKey: process.env.COMMET_API_KEY!
+  apiKey: process.env.COMMET_API_KEY!,
+  environment: 'sandbox', // or 'production'
 })
 ```
-
-<Callout type="warn">
-**Security:** Store your API key in `.env` and never commit it. The CLI adds `.commet/` to `.gitignore` automatically.
-</Callout>
 
 </Step>
 
 <Step>
 
-## Track usage events
-
-Send usage data with type-safe methods:
+## Track Usage
 
 ```typescript
-// Track API calls (type-safe after CLI link)
 await commet.usage.create({
   eventType: 'api_call',
-  customerId: 'cus_xyz', // Or use externalId
+  customerId: 'cus_xyz',
+  idempotencyKey: `evt_${Date.now()}`,
   properties: [
     { property: 'endpoint', value: '/users' },
     { property: 'method', value: 'GET' }
@@ -100,27 +80,47 @@ await commet.usage.create({
 
 <Step>
 
-## Manage seats
-
-Add, remove, or set seat counts:
+## Manage Seats
 
 ```typescript
 // Add seats
 await commet.seats.add({
-  externalId: 'stripe_cus_abc', // Use your own IDs
-  seatType: 'admin',
+  customerId: 'cus_xyz',
+  seatType: 'editor',
   count: 5
 })
 
 // Set exact count
 await commet.seats.set({
   customerId: 'cus_xyz',
-  seatType: 'admin',
+  seatType: 'editor',
   count: 10
 })
 ```
 
 </Step>
+
+<Step>
+
+## Create Subscription
+
+```typescript
+const subscription = await commet.subscriptions.create({
+  customerId: 'cus_xyz',
+  items: [
+    { priceId: 'price_xxx', quantity: 1 }
+  ]
+})
+```
+
+</Step>
 </Steps>
+
+## What's Next?
+
+- [Installation](/docs/library/installation/node) - Framework-specific setup
+- [Usage Events](/docs/library/features/usage-events) - Track consumption
+- [Seat Management](/docs/library/features/seat-management) - Manage licenses
+- [Subscriptions](/docs/library/features/subscriptions) - Create recurring billing
 
 **Need help?** [support@commet.co](mailto:support@commet.co)

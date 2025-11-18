@@ -148,14 +148,14 @@ import { commet } from '@/lib/commet'
 
 export async function POST(request: NextRequest) {
   const { eventType, customerId } = await request.json()
-  
-  const result = await commet.usage.create({
-    eventType,
-    customerId,
+    
+    const result = await commet.usage.create({
+      eventType,
+      customerId,
     idempotencyKey: `${customerId}_${Date.now()}`,
-  })
-  
-  return NextResponse.json(result.data)
+    })
+    
+    return NextResponse.json(result.data)
 }
 ```
 
@@ -173,13 +173,13 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const { eventType, customerId } = req.body
-  
-  const result = await commet.usage.create({
-    eventType,
-    customerId,
+    
+    const result = await commet.usage.create({
+      eventType,
+      customerId,
     idempotencyKey: `${customerId}_${Date.now()}`,
-  })
-  
+    })
+    
   res.json(result.data)
 }
 ```
@@ -190,9 +190,9 @@ export default async function handler(
 export function useBilling() {
   const trackUsage = async (eventType: string, customerId: string) => {
     const res = await fetch('/api/usage', {
-      method: 'POST',
+        method: 'POST',
       body: JSON.stringify({ eventType, customerId }),
-    })
+      })
     return res.json()
   }
 
@@ -216,18 +216,18 @@ import type { NextRequest } from 'next/server'
 import { Commet } from '@commet/node'
 
 export async function middleware(request: NextRequest) {
-  const customerId = request.headers.get('x-customer-id')
+    const customerId = request.headers.get('x-customer-id')
   
   if (customerId && request.nextUrl.pathname.startsWith('/api/')) {
     const commet = new Commet({
       apiKey: process.env.COMMET_API_KEY!,
     })
     
-    commet.usage.create({
-      eventType: 'api_call',
-      customerId,
+      commet.usage.create({
+        eventType: 'api_call',
+        customerId,
       idempotencyKey: `${customerId}_${Date.now()}`,
-    }).catch(console.error)
+      }).catch(console.error)
   }
 
   return NextResponse.next()

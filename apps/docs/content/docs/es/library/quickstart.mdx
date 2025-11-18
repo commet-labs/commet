@@ -1,6 +1,6 @@
 ---
 title: Inicio Rápido
-description: Comienza con Commet SDK en menos de 5 minutos
+description: Comienza con Commet SDK en 5 minutos
 ---
 
 import { Steps, Step } from 'fumadocs-ui/components/steps'
@@ -9,18 +9,18 @@ import { Callout } from 'fumadocs-ui/components/callout'
 
 # Inicio Rápido
 
-Pon tu sistema de facturación en funcionamiento en menos de 5 minutos.
+Pon tu sistema de facturación en funcionamiento en 5 minutos.
 
 <Callout type="info">
-**Prerrequisitos:** Node.js 18+ y una cuenta de Commet. [Regístrate aquí](https://sandbox.commet.co) si es necesario.
+**Prerrequisitos:** Node.js 18+ y una [cuenta de Commet](https://sandbox.commet.co).
 </Callout>
 
 <Steps>
 <Step>
 
-## Instala el SDK
+## Instalar
 
-<Tabs items={['npm', 'pnpm', 'yarn']}>
+<Tabs items={['npm', 'pnpm', 'yarn', 'bun']}>
 <Tab value="npm">
 ```bash
 npm install @commet/node
@@ -36,59 +36,39 @@ pnpm add @commet/node
 yarn add @commet/node
 ```
 </Tab>
+<Tab value="bun">
+```bash
+bun add @commet/node
+```
+</Tab>
 </Tabs>
 
 </Step>
 
 <Step>
 
-## Vincula tu proyecto
-
-Usa el CLI para conectar tu proyecto y sincronizar tipos:
-
-```bash
-npx commet link
-```
-
-Selecciona tu organización y proyecto. El CLI genera tipos de TypeScript para tus tipos de evento y tipos de asiento automáticamente.
-
-<Callout type="info">
-**Seguridad de Tipos:** El CLI crea wrappers tipados para tus eventos de facturación, previniendo errores en tiempo de ejecución.
-</Callout>
-
-</Step>
-
-<Step>
-
-## Inicializa el cliente
-
-Crea tu cliente Commet con variables de entorno:
+## Inicializar
 
 ```typescript
 import { Commet } from '@commet/node'
 
 const commet = new Commet({
-  apiKey: process.env.COMMET_API_KEY!
+  apiKey: process.env.COMMET_API_KEY!,
+  environment: 'sandbox', // o 'production'
 })
 ```
-
-<Callout type="warn">
-**Seguridad:** Guarda tu clave API en `.env` y nunca la commitees. El CLI agrega `.commet/` a `.gitignore` automáticamente.
-</Callout>
 
 </Step>
 
 <Step>
 
-## Rastrea eventos de uso
-
-Envía datos de uso con métodos type-safe:
+## Rastrear Uso
 
 ```typescript
-// Rastrea llamadas API (type-safe después de CLI link)
 await commet.usage.create({
   eventType: 'api_call',
-  customerId: 'cus_xyz', // O usa externalId
+  customerId: 'cus_xyz',
+  idempotencyKey: `evt_${Date.now()}`,
   properties: [
     { property: 'endpoint', value: '/users' },
     { property: 'method', value: 'GET' }
@@ -100,27 +80,47 @@ await commet.usage.create({
 
 <Step>
 
-## Gestiona asientos
-
-Agrega, remueve o establece cantidades de asientos:
+## Gestionar Seats
 
 ```typescript
-// Agregar asientos
+// Agregar seats
 await commet.seats.add({
-  externalId: 'stripe_cus_abc', // Usa tus propios IDs
-  seatType: 'admin',
+  customerId: 'cus_xyz',
+  seatType: 'editor',
   count: 5
 })
 
 // Establecer cantidad exacta
 await commet.seats.set({
   customerId: 'cus_xyz',
-  seatType: 'admin',
+  seatType: 'editor',
   count: 10
 })
 ```
 
 </Step>
+
+<Step>
+
+## Crear Suscripción
+
+```typescript
+const subscription = await commet.subscriptions.create({
+  customerId: 'cus_xyz',
+  items: [
+    { priceId: 'price_xxx', quantity: 1 }
+  ]
+})
+```
+
+</Step>
 </Steps>
+
+## ¿Qué Sigue?
+
+- [Instalación](/es/docs/library/installation/node) - Configuración por framework
+- [Eventos de Uso](/es/docs/library/features/usage-events) - Rastrear consumo
+- [Gestión de Seats](/es/docs/library/features/seat-management) - Administrar licencias
+- [Suscripciones](/es/docs/library/features/subscriptions) - Crear facturación recurrente
 
 **¿Necesitas ayuda?** [support@commet.co](mailto:support@commet.co)
