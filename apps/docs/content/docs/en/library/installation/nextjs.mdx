@@ -1,6 +1,6 @@
 ---
 title: Next.js Setup
-description: Complete Next.js integration with Commet SDK
+description: Use Commet SDK in Next.js applications
 ---
 
 import { Steps, Step } from 'fumadocs-ui/components/steps'
@@ -9,31 +9,36 @@ import { Callout } from 'fumadocs-ui/components/callout'
 
 # Next.js Setup
 
-Complete guide for integrating Commet SDK with Next.js applications.
+Use Commet SDK in Next.js (App Router or Pages Router).
 
 <Callout type="info">
-**Requirements:** Next.js 13.4+ with App Router or Pages Router support.
+**Requirements:** Next.js 13.4+
 </Callout>
 
 <Steps>
 <Step>
 
-## Install the SDK
+## Install
 
-<Tabs items={['npm', 'pnpm', 'yarn']}>
+<Tabs items={['npm', 'pnpm', 'yarn', 'bun']}>
 <Tab value="npm">
 ```bash
-npm install commet
+npm install @commet/node
 ```
 </Tab>
 <Tab value="pnpm">
 ```bash
-pnpm add commet
+pnpm add @commet/node
 ```
 </Tab>
 <Tab value="yarn">
 ```bash
-yarn add commet
+yarn add @commet/node
+```
+</Tab>
+<Tab value="bun">
+```bash
+bun add @commet/node
 ```
 </Tab>
 </Tabs>
@@ -42,84 +47,124 @@ yarn add commet
 
 <Step>
 
-## Configure Environment Variables
-
-Add your API key to `.env.local`:
+## Configure
 
 ```bash title=".env.local"
 COMMET_API_KEY=your_api_key_here
+COMMET_ENV=sandbox
 ```
 
 <Callout type="warn">
-**Security:** Never expose your API key in client-side code. Always use server-side routes or API routes.
+**Server-side only:** Never expose your API key in client code. Use Server Actions, API Routes, or Server Components.
 </Callout>
 
 </Step>
 
 <Step>
 
-## Initialize the Client
+## Initialize
 
-Create a server-side client instance:
-
-<Tabs items={['App Router', 'Pages Router']}>
-<Tab value="App Router">
 ```typescript title="lib/commet.ts"
-import { Commet } from 'commet'
+import { Commet } from '@commet/node'
 
 export const commet = new Commet({
   apiKey: process.env.COMMET_API_KEY!,
+  environment: process.env.COMMET_ENV === 'production' ? 'production' : 'sandbox',
 })
 ```
-</Tab>
-<Tab value="Pages Router">
-```typescript title="lib/commet.ts"
-import { Commet } from 'commet'
-
-export const commet = new Commet({
-  apiKey: process.env.COMMET_API_KEY!,
-})
-```
-</Tab>
-</Tabs>
 
 </Step>
 
 <Step>
 
-## Create API Routes
-
-Set up billing endpoints in your application:
+## Use
 
 <Tabs items={['App Router', 'Pages Router']}>
 <Tab value="App Router">
-```typescript title="app/api/billing/usage/route.ts"
+
+### Server Actions
+
+```typescript title="app/actions/billing.ts"
+'use server'
+
+import { commet } from '@/lib/commet'
+
+export async function trackUsage(eventType: string, customerId: string) {
+  const result = await commet.usage.create({
+    eventType,
+    customerId,
+    idempotencyKey: `${customerId}_${Date.now()}`,
+  })
+  
+  return result.data
+}
+```
+
+Use in components:
+
+```typescript title="app/dashboard/page.tsx"
+'use client'
+
+import { trackUsage } from '@/app/actions/billing'
+
+export default function Dashboard() {
+  const handleAction = async () => {
+    await trackUsage('api_call', 'cus_xxx')
+  }
+
+  return <button onClick={handleAction}>Track</button>
+}
+```
+
+### Server Components
+
+```typescript title="app/usage/page.tsx"
+import { commet } from '@/lib/commet'
+
+export default async function UsagePage({
+  searchParams,
+}: {
+  searchParams: { customerId: string }
+}) {
+  const events = await commet.usage.list({
+    customerId: searchParams.customerId,
+  })
+
+  return (
+    <div>
+      {events.data.map(event => (
+        <div key={event.id}>{event.eventType}</div>
+      ))}
+    </div>
+  )
+}
+```
+
+### API Routes
+
+```typescript title="app/api/usage/route.ts"
 import { NextRequest, NextResponse } from 'next/server'
 import { commet } from '@/lib/commet'
 
 export async function POST(request: NextRequest) {
-  try {
-    const { eventType, customerId, quantity } = await request.json()
-    
-    const result = await commet.usage.create({
-      eventType,
-      customerId,
-      quantity,
-    })
-    
-    return NextResponse.json(result.data)
-  } catch (error) {
-    console.error('Usage tracking error:', error)
-    return NextResponse.json(
-      { error: 'Failed to track usage' },
-      { status: 500 }
-    )
-  }
+  const { eventType, customerId } = await request.json()
+  
+  const result = await commet.usage.create({
+    eventType,
+    customerId,
+    idempotencyKey: `${customerId}_${Date.now()}`,
+  })
+  
+  return NextResponse.json(result.data)
 }
 ```
+
 </Tab>
 <Tab value="Pages Router">
-```typescript title="pages/api/billing/usage.ts"
+
+### API Routes
+
+```typescript title="pages/api/usage.ts"
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { commet } from '@/lib/commet'
 
@@ -127,176 +172,62 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' })
-  }
-
-  try {
-    const { eventType, customerId, quantity } = req.body
-    
-    const result = await commet.usage.create({
-      eventType,
-      customerId,
-      quantity,
-    })
-    
-    res.status(200).json(result.data)
-  } catch (error) {
-    console.error('Usage tracking error:', error)
-    res.status(500).json({ error: 'Failed to track usage' })
-  }
-}
-```
-</Tab>
-</Tabs>
-
-</Step>
-
-<Step>
-
-## Track Usage from Components
-
-Create client-side functions to track usage:
-
-<Tabs items={['App Router', 'Pages Router']}>
-<Tab value="App Router">
-```typescript title="app/actions/billing.ts"
-'use server'
-
-import { commet } from '@/lib/commet'
-
-export async function trackUsage(
-  eventType: string,
-  customerId: string,
-  quantity: number = 1
-) {
-  try {
-    const result = await commet.usage.create({
-      eventType,
-      customerId,
-      quantity,
-    })
-    
-    return { success: true, data: result.data }
-  } catch (error) {
-    console.error('Usage tracking error:', error)
-    return { success: false, error: 'Failed to track usage' }
-  }
+  const { eventType, customerId } = req.body
+  
+  const result = await commet.usage.create({
+    eventType,
+    customerId,
+    idempotencyKey: `${customerId}_${Date.now()}`,
+  })
+  
+  res.json(result.data)
 }
 ```
 
-Use in components:
-```typescript title="app/dashboard/page.tsx"
-import { trackUsage } from '@/app/actions/billing'
+### Client Hook
 
-export default function Dashboard() {
-  const handleApiCall = async () => {
-    // Your API logic here
-    
-    // Track usage
-    await trackUsage('api_call', 'cus_A1b2C3d4E5f6G7h8I9j0K1l2')
-  }
-
-  return (
-    <button onClick={handleApiCall}>
-      Make API Call
-    </button>
-  )
-}
-```
-</Tab>
-<Tab value="Pages Router">
 ```typescript title="hooks/useBilling.ts"
-import { useState } from 'react'
-
 export function useBilling() {
-  const [loading, setLoading] = useState(false)
-
-  const trackUsage = async (
-    eventType: string,
-    customerId: string,
-    quantity: number = 1
-  ) => {
-    setLoading(true)
-    
-    try {
-      const response = await fetch('/api/billing/usage', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ eventType, customerId, quantity }),
-      })
-      
-      if (!response.ok) throw new Error('Failed to track usage')
-      
-      const data = await response.json()
-      return { success: true, data }
-    } catch (error) {
-      console.error('Usage tracking error:', error)
-      return { success: false, error: 'Failed to track usage' }
-    } finally {
-      setLoading(false)
-    }
+  const trackUsage = async (eventType: string, customerId: string) => {
+    const res = await fetch('/api/usage', {
+      method: 'POST',
+      body: JSON.stringify({ eventType, customerId }),
+    })
+    return res.json()
   }
 
-  return { trackUsage, loading }
+  return { trackUsage }
 }
 ```
 
-Use in components:
-```typescript title="components/Dashboard.tsx"
-import { useBilling } from '@/hooks/useBilling'
-
-export default function Dashboard() {
-  const { trackUsage, loading } = useBilling()
-
-  const handleApiCall = async () => {
-    // Your API logic here
-    
-    // Track usage
-    await trackUsage('api_call', 'cus_A1b2C3d4E5f6G7h8I9j0K1l2')
-  }
-
-  return (
-    <button onClick={handleApiCall} disabled={loading}>
-      {loading ? 'Processing...' : 'Make API Call'}
-    </button>
-  )
-}
-```
 </Tab>
 </Tabs>
 
 </Step>
 </Steps>
 
-## Advanced Integration
+## Middleware Example
 
-### Middleware Integration
-
-Track usage automatically with Next.js middleware:
+Track API usage automatically:
 
 ```typescript title="middleware.ts"
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { commet } from '@/lib/commet'
+import { Commet } from '@commet/node'
 
 export async function middleware(request: NextRequest) {
-  // Only track API routes
-  if (request.nextUrl.pathname.startsWith('/api/')) {
-    const customerId = request.headers.get('x-customer-id')
+  const customerId = request.headers.get('x-customer-id')
+  
+  if (customerId && request.nextUrl.pathname.startsWith('/api/')) {
+    const commet = new Commet({
+      apiKey: process.env.COMMET_API_KEY!,
+    })
     
-    if (customerId) {
-      // Track usage asynchronously
-      commet.usage.create({
-        eventType: 'api_call',
-        customerId,
-        quantity: 1,
-        metadata: {
-          endpoint: request.nextUrl.pathname,
-          method: request.method,
-        }
-      }).catch(console.error)
-    }
+    commet.usage.create({
+      eventType: 'api_call',
+      customerId,
+      idempotencyKey: `${customerId}_${Date.now()}`,
+    }).catch(console.error)
   }
 
   return NextResponse.next()
@@ -307,151 +238,84 @@ export const config = {
 }
 ```
 
-### Server Components
+## Webhooks
 
-Use Commet SDK directly in Server Components:
+```typescript title="app/api/webhooks/commet/route.ts"
+import { NextRequest, NextResponse } from 'next/server'
+import { Webhooks } from '@commet/node'
 
-```typescript title="app/billing/page.tsx"
-import { commet } from '@/lib/commet'
+const webhooks = new Webhooks()
 
-export default async function BillingPage({
-  searchParams,
-}: {
-  searchParams: { customerId: string }
-}) {
-  const usage = await commet.usage.list({
-    customerId: searchParams.customerId,
-    limit: 10,
-  })
-
-  return (
-    <div>
-      <h1>Usage History</h1>
-      {usage.data.map(event => (
-        <div key={event.id}>
-          {event.eventType}: {event.quantity}
-        </div>
-      ))}
-    </div>
+export async function POST(request: NextRequest) {
+  const body = await request.text()
+  const signature = request.headers.get('x-commet-signature')!
+  
+  const event = webhooks.constructEvent(
+    body,
+    signature,
+    process.env.COMMET_WEBHOOK_SECRET!
   )
+  
+  // Handle event
+  console.log('Webhook received:', event.type)
+  
+  return NextResponse.json({ received: true })
 }
 ```
 
-### Error Boundaries
+## Error Handling
 
-Handle billing errors gracefully:
+```typescript
+import { CommetAPIError } from '@commet/node'
 
-```typescript title="components/BillingErrorBoundary.tsx"
-'use client'
-
-import { Component, ReactNode } from 'react'
-
-interface Props {
-  children: ReactNode
-}
-
-interface State {
-  hasError: boolean
-}
-
-export class BillingErrorBoundary extends Component<Props, State> {
-  constructor(props: Props) {
-    super(props)
-    this.state = { hasError: false }
+try {
+  await commet.usage.create({
+    eventType: 'api_call',
+    customerId: 'cus_xxx',
+    idempotencyKey: 'unique_key',
+  })
+} catch (error) {
+  if (error instanceof CommetAPIError) {
+    console.error('API Error:', error.statusCode, error.message)
   }
-
-  static getDerivedStateFromError(): State {
-    return { hasError: true }
-  }
-
-  componentDidCatch(error: Error) {
-    console.error('Billing error:', error)
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="p-4 border border-red-200 rounded">
-          <h3>Billing Error</h3>
-          <p>Usage tracking temporarily unavailable.</p>
-        </div>
-      )
-    }
-
-    return this.props.children
-  }
-}
-```
-
-## TypeScript Configuration
-
-Enhance type safety with custom types:
-
-```typescript title="types/billing.ts"
-export interface UsageEvent {
-  eventType: string
-  customerId: string
-  quantity: number
-  metadata?: Record<string, any>
-}
-
-export interface SeatUpdate {
-  customerId: string
-  seatType: string
-  quantity: number
 }
 ```
 
 ## Best Practices
 
-### Environment Management
-
-Use different API keys for different environments:
-
-```bash title=".env.local"
-# Development
-COMMET_API_KEY=sk_test_...
-
-# Production (in deployment)
-COMMET_API_KEY=sk_live_...
-```
-
-### Error Handling
-
-Implement comprehensive error handling:
+### Non-Blocking Tracking
 
 ```typescript
-try {
-  await commet.usage.create({
-    eventType: 'api_call',
-    customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
-    quantity: 1,
-  })
-} catch (error) {
-  // Log for debugging
-  console.error('Billing error:', error)
-  
-  // Don't block user experience
-  // Continue with application flow
-}
-```
-
-### Performance
-
-Use async tracking to avoid blocking requests:
-
-```typescript
-// ✅ Non-blocking
+// ✅ Good - doesn't block
 commet.usage.create({
   eventType: 'api_call',
-  customerId: 'cus_1234567890',
-  quantity: 1,
+  customerId: 'cus_xxx',
+  idempotencyKey: 'unique_key',
 }).catch(console.error)
 
-// ❌ Blocking
+// ❌ Bad - blocks request
 await commet.usage.create({
   eventType: 'api_call',
-  customerId: 'cus_1234567890',
-  quantity: 1,
+  customerId: 'cus_xxx',
+  idempotencyKey: 'unique_key',
 })
 ```
+
+### Environment Configuration
+
+```typescript title="lib/commet.ts"
+import { Commet } from '@commet/node'
+
+const isDev = process.env.NODE_ENV === 'development'
+
+export const commet = new Commet({
+  apiKey: process.env.COMMET_API_KEY!,
+  environment: isDev ? 'sandbox' : 'production',
+  debug: isDev,
+})
+```
+
+## Related Resources
+
+- [General Node.js Setup](/docs/library/installation/node) - Use in any Node.js project
+- [Testing](/docs/library/core/testing) - Test with sandbox

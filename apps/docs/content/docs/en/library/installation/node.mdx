@@ -1,0 +1,283 @@
+---
+title: Node.js Setup
+description: Use Commet SDK in any Node.js or TypeScript project
+---
+
+import { Steps, Step } from 'fumadocs-ui/components/steps'
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Node.js & TypeScript Setup
+
+Use Commet SDK in any Node.js project: Express, Fastify, serverless functions, or standalone scripts.
+
+<Callout type="info">
+**Requirements:** Node.js 18.0+
+</Callout>
+
+<Steps>
+<Step>
+
+## Install
+
+<Tabs items={['npm', 'pnpm', 'yarn', 'bun']}>
+<Tab value="npm">
+```bash
+npm install @commet/node
+```
+</Tab>
+<Tab value="pnpm">
+```bash
+pnpm add @commet/node
+```
+</Tab>
+<Tab value="yarn">
+```bash
+yarn add @commet/node
+```
+</Tab>
+<Tab value="bun">
+```bash
+bun add @commet/node
+```
+</Tab>
+</Tabs>
+
+</Step>
+
+<Step>
+
+## Configure
+
+```bash title=".env"
+COMMET_API_KEY=your_api_key_here
+COMMET_ENV=sandbox
+```
+
+</Step>
+
+<Step>
+
+## Initialize
+
+```typescript title="lib/commet.ts"
+import { Commet } from '@commet/node'
+
+export const commet = new Commet({
+  apiKey: process.env.COMMET_API_KEY!,
+  environment: 'sandbox', // or 'production'
+})
+```
+
+</Step>
+
+<Step>
+
+## Use
+
+```typescript
+// Track usage
+await commet.usage.create({
+  eventType: 'api_call',
+  customerId: 'cus_xxx',
+  idempotencyKey: `evt_${Date.now()}`,
+})
+
+// Create customer
+const customer = await commet.customers.create({
+  legalName: 'Acme Corp',
+  billingEmail: 'billing@acme.com',
+  address: {
+    line1: '123 Main St',
+    city: 'San Francisco',
+    postalCode: '94102',
+    country: 'US',
+  },
+})
+
+// Create subscription
+const subscription = await commet.subscriptions.create({
+  customerId: customer.data.id,
+  items: [
+    { priceId: 'price_xxx', quantity: 1 }
+  ],
+})
+```
+
+</Step>
+</Steps>
+
+## Framework Examples
+
+### Express
+
+```typescript title="src/server.ts"
+import express from 'express'
+import { commet } from './lib/commet'
+
+const app = express()
+app.use(express.json())
+
+app.post('/api/usage', async (req, res) => {
+  const { eventType, customerId } = req.body
+  
+  const result = await commet.usage.create({
+    eventType,
+    customerId,
+    idempotencyKey: `${customerId}_${Date.now()}`,
+  })
+  
+  res.json(result.data)
+})
+
+app.listen(3000)
+```
+
+### Fastify
+
+```typescript title="src/server.ts"
+import Fastify from 'fastify'
+import { commet } from './lib/commet'
+
+const fastify = Fastify()
+
+fastify.post('/api/usage', async (request, reply) => {
+  const { eventType, customerId } = request.body
+  
+  const result = await commet.usage.create({
+    eventType,
+    customerId,
+    idempotencyKey: `${customerId}_${Date.now()}`,
+  })
+  
+  return result.data
+})
+
+fastify.listen({ port: 3000 })
+```
+
+### Serverless
+
+<Tabs items={['Vercel', 'AWS Lambda']}>
+<Tab value="Vercel">
+```typescript title="api/usage.ts"
+import type { VercelRequest, VercelResponse } from '@vercel/node'
+import { Commet } from '@commet/node'
+
+const commet = new Commet({
+  apiKey: process.env.COMMET_API_KEY!,
+})
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  const { eventType, customerId } = req.body
+  
+  const result = await commet.usage.create({
+    eventType,
+    customerId,
+    idempotencyKey: `${customerId}_${Date.now()}`,
+  })
+  
+  res.json(result.data)
+}
+```
+</Tab>
+<Tab value="AWS Lambda">
+```typescript title="functions/usage.ts"
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import { Commet } from '@commet/node'
+
+const commet = new Commet({
+  apiKey: process.env.COMMET_API_KEY!,
+})
+
+export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  const { eventType, customerId } = JSON.parse(event.body || '{}')
+  
+  const result = await commet.usage.create({
+    eventType,
+    customerId,
+    idempotencyKey: `${customerId}_${Date.now()}`,
+  })
+  
+  return {
+    statusCode: 200,
+    body: JSON.stringify(result.data),
+  }
+}
+```
+</Tab>
+</Tabs>
+
+## Error Handling
+
+```typescript
+import { CommetAPIError } from '@commet/node'
+
+try {
+  await commet.usage.create({
+    eventType: 'api_call',
+    customerId: 'cus_xxx',
+    idempotencyKey: 'unique_key',
+  })
+} catch (error) {
+  if (error instanceof CommetAPIError) {
+    console.error('API Error:', error.statusCode, error.message)
+  }
+}
+```
+
+## Best Practices
+
+### Always Use Idempotency Keys
+
+```typescript
+// ✅ Good
+await commet.usage.create({
+  eventType: 'api_call',
+  customerId: 'cus_xxx',
+  idempotencyKey: `${customerId}_${requestId}`,
+})
+
+// ❌ Bad - can create duplicates
+await commet.usage.create({
+  eventType: 'api_call',
+  customerId: 'cus_xxx',
+})
+```
+
+### Non-Blocking Usage Tracking
+
+```typescript
+// ✅ Good - doesn't block request
+commet.usage.create({
+  eventType: 'api_call',
+  customerId: 'cus_xxx',
+  idempotencyKey: 'unique_key',
+}).catch(console.error)
+
+// Continue processing...
+
+// ❌ Bad - blocks request
+await commet.usage.create({
+  eventType: 'api_call',
+  customerId: 'cus_xxx',
+  idempotencyKey: 'unique_key',
+})
+```
+
+### Batch Operations
+
+```typescript
+const events = Array.from({ length: 100 }, (_, i) => ({
+  eventType: 'api_call',
+  customerId: 'cus_xxx',
+  idempotencyKey: `batch_${Date.now()}_${i}`,
+}))
+
+const result = await commet.usage.createBatch({ events })
+```
+
+## Related Resources
+
+- [Testing](/docs/library/core/testing) - Test with sandbox environment
+- [Error Handling](/docs/library/core/error-handling) - Handle errors gracefully

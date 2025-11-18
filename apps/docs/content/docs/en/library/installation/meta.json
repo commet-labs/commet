@@ -1,5 +1,5 @@
 {
   "title": "Installation",
   "description": "Framework-specific setup guides",
-  "pages": ["nextjs"]
+  "pages": ["node", "nextjs"]
 }
