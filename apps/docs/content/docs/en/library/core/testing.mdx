@@ -1,0 +1,412 @@
+---
+title: Testing
+description: Test your integration safely with sandbox environment and test cards
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Testing
+
+Commet provides a complete sandbox environment to test your billing integration safely before going to production. Use test data, simulate subscriptions, and process test payments without affecting real customers.
+
+<Callout type="success">
+**Sandbox is Default:** The SDK uses the sandbox environment by default, so you can test safely from day one.
+</Callout>
+
+## Sandbox Environment
+
+The sandbox environment mirrors production functionality with isolated data:
+
+```typescript
+const commet = new Commet({
+  apiKey: process.env.COMMET_SANDBOX_KEY!,
+  environment: 'sandbox' // Default
+})
+
+// All operations use sandbox.commet.co
+await commet.subscriptions.create({
+  productId: 'prod_test_123',
+  customerId: 'cus_test_456'
+})
+```
+
+### Sandbox Features
+
+- **Complete isolation**: Separate database from production
+- **Real API behavior**: Identical responses and validation
+- **Test payments**: Use Stripe test cards for checkout flows
+- **Safe experimentation**: Create, modify, and delete data freely
+- **No costs**: All operations are free in sandbox
+
+## Stripe Test Cards
+
+When testing subscription checkouts in sandbox, use Stripe's test card numbers to simulate different payment scenarios.
+
+<Callout type="info">
+**Stripe Checkout Integration:** Commet uses Stripe for payment processing. Test cards only work in sandbox environment.
+</Callout>
+
+### Successful Payment Cards
+
+Use these cards to test successful payment flows:
+
+| Card Number | Brand | CVC | Date |
+| --- | --- | --- | --- |
+| `4242 4242 4242 4242` | Visa | Any 3 digits | Any future date |
+| `5555 5555 5555 4444` | Mastercard | Any 3 digits | Any future date |
+| `3782 822463 10005` | American Express | Any 4 digits | Any future date |
+| `6011 1111 1111 1117` | Discover | Any 3 digits | Any future date |
+
+### Failed Payment Scenarios
+
+Test error handling with these cards:
+
+| Card Number | Scenario |
+| --- | --- |
+| `4000 0000 0000 9995` | Declined - Insufficient funds |
+| `4000 0000 0000 9987` | Declined - Lost card |
+| `4000 0000 0000 9979` | Declined - Stolen card |
+| `4000 0000 0000 0069` | Charge succeeds but expires immediately |
+
+### 3D Secure Authentication
+
+Test Strong Customer Authentication (SCA) flows:
+
+| Card Number | Authentication |
+| --- | --- |
+| `4000 0025 0000 3155` | Requires authentication |
+| `4000 0000 0000 3220` | Requires authentication (insufficient funds) |
+
+<Callout type="info">
+**Complete Reference:** For the full list of test cards and scenarios, visit [Stripe's Testing Documentation](https://stripe.com/docs/testing).
+</Callout>
+
+## Testing Workflows
+
+### Test a Complete Subscription Flow
+
+<Tabs items={['Fixed Subscription', 'Usage-Based', 'Seat-Based']}>
+<Tab value="Fixed Subscription">
+```typescript
+// 1. Create test customer
+const customer = await commet.customers.create({
+  name: 'Test Customer',
+  email: 'test@example.com'
+})
+
+// 2. Create subscription
+const subscription = await commet.subscriptions.create({
+  productId: 'prod_monthly_plan',
+  customerId: customer.data.id,
+  quantity: 1
+})
+
+// 3. Test checkout with Stripe test card
+// Use: 4242 4242 4242 4242
+// Customer completes payment in checkout
+
+// 4. Verify subscription is active
+const sub = await commet.subscriptions.retrieve(subscription.data.id)
+console.log('Status:', sub.data.status) // 'active'
+```
+</Tab>
+<Tab value="Usage-Based">
+```typescript
+// 1. Create customer and subscription
+const customer = await commet.customers.create({
+  name: 'API Platform Test',
+  email: 'test-api@example.com'
+})
+
+const subscription = await commet.subscriptions.create({
+  productId: 'prod_api_calls',
+  customerId: customer.data.id
+})
+
+// 2. Send test usage events
+await commet.usage.create({
+  eventType: 'api_call',
+  customerId: customer.data.id,
+  customerEventId: `test_${Date.now()}_1`
+})
+
+await commet.usage.create({
+  eventType: 'api_call',
+  customerId: customer.data.id,
+  customerEventId: `test_${Date.now()}_2`
+})
+
+// 3. Verify events were recorded
+const events = await commet.usage.list({
+  customerId: customer.data.id
+})
+console.log('Total events:', events.data.length) // 2
+```
+</Tab>
+<Tab value="Seat-Based">
+```typescript
+// 1. Create customer and seat-based subscription
+const customer = await commet.customers.create({
+  name: 'SaaS Test Company',
+  email: 'test-saas@example.com'
+})
+
+const subscription = await commet.subscriptions.create({
+  productId: 'prod_saas_seats',
+  customerId: customer.data.id,
+  initialSeats: 5
+})
+
+// 2. Add seats to test scaling
+await commet.seats.add({
+  customerId: customer.data.id,
+  seatType: 'editor',
+  count: 3
+})
+
+// 3. Verify seat balance
+const balance = await commet.seats.getBalance({
+  customerId: customer.data.id,
+  seatType: 'editor'
+})
+console.log('Total seats:', balance.data.current) // 8
+
+// 4. Test seat removal
+await commet.seats.remove({
+  customerId: customer.data.id,
+  seatType: 'editor',
+  count: 2
+})
+```
+</Tab>
+</Tabs>
+
+## Testing Best Practices
+
+### Use Unique Identifiers
+
+Avoid conflicts with unique IDs in tests:
+
+```typescript
+const testId = `test_${Date.now()}`
+
+await commet.customers.create({
+  name: `Test Customer ${testId}`,
+  email: `test-${testId}@example.com`,
+  externalId: testId
+})
+```
+
+### Test Error Scenarios
+
+Ensure your app handles errors gracefully:
+
+```typescript
+try {
+  // Test with invalid product ID
+  await commet.subscriptions.create({
+    productId: 'prod_invalid',
+    customerId: 'cus_test_123'
+  })
+} catch (error) {
+  console.log('Expected error:', error.message)
+  console.log('Status code:', error.statusCode) // 404
+}
+
+try {
+  // Test with declined card (use 4000 0000 0000 9995)
+  // Customer enters card in checkout...
+  console.log('Payment declined - handle gracefully')
+} catch (error) {
+  console.log('Payment error:', error.message)
+}
+```
+
+### Clean Up Test Data
+
+Remove test data after testing (optional in sandbox):
+
+```typescript
+// Cancel test subscriptions
+await commet.subscriptions.cancel('sub_test_123')
+
+// Sandbox data is isolated, so cleanup is optional
+// All sandbox data can be cleared from the dashboard
+```
+
+### Test Idempotency
+
+Verify idempotent operations work correctly:
+
+```typescript
+const eventId = `test_event_${Date.now()}`
+
+// Send event twice with same customerEventId
+await commet.usage.create({
+  eventType: 'api_call',
+  customerId: 'cus_test_123',
+  customerEventId: eventId
+})
+
+// Second call is idempotent - won't create duplicate
+await commet.usage.create({
+  eventType: 'api_call',
+  customerId: 'cus_test_123',
+  customerEventId: eventId // Same ID
+})
+
+// Verify only one event exists
+const events = await commet.usage.list({
+  customerId: 'cus_test_123'
+})
+console.log('Should be 1:', events.data.length)
+```
+
+## Switching to Production
+
+When ready to go live, update your configuration:
+
+```typescript
+// Before (testing)
+const commet = new Commet({
+  apiKey: process.env.COMMET_SANDBOX_KEY!,
+  environment: 'sandbox'
+})
+
+// After (production)
+const commet = new Commet({
+  apiKey: process.env.COMMET_PRODUCTION_KEY!,
+  environment: 'production'
+})
+```
+
+<Callout type="warn">
+**Different API Keys:** Sandbox and production use separate API keys. Get your production key from the [Commet dashboard](https://commet.co).
+</Callout>
+
+### Pre-Production Checklist
+
+Before switching to production:
+
+- [ ] Test all critical subscription flows in sandbox
+- [ ] Verify usage events are tracked correctly
+- [ ] Test seat management operations (if applicable)
+- [ ] Confirm error handling works as expected
+- [ ] Test payment failures with declined cards
+- [ ] Verify webhook handling (if implemented)
+- [ ] Get production API key from dashboard
+- [ ] Update environment variables
+- [ ] Set `environment: 'production'` explicitly
+
+## Common Testing Scenarios
+
+### Test Subscription Creation
+
+```typescript
+// Test with all supported product types
+const productIds = [
+  'prod_fixed_monthly',
+  'prod_usage_api',
+  'prod_seat_based'
+]
+
+for (const productId of productIds) {
+  const sub = await commet.subscriptions.create({
+    productId,
+    customerId: 'cus_test_123'
+  })
+  
+  console.log(`Created: ${sub.data.id}`)
+}
+```
+
+### Test Usage Aggregation
+
+```typescript
+// Send batch of events
+const events = Array.from({ length: 100 }, (_, i) => ({
+  eventType: 'api_call',
+  customerId: 'cus_test_123',
+  customerEventId: `batch_test_${Date.now()}_${i}`,
+  properties: [
+    { property: 'endpoint', value: '/api/test' }
+  ]
+}))
+
+await commet.usage.createBatch({ events })
+
+// Verify count
+const list = await commet.usage.list({
+  customerId: 'cus_test_123'
+})
+console.log('Events created:', list.data.length) // 100
+```
+
+### Test Concurrent Operations
+
+```typescript
+// Test parallel seat updates
+const operations = [
+  commet.seats.add({
+    customerId: 'cus_test_123',
+    seatType: 'editor',
+    count: 5
+  }),
+  commet.seats.add({
+    customerId: 'cus_test_123',
+    seatType: 'viewer',
+    count: 10
+  }),
+  commet.seats.remove({
+    customerId: 'cus_test_123',
+    seatType: 'admin',
+    count: 2
+  })
+]
+
+await Promise.all(operations)
+console.log('All operations completed')
+```
+
+## Troubleshooting
+
+### Payment Fails in Sandbox
+
+<Callout type="info">
+**Stripe Test Mode:** Ensure your Stripe account is in test mode and connected to your Commet sandbox organization.
+</Callout>
+
+### Events Not Appearing
+
+```typescript
+// Verify event was created
+const result = await commet.usage.create({
+  eventType: 'api_call',
+  customerId: 'cus_test_123',
+  customerEventId: `debug_${Date.now()}`
+})
+
+console.log('Event ID:', result.data.id)
+console.log('Created at:', result.data.createdAt)
+
+// Check event list
+const events = await commet.usage.list({
+  customerId: 'cus_test_123'
+})
+console.log('Total events:', events.data.length)
+```
+
+### Subscription Not Generating Invoices
+
+- Verify subscription status is `active`
+- Check billing day configuration
+- Ensure product has valid list prices
+- Confirm customer has billing details
+
+## Related Resources
+
+- [Environments](/docs/en/library/core/environments) - Configure sandbox and production
+- [Error Handling](/docs/en/library/core/error-handling) - Handle errors gracefully
+- [Stripe Testing Docs](https://stripe.com/docs/testing) - Complete test card reference
+
