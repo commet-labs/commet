@@ -7,14 +7,6 @@ import { Steps, Step } from 'fumadocs-ui/components/steps'
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
 import { Callout } from 'fumadocs-ui/components/callout'
 
-# Node.js & TypeScript Setup
-
-Use Commet SDK in any Node.js project: Express, Fastify, serverless functions, or standalone scripts.
-
-<Callout type="info">
-**Requirements:** Node.js 18.0+
-</Callout>
-
 <Steps>
 <Step>
 
@@ -155,58 +147,6 @@ fastify.post('/api/usage', async (request, reply) => {
 
 fastify.listen({ port: 3000 })
 ```
-
-### Serverless
-
-<Tabs items={['Vercel', 'AWS Lambda']}>
-<Tab value="Vercel">
-```typescript title="api/usage.ts"
-import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { Commet } from '@commet/node'
-
-const commet = new Commet({
-  apiKey: process.env.COMMET_API_KEY!,
-})
-
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const { eventType, customerId } = req.body
-  
-  const result = await commet.usage.create({
-    eventType,
-    customerId,
-    idempotencyKey: `${customerId}_${Date.now()}`,
-  })
-  
-  res.json(result.data)
-}
-```
-</Tab>
-<Tab value="AWS Lambda">
-```typescript title="functions/usage.ts"
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-import { Commet } from '@commet/node'
-
-const commet = new Commet({
-  apiKey: process.env.COMMET_API_KEY!,
-})
-
-export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  const { eventType, customerId } = JSON.parse(event.body || '{}')
-  
-  const result = await commet.usage.create({
-    eventType,
-    customerId,
-    idempotencyKey: `${customerId}_${Date.now()}`,
-  })
-  
-  return {
-    statusCode: 200,
-    body: JSON.stringify(result.data),
-  }
-}
-```
-</Tab>
-</Tabs>
 
 ## Error Handling
 
