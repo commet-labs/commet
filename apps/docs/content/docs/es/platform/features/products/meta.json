@@ -1,5 +1,5 @@
 {
   "title": "Productos",
   "description": "Todo lo que necesitas para montar tu pricing en Commet",
-  "pages": ["seat-based-pricing", "usage-based-pricing"]
+  "pages": ["catalog-overview", "seat-based-pricing", "usage-based-pricing"]
 }

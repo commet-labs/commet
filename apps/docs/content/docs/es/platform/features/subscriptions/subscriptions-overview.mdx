@@ -78,7 +78,7 @@ Cada suscripción incluye información completa para gestionar el ciclo de factu
 
 - **Ver link actual**: Accede al link de pago generado para el cliente
 - **Regenerar link**: Si el checkout expiró o necesitas un nuevo link, puedes regenerarlo (solo disponible si la suscripción no está activa)
-- **Compartir con cliente**: Copia el link para enviarlo por correo o integrarlo en tu flujo de onboarding
+- **Envío al cliente**: El link de checkout se envía automáticamente al correo del cliente. Si estás usando el SDK, también puedes integrar el link directamente en tu flujo de onboarding
 
 ### Facturas generadas
 
@@ -110,6 +110,10 @@ Cada suscripción incluye información completa para gestionar el ciclo de factu
 ## Integración mediante SDK
 
 Todos los pasos descritos anteriormente pueden realizarse programáticamente a través de nuestro SDK. Esta es la forma recomendada para integrar Commet directamente en tu aplicación.
+
+El siguiente diagrama de secuencia ilustra el flujo completo de suscripción al integrar Commet en tu aplicación. Ten en cuenta que este diagrama asume que ya tienes clientes y productos creados en tu sistema. Muestra la interacción entre tu frontend, backend y los servicios de Commet: desde que un usuario inicia una suscripción, pasando por el proceso de checkout donde ingresan su método de pago, hasta la activación final donde Commet envía un webhook a tu backend para habilitar las funcionalidades del usuario.
+
+![Diagrama de secuencia del ciclo de vida de suscripciones](/images/platform/subs-sequence-diagram.png)
 
 <Callout type="info">
 **Para integraciones in-app**: Si estás construyendo una integración dentro de tu aplicación, usa el SDK en lugar de la interfaz de la plataforma. Esto te permite automatizar completamente el flujo de suscripciones y mantener todo sincronizado con tu sistema.
