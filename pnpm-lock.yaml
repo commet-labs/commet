@@ -103,8 +103,8 @@ importers:
         specifier: 0.1.0
         version: 0.1.0(next@16.0.2(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))
       '@commet/node':
-        specifier: 0.10.1
-        version: 0.10.1(typescript@5.9.3)
+        specifier: 0.11.0
+        version: 0.11.0(typescript@5.9.3)
       '@radix-ui/react-avatar':
         specifier: 1.1.11
         version: 1.1.11(@types/react-dom@19.2.3(@types/react@19.2.3))(@types/react@19.2.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -421,6 +421,12 @@ packages:
 
   '@commet/node@0.10.1':
     resolution: {integrity: sha512-rJhbfb613wzuFIm3sUai6dLoYEa1MGCWTYb+wY6MmCcbdRikpMpcnJxY23i53TiCTbDpB3icFz0oWGC9Uyh2yQ==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      typescript: '>=5.0.0'
+
+  '@commet/node@0.11.0':
+    resolution: {integrity: sha512-gPUG9JwMbXcSDbED2eBknVHWwnqSFunKm5guzhZEm0JIdrdsbsJxPJWbZZTWmpqHwgpoGjPgsoT6eDgv7BTFdA==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       typescript: '>=5.0.0'
@@ -6006,6 +6012,11 @@ snapshots:
       next: 16.0.2(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
 
   '@commet/node@0.10.1(typescript@5.9.3)':
+    dependencies:
+      typescript: 5.9.3
+      zod: 4.1.12
+
+  '@commet/node@0.11.0(typescript@5.9.3)':
     dependencies:
       typescript: 5.9.3
       zod: 4.1.12

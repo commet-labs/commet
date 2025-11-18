@@ -2,6 +2,7 @@ import { checkSubscriptionStatus } from "@/actions/check-subscription-action";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ManageBillingButton } from "@/components/manage-billing-button";
 import { auth } from "@/lib/auth";
 import { commet } from "@/lib/commet";
 import { headers } from "next/headers";
@@ -124,7 +125,7 @@ export default async function DashboardPage({
                             Your Pro plan is active and ready to use.
                           </p>
                           {subscriptionDetails && (
-                            <div className="text-sm space-y-1">
+                            <div className="text-sm space-y-1 mb-4">
                               <p>
                                 <strong>Subscription ID:</strong>{" "}
                                 {subscriptionDetails.id}
@@ -143,6 +144,7 @@ export default async function DashboardPage({
                               </p>
                             </div>
                           )}
+                          <ManageBillingButton />
                         </div>
                       </div>
                     </CardContent>
