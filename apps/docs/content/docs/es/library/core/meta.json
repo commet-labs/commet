@@ -1,10 +1,5 @@
 {
   "title": "Core",
   "description": "Fundamentos del SDK",
-  "pages": [
-    "authentication",
-    "testing",
-    "error-handling",
-    "pagination"
-  ]
+  "pages": ["authentication", "testing", "error-handling", "pagination"]
 }
