@@ -1,439 +1,93 @@
 ---
 title: Customer Management
-description: Complete customer lifecycle management with addresses and taxation
+description: Manage customers with addresses and taxation
 ---
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
 import { Callout } from 'fumadocs-ui/components/callout'
 
-# Customer Management
-
-Manage the complete customer lifecycle with automatic address-based tax calculations and multi-currency support.
-
-<Callout type="info">
-**Prerequisites:** Initialize your Commet client with a valid API key.
-</Callout>
-
-## Basic Operations
-
-### Create Customer
-
-Create a customer with minimal information to start billing:
+## Create Customer
 
 ```typescript
 const customer = await commet.customers.create({
   legalName: 'Acme Corporation',
-  billingEmail: 'billing@acme.com',
-  currency: 'USD'
+  billingEmail: 'billing@acme.com'
 })
-
-console.log('Customer created:', customer.data.id)
 ```
 
-<Callout type="info">
-**Address is optional** at creation. Add it later when needed for tax calculation or before generating invoices with tax requirements.
-</Callout>
+## Link to Your System
 
-### Link to Your System
-
-Use `externalId` to connect Commet customers with your existing user database:
+Use `externalId` to connect Commet customers with your database:
 
 ```typescript
 const customer = await commet.customers.create({
-  externalId: user.id, // Your system's user ID
+  externalId: user.id,
   legalName: 'Acme Corporation',
-  billingEmail: user.email,
-  currency: 'USD'
+  billingEmail: user.email
 })
 
-// Later, find by your ID without storing Commet's
+// Later, find by your ID
 const customers = await commet.customers.list({
   externalId: user.id
 })
 ```
 
-<Callout type="info">
-**External ID** is unique per organization. Use it to sync customers without storing Commet IDs in your database.
-</Callout>
-
-### Retrieve Customer
-
-Get customer details by ID:
+## Basic Operations
 
 ```typescript
-const customer = await commet.customers.retrieve('cus_A1b2C3d4E5f6G7h8I9j0K1l2')
+// Retrieve
+const customer = await commet.customers.retrieve('cus_xxx')
 
-console.log('Customer:', customer.data.legalName)
-```
-
-### Update Customer
-
-Modify customer information:
-
-```typescript
-const updated = await commet.customers.update('cus_A1b2C3d4E5f6G7h8I9j0K1l2', {
-  displayName: 'Acme Corporation Ltd',
+// Update
+await commet.customers.update('cus_xxx', {
+  displayName: 'Acme Corp',
   billingEmail: 'accounts@acme.com'
 })
-```
 
-### List Customers
-
-Retrieve customers with filtering and pagination:
-
-```typescript
-// First page
-const page1 = await commet.customers.list({
-  currency: 'USD',
+// List
+const customers = await commet.customers.list({
   isActive: true,
   limit: 50
 })
 
-console.log(`Found ${page1.data.length} customers`)
-console.log(`More pages: ${page1.hasMore}`)
-
-// Get next page if available
-if (page1.hasMore) {
-  const page2 = await commet.customers.list({
-    currency: 'USD',
-    isActive: true,
-    limit: 50,
-    cursor: page1.nextCursor
-  })
-}
-
-// Fetch all customers
-const allCustomers = []
-let cursor = undefined
-
-do {
-  const page = await commet.customers.list({ 
-    limit: 100, 
-    cursor 
-  })
-  allCustomers.push(...page.data)
-  cursor = page.nextCursor
-} while (page.hasMore)
-
-console.log(`Total: ${allCustomers.length} customers`)
+// Deactivate
+await commet.customers.deactivate('cus_xxx')
 ```
 
-<Callout type="info">
-**Pagination**: All list operations support cursor-based pagination. See [Pagination guide](/library/core/pagination) for detailed examples.
-</Callout>
+## Add Address Later
 
-## Tax Configuration
-
-Configure tax handling based on business requirements. Default is `NOT_APPLICABLE` (B2B standard).
-
-<Tabs items={['Not Applicable', 'Taxed', 'Tax Exempt', 'Reverse Charge']}>
-<Tab value="Not Applicable">
-```typescript
-// Default for B2B - customer handles tax compliance
-await commet.customers.create({
-  legalName: 'Business Client Corp',
-  billingEmail: 'billing@client.com',
-  currency: 'USD'
-  // taxStatus: 'NOT_APPLICABLE' (default)
-})
-```
-</Tab>
-<Tab value="Taxed">
-```typescript
-// Platform collects and remits tax - requires address
-await commet.customers.create({
-  legalName: 'Standard Corp',
-  taxStatus: 'TAXED',
-  currency: 'USD',
-  address: {
-    line1: '456 Commerce Ave',
-    city: 'New York',
-    state: 'NY',
-    postalCode: '10001',
-    country: 'US'
-  }
-})
-```
-</Tab>
-<Tab value="Tax Exempt">
-```typescript
-// Tax-exempt entity
-await commet.customers.create({
-  legalName: 'Non-Profit Organization',
-  taxStatus: 'TAX_EXEMPT',
-  currency: 'USD',
-  metadata: {
-    tax_exempt_id: '501c3-12345'
-  }
-})
-```
-</Tab>
-<Tab value="Reverse Charge">
-```typescript
-// EU reverse charge mechanism
-await commet.customers.create({
-  legalName: 'European Business Ltd',
-  taxStatus: 'REVERSE_CHARGE',
-  currency: 'EUR',
-  address: {
-    line1: 'Business Park 1',
-    city: 'Amsterdam',
-    postalCode: '1000 AA',
-    country: 'NL'
-  }
-})
-```
-</Tab>
-</Tabs>
-
-<Callout type="warning">
-**Tax validation:** Customers with `taxStatus: 'TAXED'` require a complete address before invoicing. Add address during onboarding or before first billing cycle.
-</Callout>
-
-## Multi-Currency Support
-
-Create customers in different currencies:
-
-```typescript
-// USD Customer
-const usdCustomer = await commet.customers.create({
-  legalName: 'US Company',
-  currency: 'USD',
-  address: { 
-    line1: '123 Main St',
-    city: 'New York',
-    state: 'NY',
-    postalCode: '10001',
-    country: 'US'
-  }
-})
-
-// EUR Customer  
-const eurCustomer = await commet.customers.create({
-  legalName: 'German GmbH',
-  currency: 'EUR',
-  address: {
-    line1: 'Hauptstraße 1',
-    city: 'Berlin',
-    postalCode: '10115',
-    country: 'DE'
-  }
-})
-
-// LATAM Customer
-const brlCustomer = await commet.customers.create({
-  legalName: 'Empresa Brasil Ltda',
-  currency: 'BRL',
-  language: 'pt',
-  address: {
-    line1: 'Rua Principal 123',
-    city: 'São Paulo',
-    state: 'SP',
-    postalCode: '01000-000',
-    country: 'BR'
-  }
-})
-```
-
-## Customer Properties
-
-### Required Fields
-
-```typescript
-await commet.customers.create({
-  legalName: 'Required Company Name'  // Only required field
-  // Everything else is optional
-})
-```
-
-### Add Address Later
-
-Complete customer profile when address information becomes available:
+Complete customer profile when information becomes available:
 
 ```typescript
 await commet.customers.update(customerId, {
   address: {
     line1: '123 Business St',
+    line2: 'Suite 100', // Optional
     city: 'San Francisco',
-    state: 'CA',
+    state: 'CA', // Required for US/CA
     postalCode: '94105',
-    country: 'US'  // ISO-2 format
+    country: 'US', // ISO-2 format
+    region: 'North America' // Optional
   }
 })
 ```
 
-### Complete Example
-
-```typescript
-await commet.customers.create({
-  externalId: 'usr_123',               // Your user ID
-  legalName: 'Full Example Corp',
-  displayName: 'Full Example',
-  domain: 'example.com',
-  website: 'https://example.com',
-  taxStatus: 'NOT_APPLICABLE',         // Default
-  currency: 'USD',
-  address: {
-    line1: '123 Business St',
-    line2: 'Suite 100',                // Optional
-    city: 'San Francisco',
-    state: 'CA',                       // Required for US/CA
-    postalCode: '94105',
-    country: 'US',
-    region: 'North America'            // Optional
-  },
-  billingEmail: 'billing@example.com', // Optional
-  paymentTerms: 'net_30',              // Optional
-  timezone: 'America/Los_Angeles',     // Optional
-  language: 'en',                      // Optional
-  industry: 'software',                // Optional
-  employeeCount: '11-50',              // Optional
-  metadata: {                          // Optional custom data
-    salesforce_id: 'sf_123',
-    customer_tier: 'enterprise'
-  }
-})
-```
-
-## Advanced Features
-
-### Search by External ID
-
-Find customers using your system's identifier:
-
-```typescript
-const customers = await commet.customers.list({
-  externalId: user.id
-})
-
-const customer = customers.data[0]
-```
-
-### Search Customers
-
-Filter customers by attributes:
-
-```typescript
-const results = await commet.customers.list({
-  currency: 'USD',
-  taxStatus: 'NOT_APPLICABLE',
-  isActive: true,
-  limit: 50
-})
-```
-
-### Custom Metadata
+## Custom Metadata
 
 Store additional data with customers:
 
 ```typescript
-await commet.customers.update('cus_A1b2C3d4E5f6G7h8I9j0K1l2', {
+await commet.customers.update('cus_xxx', {
   metadata: {
     crm_id: 'sf_123456',
     tier: 'enterprise',
-    onboarding_date: '2024-01-15',
     account_manager: 'john.doe@company.com'
   }
 })
 ```
 
-### Deactivate Customer
+## Related Resources
 
-Soft delete customers when needed:
-
-```typescript
-// Deactivate customer
-await commet.customers.deactivate('cus_A1b2C3d4E5f6G7h8I9j0K1l2')
-
-// Reactivate customer  
-await commet.customers.update('cus_A1b2C3d4E5f6G7h8I9j0K1l2', {
-  isActive: true
-})
-```
-
-## Error Handling
-
-Handle common customer management scenarios:
-
-```typescript
-try {
-  const customer = await commet.customers.create({
-    legalName: 'New Customer',
-    currency: 'USD',
-    address: {
-      line1: '123 Main St',
-      city: 'Anytown',
-      postalCode: '12345',
-      country: 'US'
-    }
-  })
-} catch (error) {
-  if (error instanceof CommetValidationError) {
-    console.log('Validation errors:', error.validationErrors)
-  } else if (error instanceof CommetAPIError) {
-    console.log('API error:', error.statusCode, error.message)
-  }
-}
-```
-
-## Best Practices
-
-### Progressive Onboarding
-
-Create customers immediately, add details later:
-
-```typescript
-// Step 1: Initial registration
-const customer = await commet.customers.create({
-  externalId: user.id,
-  legalName: user.companyName,
-  billingEmail: user.email,
-  currency: 'USD'
-})
-
-// Step 2: Complete profile when information is available
-await commet.customers.update(customer.data.id, {
-  address: {
-    line1: '123 Business St',
-    city: 'San Francisco',
-    state: 'CA',
-    postalCode: '94105',
-    country: 'US'
-  },
-  taxStatus: 'TAXED'  // Enable tax calculation
-})
-```
-
-### Currency Consistency
-
-Match customer currency with their billing region:
-
-```typescript
-// ✅ Consistent
-{ currency: 'EUR', address: { country: 'DE' }}
-{ currency: 'BRL', address: { country: 'BR' }}
-{ currency: 'USD', address: { country: 'US' }}
-
-// ⚠️ May need review
-{ currency: 'USD', address: { country: 'DE' }}
-```
-
-### Structured Metadata
-
-Keep metadata flat and searchable:
-
-```typescript
-// ✅ Good structure
-metadata: {
-  crm_id: 'sf_12345',
-  tier: 'enterprise',
-  industry: 'fintech'
-}
-
-// ❌ Avoid nested objects
-metadata: {
-  crm: {
-    salesforce: { id: 'sf_12345' }
-  }
-}
-```
+- [Subscriptions](/docs/library/features/subscriptions) - Create recurring billing
+- [Portal Access](/docs/library/features/portal-access) - Generate customer portal links
+- [Pagination](/docs/library/core/pagination) - Handle large customer lists
