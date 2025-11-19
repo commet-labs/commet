@@ -1,123 +1,85 @@
 ---
 title: Authentication
-description: Secure API key authentication with sandbox and production environments
+description: API key authentication with sandbox and production environments
 ---
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
-import { Callout } from 'fumadocs-ui/components/callout'
 
 # Authentication
 
-Commet SDK uses API key authentication with sandbox and production environments for safe testing and live billing.
+Initialize the SDK with your API key.
 
-## API Key Format
+## Basic Setup
 
-Commet API keys follow a predictable format for easy identification:
-
-```
-ck_xxx1234567890abcdef...  // Production API keys
-```
-
-<Callout type="warn">
-**Security:** Never expose API keys in client-side code. Always use server-side routes or environment variables.
-</Callout>
-
-## Initialize Client
-
-Configure your Commet client with your API key:
-
-<Tabs items={['Basic Setup', 'With Options', 'Environment Variables']}>
-<Tab value="Basic Setup">
 ```typescript
-import { Commet } from 'commet'
+import { Commet } from '@commet/node'
 
 const commet = new Commet({
   apiKey: process.env.COMMET_API_KEY!
 })
 ```
-</Tab>
-<Tab value="With Options">
-```typescript
-import { Commet } from 'commet'
 
-const commet = new Commet({
-  apiKey: process.env.COMMET_API_KEY!,
-  environment: 'sandbox',  // 'sandbox' (default) or 'production'
-  debug: true,
-  timeout: 30000,
-  retries: 3
-})
-```
-</Tab>
-<Tab value="Environment Variables">
-```bash title=".env.local"
-COMMET_API_KEY=ck_xxx1234567890abcdef...
-```
-
-```typescript title="lib/commet.ts"
-import { Commet } from 'commet'
-
-export const commet = new Commet({
-  apiKey: process.env.COMMET_API_KEY!
-})
-```
-</Tab>
-</Tabs>
-
-## Environment Configuration
-
-Choose between sandbox and production environments:
-
-### Sandbox Environment (Default)
-
-Safe environment for development and testing with real API calls to sandbox server:
-
-```typescript
-const commet = new Commet({
-  apiKey: process.env.COMMET_API_KEY!,
-  environment: 'sandbox' // Default - uses sandbox.commet.co
-})
-
-console.log(commet.getEnvironment()) // 'sandbox'
-console.log(commet.isSandbox()) // true
-```
-
-### Production Environment
-
-Live environment for real billing operations:
-
-```typescript
-const commet = new Commet({
-  apiKey: process.env.COMMET_API_KEY!,
-  environment: 'production' // Uses commet.co
-})
-
-console.log(commet.getEnvironment()) // 'production'
-console.log(commet.isProduction()) // true
-```
+Get your API key from the [dashboard](https://sandbox.commet.co/settings/api-keys).
 
 ## Configuration Options
 
-Complete configuration reference:
+```typescript
+const commet = new Commet({
+  apiKey: process.env.COMMET_API_KEY!,
+  environment: 'sandbox',  // 'sandbox' (default) or 'production'
+  debug: true,             // Enable logging
+  timeout: 30000,          // Request timeout (ms)
+  retries: 3               // Max retry attempts
+})
+```
+
+### Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `apiKey` | string | *required* | Your API key (starts with `ck_`) |
+| `environment` | `'sandbox'` \| `'production'` | `'sandbox'` | Environment to use |
+| `debug` | boolean | `false` | Enable detailed logging |
+| `timeout` | number | `30000` | Request timeout in milliseconds |
+| `retries` | number | `3` | Maximum retry attempts for failed requests |
+
+## Environments
+
+Commet has two isolated environments:
+
+**Sandbox** (`sandbox.commet.co`): Development and testing
+
+**Production** (`commet.co`): Live billing
 
 ```typescript
-interface CommetConfig {
-  apiKey: string                    // Required: Your API key
-  environment?: 'sandbox' | 'production'  // Default: 'sandbox'
-  debug?: boolean                   // Enable detailed logging
-  timeout?: number                  // Request timeout (ms)
-  retries?: number                  // Max retry attempts
-}
+// Sandbox (default)
+const sandbox = new Commet({
+  apiKey: process.env.COMMET_SANDBOX_KEY!,
+  environment: 'sandbox'
+})
+
+// Production
+const production = new Commet({
+  apiKey: process.env.COMMET_PRODUCTION_KEY!,
+  environment: 'production'
+})
+```
+
+Check current environment:
+
+```typescript
+console.log(commet.getEnvironment())  // 'sandbox' or 'production'
+console.log(commet.isSandbox())       // true or false
+console.log(commet.isProduction())    // true or false
 ```
 
 ## Debug Mode
 
-Enable debug logging to see detailed request/response information:
+Enable logging to see request/response details:
 
 ```typescript
 const commet = new Commet({
   apiKey: process.env.COMMET_API_KEY!,
-  environment: 'sandbox',
   debug: true
 })
 
@@ -125,11 +87,13 @@ const commet = new Commet({
 // [Commet SDK] Initialized in sandbox mode
 // API Key: ck_xxx12345...
 // Base URL: https://sandbox.commet.co
+// [Commet SDK] GET https://sandbox.commet.co/api/customers
+// [Commet SDK] Response status: 200 OK
 ```
 
 ## Validation
 
-The SDK validates your configuration on initialization:
+API key is validated on initialization:
 
 ```typescript
 // ❌ Missing API key
@@ -142,78 +106,8 @@ const commet = new Commet({
 })
 // Error: Commet SDK: Invalid API key format. Expected format: ck_xxx...
 
-// ✅ Valid configuration
+// ✅ Valid
 const commet = new Commet({
   apiKey: 'ck_xxx1234567890abcdef'
 })
-```
-
-## Best Practices
-
-### Environment Separation
-
-Use environment variables for different environments:
-
-```typescript title="lib/commet.ts"
-import { Commet } from 'commet'
-
-export const commet = new Commet({
-  apiKey: process.env.COMMET_API_KEY!,
-  environment: process.env.NODE_ENV === 'production' ? 'production' : 'sandbox',
-  debug: process.env.NODE_ENV !== 'production'
-})
-```
-
-### Configuration Validation
-
-Validate configuration at startup:
-
-```typescript
-if (!process.env.COMMET_API_KEY) {
-  throw new Error('COMMET_API_KEY environment variable is required')
-}
-
-const commet = new Commet({
-  apiKey: process.env.COMMET_API_KEY
-})
-```
-
-### Secure Storage
-
-Never hardcode API keys:
-
-```typescript
-// ❌ Never do this
-const commet = new Commet({
-  apiKey: 'ck_xxx1234567890abcdef'
-})
-
-// ✅ Use environment variables
-const commet = new Commet({
-  apiKey: process.env.COMMET_API_KEY!
-})
-```
-
-## Troubleshooting
-
-### Check Environment Configuration
-
-```typescript
-const commet = new Commet({
-  apiKey: process.env.COMMET_API_KEY!,
-  debug: true
-})
-
-console.log('Environment:', commet.getEnvironment())
-console.log('Is Sandbox:', commet.isSandbox())
-console.log('Is Production:', commet.isProduction())
-```
-
-### Validate API Key Format
-
-```typescript
-const apiKey = process.env.COMMET_API_KEY
-if (!apiKey?.startsWith('ck_')) {
-  console.error('Invalid API key format')
-}
 ```

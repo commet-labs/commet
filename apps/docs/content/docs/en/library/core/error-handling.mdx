@@ -1,405 +1,87 @@
 ---
 title: Error Handling
-description: Comprehensive error handling with automatic retries and detailed error types
+description: Handle errors with automatic retries and typed error classes
 ---
-
-import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
-import { Callout } from 'fumadocs-ui/components/callout'
 
 # Error Handling
 
-Commet SDK provides comprehensive error handling with automatic retries, detailed error types, and graceful failure modes.
+The SDK provides error classes and automatic retries.
 
-## Error Types
-
-The SDK provides specific error classes for different scenarios:
+## Error Classes
 
 ### CommetError
 
-Base error class for all SDK errors:
+Base error class:
 
 ```typescript
-import { CommetError } from 'commet'
+import { CommetError } from '@commet/node'
 
 try {
-  await commet.customers.create(invalidData)
+  await commet.customers.create(data)
 } catch (error) {
   if (error instanceof CommetError) {
-    console.log('SDK Error:', error.message)
-    console.log('Error Code:', error.code)
-    console.log('Status Code:', error.statusCode)
+    console.log(error.message)
+    console.log(error.code)
+    console.log(error.statusCode)
   }
 }
 ```
 
 ### CommetAPIError
 
-API-specific errors with HTTP status codes:
+API errors with HTTP status codes:
 
 ```typescript
-import { CommetAPIError } from 'commet'
+import { CommetAPIError } from '@commet/node'
 
 try {
   await commet.customers.retrieve('invalid_id')
 } catch (error) {
   if (error instanceof CommetAPIError) {
-    console.log('API Error:', error.message)
-    console.log('Status Code:', error.statusCode) // 404, 500, etc.
-    console.log('Error Code:', error.code)         // CUSTOMER_NOT_FOUND
-    console.log('Details:', error.details)
+    console.log(error.statusCode)  // 404
+    console.log(error.message)
   }
 }
 ```
 
 ### CommetValidationError
 
-Validation errors with field-specific details:
+Validation errors with field details:
 
 ```typescript
-import { CommetValidationError } from 'commet'
+import { CommetValidationError } from '@commet/node'
 
 try {
   await commet.customers.create({
-    legalName: '', // Required field missing
-    currency: 'INVALID' // Invalid currency
+    legalName: ''  // Required
   })
 } catch (error) {
   if (error instanceof CommetValidationError) {
-    console.log('Validation failed:', error.message)
-    console.log('Field errors:', error.validationErrors)
-    // {
-    //   legalName: ['Legal name is required'],
-    //   currency: ['Invalid currency code']
-    // }
+    console.log(error.validationErrors)
+    // { legalName: ['Legal name is required'] }
   }
 }
 ```
-
-## Error Codes
-
-Common error codes and their meanings:
-
-<Tabs items={['Customer Errors', 'Usage Errors', 'Seat Errors', 'General Errors']}>
-<Tab value="Customer Errors">
-```typescript
-// Customer not found
-catch (error) {
-  if (error.code === 'CUSTOMER_NOT_FOUND') {
-    console.log('Customer does not exist')
-  }
-}
-
-// Invalid address
-catch (error) {
-  if (error.code === 'INVALID_ADDRESS') {
-    console.log('Address validation failed')
-  }
-}
-
-// Unsupported currency
-catch (error) {
-  if (error.code === 'UNSUPPORTED_CURRENCY') {
-    console.log('Currency not supported')
-  }
-}
-```
-</Tab>
-<Tab value="Usage Errors">
-```typescript
-// Invalid event type
-catch (error) {
-  if (error.code === 'INVALID_EVENT_TYPE') {
-    console.log('Event type not configured')
-  }
-}
-
-// Duplicate event (idempotency)
-catch (error) {
-  if (error.code === 'DUPLICATE_EVENT') {
-    console.log('Event already processed')
-  }
-}
-
-// Invalid timestamp
-catch (error) {
-  if (error.code === 'INVALID_TIMESTAMP') {
-    console.log('Timestamp is too far in the past')
-  }
-}
-```
-</Tab>
-<Tab value="Seat Errors">
-```typescript
-// Insufficient seats
-catch (error) {
-  if (error.code === 'INSUFFICIENT_SEATS') {
-    console.log('Cannot remove more seats than available')
-  }
-}
-
-// Seat type not found
-catch (error) {
-  if (error.code === 'SEAT_TYPE_NOT_FOUND') {
-    console.log('Seat type not configured for customer')
-  }
-}
-
-// Invalid seat count
-catch (error) {
-  if (error.code === 'INVALID_SEAT_COUNT') {
-    console.log('Seat count must be positive')
-  }
-}
-```
-</Tab>
-<Tab value="General Errors">
-```typescript
-// Authentication errors
-catch (error) {
-  if (error.code === 'UNAUTHORIZED') {
-    console.log('Invalid or missing API key')
-  }
-}
-
-// Rate limiting
-catch (error) {
-  if (error.code === 'RATE_LIMITED') {
-    console.log('Too many requests, please slow down')
-  }
-}
-
-// Network errors
-catch (error) {
-  if (error.code === 'NETWORK_ERROR') {
-    console.log('Network connection failed')
-  }
-}
-```
-</Tab>
-</Tabs>
 
 ## Automatic Retries
 
-The SDK automatically retries failed requests with exponential backoff:
+Failed requests are retried automatically with exponential backoff.
 
-### Default Retry Configuration
-
-```typescript
-const commet = new Commet({
-  apiKey: process.env.COMMET_API_KEY!,
-  retries: 3,      // Maximum retry attempts (default)
-  timeout: 30000   // Request timeout in milliseconds
-})
-```
-
-### Retryable Conditions
-
-Automatic retries are triggered for:
-
-- **HTTP Status Codes:** 408, 429, 500, 502, 503, 504
-- **Network Errors:** Connection timeouts, DNS failures
-- **Temporary Failures:** Service unavailable, gateway timeouts
-
-```typescript
-// This request will be retried up to 3 times
-try {
-  await commet.usage.events.create({
-    eventType: 'api_call',
-    customerId: 'cus_123'
-  })
-} catch (error) {
-  // Only thrown after all retries are exhausted
-  console.log('Request failed after retries:', error.message)
-}
-```
-
-### Retry Configuration
-
-Customize retry behavior:
+**Retry configuration:**
 
 ```typescript
 const commet = new Commet({
   apiKey: process.env.COMMET_API_KEY!,
-  retries: 5,        // More aggressive retries
-  timeout: 60000,    // Longer timeout
-  debug: true        // See retry attempts in logs
+  retries: 3,      // Max attempts (default: 3)
+  timeout: 30000   // Request timeout (default: 30000ms)
 })
-
-// Console output shows retry attempts:
-// [Commet SDK] Retrying in 1000ms (attempt 1/5)
-// [Commet SDK] Retrying in 2000ms (attempt 2/5)
-// [Commet SDK] Retrying in 4000ms (attempt 3/5)
 ```
 
-## Error Handling Patterns
+**Retryable status codes:** 408, 429, 500, 502, 503, 504
 
-### Comprehensive Error Handling
+**Retry delays:** 1s → 2s → 4s (exponential backoff, max 8s)
 
-Handle all error types systematically:
-
-```typescript
-import { CommetError, CommetAPIError, CommetValidationError } from 'commet'
-
-async function createCustomerSafely(customerData) {
-  try {
-    const customer = await commet.customers.create(customerData)
-    return { success: true, customer: customer.data }
-  } catch (error) {
-    if (error instanceof CommetValidationError) {
-      return {
-        success: false,
-        type: 'validation',
-        errors: error.validationErrors
-      }
-    } else if (error instanceof CommetAPIError) {
-      return {
-        success: false,
-        type: 'api',
-        statusCode: error.statusCode,
-        message: error.message
-      }
-    } else if (error instanceof CommetError) {
-      return {
-        success: false,
-        type: 'sdk',
-        message: error.message
-      }
-    } else {
-      return {
-        success: false,
-        type: 'unknown',
-        message: 'An unexpected error occurred'
-      }
-    }
-  }
-}
-```
-
-### Graceful Degradation
-
-Don't let billing errors break your application:
-
-```typescript
-async function trackUsageGracefully(eventType: string, customerId: string) {
-  try {
-    await commet.usage.events.create({
-      eventType,
-      customerId,
-      quantity: 1
-    })
-    console.log('Usage tracked successfully')
-  } catch (error) {
-    // Log error but continue with application flow
-    console.error('Failed to track usage:', error.message)
-    
-    // Optional: Queue for retry later
-    // await queueForRetry({ eventType, customerId })
-    
-    // Don't throw - let application continue
-  }
-}
-```
-
-### Specific Error Handling
-
-Handle specific business scenarios:
-
-```typescript
-async function addSeatsWithValidation(customerId: string, seatType: string, count: number) {
-  try {
-    const result = await commet.seats.add(customerId, seatType, count)
-    return result.data
-  } catch (error) {
-    if (error.code === 'CUSTOMER_NOT_FOUND') {
-      throw new Error('Please create customer account first')
-    } else if (error.code === 'SEAT_TYPE_NOT_FOUND') {
-      throw new Error(`Seat type '${seatType}' not available for this plan`)
-    } else if (error.code === 'RATE_LIMITED') {
-      // Wait and retry once
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      return await commet.seats.add(customerId, seatType, count)
-    } else {
-      throw new Error(`Failed to add seats: ${error.message}`)
-    }
-  }
-}
-```
-
-## Best Practices
-
-### Non-Blocking Operations
-
-Make billing operations non-blocking:
-
-```typescript
-// ✅ Non-blocking usage tracking
-const processApiRequest = async (request) => {
-  // Process the main request first
-  const result = await handleApiRequest(request)
-  
-  // Track usage asynchronously (don't await)
-  commet.usage.events.create({
-    eventType: 'api_call',
-    customerId: request.customerId
-  }).catch(error => {
-    console.error('Usage tracking failed:', error.message)
-  })
-  
-  return result
-}
-
-// ❌ Blocking operation
-const processApiRequest = async (request) => {
-  const result = await handleApiRequest(request)
-  
-  // This could delay the response
-  await commet.usage.events.create({
-    eventType: 'api_call',
-    customerId: request.customerId
-  })
-  
-  return result
-}
-```
-
-### Error Logging
-
-Implement comprehensive error logging:
-
-```typescript
-const logBillingError = (operation: string, error: any, context: any) => {
-  const errorInfo = {
-    timestamp: new Date().toISOString(),
-    operation,
-    error: {
-      message: error.message,
-      code: error.code,
-      statusCode: error.statusCode,
-      stack: error.stack
-    },
-    context
-  }
-  
-  console.error('Billing Error:', JSON.stringify(errorInfo, null, 2))
-  
-  // Send to error tracking service
-  // sendToErrorTracker(errorInfo)
-}
-
-// Usage
-try {
-  await commet.customers.create(customerData)
-} catch (error) {
-  logBillingError('create_customer', error, { customerData })
-  throw error
-}
-```
-
-## Troubleshooting
-
-### Debug Mode
-
-Enable debug mode to see detailed error information:
+Enable debug mode to see retries:
 
 ```typescript
 const commet = new Commet({
@@ -407,34 +89,64 @@ const commet = new Commet({
   debug: true
 })
 
-// Shows full request/response details for errors
-try {
-  await commet.usage.events.create(invalidData)
-} catch (error) {
-  // Console will show:
-  // [Commet SDK] POST https://commet.co/api/usage/events
-  // [Commet SDK] Response status: 400 Bad Request
-  // [Commet SDK] Error response: { message: '...', errors: {...} }
+// Console output:
+// [Commet SDK] Retrying in 1000ms (attempt 1/3)
+// [Commet SDK] Retrying in 2000ms (attempt 2/3)
+```
+
+## Error Handling Pattern
+
+```typescript
+import { CommetError, CommetAPIError, CommetValidationError } from '@commet/node'
+
+async function createCustomer(data) {
+  try {
+    const customer = await commet.customers.create(data)
+    return { success: true, data: customer.data }
+  } catch (error) {
+    if (error instanceof CommetValidationError) {
+      return {
+        success: false,
+        type: 'validation',
+        errors: error.validationErrors
+      }
+    }
+    
+    if (error instanceof CommetAPIError) {
+      return {
+        success: false,
+        type: 'api',
+        statusCode: error.statusCode,
+        message: error.message
+      }
+    }
+    
+    return {
+      success: false,
+      type: 'unknown',
+      message: 'An unexpected error occurred'
+    }
+  }
 }
 ```
 
-### Network Diagnostics
+## Non-Blocking Operations
 
-Test network connectivity:
+Don't let billing errors break your app:
 
 ```typescript
-const testConnection = async () => {
-  try {
-    await commet.customers.list({ limit: 1 })
-    console.log('Connection successful')
-  } catch (error) {
-    if (error.message.includes('fetch')) {
-      console.log('Network connection failed')
-    } else if (error.statusCode === 401) {
-      console.log('Authentication failed - check API key')
-    } else {
-      console.log('API error:', error.message)
-    }
-  }
+// Usage tracking without blocking
+async function processRequest(request) {
+  const result = await handleRequest(request)
+  
+  // Track usage asynchronously
+  commet.usage.create({
+    eventType: 'api_call',
+    customerId: request.customerId
+  }).catch(error => {
+    console.error('Usage tracking failed:', error.message)
+  })
+  
+  return result
 }
 ```

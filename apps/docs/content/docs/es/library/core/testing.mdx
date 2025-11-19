@@ -1,412 +1,112 @@
 ---
-title: Testing
-description: Prueba tu integración de forma segura con el entorno sandbox y tarjetas de prueba
+title: Pruebas
+description: Prueba de forma segura con el entorno sandbox
 ---
 
-import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
-import { Callout } from 'fumadocs-ui/components/callout'
+# Pruebas
 
-# Testing
-
-Commet proporciona un entorno sandbox completo para probar tu integración de facturación de forma segura antes de pasar a producción. Usa datos de prueba, simula suscripciones y procesa pagos de prueba sin afectar clientes reales.
-
-<Callout type="success">
-**Sandbox por defecto:** El SDK usa el entorno sandbox de forma predeterminada, para que puedas probar de forma segura desde el primer día.
-</Callout>
+Usa el entorno sandbox para probar de forma segura antes de producción.
 
 ## Entorno Sandbox
 
-El entorno sandbox refleja la funcionalidad de producción con datos aislados:
+Sandbox es el entorno por defecto con datos completamente aislados:
 
 ```typescript
 const commet = new Commet({
   apiKey: process.env.COMMET_SANDBOX_KEY!,
-  environment: 'sandbox' // Por defecto
+  environment: 'sandbox'  // Default
 })
 
 // Todas las operaciones usan sandbox.commet.co
-await commet.subscriptions.create({
-  productId: 'prod_test_123',
-  customerId: 'cus_test_456'
+await commet.customers.create({
+  legalName: 'Test Customer',
+  currency: 'USD'
 })
 ```
 
-### Características del Sandbox
+**Características de sandbox:**
+- Base de datos separada de producción
+- Comportamiento real de la API
+- Operaciones gratuitas
+- Experimentación segura
 
-- **Aislamiento completo**: Base de datos separada de producción
-- **Comportamiento real de API**: Respuestas y validación idénticas
-- **Pagos de prueba**: Usa tarjetas de prueba de Stripe para flujos de checkout
-- **Experimentación segura**: Crea, modifica y elimina datos libremente
-- **Sin costos**: Todas las operaciones son gratuitas en sandbox
+## Flujo de Prueba
 
-## Tarjetas de Prueba de Stripe
-
-Al probar checkouts de suscripciones en sandbox, usa los números de tarjeta de prueba de Stripe para simular diferentes escenarios de pago.
-
-<Callout type="info">
-**Integración con Stripe Checkout:** Commet usa Stripe para el procesamiento de pagos. Las tarjetas de prueba solo funcionan en el entorno sandbox.
-</Callout>
-
-### Tarjetas de Pago Exitoso
-
-Usa estas tarjetas para probar flujos de pago exitosos:
-
-| Número de Tarjeta | Marca | CVC | Fecha |
-| --- | --- | --- | --- |
-| `4242 4242 4242 4242` | Visa | Cualquier 3 dígitos | Cualquier fecha futura |
-| `5555 5555 5555 4444` | Mastercard | Cualquier 3 dígitos | Cualquier fecha futura |
-| `3782 822463 10005` | American Express | Cualquier 4 dígitos | Cualquier fecha futura |
-| `6011 1111 1111 1117` | Discover | Cualquier 3 dígitos | Cualquier fecha futura |
-
-### Escenarios de Pago Fallido
-
-Prueba el manejo de errores con estas tarjetas:
-
-| Número de Tarjeta | Escenario |
-| --- | --- |
-| `4000 0000 0000 9995` | Rechazada - Fondos insuficientes |
-| `4000 0000 0000 9987` | Rechazada - Tarjeta perdida |
-| `4000 0000 0000 9979` | Rechazada - Tarjeta robada |
-| `4000 0000 0000 0069` | Cargo exitoso pero expira inmediatamente |
-
-### Autenticación 3D Secure
-
-Prueba flujos de Strong Customer Authentication (SCA):
-
-| Número de Tarjeta | Autenticación |
-| --- | --- |
-| `4000 0025 0000 3155` | Requiere autenticación |
-| `4000 0000 0000 3220` | Requiere autenticación (fondos insuficientes) |
-
-<Callout type="info">
-**Referencia Completa:** Para la lista completa de tarjetas de prueba y escenarios, visita la [Documentación de Testing de Stripe](https://stripe.com/docs/testing).
-</Callout>
-
-## Flujos de Testing
-
-### Prueba un Flujo Completo de Suscripción
-
-<Tabs items={['Suscripción Fija', 'Basada en Uso', 'Basada en Seats']}>
-<Tab value="Suscripción Fija">
 ```typescript
-// 1. Crear cliente de prueba
+// 1. Crear customer de prueba
 const customer = await commet.customers.create({
-  name: 'Cliente de Prueba',
-  email: 'test@example.com'
+  legalName: 'Test Company',
+  currency: 'USD'
 })
 
 // 2. Crear suscripción
 const subscription = await commet.subscriptions.create({
-  productId: 'prod_monthly_plan',
-  customerId: customer.data.id,
-  quantity: 1
-})
-
-// 3. Probar checkout con tarjeta de prueba de Stripe
-// Usar: 4242 4242 4242 4242
-// Cliente completa el pago en el checkout
-
-// 4. Verificar que la suscripción está activa
-const sub = await commet.subscriptions.retrieve(subscription.data.id)
-console.log('Estado:', sub.data.status) // 'active'
-```
-</Tab>
-<Tab value="Basada en Uso">
-```typescript
-// 1. Crear cliente y suscripción
-const customer = await commet.customers.create({
-  name: 'Prueba Plataforma API',
-  email: 'test-api@example.com'
-})
-
-const subscription = await commet.subscriptions.create({
-  productId: 'prod_api_calls',
+  productId: 'prd_test_123',
   customerId: customer.data.id
 })
 
-// 2. Enviar eventos de uso de prueba
+// 3. Enviar eventos de uso
 await commet.usage.create({
   eventType: 'api_call',
   customerId: customer.data.id,
-  customerEventId: `test_${Date.now()}_1`
+  idempotencyKey: `test_${Date.now()}`
 })
 
-await commet.usage.create({
-  eventType: 'api_call',
-  customerId: customer.data.id,
-  customerEventId: `test_${Date.now()}_2`
-})
-
-// 3. Verificar que los eventos fueron registrados
+// 4. Verificar
 const events = await commet.usage.list({
   customerId: customer.data.id
 })
-console.log('Total de eventos:', events.data.length) // 2
+console.log('Events:', events.data.length)
 ```
-</Tab>
-<Tab value="Basada en Seats">
-```typescript
-// 1. Crear cliente y suscripción basada en seats
-const customer = await commet.customers.create({
-  name: 'Empresa SaaS de Prueba',
-  email: 'test-saas@example.com'
-})
 
-const subscription = await commet.subscriptions.create({
-  productId: 'prod_saas_seats',
-  customerId: customer.data.id,
-  initialSeats: 5
-})
+## Identificadores Únicos
 
-// 2. Agregar seats para probar escalado
-await commet.seats.add({
-  customerId: customer.data.id,
-  seatType: 'editor',
-  count: 3
-})
-
-// 3. Verificar balance de seats
-const balance = await commet.seats.getBalance({
-  customerId: customer.data.id,
-  seatType: 'editor'
-})
-console.log('Total de seats:', balance.data.current) // 8
-
-// 4. Probar remoción de seats
-await commet.seats.remove({
-  customerId: customer.data.id,
-  seatType: 'editor',
-  count: 2
-})
-```
-</Tab>
-</Tabs>
-
-## Mejores Prácticas de Testing
-
-### Usa Identificadores Únicos
-
-Evita conflictos con IDs únicos en las pruebas:
+Usa IDs únicos para evitar conflictos:
 
 ```typescript
 const testId = `test_${Date.now()}`
 
 await commet.customers.create({
-  name: `Cliente de Prueba ${testId}`,
-  email: `test-${testId}@example.com`,
-  externalId: testId
+  legalName: `Test Customer ${testId}`,
+  externalId: testId,
+  currency: 'USD'
 })
 ```
 
-### Prueba Escenarios de Error
-
-Asegúrate de que tu app maneje errores correctamente:
+## Probar Idempotencia
 
 ```typescript
-try {
-  // Probar con ID de producto inválido
-  await commet.subscriptions.create({
-    productId: 'prod_invalid',
-    customerId: 'cus_test_123'
-  })
-} catch (error) {
-  console.log('Error esperado:', error.message)
-  console.log('Código de estado:', error.statusCode) // 404
-}
+const eventId = `test_${Date.now()}`
 
-try {
-  // Probar con tarjeta rechazada (usar 4000 0000 0000 9995)
-  // Cliente ingresa tarjeta en checkout...
-  console.log('Pago rechazado - manejar correctamente')
-} catch (error) {
-  console.log('Error de pago:', error.message)
-}
-```
-
-### Limpia Datos de Prueba
-
-Elimina datos de prueba después de probar (opcional en sandbox):
-
-```typescript
-// Cancelar suscripciones de prueba
-await commet.subscriptions.cancel('sub_test_123')
-
-// Los datos de sandbox están aislados, así que la limpieza es opcional
-// Todos los datos de sandbox se pueden limpiar desde el dashboard
-```
-
-### Prueba Idempotencia
-
-Verifica que las operaciones idempotentes funcionen correctamente:
-
-```typescript
-const eventId = `test_event_${Date.now()}`
-
-// Enviar evento dos veces con el mismo customerEventId
+// Enviar dos veces con mismo idempotencyKey
 await commet.usage.create({
   eventType: 'api_call',
-  customerId: 'cus_test_123',
-  customerEventId: eventId
+  customerId: 'cus_123',
+  idempotencyKey: eventId
 })
 
-// La segunda llamada es idempotente - no creará duplicado
+// Segunda llamada no crea duplicado
 await commet.usage.create({
   eventType: 'api_call',
-  customerId: 'cus_test_123',
-  customerEventId: eventId // Mismo ID
+  customerId: 'cus_123',
+  idempotencyKey: eventId  // Mismo ID
 })
-
-// Verificar que solo existe un evento
-const events = await commet.usage.list({
-  customerId: 'cus_test_123'
-})
-console.log('Debe ser 1:', events.data.length)
 ```
 
 ## Cambiar a Producción
 
-Cuando estés listo para ir en vivo, actualiza tu configuración:
-
 ```typescript
-// Antes (testing)
-const commet = new Commet({
+// Sandbox (pruebas)
+const sandbox = new Commet({
   apiKey: process.env.COMMET_SANDBOX_KEY!,
   environment: 'sandbox'
 })
 
-// Después (producción)
-const commet = new Commet({
+// Production (en vivo)
+const production = new Commet({
   apiKey: process.env.COMMET_PRODUCTION_KEY!,
   environment: 'production'
 })
 ```
 
-<Callout type="warn">
-**API Keys diferentes:** Sandbox y producción usan API keys separadas. Obtén tu clave de producción desde el [dashboard de Commet](https://commet.co).
-</Callout>
-
-### Checklist Pre-Producción
-
-Antes de cambiar a producción:
-
-- [ ] Probar todos los flujos críticos de suscripción en sandbox
-- [ ] Verificar que los eventos de uso se rastrean correctamente
-- [ ] Probar operaciones de gestión de seats (si aplica)
-- [ ] Confirmar que el manejo de errores funciona como se espera
-- [ ] Probar fallos de pago con tarjetas rechazadas
-- [ ] Verificar manejo de webhooks (si está implementado)
-- [ ] Obtener API key de producción del dashboard
-- [ ] Actualizar variables de entorno
-- [ ] Establecer `environment: 'production'` explícitamente
-
-## Escenarios Comunes de Testing
-
-### Probar Creación de Suscripciones
-
-```typescript
-// Probar con todos los tipos de producto soportados
-const productIds = [
-  'prod_fixed_monthly',
-  'prod_usage_api',
-  'prod_seat_based'
-]
-
-for (const productId of productIds) {
-  const sub = await commet.subscriptions.create({
-    productId,
-    customerId: 'cus_test_123'
-  })
-  
-  console.log(`Creado: ${sub.data.id}`)
-}
-```
-
-### Probar Agregación de Uso
-
-```typescript
-// Enviar lote de eventos
-const events = Array.from({ length: 100 }, (_, i) => ({
-  eventType: 'api_call',
-  customerId: 'cus_test_123',
-  customerEventId: `batch_test_${Date.now()}_${i}`,
-  properties: [
-    { property: 'endpoint', value: '/api/test' }
-  ]
-}))
-
-await commet.usage.createBatch({ events })
-
-// Verificar cantidad
-const list = await commet.usage.list({
-  customerId: 'cus_test_123'
-})
-console.log('Eventos creados:', list.data.length) // 100
-```
-
-### Probar Operaciones Concurrentes
-
-```typescript
-// Probar actualizaciones paralelas de seats
-const operations = [
-  commet.seats.add({
-    customerId: 'cus_test_123',
-    seatType: 'editor',
-    count: 5
-  }),
-  commet.seats.add({
-    customerId: 'cus_test_123',
-    seatType: 'viewer',
-    count: 10
-  }),
-  commet.seats.remove({
-    customerId: 'cus_test_123',
-    seatType: 'admin',
-    count: 2
-  })
-]
-
-await Promise.all(operations)
-console.log('Todas las operaciones completadas')
-```
-
-## Solución de Problemas
-
-### El Pago Falla en Sandbox
-
-<Callout type="info">
-**Modo de Prueba de Stripe:** Asegúrate de que tu cuenta de Stripe esté en modo de prueba y conectada a tu organización sandbox de Commet.
-</Callout>
-
-### Los Eventos No Aparecen
-
-```typescript
-// Verificar que el evento fue creado
-const result = await commet.usage.create({
-  eventType: 'api_call',
-  customerId: 'cus_test_123',
-  customerEventId: `debug_${Date.now()}`
-})
-
-console.log('ID del evento:', result.data.id)
-console.log('Creado en:', result.data.createdAt)
-
-// Verificar lista de eventos
-const events = await commet.usage.list({
-  customerId: 'cus_test_123'
-})
-console.log('Total de eventos:', events.data.length)
-```
-
-### La Suscripción No Genera Facturas
-
-- Verificar que el estado de la suscripción sea `active`
-- Revisar configuración del día de facturación
-- Asegurar que el producto tenga precios de lista válidos
-- Confirmar que el cliente tenga detalles de facturación
-
-## Recursos Relacionados
-
-- [Ambientes](/docs/es/library/core/environments) - Configurar sandbox y producción
-- [Manejo de Errores](/docs/es/library/core/error-handling) - Manejar errores correctamente
-- [Docs de Testing de Stripe](https://stripe.com/docs/testing) - Referencia completa de tarjetas de prueba
-
+Obtén tu API key de producción desde el [dashboard](https://commet.co/settings/api-keys).

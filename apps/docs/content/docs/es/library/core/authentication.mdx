@@ -1,219 +1,113 @@
 ---
 title: Autenticación
-description: Autenticación segura con clave API en entornos sandbox y producción
+description: Autenticación con API key en entornos sandbox y producción
 ---
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
-import { Callout } from 'fumadocs-ui/components/callout'
 
 # Autenticación
 
-Commet SDK utiliza autenticación por clave API con entornos sandbox y producción para pruebas seguras y facturación en vivo.
+Inicializa el SDK con tu API key.
 
-## Formato de Clave API
+## Configuración Básica
 
-Las claves API de Commet siguen un formato predecible para fácil identificación:
-
-```
-ck_xxx1234567890abcdef...  // Claves API de producción
-```
-
-<Callout type="warn">
-**Seguridad:** Nunca expongas las claves API en código del lado del cliente. Siempre usa rutas del lado del servidor o variables de entorno.
-</Callout>
-
-## Inicializar Cliente
-
-Configura tu cliente Commet con tu clave API:
-
-<Tabs items={['Configuración Básica', 'Con Opciones', 'Variables de Entorno']}>
-<Tab value="Configuración Básica">
 ```typescript
-import { Commet } from 'commet'
+import { Commet } from '@commet/node'
 
 const commet = new Commet({
   apiKey: process.env.COMMET_API_KEY!
 })
 ```
-</Tab>
-<Tab value="Con Opciones">
-```typescript
-import { Commet } from 'commet'
 
-const commet = new Commet({
-  apiKey: process.env.COMMET_API_KEY!,
-  environment: 'sandbox',  // 'sandbox' (por defecto) o 'production'
-  debug: true,
-  timeout: 30000,
-  retries: 3
-})
-```
-</Tab>
-<Tab value="Variables de Entorno">
-```bash title=".env.local"
-COMMET_API_KEY=ck_xxx1234567890abcdef...
-```
-
-```typescript title="lib/commet.ts"
-import { Commet } from 'commet'
-
-export const commet = new Commet({
-  apiKey: process.env.COMMET_API_KEY!
-})
-```
-</Tab>
-</Tabs>
-
-## Configuración de Entorno
-
-Elige entre entornos sandbox y producción:
-
-### Entorno Sandbox (Por Defecto)
-
-Entorno seguro para desarrollo y pruebas con llamadas API reales al servidor sandbox:
-
-```typescript
-const commet = new Commet({
-  apiKey: process.env.COMMET_API_KEY!,
-  environment: 'sandbox' // Por defecto - usa sandbox.commet.co
-})
-
-console.log(commet.getEnvironment()) // 'sandbox'
-console.log(commet.isSandbox()) // true
-```
-
-### Entorno de Producción
-
-Entorno en vivo para operaciones de facturación reales:
-
-```typescript
-const commet = new Commet({
-  apiKey: process.env.COMMET_API_KEY!,
-  environment: 'production' // Usa commet.co
-})
-
-console.log(commet.getEnvironment()) // 'production'
-console.log(commet.isProduction()) // true
-```
+Obtén tu API key desde el [dashboard](https://sandbox.commet.co/settings/api-keys).
 
 ## Opciones de Configuración
 
-Referencia completa de configuración:
+```typescript
+const commet = new Commet({
+  apiKey: process.env.COMMET_API_KEY!,
+  environment: 'sandbox',  // 'sandbox' (default) o 'production'
+  debug: true,             // Habilitar logging
+  timeout: 30000,          // Timeout de request (ms)
+  retries: 3               // Máximo de reintentos
+})
+```
+
+### Opciones
+
+| Opción | Tipo | Default | Descripción |
+|--------|------|---------|-------------|
+| `apiKey` | string | *requerido* | Tu API key (empieza con `ck_`) |
+| `environment` | `'sandbox'` \| `'production'` | `'sandbox'` | Entorno a usar |
+| `debug` | boolean | `false` | Habilitar logging detallado |
+| `timeout` | number | `30000` | Timeout de request en milisegundos |
+| `retries` | number | `3` | Máximo de reintentos para requests fallidos |
+
+## Entornos
+
+Commet tiene dos entornos aislados:
+
+**Sandbox** (`sandbox.commet.co`): Desarrollo y pruebas
+
+**Production** (`commet.co`): Facturación en vivo
 
 ```typescript
-interface CommetConfig {
-  apiKey: string                         // Requerido: Tu clave API
-  environment?: 'sandbox' | 'production' // Por defecto: 'sandbox'
-  debug?: boolean                        // Habilitar logging detallado
-  timeout?: number                       // Timeout de petición (ms)
-  retries?: number                       // Máximo intentos de reintento
-}
+// Sandbox (default)
+const sandbox = new Commet({
+  apiKey: process.env.COMMET_SANDBOX_KEY!,
+  environment: 'sandbox'
+})
+
+// Production
+const production = new Commet({
+  apiKey: process.env.COMMET_PRODUCTION_KEY!,
+  environment: 'production'
+})
+```
+
+Verificar entorno actual:
+
+```typescript
+console.log(commet.getEnvironment())  // 'sandbox' o 'production'
+console.log(commet.isSandbox())       // true o false
+console.log(commet.isProduction())    // true o false
 ```
 
 ## Modo Debug
 
-Habilita logging de debug para ver información detallada de peticiones/respuestas:
+Habilita logging para ver detalles de request/response:
 
 ```typescript
 const commet = new Commet({
   apiKey: process.env.COMMET_API_KEY!,
-  environment: 'sandbox',
   debug: true
 })
 
 // Salida en consola:
-// [Commet SDK] Inicializado en modo sandbox
-// Clave API: ck_xxx12345...
-// URL Base: https://sandbox.commet.co
+// [Commet SDK] Initialized in sandbox mode
+// API Key: ck_xxx12345...
+// Base URL: https://sandbox.commet.co
+// [Commet SDK] GET https://sandbox.commet.co/api/customers
+// [Commet SDK] Response status: 200 OK
 ```
 
 ## Validación
 
-El SDK valida tu configuración al inicializar:
+El API key es validado en la inicialización:
 
 ```typescript
-// ❌ Falta clave API
+// ❌ API key faltante
 const commet = new Commet({})
-// Error: Commet SDK: Se requiere clave API
+// Error: Commet SDK: API key is required
 
 // ❌ Formato inválido
 const commet = new Commet({
-  apiKey: 'clave-inválida'
+  apiKey: 'invalid-key'
 })
-// Error: Commet SDK: Formato de clave API inválido. Formato esperado: ck_xxx...
+// Error: Commet SDK: Invalid API key format. Expected format: ck_xxx...
 
-// ✅ Configuración válida
+// ✅ Válido
 const commet = new Commet({
   apiKey: 'ck_xxx1234567890abcdef'
 })
-```
-
-## Mejores Prácticas
-
-### Separación de Entornos
-
-Usa variables de entorno para diferentes entornos:
-
-```typescript title="lib/commet.ts"
-import { Commet } from 'commet'
-
-export const commet = new Commet({
-  apiKey: process.env.COMMET_API_KEY!,
-  environment: process.env.NODE_ENV === 'production' ? 'production' : 'sandbox',
-  debug: process.env.NODE_ENV !== 'production'
-})
-```
-
-### Validación de Configuración
-
-Valida la configuración al inicio:
-
-```typescript
-if (!process.env.COMMET_API_KEY) {
-  throw new Error('Variable de entorno COMMET_API_KEY es requerida')
-}
-
-const commet = new Commet({
-  apiKey: process.env.COMMET_API_KEY
-})
-```
-
-### Almacenamiento Seguro
-
-Nunca hardcodees claves API:
-
-```typescript
-// ❌ Nunca hagas esto
-const commet = new Commet({
-  apiKey: 'ck_xxx1234567890abcdef'
-})
-
-// ✅ Usa variables de entorno
-const commet = new Commet({
-  apiKey: process.env.COMMET_API_KEY!
-})
-```
-
-## Resolución de Problemas
-
-### Verificar Configuración de Entorno
-
-```typescript
-const commet = new Commet({
-  apiKey: process.env.COMMET_API_KEY!,
-  debug: true
-})
-
-console.log('Entorno:', commet.getEnvironment())
-console.log('Es Sandbox:', commet.isSandbox())
-console.log('Es Producción:', commet.isProduction())
-```
-
-### Validar Formato de Clave API
-
-```typescript
-const apiKey = process.env.COMMET_API_KEY
-if (!apiKey?.startsWith('ck_')) {
-  console.error('Formato de clave API inválido')
-}
 ```
