@@ -3,65 +3,16 @@ title: CLI Overview
 description: Command-line interface for managing Commet projects
 ---
 
-import { Callout } from 'fumadocs-ui/components/callout'
+# Commet CLI
 
-# Commet CLI Overview
+Authenticate, link projects, and generate TypeScript types from your Commet configuration.
 
-Commet CLI provides powerful tools to authenticate, manage projects, and generate TypeScript types for your billing platform.
-
-## What is Commet CLI?
-
-The command-line interface (CLI) allows you to interact with the Commet platform directly from your terminal, enabling you to:
-
-- **Authenticate** with Commet using secure OAuth device flow
-- **Link projects** to organizations for seamless integration
-- **Generate TypeScript types** from your event and seat configurations
-- **Manage environments** across sandbox and production
-- **Inspect configurations** and project status
-
-<Callout type="info">
-**Prerequisites**: You'll need a Commet account. [Sign up for sandbox](https://sandbox.commet.co) or [production](https://commet.co).
-</Callout>
-
-## Key Features
-
-### OAuth Authentication
-
-Secure device authorization flow with browser-based authentication:
+## Quick Start
 
 ```bash
-commet login
-```
+# Install
+npm install -g commet
 
-Choose between sandbox and production environments, then authenticate in your browser.
-
-### Project Linking
-
-Connect your local project to a Commet organization:
-
-```bash
-commet link
-```
-
-Select your organization and the CLI creates a `.commet` configuration file.
-
-### Type Generation
-
-Generate TypeScript definitions from your Commet configuration:
-
-```bash
-commet pull
-```
-
-Creates `.commet.d.ts` with type-safe definitions for your event and seat types.
-
-### Environment Management
-
-Work seamlessly across sandbox and production environments with complete isolation.
-
-## Quick Example
-
-```bash
 # Authenticate
 commet login
 
@@ -70,47 +21,40 @@ commet link
 
 # Generate types
 commet pull
-
-# Check status
-commet whoami
 ```
 
-## Available Commands
+## What It Does
+
+**Authentication**: OAuth device flow with sandbox and production environments.
+
+**Project Linking**: Creates `.commet` file with organization config.
+
+**Type Generation**: Generates `.commet/types.d.ts` with your event types, seat types, and products for autocomplete in your code.
+
+## Commands
 
 ### Authentication
-- [`commet login`](/docs/library/cli/commands#commet-login) - Authenticate with Commet
-- [`commet logout`](/docs/library/cli/commands#commet-logout) - Remove credentials
-- [`commet whoami`](/docs/library/cli/commands#commet-whoami) - Display auth status
+- `commet login` - Authenticate with Commet
+- `commet logout` - Remove credentials
+- `commet whoami` - Display auth status
 
 ### Project Management
-- [`commet link`](/docs/library/cli/commands#commet-link) - Link project to organization
-- [`commet unlink`](/docs/library/cli/commands#commet-unlink) - Unlink project
-- [`commet switch`](/docs/library/cli/commands#commet-switch) - Switch organization
-- [`commet info`](/docs/library/cli/commands#commet-info) - Show project details
+- `commet link` - Link project to organization
+- `commet unlink` - Unlink project
+- `commet switch` - Switch organization
+- `commet info` - Show project details
 
 ### Type Generation
-- [`commet pull`](/docs/library/cli/commands#commet-pull) - Generate TypeScript types
-- [`commet list`](/docs/library/cli/commands#commet-list) - List event/seat types
+- `commet pull` - Generate TypeScript types
+- `commet list events` - List event types
+- `commet list seats` - List seat types
 
-## Installation
+See [Commands](/docs/library/cli/commands) for full reference.
 
-Install globally via your preferred package manager:
+## Configuration
 
-```bash
-npm install -g commet
-# or
-pnpm add -g commet
-# or
-yarn global add commet
-```
+**`~/.commet/auth.json`**: Global auth credentials
 
-See [Installation Guide](/docs/library/cli/installation) for detailed setup instructions.
+**`.commet`**: Project organization settings
 
-## Configuration Files
-
-The CLI uses two configuration files:
-
-- **`~/.commet/auth.json`**: Global authentication credentials
-- **`.commet`**: Project-specific organization settings
-
-See [Configuration](/docs/library/cli/configuration) for details.
+**`.commet/types.d.ts`**: Generated TypeScript types

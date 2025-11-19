@@ -49,7 +49,7 @@ export function baseOptions(locale: string): BaseLayoutProps {
         </>
       ),
     },
-    githubUrl: "https://github.com/commet-labs/docs",
+    githubUrl: "https://github.com/commet-labs/commet",
     // see https://fumadocs.dev/docs/ui/navigation/links
     links: [],
   };

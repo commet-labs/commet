@@ -1,24 +1,16 @@
 ---
-title: Instalando el CLI de Commet
-description: Pon el CLI en funcionamiento en tu sistema
+title: Instalación
+description: Instalar el CLI de Commet
 ---
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
-import { Callout } from 'fumadocs-ui/components/callout'
 import { Steps, Step } from 'fumadocs-ui/components/steps'
 
 # Instalando el CLI de Commet
 
-Instala el CLI de Commet para autenticar, gestionar proyectos y generar tipos TypeScript.
+Requiere Node.js 18+.
 
-## Requisitos
-
-- **Node.js**: 18.0.0 o superior
-- **npm**, **pnpm**, o **yarn**
-
-## Instalación Global
-
-Instala el CLI globalmente para usarlo desde cualquier directorio:
+## Instalar
 
 <Tabs items={['npm', 'pnpm', 'yarn']}>
 <Tab value="npm">
@@ -38,30 +30,24 @@ yarn global add commet
 </Tab>
 </Tabs>
 
-## Verificar Instalación
-
-Verifica que el CLI esté instalado correctamente:
+Verificar:
 
 ```bash
 commet --version
 ```
 
-Deberías ver el número de versión actual.
-
-## Configuración Inicial
+## Configuración
 
 <Steps>
 <Step>
 
 ### Autenticar
 
-Inicia sesión en tu cuenta de Commet:
-
 ```bash
 commet login
 ```
 
-Selecciona tu entorno (Sandbox o Producción) y completa la autenticación en tu navegador.
+Selecciona entorno (Sandbox/Producción) y autentica en el navegador.
 
 </Step>
 
@@ -69,14 +55,12 @@ Selecciona tu entorno (Sandbox o Producción) y completa la autenticación en tu
 
 ### Vincular Proyecto
 
-Navega a tu directorio de proyecto y vincúlalo a una organización de Commet:
-
 ```bash
 cd tu-proyecto
 commet link
 ```
 
-Selecciona tu organización de la lista.
+Selecciona tu organización.
 
 </Step>
 
@@ -84,20 +68,16 @@ Selecciona tu organización de la lista.
 
 ### Generar Tipos
 
-Obtén definiciones de tipos TypeScript desde tu configuración:
-
 ```bash
 commet pull
 ```
 
-Esto crea `.commet.d.ts` con tus tipos de evento y asiento.
+Crea `.commet/types.d.ts` con tus event y seat types.
 
 </Step>
 </Steps>
 
-## Actualizando el CLI
-
-Actualiza a la última versión:
+## Actualizar
 
 <Tabs items={['npm', 'pnpm', 'yarn']}>
 <Tab value="npm">
@@ -116,66 +96,3 @@ yarn global upgrade commet
 ```
 </Tab>
 </Tabs>
-
-El CLI te notificará cuando haya actualizaciones disponibles.
-
-## Desinstalando
-
-Remueve el CLI de tu sistema:
-
-<Tabs items={['npm', 'pnpm', 'yarn']}>
-<Tab value="npm">
-```bash
-npm uninstall -g commet
-```
-</Tab>
-<Tab value="pnpm">
-```bash
-pnpm remove -g commet
-```
-</Tab>
-<Tab value="yarn">
-```bash
-yarn global remove commet
-```
-</Tab>
-</Tabs>
-
-Tus configuraciones de autenticación y proyecto (directorio `~/.commet/`) permanecerán en tu sistema.
-
-## Resolución de Problemas
-
-### Errores de Permisos (npm)
-
-Si encuentras errores de permisos con npm:
-
-```bash
-# Opción 1: Usar npx
-npx commet login
-
-# Opción 2: Arreglar permisos de npm
-npm config set prefix ~/.npm-global
-export PATH=~/.npm-global/bin:$PATH
-```
-
-Ver [guía oficial de npm](https://docs.npmjs.com/resolving-eacces-permissions-errors-when-installing-packages-globally) para detalles.
-
-### Comando No Encontrado
-
-Si el comando `commet` no se encuentra después de la instalación:
-
-1. **Verificar ruta de instalación**: Ejecuta `npm list -g commet` (o equivalente para tu gestor de paquetes)
-2. **Verificar PATH**: Asegúrate de que tu directorio bin global de npm/pnpm/yarn esté en tu PATH
-3. **Reiniciar terminal**: Cierra y reabre tu terminal para recargar las variables de entorno
-
-### Desajuste de Versión
-
-Si el CLI se comporta inesperadamente después de una actualización:
-
-```bash
-# Limpiar caché de npm y reinstalar
-npm cache clean --force
-npm uninstall -g commet
-npm install -g commet
-```
-

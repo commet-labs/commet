@@ -1,11 +1,7 @@
 {
-  "title": "Características",
-  "description": "Capacidades del SDK",
-  "pages": [
-    "customers",
-    "usage-events",
-    "seat-management",
-    "subscriptions",
-    "portal-access"
-  ]
+  "title": "Library",
+  "description": "Learn how to use the Commet SDK",
+  "icon": "Library",
+  "root": true,
+  "pages": ["quickstart", "installation", "features", "core", "cli"]
 }

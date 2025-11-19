@@ -4,152 +4,64 @@ description: Complete reference for all Commet CLI commands
 ---
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
-import { Callout } from 'fumadocs-ui/components/callout'
 
-# CLI Commands Reference
+# CLI Commands
 
-Complete reference for all commands available in the Commet CLI.
-
-## Authentication Commands
+## Authentication
 
 ### `commet login`
 
-Authenticate with Commet using OAuth device authorization flow.
+Authenticate with Commet using OAuth device flow.
 
 ```bash
 commet login
 ```
 
-**What it does:**
-1. Prompts you to select environment (Sandbox or Production)
-2. Opens your browser for authentication
-3. Stores credentials in `~/.commet/auth.json`
-
-**Example output:**
-```
-? Select environment to login:
-❯ Sandbox (Development)
-  Production
-
-✓ Opening browser for authentication...
-✓ Successfully authenticated!
-  
-Environment: sandbox
-User: john@example.com
-```
-
-<Callout type="info">
-**Environment Selection**: Choose Sandbox for development/testing or Production for live billing. Each requires separate authentication.
-</Callout>
+Prompts for environment (Sandbox/Production), opens browser, stores credentials in `~/.commet/auth.json`.
 
 ---
 
 ### `commet logout`
 
-Remove stored authentication credentials.
-
 ```bash
 commet logout
 ```
 
-**What it does:**
-- Deletes `~/.commet/auth.json`
-- Requires re-authentication with `commet login`
-
-**Example output:**
-```
-✓ Logged out successfully
-```
+Removes `~/.commet/auth.json`.
 
 ---
 
 ### `commet whoami`
 
-Display current authentication and project status.
-
 ```bash
 commet whoami
 ```
 
-**Example output:**
-```
-Authentication Status
-  ✓ Logged in
-  Environment: sandbox
-  User: john@example.com
-
-Project Configuration
-  ✓ Linked
-  Organization: Acme Corp
-  Environment: sandbox
-```
-
-**Use cases:**
-- Verify authentication status
-- Check which organization you're linked to
-- Confirm environment before operations
+Shows authentication status and linked organization.
 
 ---
 
-## Project Management Commands
+## Project Management
 
 ### `commet link`
 
-Link the current directory to a Commet organization.
+Link project to a Commet organization.
 
 ```bash
 commet link
 ```
 
-**What it does:**
-1. Fetches your organizations from the authenticated environment
-2. Prompts you to select an organization
-3. Creates `.commet` file with configuration
-
-**Example output:**
-```
-✓ Fetching organizations...
-
-? Select organization:
-❯ Acme Corp (acme-corp)
-  Beta Inc (beta-inc)
-
-✓ Project linked successfully!
-
-Project configuration:
-  Organization: Acme Corp
-  Environment: sandbox
-
-Next step:
-  Run `commet pull` to generate TypeScript types
-```
-
-**Prerequisites:**
-- Must be authenticated (`commet login`)
-- Must be in a project directory
-
-<Callout type="warn">
-**Existing Links**: If the project is already linked, you'll need to run `commet unlink` first.
-</Callout>
+Creates `.commet` file with organization config.
 
 ---
 
 ### `commet unlink`
 
-Unlink the current directory from Commet.
-
 ```bash
 commet unlink
 ```
 
-**What it does:**
-- Removes `.commet` configuration file
-- Project remains authenticated but not linked
-
-**Example output:**
-```
-✓ Project unlinked successfully
-```
+Removes `.commet` file.
 
 ---
 
@@ -161,265 +73,127 @@ Switch to a different organization.
 commet switch
 ```
 
-**What it does:**
-- Shows list of your organizations
-- Updates `.commet` with new organization
-- Environment remains the same (from auth token)
-
-**Example output:**
-```
-✓ Fetching organizations...
-
-? Select organization:
-  Acme Corp (acme-corp)
-❯ Beta Inc (beta-inc)
-
-✓ Switched organization successfully!
-
-New configuration:
-  Organization: Beta Inc
-  Environment: sandbox
-
-Run `commet pull` to update TypeScript types for this organization
-```
-
-<Callout type="info">
-**Environment Lock**: Switch only changes organization within the same environment. To switch environments, use `commet logout` then `commet login`.
-</Callout>
+Updates `.commet` with new organization (same environment).
 
 ---
 
 ### `commet info`
 
-Display detailed information about the current project.
-
 ```bash
 commet info
 ```
 
-**Example output:**
+Shows current authentication and project status.
+
+**Output:**
 ```
-Project Information
-  Organization: Acme Corp (org_A1b2C3d4E5f6G7h8)
+📦 Project Information
+
+Authentication: Logged in ✓
+
+Project: Linked ✓
+  Organization: Acme Corp
+  Organization ID: org_A1b2C3d4E5f6G7h8
   Environment: sandbox
-  
-Configuration File
-  Location: /Users/john/projects/my-app/.commet
-  
-Event Types: 3
-  - api_call
-  - email_sent
-  - payment_processed
 
-Seat Types: 2
-  - admin
-  - user
-
-Products: 5
-  - prd_c2JV8SjRxSD2y6cRSMzYJPJ2
-  - prd_fnvJZwETRrYTmt9y42tLQEMH
-  - prd_D1gc8fodQWvUFmJe5YP3IMb1
+Run `commet pull` to generate type definitions
 ```
-
-**Use cases:**
-- Quick overview of project configuration
-- Verify event types, seat types, and products before pull
-- Debug configuration issues
 
 ---
 
-## Type Generation Commands
+## Type Generation
 
 ### `commet pull`
 
-Generate TypeScript type definitions from your Commet configuration. Includes event types, seat types, and products.
+Generate TypeScript types in `.commet/types.d.ts`.
 
-<Callout type="info">
-**Product IDs**: Products use long IDs (like `prd_D1gc8fodQWvUFmJe5YP3IMb1`) rather than short codes. The generated types file includes comments mapping each product ID to its name and description for easy reference.
-</Callout>
-
-```bash
-commet pull [options]
-```
-
-**Options:**
-- `-o, --output <path>` - Output file path (default: `.commet.d.ts`)
-
-**Examples:**
-
-<Tabs items={['Default', 'Custom Output', 'Subdirectory']}>
-<Tab value="Default">
 ```bash
 commet pull
 ```
-Creates `.commet.d.ts` in current directory.
-</Tab>
-<Tab value="Custom Output">
-```bash
-commet pull -o types/commet.d.ts
-```
-Creates `types/commet.d.ts`.
-</Tab>
-<Tab value="Subdirectory">
-```bash
-commet pull -o src/types/billing.d.ts
-```
-Creates `src/types/billing.d.ts`.
-</Tab>
-</Tabs>
 
-**Generated file example:**
+Creates:
+- `.commet/` directory
+- `.commet/types.d.ts` with event types, seat types, and products
+- Updates `tsconfig.json` to include the types
+- Updates `.gitignore` to ignore `.commet/`
+
+**Generated file:**
 ```typescript
 // .commet/types.d.ts
 /**
+ * Event types available in your organization:
+ * - "api_call": API Calls - Track API usage
+ * - "email_sent": Emails Sent - Email delivery events
+ * 
+ * Seat types available in your organization:
+ * - "admin": Administrator - Full access (Free)
+ * - "user": Standard User - Regular access
+ * 
  * Products available in your organization:
- * - "prd_c2JV8SjRxSD2y6cRSMzYJPJ2": Implementation Service - One-time setup
- * - "prd_fnvJZwETRrYTmt9y42tLQEMH": API Usage - Pay-per-use API calls
- * - "prd_D1gc8fodQWvUFmJe5YP3IMb1": Plan pro
+ * - "prd_c2JV8SjRxSD2y6cRSMzYJPJ2": API Platform - Usage-based billing
+ * - "prd_fnvJZwETRrYTmt9y42tLQEMH": Support Plan - Fixed monthly fee
  */
 declare module '@commet/node' {
   interface CommetGeneratedTypes {
-    eventType: "api_call" | "email_sent" | "payment_processed";
-    seatType: "admin" | "user" | "viewer";
-    productId: "prd_c2JV8SjRxSD2y6cRSMzYJPJ2" | "prd_fnvJZwETRrYTmt9y42tLQEMH" | "prd_D1gc8fodQWvUFmJe5YP3IMb1";
+    eventType: "api_call" | "email_sent";
+    seatType: "admin" | "user";
+    productId: "prd_c2JV8SjRxSD2y6cRSMzYJPJ2" | "prd_fnvJZwETRrYTmt9y42tLQEMH";
   }
 }
 ```
 
-**Use in code:**
+**Usage:**
 ```typescript
 import { Commet } from '@commet/node';
 
 const commet = new Commet({ apiKey: '...' });
 
-// Type-safe events
+// Autocomplete for event types
 await commet.usage.create({
   customerId: 'cus_123',
-  eventType: 'api_call', // Autocomplete works!
+  eventType: 'api_call', // ✓ autocomplete
 });
 
-// Type-safe seats
+// Autocomplete for seat types
 await commet.seats.add({
   customerId: 'cus_123',
-  seatType: 'admin', // Autocomplete works!
+  seatType: 'admin', // ✓ autocomplete
   count: 5
 });
 
-// Type-safe subscriptions
+// Autocomplete for products
 await commet.subscriptions.create({
   customerId: 'cus_123',
-  productId: 'prd_c2JV8SjRxSD2y6cRSMzYJPJ2', // Autocomplete with your product IDs!
-  status: 'active'
+  productId: 'prd_c2JV8SjRxSD2y6cRSMzYJPJ2', // ✓ autocomplete
 });
 ```
-
-**Prerequisites:**
-- Must be authenticated and linked
-- Organization must have event types, seat types, or products configured
-
-<Callout type="info">
-**Git Integration**: Add `.commet/types.d.ts` to version control so team members have consistent types.
-</Callout>
 
 ---
 
 ### `commet list events`
 
-List all event types configured in your organization.
+List event types in your organization.
 
 ```bash
 commet list events
-```
-
-**Example output:**
-```
-Event Types (3)
-  
-  api_call
-    Description: API endpoint calls
-    
-  email_sent
-    Description: Email delivery events
-    
-  payment_processed
-    Description: Payment transactions
 ```
 
 ---
 
 ### `commet list seats`
 
-List all seat types configured in your organization.
+List seat types in your organization.
 
 ```bash
 commet list seats
-```
-
-**Example output:**
-```
-Seat Types (3)
-  
-  admin
-    Description: Administrator access
-    
-  user
-    Description: Standard user access
-    
-  viewer
-    Description: Read-only access
 ```
 
 ---
 
 ## Global Options
 
-All commands support these global options:
-
-```bash
-commet [command] [options]
-```
-
-**Options:**
-- `--version` - Display CLI version
-- `--help` - Show help for command
-
-**Examples:**
 ```bash
 commet --version
-commet login --help
-commet pull --help
+commet [command] --help
 ```
-
----
-
-## Exit Codes
-
-The CLI uses standard exit codes:
-
-- `0` - Success
-- `1` - Error (authentication, validation, network, etc.)
-- `130` - User cancelled (Ctrl+C)
-
-**Use in scripts:**
-```bash
-#!/bin/bash
-
-if commet pull; then
-  echo "Types updated successfully"
-else
-  echo "Failed to update types"
-  exit 1
-fi
-```
-
----
-
-## Command Aliases
-
-Some commands have shorter aliases:
-
-| Full Command | Alias |
-|--------------|-------|
-| `commet list events` | `commet ls events` |
-| `commet list seats` | `commet ls seats` |
 

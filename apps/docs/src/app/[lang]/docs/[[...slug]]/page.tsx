@@ -37,7 +37,7 @@ export default async function Page(
         <LLMCopyButton markdownUrl={`${page.url}.mdx`} />
         <ViewOptions
           markdownUrl={`${page.url}.mdx`}
-          githubUrl={`https://github.com/commet-labs/docs/tree/main/content/docs/${page.path}`}
+          githubUrl={`https://github.com/commet-labs/commet/tree/main/apps/docs/content/docs/${page.path}`}
         />
       </div>
       <DocsBody>
@@ -53,7 +53,7 @@ export default async function Page(
           "use server";
           console.log(url, feedback);
           return {
-            githubUrl: `https://github.com/commet-labs/docs/tree/main/content/docs/${page.path}`,
+            githubUrl: `https://github.com/commet-labs/commet/tree/main/apps/docs/content/docs/${page.path}`,
           };
         }}
       />
