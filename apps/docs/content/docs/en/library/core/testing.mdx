@@ -93,6 +93,33 @@ await commet.usage.create({
 })
 ```
 
+## Test Cards
+
+Use these test cards in sandbox:
+
+**Successful payments:**
+
+| Card | Brand |
+|------|-------|
+| `4242 4242 4242 4242` | Visa |
+| `5555 5555 5555 4444` | Mastercard |
+
+Use any future expiry date and any 3-digit CVC.
+
+**Failed payments:**
+
+| Card | Scenario |
+|------|----------|
+| `4000 0000 0000 9995` | Insufficient funds |
+| `4000 0000 0000 9987` | Lost card |
+| `4000 0000 0000 9979` | Stolen card |
+
+**3D Secure:**
+
+| Card | Description |
+|------|-------------|
+| `4000 0025 0000 3155` | Requires authentication |
+
 ## Switch to Production
 
 ```typescript

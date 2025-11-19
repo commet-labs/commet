@@ -119,11 +119,11 @@ async function createCustomer(data) {
         statusCode: error.statusCode,
         message: error.message
       }
-    }
+      }
     
-    return {
-      success: false,
-      type: 'unknown',
+      return {
+        success: false,
+        type: 'unknown',
       message: 'An unexpected error occurred'
     }
   }
