@@ -7,6 +7,33 @@ description: Prueba de forma segura con el entorno sandbox
 
 Usa el entorno sandbox para probar de forma segura antes de producción.
 
+## Tarjetas de Prueba
+
+Usa estas tarjetas de prueba en sandbox:
+
+**Pagos exitosos:**
+
+| Tarjeta | Marca |
+|---------|-------|
+| `4242 4242 4242 4242` | Visa |
+| `5555 5555 5555 4444` | Mastercard |
+
+Usa cualquier fecha de vencimiento futura y cualquier CVC de 3 dígitos.
+
+**Pagos fallidos:**
+
+| Tarjeta | Escenario |
+|---------|-----------|
+| `4000 0000 0000 9995` | Fondos insuficientes |
+| `4000 0000 0000 9987` | Tarjeta perdida |
+| `4000 0000 0000 9979` | Tarjeta robada |
+
+**3D Secure:**
+
+| Tarjeta | Descripción |
+|---------|-------------|
+| `4000 0025 0000 3155` | Requiere autenticación |
+
 ## Entorno Sandbox
 
 Sandbox es el entorno por defecto con datos completamente aislados:
@@ -92,33 +119,6 @@ await commet.usage.create({
   idempotencyKey: eventId  // Mismo ID
 })
 ```
-
-## Tarjetas de Prueba
-
-Usa estas tarjetas de prueba en sandbox:
-
-**Pagos exitosos:**
-
-| Tarjeta | Marca |
-|---------|-------|
-| `4242 4242 4242 4242` | Visa |
-| `5555 5555 5555 4444` | Mastercard |
-
-Usa cualquier fecha de vencimiento futura y cualquier CVC de 3 dígitos.
-
-**Pagos fallidos:**
-
-| Tarjeta | Escenario |
-|---------|-----------|
-| `4000 0000 0000 9995` | Fondos insuficientes |
-| `4000 0000 0000 9987` | Tarjeta perdida |
-| `4000 0000 0000 9979` | Tarjeta robada |
-
-**3D Secure:**
-
-| Tarjeta | Descripción |
-|---------|-------------|
-| `4000 0025 0000 3155` | Requiere autenticación |
 
 ## Cambiar a Producción
 
