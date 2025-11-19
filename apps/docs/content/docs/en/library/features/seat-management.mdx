@@ -1,317 +1,115 @@
 ---
-title: Seat Management
-description: Handle subscription-based billing with intuitive seat operations
+title: Seat
+description: Manage subscription seats with automatic audit trails
 ---
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
 import { Callout } from 'fumadocs-ui/components/callout'
 
-# Seat Management
-
-Manage customer seats for subscription billing. Add, remove, or set seat quantities with automatic audit trails.
-
 <Callout type="info">
-**Prerequisites:** Customer must exist and have active seat types configured.
+**Prerequisites:** Customer must exist and have seat types configured.
 </Callout>
 
-## Basic Operations
-
-<Callout type="info">
-**Customer Identification**: Use either `customerId` (Commet-generated) or `externalId` (your own system ID) to identify customers.
-</Callout>
-
-### Add Seats
-
-Increase seat count for a customer:
+## Add Seats
 
 ```typescript
 const result = await commet.seats.add({
-  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
-  seatType: 'admin',
-  count: 5
-})
-
-console.log(`Added ${result.data.quantity} admin seats`)
-```
-
-Using external IDs:
-
-```typescript
-const result = await commet.seats.add({
-  externalId: 'stripe_cus_abc123', // Your internal customer ID
-  seatType: 'admin',
+  customerId: 'cus_xxx',
+  seatType: 'editor',
   count: 5
 })
 ```
 
-### Remove Seats
+<Callout type="info">
+**Customer Identification**: Use `customerId` or `externalId` to identify customers.
+</Callout>
 
-Decrease seat count:
+## Remove Seats
 
 ```typescript
 const result = await commet.seats.remove({
-  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
-  seatType: 'admin',
+  customerId: 'cus_xxx',
+  seatType: 'editor',
   count: 2
 })
-
-console.log(`Removed ${result.data.quantity} admin seats`)
 ```
 
-### Set Exact Count
-
-Set precise seat quantity:
+## Set Exact Count
 
 ```typescript
 const result = await commet.seats.set({
-  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
-  seatType: 'admin',
+  customerId: 'cus_xxx',
+  seatType: 'editor',
   count: 10
 })
-
-console.log(`Set admin seats to ${result.data.quantity}`)
 ```
 
-## Seat Types
+## Using External IDs
 
-Common seat configurations:
-
-<Tabs items={['Admin/User', 'Tiered Plans', 'Role-Based', 'Custom']}>
-<Tab value="Admin/User">
 ```typescript
-// Administrative seats
-await commet.seats.add({
-  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
-  seatType: 'admin',
-  count: 2
-})
-
-// Regular user seats  
-await commet.seats.add({
-  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
-  seatType: 'user',
-  count: 25
-})
-```
-</Tab>
-<Tab value="Tiered Plans">
-```typescript
-// Starter plan seats
-await commet.seats.set({
-  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
-  seatType: 'starter',
+const result = await commet.seats.add({
+  externalId: 'stripe_cus_abc123',
+  seatType: 'editor',
   count: 5
 })
-
-// Pro plan seats
-await commet.seats.set({
-  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2', 
-  seatType: 'pro',
-  count: 15
-})
 ```
-</Tab>
-<Tab value="Role-Based">
-```typescript
-// Developer seats
-await commet.seats.add({
-  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
-  seatType: 'developer',
-  count: 8
-})
 
-// Viewer seats (read-only)
-await commet.seats.add({
-  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
-  seatType: 'viewer', 
-  count: 20
-})
-```
-</Tab>
-<Tab value="Custom">
-```typescript
-// Custom seat type
-await commet.seats.add({
-  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
-  seatType: 'api_access',
-  count: 3
-})
-```
-</Tab>
-</Tabs>
+## Bulk Update
 
-## Bulk Operations
-
-Update multiple seat types simultaneously:
+Update multiple seat types at once:
 
 ```typescript
 const result = await commet.seats.bulkUpdate({
-  externalId: 'stripe_cus_xyz', // Or use customerId
+  customerId: 'cus_xxx',
   seats: {
     admin: 3,
-    user: 50,
+    editor: 50,
     viewer: 100
   }
 })
-
-console.log(`Updated ${result.data.length} seat types`)
 ```
 
-## Seat Balances
-
-Get specific seat type balance:
+## Get Balance
 
 ```typescript
 const balance = await commet.seats.getBalance({
-  externalId: 'stripe_cus_xyz', // Or use customerId
-  seatType: 'admin'
+  customerId: 'cus_xxx',
+  seatType: 'editor'
 })
 
-console.log(`Admin seats: ${balance.data.current}`)
+console.log(`Current seats: ${balance.data.current}`)
 ```
 
-Get all seat balances for a customer:
+## Get All Balances
 
 ```typescript
 const allBalances = await commet.seats.getAllBalances({
-  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2'
+  customerId: 'cus_xxx'
 })
 
-console.log('Current seats:', allBalances.data)
-// Output: { admin: { current: 3, asOf: '...' }, user: { current: 50, asOf: '...' } }
+console.log(allBalances.data)
+// { editor: { current: 50, asOf: '...' }, viewer: { current: 100, asOf: '...' } }
 ```
 
-## Seat History
-
-Track seat changes over time with pagination:
-
-```typescript
-// Filter by customerId or externalId
-const page1 = await commet.seats.listEvents({
-  externalId: 'stripe_cus_xyz',
-  seatType: 'admin',
-  limit: 50
-})
-
-page1.data.forEach(event => {
-  console.log(`${event.ts}: ${event.eventType} ${event.quantity} seats`)
-})
-
-// Get next page if available
-if (page1.hasMore) {
-  const page2 = await commet.seats.listEvents({
-    externalId: 'stripe_cus_xyz',
-    seatType: 'admin',
-    limit: 50,
-    cursor: page1.nextCursor
-  })
-}
-
-// Fetch all history
-const allHistory = []
-let cursor = undefined
-let hasMore = true
-
-do {
-  const page = await commet.seats.listEvents({ 
-    customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
-    seatType: 'admin',
-    limit: 100, 
-    cursor 
-  })
-  allHistory.push(...page.data)
-  cursor = page.nextCursor
-  hasMore = page.hasMore
-} while (hasMore)
-```
-
-<Callout type="info">
-**Pagination**: Seat history supports cursor-based pagination for efficient traversal through change logs. See [Pagination guide](/library/core/pagination) for more details.
-</Callout>
-
-## List All Seat Events
-
-Query seat events across all customers:
+## List Events
 
 ```typescript
 const events = await commet.seats.listEvents({
-  seatType: 'admin',
-  eventType: 'add',
-  limit: 100,
-  cursor: 'token'
+  customerId: 'cus_xxx',
+  seatType: 'editor',
+  limit: 50
 })
 
-events.data.forEach(event => {
-  console.log(`Customer ${event.customerId}: ${event.eventType} ${event.quantity} seats`)
-})
-```
-
-## Error Handling
-
-Handle common scenarios:
-
-```typescript
-try {
-  await commet.seats.remove({
-    customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
-    seatType: 'admin',
-    count: 10
+// Pagination
+if (events.hasMore) {
+  const nextPage = await commet.seats.listEvents({
+    customerId: 'cus_xxx',
+    cursor: events.nextCursor
   })
-} catch (error) {
-  if (error.code === 'INSUFFICIENT_SEATS') {
-    console.log('Cannot remove more seats than available')
-  } else if (error.code === 'SEAT_TYPE_NOT_FOUND') {
-    console.log('Seat type not configured for customer')
-  } else {
-    console.log('Unexpected error:', error.message)
-  }
 }
 ```
 
-## Best Practices
+## Related Resources
 
-### Seat Naming
-
-Use descriptive, consistent seat type names:
-
-```typescript
-// ✅ Good
-'admin', 'user', 'viewer', 'developer', 'analyst'
-
-// ❌ Avoid
-'type1', 'seat', 'license', 'user_thing'
-```
-
-### Batch Operations
-
-For multiple seat updates, use bulk operations:
-
-```typescript
-// ✅ Efficient - single API call
-await commet.seats.bulkUpdate({
-  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
-  seats: {
-    admin: 3,
-    user: 50
-  }
-})
-
-// ❌ Inefficient - multiple API calls
-await commet.seats.set({ customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2', seatType: 'admin', count: 3 })
-await commet.seats.set({ customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2', seatType: 'user', count: 50 })
-```
-
-### Operation Choice
-
-Choose the right operation for your use case:
-
-```typescript
-// Use 'add' when incrementing
-await commet.seats.add({ customerId: 'cus_123', seatType: 'user', count: 5 })
-
-// Use 'remove' when decrementing  
-await commet.seats.remove({ customerId: 'cus_123', seatType: 'user', count: 2 })
-
-// Use 'set' when you know the exact total
-await commet.seats.set({ customerId: 'cus_123', seatType: 'user', count: 50 })
-```
+- [Subscriptions](/docs/library/features/subscriptions) - Create recurring billing
+- [Customers](/docs/library/features/customers) - Manage customer data

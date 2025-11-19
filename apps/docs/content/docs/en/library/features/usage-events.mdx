@@ -1,6 +1,6 @@
 ---
 title: Usage Events
-description: Track usage data for accurate billing calculations
+description: Track usage data for accurate billing
 ---
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
@@ -8,97 +8,51 @@ import { Callout } from 'fumadocs-ui/components/callout'
 
 # Usage Events
 
-Track customer usage for accurate billing calculations. Send events in real-time or batch them for high-volume scenarios.
+Track customer usage for billing. Send events in real-time or batch them for high-volume scenarios.
 
 <Callout type="info">
 **Prerequisites:** Initialize your Commet client with a valid API key.
 </Callout>
 
-## Basic Usage
-
-Send a single usage event:
+## Create Event
 
 ```typescript
 const result = await commet.usage.create({
   eventType: 'api_call',
-  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
+  customerId: 'cus_xxx',
+  idempotencyKey: `evt_${Date.now()}`,
 })
-
-console.log('Event tracked:', result.data.id)
 ```
 
 <Callout type="info">
-**Customer Identification**: Use either `customerId` (Commet-generated) or `externalId` (your own system ID) to identify customers.
+**Customer Identification**: Use `customerId` or `externalId` to identify customers.
 </Callout>
 
-### Using External IDs
-
-Reference customers with your own IDs:
+## Using External IDs
 
 ```typescript
 const result = await commet.usage.create({
   eventType: 'api_call',
-  externalId: 'stripe_cus_abc123', // Your internal customer ID
+  externalId: 'stripe_cus_abc123',
+  idempotencyKey: `evt_${Date.now()}`,
 })
 ```
 
-## Event Types
+## Event Properties
 
-Common event types for billing:
+Add context to events:
 
-<Tabs items={['API Calls', 'Storage', 'Compute', 'Custom']}>
-<Tab value="API Calls">
 ```typescript
 await commet.usage.create({
   eventType: 'api_call',
-  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
+  customerId: 'cus_xxx',
+  idempotencyKey: `evt_${Date.now()}`,
   properties: [
     { property: 'endpoint', value: '/api/users' },
     { property: 'method', value: 'GET' }
   ]
 })
 ```
-</Tab>
-<Tab value="Storage">
-```typescript
-await commet.usage.create({
-  eventType: 'storage_gb',
-  externalId: 'stripe_cus_xyz', // Using external ID
-  properties: [
-    { property: 'quantity', value: '2.5' },
-    { property: 'region', value: 'us-east-1' },
-    { property: 'type', value: 'ssd' }
-  ]
-})
-```
-</Tab>
-<Tab value="Compute">
-```typescript
-await commet.usage.create({
-  eventType: 'compute_hours',
-  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
-  properties: [
-    { property: 'quantity', value: '0.25' },
-    { property: 'instance_type', value: 't3.micro' },
-    { property: 'region', value: 'us-west-2' }
-  ]
-})
-```
-</Tab>
-<Tab value="Custom">
-```typescript
-await commet.usage.create({
-  eventType: 'email_sent',
-  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
-  properties: [
-    { property: 'quantity', value: '100' },
-    { property: 'campaign_id', value: 'camp_abc123' },
-    { property: 'template', value: 'welcome' }
-  ]
-})
-```
-</Tab>
-</Tabs>
 
 ## Batch Processing
 
@@ -109,181 +63,49 @@ const result = await commet.usage.createBatch({
   events: [
     {
       eventType: 'api_call',
-      customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
-      timestamp: '2024-01-15T10:00:00Z'
+      customerId: 'cus_xxx',
+      idempotencyKey: `evt_${Date.now()}_1`,
     },
     {
-      eventType: 'api_call', 
-      externalId: 'stripe_cus_abc', // Mix customerId and externalId
-      timestamp: '2024-01-15T10:01:00Z'
+      eventType: 'api_call',
+      externalId: 'stripe_cus_abc',
+      idempotencyKey: `evt_${Date.now()}_2`,
     }
   ]
 })
-
-console.log(`Tracked ${result.data.successful.length} events`)
 ```
 
-## Advanced Options
-
-### Idempotency
-
-Prevent duplicate events with idempotency keys:
+## List Events
 
 ```typescript
-await commet.usage.events.create({
-  eventType: 'api_call',
-  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
-  idempotencyKey: 'unique-key-123'
-})
-```
-
-### Custom Timestamps
-
-Backfill historical usage:
-
-```typescript
-await commet.usage.events.create({
-  eventType: 'api_call',
-  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
-  timestamp: '2024-01-01T00:00:00Z'
-})
-```
-
-### Rich Properties
-
-Add context for reporting and debugging:
-
-```typescript
-await commet.usage.events.create({
-  eventType: 'api_call',
-  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
-  properties: [
-    { property: 'user_id', value: 'usr_789' },
-    { property: 'endpoint', value: '/api/analytics' },
-    { property: 'response_time_ms', value: '150' },
-    { property: 'status_code', value: '200' },
-    { property: 'region', value: 'us-east-1' }
-  ]
-})
-```
-
-## Error Handling
-
-Handle common scenarios:
-
-```typescript
-try {
-  const result = await commet.usage.create({
-    eventType: 'api_call',
-    externalId: 'stripe_cus_xyz',
-  })
-  
-  console.log('Event tracked:', result.data.id)
-} catch (error) {
-  if (error.code === 'CUSTOMER_NOT_FOUND') {
-    console.log('Customer does not exist')
-  } else if (error.code === 'INVALID_EVENT_TYPE') {
-    console.log('Event type not configured')
-  } else {
-    console.log('Unexpected error:', error.message)
-  }
-}
-```
-
-## List Usage Events
-
-Retrieve usage history for analysis with pagination:
-
-```typescript
-// Filter by customerId or externalId
-const page1 = await commet.usage.list({
-  externalId: 'stripe_cus_xyz', // Or use customerId
+const events = await commet.usage.list({
+  customerId: 'cus_xxx',
   eventType: 'api_call',
   limit: 100
 })
 
-console.log(`Found ${page1.data.length} events`)
-console.log(`More pages: ${page1.hasMore}`)
-
-// Get next page
-if (page1.hasMore) {
-  const page2 = await commet.usage.list({
-    externalId: 'stripe_cus_xyz',
-    eventType: 'api_call',
-    limit: 100,
-    cursor: page1.nextCursor
+// Pagination
+if (events.hasMore) {
+  const nextPage = await commet.usage.list({
+    customerId: 'cus_xxx',
+    cursor: events.nextCursor
   })
 }
-
-// Fetch all events for a customer
-const allEvents = []
-let cursor = undefined
-
-do {
-  const page = await commet.usage.list({ 
-    customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
-    limit: 100, 
-    cursor 
-  })
-  allEvents.push(...page.data)
-  cursor = page.nextCursor
-} while (page.hasMore)
 ```
 
-<Callout type="info">
-**Pagination**: Usage event lists support cursor-based pagination for efficient traversal of large event histories. See [Pagination guide](/library/core/pagination) for more examples.
-</Callout>
-
-## Best Practices
-
-### High-Volume Applications
-
-For applications sending >1000 events/minute:
+## Retrieve Event
 
 ```typescript
-// Buffer events locally
-const eventBuffer = []
-
-// Add to buffer with externalId
-eventBuffer.push({
-  eventType: 'api_call',
-  externalId: 'stripe_cus_xyz',
-  timestamp: new Date().toISOString()
-})
-
-// Flush buffer every 10 seconds or 100 events
-if (eventBuffer.length >= 100) {
-  await commet.usage.createBatch({ events: eventBuffer })
-  eventBuffer.length = 0
-}
+const event = await commet.usage.retrieve('evt_xxx')
 ```
 
-### Event Naming
-
-Use consistent, descriptive event types:
+## Delete Event
 
 ```typescript
-// ✅ Good
-'api_call', 'storage_gb', 'compute_hours', 'email_sent'
-
-// ❌ Avoid  
-'event1', 'usage', 'thing', 'api'
+await commet.usage.delete('evt_xxx')
 ```
 
-### Properties Structure
+## Related Resources
 
-Keep properties flat and searchable:
-
-```typescript
-// ✅ Good
-properties: [
-  { property: 'endpoint', value: '/api/users' },
-  { property: 'method', value: 'GET' },
-  { property: 'user_id', value: 'usr_123' }
-]
-
-// ❌ Avoid - nested objects not supported
-properties: [
-  { property: 'request', value: JSON.stringify({ endpoint: '/api/users', method: 'GET' }) }
-]
-```
+- [Subscriptions](/docs/library/features/subscriptions) - Create recurring billing
+- [Customers](/docs/library/features/customers) - Manage customer data

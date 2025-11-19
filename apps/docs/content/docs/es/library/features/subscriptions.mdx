@@ -1,102 +1,92 @@
 ---
 title: Suscripciones
-description: Gestión simple de suscripciones con configuración automática
+description: Crea y gestiona suscripciones con múltiples productos
 ---
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
 import { Callout } from 'fumadocs-ui/components/callout'
 
-# Suscripciones
-
-Crea suscripciones con solo un ID de producto y un ID de cliente. El sistema maneja automáticamente precios, cantidades y configuración de facturación según tu producto.
-
 <Callout type="info">
 **Prerrequisitos:** Inicializa tu cliente Commet con una clave API válida.
-</Callout>
-
-## Uso Básico
-
-Crea una suscripción con información mínima:
-
-```typescript
-const subscription = await commet.subscriptions.create({
-  productId: 'prod_A1b2C3d4E5f6G7h8I9j0K1l2',
-  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2'
-})
-
-console.log('Suscripción creada:', subscription.data.id)
-```
-
-<Callout type="info">
-**Auto-configuración**: El backend selecciona automáticamente el precio de lista por defecto, configura cantidades según el tipo de producto, y establece el día de facturación a hoy.
 </Callout>
 
 <Callout type="success">
 **¿Probando suscripciones?** Usa el entorno sandbox y las [tarjetas de prueba de Stripe](/es/docs/library/core/testing#tarjetas-de-prueba-de-stripe) para probar flujos de checkout de forma segura.
 </Callout>
 
-### Usando IDs Externos
+## Crear Suscripción
 
-Referencia clientes con tus propios IDs:
+Crea una suscripción con uno o más productos:
 
 ```typescript
 const subscription = await commet.subscriptions.create({
-  productId: 'prod_A1b2C3d4E5f6G7h8I9j0K1l2',
-  externalId: 'stripe_cus_abc123' // Tu ID interno de cliente
+  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
+  items: [
+    { priceId: 'price_tasks_free', quantity: 1 }
+  ]
+})
+
+console.log('Suscripción creada:', subscription.data.id)
+```
+
+### Múltiples Productos
+
+Agrupa múltiples productos en una sola suscripción:
+
+```typescript
+const subscription = await commet.subscriptions.create({
+  externalId: 'org_123',
+  items: [
+    { priceId: 'price_tasks_pro', quantity: 1 },
+    { priceId: 'price_usage_pro' },
+    { priceId: 'price_seats_pro', initialSeats: 5 }
+  ],
+  status: 'active'
 })
 ```
 
-## Tipos de Productos
-
-El SDK soporta tres tipos de productos con defaults inteligentes:
+### Tipos de Productos
 
 <Tabs items={['Fijo', 'Por Uso', 'Por Asientos']}>
 <Tab value="Fijo">
 ```typescript
-// Producto de cantidad fija (licencias, planes)
 const subscription = await commet.subscriptions.create({
-  productId: 'prod_enterprise_plan',
-  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2'
-})
-// Backend establece: fixedQuantity = 1
-
-// Cantidad personalizada
-const subscription = await commet.subscriptions.create({
-  productId: 'prod_api_platform',
-  externalId: 'my-customer-123',
-  quantity: 5 // 5 unidades
+  customerId: 'cus_xxx',
+  items: [
+    { priceId: 'price_fixed_plan', quantity: 1 }
+  ]
 })
 ```
 </Tab>
 <Tab value="Por Uso">
 ```typescript
-// Producto basado en uso (llamadas API, emails)
 const subscription = await commet.subscriptions.create({
-  productId: 'prod_api_calls',
-  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2'
+  customerId: 'cus_xxx',
+  items: [
+    { priceId: 'price_api_calls' }
+  ]
 })
-// Backend usa usageMetricId del producto
 
-// Luego rastrea eventos de uso
+// Rastrea uso
 await commet.usage.create({
   eventType: 'api_call',
-  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2'
+  customerId: 'cus_xxx',
+  idempotencyKey: `evt_${Date.now()}`
 })
 ```
 </Tab>
 <Tab value="Por Asientos">
 ```typescript
-// Producto basado en asientos (licencias de usuario)
 const subscription = await commet.subscriptions.create({
-  productId: 'prod_saas_licenses',
-  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
-  initialSeats: 10 // Comienza con 10 asientos
+  customerId: 'cus_xxx',
+  items: [
+    { priceId: 'price_user_licenses', initialSeats: 10 }
+  ]
 })
-// Backend usa seatTypeId del producto
 
-// Luego gestiona asientos
+// Gestiona asientos
 await commet.seats.add({
-  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
+  customerId: 'cus_xxx',
   seatType: 'editor',
   count: 5
 })
@@ -104,90 +94,24 @@ await commet.seats.add({
 </Tab>
 </Tabs>
 
-<Callout type="info">
-**No se necesita cantidad para productos por uso**: La cantidad viene de eventos de uso. Para productos por asientos, `initialSeats` es 0 por defecto si no se especifica.
-</Callout>
+## Opciones
 
-## Operaciones de Suscripción
-
-### Crear con Opciones
-
-Personaliza la creación de suscripción:
-
-```typescript
-const subscription = await commet.subscriptions.create({
-  productId: 'prod_A1b2C3d4E5f6G7h8I9j0K1l2',
-  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
-  name: 'Nombre Personalizado de Suscripción',
-  startDate: '2025-01-15T00:00:00Z',
-  status: 'active', // Genera factura inmediatamente
-  quantity: 5 // Para productos fijos
-})
-```
-
-<Callout type="info">
-**Status por defecto es active**: Las suscripciones generan facturas inmediatamente a menos que el status sea `draft`.
-</Callout>
-
-### Recuperar Suscripción
-
-Obtén detalles de la suscripción:
-
-```typescript
-const subscription = await commet.subscriptions.retrieve('sub_A1b2C3d4E5f6G7h8I9j0K1l2')
-
-console.log('Suscripción:', subscription.data.name)
-console.log('Estado:', subscription.data.status)
-```
-
-### Listar Suscripciones
-
-Filtra suscripciones por cliente o estado:
-
-```typescript
-// Por ID de cliente
-const subscriptions = await commet.subscriptions.list({
-  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
-  status: 'active'
-})
-
-// Por ID externo
-const subscriptions = await commet.subscriptions.list({
-  externalId: 'stripe_cus_abc123'
-})
-
-console.log(`Encontradas ${subscriptions.data.length} suscripciones`)
-```
-
-### Cancelar Suscripción
-
-Cancela una suscripción activa:
-
-```typescript
-const result = await commet.subscriptions.cancel('sub_A1b2C3d4E5f6G7h8I9j0K1l2')
-
-console.log('Suscripción cancelada:', result.data.status)
-```
-
-## Uso Avanzado
-
-### Suscripciones Borrador
+### Suscripción Borrador
 
 Crea suscripción para revisión antes de activación:
 
 ```typescript
 const draft = await commet.subscriptions.create({
-  productId: 'prod_enterprise',
-  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
-  quantity: 10,
-  status: 'draft' // No genera factura
+  customerId: 'cus_xxx',
+  items: [
+    { priceId: 'price_enterprise', quantity: 100 }
+  ],
+  status: 'draft'
 })
-
-// Revisa en la UI de la plataforma, luego activa manualmente
 ```
 
-<Callout type="warn">
-**Suscripciones borrador**: No generan facturas hasta ser activadas manualmente en la plataforma o actualizadas vía API.
+<Callout type="info">
+**Suscripciones borrador** no generan facturas hasta ser activadas manualmente en la plataforma.
 </Callout>
 
 ### Fecha de Inicio Personalizada
@@ -196,38 +120,78 @@ Programa suscripciones para facturación futura:
 
 ```typescript
 const subscription = await commet.subscriptions.create({
-  productId: 'prod_monthly_plan',
-  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
-  startDate: '2025-02-01T00:00:00Z', // Fecha futura
+  customerId: 'cus_xxx',
+  items: [
+    { priceId: 'price_monthly', quantity: 1 }
+  ],
+  startDate: '2025-02-01T00:00:00Z',
   status: 'active'
 })
-
-// Día de facturación establecido a: 1 de febrero
-console.log('Día de facturación:', subscription.data.billingDayOfMonth) // 1
 ```
 
-## Ejemplos Completos
-
-### Plataforma SaaS (Asientos)
+### Suscripción con Nombre
 
 ```typescript
-// Crea suscripción con asientos iniciales
-const sub = await commet.subscriptions.create({
-  productId: 'prod_saas_platform',
+const subscription = await commet.subscriptions.create({
   externalId: 'startup-xyz',
-  initialSeats: 5,
   name: 'Startup XYZ - Plan Growth',
+  items: [
+    { priceId: 'price_growth', quantity: 1 }
+  ]
+})
+```
+
+## Operaciones Básicas
+
+```typescript
+// Recuperar suscripción
+const subscription = await commet.subscriptions.retrieve('sub_A1b2C3d4E5f6G7h8I9j0K1l2')
+
+// Listar suscripciones
+const subscriptions = await commet.subscriptions.list({
+  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
   status: 'active'
 })
 
-// Usuario agrega miembros del equipo
+// Listar por ID externo
+const subscriptions = await commet.subscriptions.list({
+  externalId: 'org_123'
+})
+
+// Cancelar suscripción
+await commet.subscriptions.cancel('sub_A1b2C3d4E5f6G7h8I9j0K1l2')
+```
+
+## Ejemplo Completo
+
+```typescript
+// Crear suscripción con múltiples productos
+const sub = await commet.subscriptions.create({
+  externalId: 'startup-xyz',
+  name: 'Startup XYZ - Plan Growth',
+  items: [
+    { priceId: 'price_base_plan', quantity: 1 },
+    { priceId: 'price_api_usage' },
+    { priceId: 'price_user_seats', initialSeats: 5 }
+  ],
+  status: 'active'
+})
+
+// Rastrear uso de API
+await commet.usage.create({
+  eventType: 'api_call',
+  externalId: 'startup-xyz',
+  idempotencyKey: `evt_${Date.now()}`
+})
+
+// Agregar miembros del equipo
 await commet.seats.add({
   externalId: 'startup-xyz',
   seatType: 'editor',
   count: 3
 })
 
-// Verifica balance actual
+// Verificar balance de asientos
 const balance = await commet.seats.getBalance({
   externalId: 'startup-xyz',
   seatType: 'editor'
@@ -235,84 +199,8 @@ const balance = await commet.seats.getBalance({
 console.log('Total asientos:', balance.data.current) // 8
 ```
 
-### Plataforma API (Uso)
-
-```typescript
-// Crea suscripción
-await commet.subscriptions.create({
-  productId: 'prod_api_platform',
-  customerId: 'cus_fintech_app'
-})
-
-// Rastrea uso de API
-await commet.usage.createBatch({
-  events: [
-    {
-      eventType: 'api_call',
-      customerId: 'cus_fintech_app',
-      properties: [
-        { property: 'endpoint', value: '/api/transactions' },
-        { property: 'method', value: 'POST' }
-      ]
-    }
-  ]
-})
-```
-
-### Deal Enterprise (Fijo)
-
-```typescript
-// Crea como borrador para revisión de ventas
-const draft = await commet.subscriptions.create({
-  productId: 'prod_enterprise',
-  customerId: 'cus_big_corp',
-  quantity: 100,
-  name: 'Big Corp - Deal Enterprise Personalizado',
-  status: 'draft'
-})
-
-// Después de aprobación, activa en la UI de la plataforma
-```
-
-## Manejo de Errores
-
-Maneja errores comunes elegantemente:
-
-```typescript
-try {
-  await commet.subscriptions.create({
-    productId: 'prod_xxx',
-    customerId: 'cus_xxx'
-  })
-} catch (error) {
-  if (error.statusCode === 404) {
-    console.error('Producto o cliente no encontrado')
-  } else if (error.statusCode === 400) {
-    console.error('Producto no tiene precios de lista configurados')
-  }
-}
-```
-
-## Mejores Prácticas
-
-<Callout type="info">
-**Usa IDs Externos**: Conéctate con tu sistema existente para una integración más simple.
-</Callout>
-
-<Callout type="info">
-**Por defecto Activo**: Usa `status: "active"` a menos que se requiera aprobación manual.
-</Callout>
-
-<Callout type="info">
-**Auto-configuración**: Deja que el backend maneje los quantity sources - no sobre-pienses la configuración.
-</Callout>
-
-<Callout type="info">
-**Asientos Empiezan en Cero**: Para productos por asientos, establece `initialSeats: 0` y agrega asientos mientras los usuarios se registran.
-</Callout>
-
 ## Recursos Relacionados
 
-- [Eventos de Uso](/docs/es/library/features/usage-events) - Rastrea consumo para facturación por uso
-- [Gestión de Asientos](/docs/es/library/features/seat-management) - Gestiona licencias por asiento
-- [Clientes](/docs/es/library/features/customers) - Crea y gestiona clientes
+- [Eventos de Uso](/es/docs/library/features/usage-events) - Rastrea consumo para facturación por uso
+- [Gestión de Asientos](/es/docs/library/features/seat-management) - Gestiona licencias por asiento
+- [Clientes](/es/docs/library/features/customers) - Crea y gestiona clientes
