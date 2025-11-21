@@ -5,10 +5,10 @@
       <h3 align="center">@commet/next</h3>
     </a>
   </p>
-  <p>Next.js integration for Commet webhooks</p>
+  <p>Next.js integration for Commet</p>
 
   <a href="https://www.npmjs.com/package/@commet/next"><img alt="NPM version" src="https://img.shields.io/npm/v/@commet/next.svg?style=for-the-badge&labelColor=000000"></a>
-  <a href="https://docs.commet.co/docs/library/installation/webhooks"><img alt="Documentation" src="https://img.shields.io/badge/docs-webhooks-blue.svg?style=for-the-badge&labelColor=000000"></a>
+  <a href="https://docs.commet.co"><img alt="Documentation" src="https://img.shields.io/badge/docs-commet-blue.svg?style=for-the-badge&labelColor=000000"></a>
 </div>
 
 <br/>
@@ -19,7 +19,7 @@
 npm install @commet/next
 ```
 
-## Quick Start
+## Webhooks
 
 ```typescript
 // app/api/webhooks/commet/route.ts
@@ -27,29 +27,40 @@ import { Webhooks } from "@commet/next";
 
 export const POST = Webhooks({
   webhookSecret: process.env.COMMET_WEBHOOK_SECRET!,
-  
   onSubscriptionActivated: async (payload) => {
-    // Handle subscription activation
+    // Grant access
   },
 });
 ```
 
+## Customer Portal
+
+```typescript
+// app/api/commet/portal/route.ts
+import { CustomerPortal } from "@commet/next";
+import { auth } from "@/lib/auth";
+
+export const GET = CustomerPortal({
+  apiKey: process.env.COMMET_API_KEY!,
+  getCustomerId: async (req) => {
+    const session = await auth.api.getSession({ headers: req.headers });
+    return session?.user.id ?? null;
+  },
+});
+```
+
+```tsx
+// Use in component
+<Button asChild>
+  <Link href="/api/commet/portal">Manage Billing</Link>
+</Button>
+```
+
 ## Documentation
 
-Visit [docs.commet.co/docs/library/installation/webhooks](https://docs.commet.co/docs/library/installation/webhooks) for:
-
-- Complete setup guide
-- Event handler reference
-- TypeScript integration
-- Error handling patterns
-- Testing strategies
-
-## Resources
-
-- [Webhook Documentation](https://docs.commet.co/docs/library/installation/webhooks)
+- [Webhooks](https://docs.commet.co/docs/library/installation/webhooks)
+- [Customer Portal](https://docs.commet.co/docs/library/features/portal-access)
 - [SDK Reference](https://docs.commet.co/docs/library/quickstart)
-- [GitHub](https://github.com/commet-labs/commet)
-- [Issues](https://github.com/commet-labs/commet/issues)
 
 ## License
 
