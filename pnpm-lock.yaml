@@ -131,8 +131,8 @@ importers:
   packages/next:
     dependencies:
       '@commet/node':
-        specifier: 0.11.0
-        version: 0.11.0(typescript@5.9.3)
+        specifier: workspace:*
+        version: link:../node
     devDependencies:
       '@types/node':
         specifier: 24.10.1
@@ -305,12 +305,6 @@ packages:
 
   '@changesets/write@0.3.2':
     resolution: {integrity: sha512-kDxDrPNpUgsjDbWBvUo27PzKX4gqeKOlhibaOXDJA6kuBisGqNHv/HwGJrAu8U/dSf8ZEFIeHIPtvSlZI1kULw==}
-
-  '@commet/node@0.11.0':
-    resolution: {integrity: sha512-gPUG9JwMbXcSDbED2eBknVHWwnqSFunKm5guzhZEm0JIdrdsbsJxPJWbZZTWmpqHwgpoGjPgsoT6eDgv7BTFdA==}
-    engines: {node: '>=18.0.0'}
-    peerDependencies:
-      typescript: '>=5.0.0'
 
   '@emnapi/runtime@1.6.0':
     resolution: {integrity: sha512-obtUmAHTMjll499P+D9A3axeJFlhdjOWdKUNs/U6QIGT7V5RjcUW1xToAzjvmgTSQhDbYn/NwfTRoJcQ2rNBxA==}
@@ -4983,11 +4977,6 @@ snapshots:
       fs-extra: 7.0.1
       human-id: 1.0.2
       prettier: 2.8.8
-
-  '@commet/node@0.11.0(typescript@5.9.3)':
-    dependencies:
-      typescript: 5.9.3
-      zod: 4.1.12
 
   '@emnapi/runtime@1.6.0':
     dependencies:
