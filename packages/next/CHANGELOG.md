@@ -1,5 +1,13 @@
 # @commet/next
 
+## 0.2.0
+
+### Minor Changes
+
+- 1ccbb54: Add CustomerPortal adapter for Next.js
+
+  New CustomerPortal helper creates route handlers for customer portal access with a single function call. Eliminates boilerplate for portal session creation and redirects.
+
 ## 0.1.1
 
 ### Patch Changes
