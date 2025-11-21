@@ -73,7 +73,8 @@ export const CustomerPortal = ({
       // Redirect to customer portal
       return NextResponse.redirect(result.data.portalUrl);
     } catch (error) {
-      const errorObj = error instanceof Error ? error : new Error(String(error));
+      const errorObj =
+        error instanceof Error ? error : new Error(String(error));
 
       // Call custom error handler if provided
       onError?.(errorObj);
@@ -89,4 +90,3 @@ export const CustomerPortal = ({
     }
   };
 };
-
