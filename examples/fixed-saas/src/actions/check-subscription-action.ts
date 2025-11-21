@@ -11,7 +11,7 @@ export interface SubscriptionStatus {
 
 /**
  * Check if user has an active subscription with Commet
- * This is a workaround until webhooks are implemented
+ * Used to verify subscription status on page load
  */
 export async function checkSubscriptionStatus(): Promise<SubscriptionStatus> {
   try {

@@ -304,7 +304,7 @@ export default async function DashboardPage({
                 <li>Automatic Commet customer creation</li>
                 <li>Subscription management with the Commet SDK</li>
                 <li>Protected routes based on subscription status</li>
-                <li>Webhook handling for payment events (when implemented)</li>
+                <li>Webhook handling for payment events</li>
               </ul>
             </CardContent>
           </Card>

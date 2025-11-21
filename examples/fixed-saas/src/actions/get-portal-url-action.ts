@@ -29,18 +29,17 @@ export async function getPortalUrl(): Promise<{
       externalId: userId,
     });
 
-    if (!result.success || !result.data) {
-      return {
-        success: false,
-        error: result.error || "Failed to generate portal URL",
-      };
-    }
-
-    console.log("result", result);
+  if (!result.success || !result.data) {
     return {
-      success: true,
-      url: result.data.portalUrl,
+      success: false,
+      error: result.error || "Failed to generate portal URL",
     };
+  }
+
+  return {
+    success: true,
+    url: result.data.portalUrl,
+  };
   } catch (error) {
     console.error("Error requesting portal access:", error);
     return {
