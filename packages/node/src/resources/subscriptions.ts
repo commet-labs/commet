@@ -1,11 +1,6 @@
-import type {
-  ApiResponse,
-  ListParams,
-  RequestOptions,
-  RetrieveOptions,
-} from "../types/common";
+import type { ApiResponse, ListParams, RequestOptions } from "../types/common";
 import type { CommetHTTPClient } from "../utils/http";
-import type { BillingInterval, PlanID } from "./plans";
+import type { BillingInterval } from "./plans";
 
 export type SubscriptionStatus =
   | "draft"
@@ -17,40 +12,6 @@ export type SubscriptionStatus =
   | "canceled"
   | "expired";
 
-export interface Subscription {
-  id: string; // publicId (e.g., "sub_xxx")
-  customerId: string;
-  externalId?: string;
-  planId: string;
-  planName: string;
-  name: string;
-  description?: string;
-  status: SubscriptionStatus;
-  billingInterval: BillingInterval;
-  trialEndsAt?: string; // ISO datetime
-  startDate: string; // ISO datetime
-  endDate?: string; // ISO datetime
-  currentPeriodStart?: string; // ISO datetime
-  currentPeriodEnd?: string; // ISO datetime
-  billingDayOfMonth: number; // 1-31
-  checkoutUrl?: string; // Stripe checkout URL for pending payment
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface SubscriptionWithPlan extends Subscription {
-  plan: {
-    id: string;
-    name: string;
-    price: number;
-    billingInterval: BillingInterval;
-  };
-  currentPeriod: {
-    start: string;
-    end: string;
-  };
-}
-
 export interface FeatureSummary {
   code: string;
   name: string;
@@ -60,30 +21,54 @@ export interface FeatureSummary {
     current: number;
     included: number;
     overage: number;
-    estimatedCost: number;
   };
 }
 
-export interface SubscriptionSummary {
-  subscription: {
-    id: string;
-    status: SubscriptionStatus;
-    trialEndsAt?: string;
-  };
+export interface ActiveSubscription {
+  id: string;
+  customerId: string;
   plan: {
     id: string;
     name: string;
     basePrice: number;
     billingInterval: BillingInterval;
   };
+  name: string;
+  description?: string;
+  status: SubscriptionStatus;
+  trialEndsAt?: string;
   currentPeriod: {
     start: string;
     end: string;
     daysRemaining: number;
   };
   features: FeatureSummary[];
-  estimatedTotal: number;
+  startDate: string;
+  endDate?: string;
+  billingDayOfMonth: number;
   nextBillingDate: string;
+  checkoutUrl?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Subscription {
+  id: string;
+  customerId: string;
+  planId: string;
+  planName: string;
+  name: string;
+  description?: string;
+  status: SubscriptionStatus;
+  billingInterval: BillingInterval;
+  trialEndsAt?: string;
+  startDate: string;
+  endDate?: string;
+  currentPeriodStart?: string;
+  currentPeriodEnd?: string;
+  billingDayOfMonth: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 // Customer identifier: mutually exclusive customerId or externalId
@@ -136,19 +121,11 @@ export class SubscriptionsResource {
    *
    * @example
    * ```typescript
-   * // Subscribe to a plan
    * await commet.subscriptions.create({
    *   externalId: 'user_123',
    *   planId: 'plan_pro',
    *   billingInterval: 'yearly',
    *   initialSeats: { editor: 5 }
-   * });
-   *
-   * // Skip trial period
-   * await commet.subscriptions.create({
-   *   customerId: 'cus_xxx',
-   *   planId: 'plan_enterprise',
-   *   skipTrial: true
    * });
    * ```
    */
@@ -160,46 +137,40 @@ export class SubscriptionsResource {
   }
 
   /**
-   * Get the active subscription for a customer
+   * Get the active subscription for a customer (includes summary)
    *
-   * Since each customer can only have one active subscription,
-   * this returns that subscription or null if none exists.
+   * Returns the subscription with plan info, current period, and feature usage.
+   * Since each customer can only have one active subscription, this returns
+   * that subscription or null if none exists.
    *
    * @example
    * ```typescript
    * const sub = await commet.subscriptions.get({ externalId: 'user_123' });
    * if (sub.data) {
-   *   console.log('Current plan:', sub.data.plan.name);
+   *   console.log('Plan:', sub.data.plan.name);
+   *   console.log('Days remaining:', sub.data.currentPeriod.daysRemaining);
+   *   for (const feature of sub.data.features) {
+   *     if (feature.usage) {
+   *       console.log(`${feature.name}: ${feature.usage.current}/${feature.usage.included}`);
+   *     }
+   *   }
    * }
    * ```
    */
   async get(
     params: GetSubscriptionParams,
-  ): Promise<ApiResponse<SubscriptionWithPlan | null>> {
+  ): Promise<ApiResponse<ActiveSubscription | null>> {
     return this.httpClient.get("/subscriptions/active", params);
   }
 
   /**
-   * Retrieve a subscription by ID
-   */
-  async retrieve(
-    subscriptionId: string,
-    options?: RetrieveOptions,
-  ): Promise<ApiResponse<Subscription>> {
-    const params = options?.expand
-      ? { expand: options.expand.join(",") }
-      : undefined;
-    return this.httpClient.get(`/subscriptions/${subscriptionId}`, params);
-  }
-
-  /**
-   * List subscriptions with optional filters
+   * List subscriptions (includes canceled/expired for history)
    *
    * @example
    * ```typescript
-   * // List all subscriptions for a customer
-   * await commet.subscriptions.list({
-   *   externalId: 'user_123'
+   * const history = await commet.subscriptions.list({
+   *   externalId: 'user_123',
+   *   status: 'canceled'
    * });
    * ```
    */
@@ -214,10 +185,8 @@ export class SubscriptionsResource {
    *
    * @example
    * ```typescript
-   * // Upgrade to enterprise plan
    * await commet.subscriptions.changePlan('sub_xxx', {
    *   planId: 'plan_enterprise',
-   *   billingInterval: 'yearly',
    *   prorate: true
    * });
    * ```
@@ -271,24 +240,6 @@ export class SubscriptionsResource {
       {},
       options,
     );
-  }
-
-  /**
-   * Get a summary of the current billing period
-   *
-   * Returns usage, seat counts, and estimated total for the current period.
-   *
-   * @example
-   * ```typescript
-   * const summary = await commet.subscriptions.getSummary('sub_xxx');
-   * console.log('Estimated total:', summary.data.estimatedTotal);
-   * console.log('Days remaining:', summary.data.currentPeriod.daysRemaining);
-   * ```
-   */
-  async getSummary(
-    subscriptionId: string,
-  ): Promise<ApiResponse<SubscriptionSummary>> {
-    return this.httpClient.get(`/subscriptions/${subscriptionId}/summary`);
   }
 
   /**

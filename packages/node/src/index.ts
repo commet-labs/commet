@@ -82,8 +82,7 @@ export type {
 
 export type {
   Subscription,
-  SubscriptionWithPlan,
-  SubscriptionSummary,
+  ActiveSubscription,
   SubscriptionStatus,
   FeatureSummary,
   CreateSubscriptionParams,

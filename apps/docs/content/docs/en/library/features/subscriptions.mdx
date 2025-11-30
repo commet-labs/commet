@@ -3,13 +3,7 @@ title: Subscriptions
 description: Manage subscriptions with the plan-first model
 ---
 
-import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
 import { Callout } from 'fumadocs-ui/components/callout'
-
-<Callout type="info">
-**Plan-First Model:** Each customer can only have ONE active subscription at a time.
-This simplifies billing and makes it easy to know exactly what plan a customer is on.
-</Callout>
 
 ## Create Subscription
 
@@ -17,13 +11,11 @@ Subscribe a customer to a plan:
 
 ```typescript
 const subscription = await commet.subscriptions.create({
-  externalId: 'user_123',  // Your user ID
+  externalId: 'user_123',
   planId: 'plan_pro',
-  billingInterval: 'yearly',  // optional, defaults to plan's default
-  initialSeats: { editor: 5 }  // optional
+  billingInterval: 'yearly',
+  initialSeats: { editor: 5 }
 })
-
-console.log('Subscription created:', subscription.data.id)
 ```
 
 ### Options
@@ -36,11 +28,11 @@ console.log('Subscription created:', subscription.data.id)
 | `initialSeats` | object | Initial seat counts by type |
 | `skipTrial` | boolean | Skip the trial period if plan has one |
 | `startDate` | string | ISO date for future-dated subscription |
-| `name` | string | Custom subscription name |
 
-## Get Active Subscription
 
-Since each customer has only one active subscription:
+## Get Subscription
+
+Each customer has only one active subscription. This returns it with full summary:
 
 ```typescript
 const sub = await commet.subscriptions.get({
@@ -48,33 +40,35 @@ const sub = await commet.subscriptions.get({
 })
 
 if (sub.data) {
-  console.log('Current plan:', sub.data.plan.name)
+  console.log('Plan:', sub.data.plan.name)
   console.log('Status:', sub.data.status)
-} else {
-  console.log('No active subscription')
+  console.log('Days remaining:', sub.data.currentPeriod.daysRemaining)
+  
+  // Check feature usage
+  for (const feature of sub.data.features) {
+    if (feature.usage) {
+      console.log(`${feature.name}: ${feature.usage.current}/${feature.usage.included}`)
+    }
+  }
 }
 ```
 
 ## Change Plan
 
-Upgrade or downgrade a subscription:
+Upgrade or downgrade:
 
 ```typescript
 await commet.subscriptions.changePlan('sub_xxx', {
   planId: 'plan_enterprise',
-  billingInterval: 'yearly',
-  prorate: true  // Calculate credits/charges for partial period
+  prorate: true
 })
 ```
 
-<Callout type="success">
-**Proration:** When `prorate: true`, Commet calculates the credit for unused time
-on the old plan and the charge for the remaining time on the new plan.
+<Callout type="info">
+When `prorate: true`, Commet calculates the credit for unused time on the old plan and the charge for the remaining time on the new plan.
 </Callout>
 
 ## Pause and Resume
-
-Temporarily pause a subscription:
 
 ```typescript
 // Pause
@@ -82,35 +76,11 @@ await commet.subscriptions.pause('sub_xxx', {
   reason: 'seasonal'
 })
 
-// Resume later
+// Resume
 await commet.subscriptions.resume('sub_xxx')
 ```
 
-<Callout type="info">
-Paused subscriptions don't generate invoices. Usage and seat events are still tracked.
-</Callout>
-
-## Get Billing Summary
-
-View the current period's usage, seats, and estimated total:
-
-```typescript
-const summary = await commet.subscriptions.getSummary('sub_xxx')
-
-console.log('Plan:', summary.data.plan.name)
-console.log('Base price:', summary.data.plan.basePrice)
-console.log('Estimated total:', summary.data.estimatedTotal)
-console.log('Days remaining:', summary.data.currentPeriod.daysRemaining)
-
-// Check feature usage
-for (const feature of summary.data.features) {
-  if (feature.usage) {
-    console.log(`${feature.name}: ${feature.usage.current}/${feature.usage.included}`)
-  }
-}
-```
-
-## Cancel Subscription
+## Cancel
 
 ```typescript
 await commet.subscriptions.cancel('sub_xxx', {
@@ -124,7 +94,7 @@ await commet.subscriptions.cancel('sub_xxx', {
 |--------|-------------|
 | `draft` | Created but not activated |
 | `pending_payment` | Waiting for first payment |
-| `trialing` | In trial period (if plan has trial) |
+| `trialing` | In trial period |
 | `active` | Active and billing normally |
 | `paused` | Temporarily paused |
 | `past_due` | Payment failed, grace period |
@@ -136,33 +106,26 @@ await commet.subscriptions.cancel('sub_xxx', {
 If a plan has trial days configured, new subscriptions start in `trialing` status:
 
 ```typescript
-// Plan with 14-day trial
 const subscription = await commet.subscriptions.create({
   externalId: 'user_123',
   planId: 'plan_with_trial'
 })
 
 console.log(subscription.data.status)  // "trialing"
-console.log(subscription.data.trialEndsAt)  // ISO date
+console.log(subscription.data.trialEndsAt)
 
 // Skip trial if needed
-const noTrial = await commet.subscriptions.create({
+await commet.subscriptions.create({
   externalId: 'user_456',
   planId: 'plan_with_trial',
   skipTrial: true
 })
 ```
 
-## List Subscriptions
+## List Subscription History
 
 ```typescript
-// List all subscriptions for a customer
-const subscriptions = await commet.subscriptions.list({
-  externalId: 'user_123'
-})
-
-// Filter by status
-const canceled = await commet.subscriptions.list({
+const history = await commet.subscriptions.list({
   externalId: 'user_123',
   status: 'canceled'
 })
@@ -182,7 +145,6 @@ const commet = new Commet({
 const sub = await commet.subscriptions.create({
   externalId: 'user_123',
   planId: 'plan_pro',
-  billingInterval: 'yearly',
   initialSeats: { editor: 5 }
 })
 
@@ -200,9 +162,9 @@ await commet.seats.add({
   count: 3
 })
 
-// 4. Check summary
-const summary = await commet.subscriptions.getSummary(sub.data.id)
-console.log('Estimated total:', summary.data.estimatedTotal)
+// 4. Check current status (includes summary)
+const current = await commet.subscriptions.get({ externalId: 'user_123' })
+console.log('Days remaining:', current.data?.currentPeriod.daysRemaining)
 
 // 5. Upgrade plan
 await commet.subscriptions.changePlan(sub.data.id, {
@@ -216,4 +178,3 @@ await commet.subscriptions.changePlan(sub.data.id, {
 - [Plans](/docs/library/features/plans) - List available plans
 - [Usage Events](/docs/library/features/usage-events) - Track consumption
 - [Seat Management](/docs/library/features/seat-management) - Manage licenses
-- [Portal Access](/docs/library/features/portal-access) - Customer self-service
