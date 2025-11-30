@@ -1,4 +1,5 @@
 import { CustomersResource } from "./resources/customers";
+import { PlansResource } from "./resources/plans";
 import { PortalResource } from "./resources/portal";
 import { SeatsResource } from "./resources/seats";
 import { SubscriptionsResource } from "./resources/subscriptions";
@@ -15,6 +16,7 @@ export class Commet {
   private environment: Environment;
 
   public readonly customers: CustomersResource;
+  public readonly plans: PlansResource;
   public readonly usage: UsageResource;
   public readonly seats: SeatsResource;
   public readonly subscriptions: SubscriptionsResource;
@@ -37,6 +39,7 @@ export class Commet {
 
     this.httpClient = new CommetHTTPClient(config, this.environment);
     this.customers = new CustomersResource(this.httpClient);
+    this.plans = new PlansResource(this.httpClient);
     this.usage = new UsageResource(this.httpClient);
     this.seats = new SeatsResource(this.httpClient);
     this.subscriptions = new SubscriptionsResource(this.httpClient);

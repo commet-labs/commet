@@ -1,0 +1,219 @@
+---
+title: Plans
+description: List and retrieve available pricing plans
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+<Callout type="info">
+**Plan-First Model:** Plans are the core of Commet's billing. Each plan defines
+a pricing template with features, limits, and prices for different billing intervals.
+</Callout>
+
+## List Plans
+
+Get all available plans for your organization:
+
+```typescript
+const plans = await commet.plans.list()
+
+for (const plan of plans.data) {
+  console.log(`${plan.name}: $${plan.prices[0].price / 100}/month`)
+}
+```
+
+### Include Private Plans
+
+By default, only public plans are returned. Include private plans with:
+
+```typescript
+const allPlans = await commet.plans.list({
+  includePrivate: true
+})
+```
+
+## Retrieve Plan Details
+
+Get detailed information about a specific plan:
+
+```typescript
+const plan = await commet.plans.retrieve('plan_pro')
+
+console.log('Plan:', plan.data.name)
+console.log('Description:', plan.data.description)
+console.log('Trial days:', plan.data.trialDays)
+
+// Prices by interval
+for (const price of plan.data.prices) {
+  console.log(`${price.billingInterval}: $${price.price / 100}`)
+}
+
+// Features included
+for (const feature of plan.data.features) {
+  if (feature.type === 'boolean') {
+    console.log(`${feature.name}: ${feature.enabled ? 'Yes' : 'No'}`)
+  } else {
+    console.log(`${feature.name}: ${feature.includedAmount} included`)
+  }
+}
+```
+
+## Plan Structure
+
+### Basic Info
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Plan ID (e.g., `plan_xxx`) |
+| `name` | string | Display name |
+| `description` | string | Description |
+| `isPublic` | boolean | Visible on pricing page |
+| `isDefault` | boolean | Default plan for new signups |
+| `trialDays` | number | Free trial period (0 = no trial) |
+| `sortOrder` | number | Display order |
+
+### Prices
+
+Each plan can have multiple prices for different billing intervals:
+
+```typescript
+interface PlanPrice {
+  billingInterval: 'monthly' | 'quarterly' | 'yearly'
+  price: number  // in cents (e.g., 9900 = $99)
+  isDefault: boolean
+}
+```
+
+**Example:**
+
+```typescript
+// Pro plan with monthly and yearly options
+{
+  name: 'Pro',
+  prices: [
+    { billingInterval: 'monthly', price: 9900, isDefault: true },
+    { billingInterval: 'yearly', price: 94800, isDefault: false }  // 20% discount
+  ]
+}
+```
+
+### Features
+
+Plans include features with different configurations:
+
+```typescript
+interface PlanFeature {
+  code: string        // e.g., 'api_calls'
+  name: string        // e.g., 'API Calls'
+  type: 'boolean' | 'metered' | 'seats'
+  enabled?: boolean   // For boolean features
+  includedAmount?: number  // For metered/seats
+  unlimited?: boolean
+  overageEnabled?: boolean
+  overageUnitPrice?: number  // Price per extra unit in cents
+}
+```
+
+**Feature Types:**
+
+| Type | Description | Example |
+|------|-------------|---------|
+| `boolean` | On/off access | Custom branding, SSO |
+| `metered` | Usage-based | API calls, storage GB |
+| `seats` | Per-user licenses | Team members, editors |
+
+## Use Cases
+
+### Pricing Page
+
+Display available plans with pricing:
+
+```typescript
+const plans = await commet.plans.list()
+
+// Group by billing interval for toggle
+const monthlyPrices = plans.data.map(plan => ({
+  name: plan.name,
+  price: plan.prices.find(p => p.billingInterval === 'monthly')?.price ?? 0
+}))
+
+const yearlyPrices = plans.data.map(plan => ({
+  name: plan.name,
+  price: plan.prices.find(p => p.billingInterval === 'yearly')?.price ?? 0
+}))
+```
+
+### Feature Comparison
+
+Show what's included in each plan:
+
+```typescript
+const plans = await commet.plans.list()
+
+for (const plan of plans.data) {
+  console.log(`\n${plan.name}:`)
+  for (const feature of plan.features) {
+    if (feature.type === 'boolean') {
+      console.log(`  ${feature.enabled ? '✓' : '✗'} ${feature.name}`)
+    } else if (feature.unlimited) {
+      console.log(`  ∞ ${feature.name}`)
+    } else {
+      console.log(`  ${feature.includedAmount} ${feature.name}`)
+    }
+  }
+}
+```
+
+### Upgrade Options
+
+Show plans the customer can upgrade to:
+
+```typescript
+// Get current subscription
+const sub = await commet.subscriptions.get({ externalId: 'user_123' })
+const currentPlanId = sub.data?.plan.id
+
+// Get available plans
+const plans = await commet.plans.list()
+
+// Filter to show upgrade options
+const upgradeOptions = plans.data.filter(plan => {
+  // Only show plans with higher sort order (tier)
+  const currentPlan = plans.data.find(p => p.id === currentPlanId)
+  return plan.sortOrder > (currentPlan?.sortOrder ?? 0)
+})
+```
+
+## Complete Example
+
+```typescript
+import { Commet } from '@commet/node'
+
+const commet = new Commet({
+  apiKey: process.env.COMMET_API_KEY!,
+  environment: 'sandbox'
+})
+
+// 1. List all plans
+const plans = await commet.plans.list()
+console.log(`Found ${plans.data.length} plans`)
+
+// 2. Get detailed info for Pro plan
+const proPlan = await commet.plans.retrieve('plan_pro')
+console.log(`Pro plan: $${proPlan.data.prices[0].price / 100}/month`)
+console.log(`Trial: ${proPlan.data.trialDays} days`)
+
+// 3. Subscribe customer to plan
+await commet.subscriptions.create({
+  externalId: 'user_123',
+  planId: proPlan.data.id,
+  billingInterval: 'yearly'
+})
+```
+
+## Related Resources
+
+- [Subscriptions](/docs/library/features/subscriptions) - Subscribe customers to plans
+- [Usage Events](/docs/library/features/usage-events) - Track metered feature usage
+- [Seat Management](/docs/library/features/seat-management) - Manage seat-based features
+

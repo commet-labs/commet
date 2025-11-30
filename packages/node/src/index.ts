@@ -50,6 +50,9 @@ export type {
   CreateBatchUsageEventsParams,
   BatchResult,
   ListUsageEventsParams,
+  TrackUsageParams,
+  UsageSummary,
+  GetUsageSummaryParams,
 } from "./resources/usage";
 
 export type {
@@ -67,10 +70,28 @@ export type {
 } from "./resources/seats";
 
 export type {
+  Plan,
+  PlanDetail,
+  PlanPrice,
+  PlanFeature,
+  PlanID,
+  BillingInterval,
+  FeatureType,
+  ListPlansParams,
+} from "./resources/plans";
+
+export type {
   Subscription,
-  SubscriptionItem,
+  SubscriptionWithPlan,
+  SubscriptionSummary,
+  SubscriptionStatus,
+  FeatureSummary,
   CreateSubscriptionParams,
+  ChangePlanParams,
+  PauseParams,
+  CancelParams,
   ListSubscriptionsParams,
+  GetSubscriptionParams,
 } from "./resources/subscriptions";
 
 export type {

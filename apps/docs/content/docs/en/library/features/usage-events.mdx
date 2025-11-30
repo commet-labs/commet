@@ -14,80 +14,104 @@ Track customer usage for billing. Send events in real-time or batch them for hig
 **Prerequisites:** Initialize your Commet client with a valid API key.
 </Callout>
 
-## Create Event
+## Track Event
+
+Use `track()` to record usage events:
 
 ```typescript
-const result = await commet.usage.create({
+await commet.usage.track({
+  externalId: 'user_123',
   eventType: 'api_call',
-  customerId: 'cus_xxx',
-  idempotencyKey: `evt_${Date.now()}`,
+  idempotencyKey: `evt_${requestId}`,
+  properties: {
+    endpoint: '/api/users',
+    method: 'GET'
+  }
 })
 ```
+
+### Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `externalId` or `customerId` | string | Customer identifier (required) |
+| `eventType` | string | Type of event (e.g., `api_call`) |
+| `idempotencyKey` | string | Unique key to prevent duplicates |
+| `value` | number | Event value (optional, default: 1) |
+| `timestamp` | string | ISO timestamp (optional, defaults to now) |
+| `properties` | object | Additional context as key-value pairs |
 
 <Callout type="info">
-**Customer Identification**: Use `customerId` or `externalId` to identify customers.
+**Idempotency:** Always include an `idempotencyKey` to prevent duplicate events.
+The same key will be deduplicated within the same customer.
 </Callout>
-
-## Using External IDs
-
-```typescript
-const result = await commet.usage.create({
-  eventType: 'api_call',
-  externalId: 'stripe_cus_abc123',
-  idempotencyKey: `evt_${Date.now()}`,
-})
-```
-
-## Event Properties
-
-Add context to events:
-
-```typescript
-await commet.usage.create({
-  eventType: 'api_call',
-  customerId: 'cus_xxx',
-  idempotencyKey: `evt_${Date.now()}`,
-  properties: [
-    { property: 'endpoint', value: '/api/users' },
-    { property: 'method', value: 'GET' }
-  ]
-})
-```
 
 ## Batch Processing
 
 Send multiple events efficiently:
 
 ```typescript
-const result = await commet.usage.createBatch({
+await commet.usage.trackBatch({
   events: [
     {
+      externalId: 'user_123',
       eventType: 'api_call',
-      customerId: 'cus_xxx',
       idempotencyKey: `evt_${Date.now()}_1`,
+      properties: { endpoint: '/users' }
     },
     {
+      externalId: 'user_456',
       eventType: 'api_call',
-      externalId: 'stripe_cus_abc',
       idempotencyKey: `evt_${Date.now()}_2`,
+      properties: { endpoint: '/orders' }
     }
   ]
 })
 ```
 
+<Callout type="success">
+**Batch Performance:** Batch events for high-volume scenarios. 
+The SDK handles automatic retries and error handling.
+</Callout>
+
+## Event Properties
+
+Add context to events for filtering and aggregation:
+
+```typescript
+await commet.usage.track({
+  externalId: 'user_123',
+  eventType: 'compute',
+  idempotencyKey: `compute_${jobId}`,
+  value: 3600,  // seconds of compute time
+  properties: {
+    region: 'us-east-1',
+    instance_type: 'c5.xlarge',
+    job_id: jobId
+  }
+})
+```
+
+Properties can be used to:
+- Filter events in metrics (e.g., only count `region=us-east-1`)
+- Group events for reporting
+- Add audit context
+
 ## List Events
 
 ```typescript
 const events = await commet.usage.list({
-  customerId: 'cus_xxx',
+  externalId: 'user_123',
   eventType: 'api_call',
   limit: 100
 })
 
+console.log(`Found ${events.data.length} events`)
+
 // Pagination
 if (events.hasMore) {
   const nextPage = await commet.usage.list({
-    customerId: 'cus_xxx',
+    externalId: 'user_123',
     cursor: events.nextCursor
   })
 }
@@ -97,15 +121,64 @@ if (events.hasMore) {
 
 ```typescript
 const event = await commet.usage.retrieve('evt_xxx')
+console.log('Event type:', event.data.eventType)
+console.log('Timestamp:', event.data.ts)
 ```
 
 ## Delete Event
+
+Soft-delete an event (won't be counted in billing):
 
 ```typescript
 await commet.usage.delete('evt_xxx')
 ```
 
+## Complete Example
+
+```typescript
+import { Commet } from '@commet/node'
+
+const commet = new Commet({
+  apiKey: process.env.COMMET_API_KEY!,
+  environment: 'sandbox'
+})
+
+// Track API call with context
+await commet.usage.track({
+  externalId: 'user_123',
+  eventType: 'api_call',
+  idempotencyKey: `req_${crypto.randomUUID()}`,
+  properties: {
+    endpoint: '/api/users',
+    method: 'POST',
+    status: '201'
+  }
+})
+
+// Track compute usage
+await commet.usage.track({
+  externalId: 'user_123',
+  eventType: 'compute_seconds',
+  idempotencyKey: `job_${jobId}`,
+  value: 3600,
+  properties: {
+    region: 'us-east-1',
+    job_type: 'ml_training'
+  }
+})
+
+// Batch multiple events
+await commet.usage.trackBatch({
+  events: Array.from({ length: 100 }, (_, i) => ({
+    externalId: 'user_123',
+    eventType: 'api_call',
+    idempotencyKey: `batch_${Date.now()}_${i}`,
+  }))
+})
+```
+
 ## Related Resources
 
-- [Subscriptions](/docs/library/features/subscriptions) - Create recurring billing
+- [Plans](/docs/library/features/plans) - Configure metered features
+- [Subscriptions](/docs/library/features/subscriptions) - View usage summary
 - [Customers](/docs/library/features/customers) - Manage customer data
