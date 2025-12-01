@@ -1,0 +1,187 @@
+---
+title: Plans
+description: Create and manage pricing plans that automatically generate subscriptions when assigned to customers
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+import { Steps, Step } from 'fumadocs-ui/components/steps'
+
+# Plans
+
+Plans are pre-configured billing packages that combine pricing, features, and billing intervals. When you assign a Plan to a Customer, a Subscription is automatically created, making plan-based subscriptions the foundation of Commet's billing model.
+
+<Callout type="success">
+The Platform section is designed for go-to-market, finance, and operations teams. If you need implementation details, go to the [Developer Library](/docs/library/quickstart).
+</Callout>
+
+## Quick start example
+
+Here's how a typical SaaS company uses Plans:
+
+1. **Create Plans**: Define your pricing tiers (Starter, Pro, Enterprise) with prices and features
+2. **Assign Plan to Customer**: Select a customer and assign a plan—the subscription is created automatically
+3. **Automatic billing**: Once active, Commet automatically generates recurring invoices each billing period
+4. **Manage updates**: Change customer plans or update plan configurations as needed
+
+The billing engine handles the entire cycle: Plan creation → Plan assignment → Subscription creation → Checkout → Activation → Recurring billing.
+
+## Why plans matter
+
+- **Consistency**: Standardize pricing across all customers using the same plan
+- **Automatic subscriptions**: Assigning a plan to a customer automatically creates their subscription
+- **Easy updates**: Modify plan features or pricing and all future subscriptions use the updated plan
+- **Public or private**: Control which plans appear on your pricing page vs. internal-only plans
+- **Scalability**: Create once, assign to many customers without manual configuration
+
+## What are plans?
+
+Plans are templates that define everything a customer gets when they subscribe:
+
+| Component | Description | Example |
+| --- | --- | --- |
+| **Name & Description** | Display information for customers and your team | "Pro Plan" - "Best for growing teams" |
+| **Prices** | Multiple pricing options by billing interval | $99/month, $990/year (save 17%) |
+| **Features** | What's included in the plan | API calls, storage, seats, feature flags |
+| **Trial Days** | Optional free trial period | 14 days free trial |
+| **Public Visibility** | Whether plan appears on pricing page | Public or private |
+
+Think of Plans as product packages. Once you create a Plan, you can assign it to multiple customers, and each assignment automatically creates a Subscription linked to that plan.
+
+<Callout type="info">
+Learn more about how Features work within Plans in the [Features documentation](./features).
+</Callout>
+
+## How to create a plan
+
+<Steps>
+<Step>
+
+### Navigate to Plans
+
+Go to **Plans** in the platform navigation and click **Create Plan**.
+
+</Step>
+<Step>
+
+### Configure plan details
+
+Set up the basic plan information:
+
+- **Plan name**: Choose a clear, customer-facing name (e.g., "Starter", "Pro", "Enterprise")
+- **Description**: Add a brief description explaining the plan's value proposition
+- **Public or private**: 
+  - **Public**: Plan appears on your pricing page and can be selected by customers
+  - **Private**: Plan only visible internally (useful for custom enterprise deals)
+
+</Step>
+<Step>
+
+### Set pricing
+
+Add prices for different billing intervals:
+
+- **Monthly**: Recurring monthly billing
+- **Quarterly**: Recurring every 3 months (often with discount)
+- **Yearly**: Recurring annually (often with the best discount)
+
+For each billing interval:
+- Enter the price amount
+- Set one as the default (shown first when customers view plans)
+
+<Callout type="info">
+**Pricing strategy**: Many companies offer discounts for longer commitments. For example: $99/month, $270/quarter (save 9%), $990/year (save 17%). This encourages annual subscriptions while maintaining flexibility.
+</Callout>
+
+</Step>
+<Step>
+
+### Add features
+
+Configure what's included in the plan by adding features. Features define what customers can access:
+
+- **Boolean features**: On/off capabilities (e.g., SSO enabled, custom branding)
+- **Metered features**: Usage-based limits (e.g., 10,000 API calls included, then $0.01 per call)
+- **Seat features**: Per-user licenses (e.g., 5 editor seats included, $10 per additional seat)
+
+You can add multiple features of each type to a plan. For detailed information about configuring features, see the [Features documentation](./features).
+
+</Step>
+<Step>
+
+### Configure trial period (optional)
+
+If you want to offer a free trial:
+
+- Set the number of trial days (e.g., 14 days)
+- Subscriptions created with this plan will start in "Trialing" status
+- Customers won't be charged until the trial period ends
+
+</Step>
+<Step>
+
+### Save and publish
+
+Once configured, save your plan. If it's marked as public, it will appear on your pricing page. If it's private, only your team can assign it to customers.
+
+</Step>
+</Steps>
+
+## Plan structure
+
+### Basic information
+
+| Field | Description | Example |
+| --- | --- | --- |
+| **Name** | Display name for the plan | "Pro Plan" |
+| **Description** | Brief explanation of plan value | "Best for growing teams" |
+| **Code** | Internal identifier (auto-generated) | "pro" |
+| **Public** | Whether plan appears on pricing page | Yes/No |
+| **Sort Order** | Display order on pricing page | 1, 2, 3... |
+
+### Pricing
+
+Each plan can have multiple prices for different billing intervals:
+
+| Billing Interval | Description | Typical Use |
+| --- | --- | --- |
+| **Monthly** | Recurring monthly billing | Default option, highest flexibility |
+| **Quarterly** | Recurring every 3 months | Small discount, quarterly commitment |
+| **Yearly** | Recurring annually | Best discount, annual commitment |
+
+When a customer is assigned a plan, they select which billing interval they want. The subscription will use this interval for all future billing cycles.
+
+### Trial configuration
+
+| Setting | Description | Example |
+| --- | --- | --- |
+| **Trial Days** | Number of free days before billing starts | 0 (no trial) to 365 |
+| **Trial Behavior** | How trial affects subscription status | Subscription starts in "Trialing" status |
+
+If a plan has trial days configured, all subscriptions created with that plan will automatically start in trial mode.
+
+## How plans connect to subscriptions
+
+When you assign a Plan to a Customer:
+
+1. **Subscription is created automatically** — No manual subscription creation needed
+2. **Plan configuration is copied** — Subscription inherits all plan settings (pricing, features, trial)
+3. **Billing interval is set** — Customer selects monthly, quarterly, or yearly at assignment
+4. **Status is determined** — Subscription starts in the appropriate status:
+   - **Trialing**: If plan has trial days
+   - **Pending payment**: If payment is required
+   - **Active**: If no payment or trial needed
+
+Once assigned, the subscription is independent—changes to the plan don't affect existing subscriptions, only new assignments.
+
+<Callout type="info">
+For detailed information about managing subscriptions created from plans, see the [Subscriptions documentation](../subscriptions/subscriptions-overview).
+</Callout>
+
+
+## Related Resources
+
+- [Features](./features) - Understand how features work within plans
+- [Subscriptions](../subscriptions/subscriptions-overview) - Learn how subscriptions are automatically created from plans
+- [Usage Metrics](../usage-metrics/metrics) - Track consumption for metered features
+- [Seat Management](../seats/seats-overview) - Manage seat-based features
+

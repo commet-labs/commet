@@ -4,10 +4,11 @@ description: Gestiona el ciclo de vida completo de las suscripciones de tus clie
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout'
+import { Steps, Step } from 'fumadocs-ui/components/steps'
 
 # Gestión de Suscripciones
 
-Las suscripciones son el corazón de Commet. Definen cómo y cuánto cobrar a tus clientes de manera recurrente, conectando productos, clientes y acuerdos en un flujo automatizado de facturación.
+Las suscripciones se crean automáticamente cuando asignas un Plan a un Cliente. Conectan planes, clientes y ciclos de facturación en un flujo automatizado que maneja facturación recurrente, acceso a características y rastreo de uso.
 
 <Callout type="success">
 La sección de Plataforma está diseñada para equipos de go-to-market, finanzas y operaciones. Si necesitas detalles de implementación, ve a la [Librería de Desarrolladores](/docs/library/quickstart).
@@ -15,76 +16,161 @@ La sección de Plataforma está diseñada para equipos de go-to-market, finanzas
 
 ## Ejemplo de inicio rápido
 
-Así es como una empresa SaaS típica crea y gestiona suscripciones:
+Así es como funcionan las suscripciones con el modelo plan-first de Commet:
 
-1. **Crear un cliente**: Registra la información del cliente con su correo de facturación
-2. **Seleccionar productos**: Elige productos y variantes de precio del catálogo
-3. **Iniciar suscripción**: Genera el checkout y envía el link de pago al cliente
-4. **Facturación automática**: Una vez activa, Commet genera facturas recurrentes automáticamente
+1. **Crear Planes**: Define tus niveles de precios (Starter, Pro, Enterprise) con características y precios
+2. **Asignar Plan a Cliente**: Selecciona un cliente y asigna un plan—la suscripción se crea automáticamente
+3. **Facturación automática**: Una vez activa, Commet genera automáticamente facturas recurrentes en cada período de facturación
+4. **Gestionar ciclo de vida**: Actualiza, degrada o cancela suscripciones según cambien las necesidades del cliente
 
-El motor de facturación maneja todo el ciclo: creación → checkout → activación → facturación recurrente.
+El motor de facturación maneja todo el ciclo: Asignación de Plan → Creación de Suscripción → Checkout → Activación → Facturación recurrente.
 
 ## Por qué importan las suscripciones
 
 - **Facturación recurrente automatizada**: Una vez activa, las suscripciones generan facturas automáticamente cada período sin intervención manual
-- **Control total del ciclo de vida**: Gestiona estados, fechas de inicio, cancelaciones y renovaciones desde un solo lugar
+- **Control total del ciclo de vida**: Gestiona estados, cancelaciones y renovaciones desde un solo lugar
 - **Visibilidad completa**: Accede a historial de facturas, pagos y detalles del cliente en tiempo real
-- **Flexibilidad operativa**: Crea suscripciones como borrador para revisión, programa fechas futuras o activa inmediatamente
+- **Simplicidad basada en planes**: Las suscripciones heredan toda la configuración de los planes, facilitando la gestión
+- **Creación automática**: No se necesita configuración manual de suscripción—solo asigna un plan a un cliente
 
-## Ciclo de vida de una suscripción
+## Modelo de suscripción plan-first
+
+En Commet, las suscripciones no se crean manualmente desde la interfaz de la plataforma. En su lugar, se crean automáticamente cuando asignas un Plan a un Cliente.
+
+### Cómo funciona
+
+<Steps>
+<Step>
+
+**Crea tus Planes** con todos los precios, características e intervalos de facturación configurados
+
+</Step>
+<Step>
+
+**Asigna un Plan a un Cliente** — esto crea automáticamente una Suscripción
+
+</Step>
+<Step>
+
+**La Suscripción comienza** en el estado apropiado basado en la configuración de pago y prueba
+
+</Step>
+</Steps>
+
+Este enfoque plan-first asegura:
+- **Consistencia**: Todos los clientes en el mismo plan obtienen la misma configuración
+- **Simplicidad**: No es necesario configurar manualmente cada suscripción
+- **Escalabilidad**: Gestiona fácilmente cientos o miles de suscripciones
+- **Actualizaciones**: Modifica planes y las futuras asignaciones usan la configuración actualizada
+
+<Callout type="info">
+Aprende más sobre cómo crear y gestionar Planes en la [documentación de Planes](../plans-and-features/plans).
+</Callout>
+
+## Cómo se crean las suscripciones
+
+<Steps>
+<Step>
+
+### Seleccionar o crear cliente
+
+Navega a **Clientes** en la plataforma y selecciona el cliente al que quieres asignar un plan. Si el cliente aún no existe, puedes crearlo directamente desde la sección de gestión de clientes.
+
+<Callout type="warning">
+**Importante**: El correo del cliente se usa como dirección de envío para el link de pago y no puede modificarse en el checkout. Asegúrate de usar el correo correcto desde el inicio.
+</Callout>
+
+</Step>
+<Step>
+
+### Asignar un plan
+
+Desde la página de detalles del cliente, haz clic en **Asignar Plan** o **Cambiar Plan**. Verás todos los planes disponibles:
+
+- **Planes públicos**: Planes visibles en tu página de precios
+- **Planes privados**: Planes internos no mostrados públicamente (útiles para acuerdos empresariales)
+
+Selecciona el plan que quieres asignar. También puedes elegir:
+- **Intervalo de facturación**: Mensual, trimestral o anual (si el plan soporta múltiples intervalos)
+- **Asientos iniciales**: Para planes con características basadas en asientos, establece el conteo inicial de asientos
+- **Omitir prueba**: Opcionalmente omite el período de prueba si el plan tiene uno configurado
+
+</Step>
+<Step>
+
+### La suscripción se crea automáticamente
+
+Cuando confirmas la asignación del plan, Commet automáticamente:
+- Crea una Suscripción para el cliente
+- Vincula la suscripción al plan seleccionado
+- Establece el intervalo de facturación y la configuración inicial
+- Genera un link de checkout si se requiere pago
+
+El estado de la suscripción depende de la configuración del plan:
+- **En Prueba**: Si el plan tiene días de prueba configurados
+- **Pago Pendiente**: Si se requiere pago para activar
+- **Activa**: Si no se necesita pago o prueba
+
+</Step>
+</Steps>
+
+## Ciclo de vida de la suscripción
 
 Las suscripciones pasan por diferentes estados durante su vida útil:
 
 | Estado | Descripción | Cuándo ocurre |
 | --- | --- | --- |
-`Borrador` |Suscripción creada pero no iniciada | Cuando creas una suscripción para revisión antes de enviar al cliente
-| `Pendiente de pago` | Cliente recibió el checkout pero no completó el pago | Inmediatamente después de iniciar la suscripción |
-| `Cancelada` (Checkout expirado) | El cliente no completó el pago en 24 horas | Automáticamente después de 24 horas sin pago |
-| `Activa` | Cliente completó el pago y la suscripción está facturando | Después del primer pago exitoso |
-
-## Cómo crear una suscripción
-
-### Paso 1: Seleccionar o crear cliente
-
-Navega a **Suscripciones** en la plataforma y haz clic en **Crear Suscripción**.
-
-Si el cliente ya existe en tu sistema, búscalo por nombre o correo. Si es un cliente nuevo, puedes crearlo directamente desde el flujo de creación de suscripción.
-
-<Callout type="warning">
-**Importante**: El correo del cliente se usa como dirección de envío del link de pago y no puede modificarse en el checkout. Asegúrate de usar el correo correcto desde el inicio.
-</Callout>
-
-### Paso 2: Agregar productos
-
-Selecciona los productos que quieres incluir en la suscripción:
-
-- **Productos del catálogo**: Elige entre los productos que hayas creado previamente
-- **Variantes de precio**: Selecciona la variante específica para este cliente (precio de lista o variante personalizada)
-- **Ajustes personalizados**: Si el cliente requiere descuentos o condiciones especiales, puedes editar las condiciones del producto y generar nuevas variantes al momento
-
-<Callout type="info">
-**Variantes automáticas**: Si aplicas descuentos o modificas precios durante la creación, Commet genera automáticamente una variante de precio específica para este cliente.
-</Callout>
-
-### Paso 3:  Iniciar suscripción
-
-Cuando la suscripción esté lista, haz clic en **Comenzar**. La suscripción se creará en estado "Pendiente de pago" y se generará automáticamente un link de checkout que puedes enviar al cliente.
+| `Borrador` | Suscripción creada pero no activada | Cuando se crea programáticamente para revisión |
+| `En Prueba` | Cliente en período de prueba gratuita | Cuando el plan tiene días de prueba y la prueba no ha terminado |
+| `Pago Pendiente` | Cliente recibió checkout pero no ha pagado | Inmediatamente después de la asignación del plan si se requiere pago |
+| `Activa` | La suscripción está facturando normalmente | Después de que termina la prueba o se completa el pago |
+| `Pausada` | Temporalmente pausada (sin facturación) | Cuando es pausada manualmente por el equipo de operaciones |
+| `Pago Vencido` | Pago fallido, en período de gracia | Cuando falla el método de pago |
+| `Cancelada` | Cancelada, ya no factura | Cuando el cliente cancela o la suscripción termina |
+| `Expirada` | Alcanzó la fecha de fin | Cuando la suscripción alcanza el fin programado |
 
 ## Detalles de la suscripción
 
 Cada suscripción incluye información completa para gestionar el ciclo de facturación:
 
+### Información del plan actual
+
+- **Nombre del plan**: Ve qué plan tiene suscrito el cliente
+- **Intervalo de facturación**: Mensual, trimestral o anual
+- **Características del plan**: Ve todas las características incluidas en el plan
+- **Estado de prueba**: Verifica si la suscripción está en período de prueba
+
+### Información de facturación
+
+- **Período actual**: Fechas de inicio y fin del ciclo de facturación actual
+- **Días restantes**: Cuántos días hasta la próxima factura
+- **Fecha de próxima factura**: Cuándo se generará la próxima factura recurrente
+- **Monto**: Precio actual del plan para el intervalo de facturación seleccionado
+
+### Uso de características
+
+Para planes con características medidas o basadas en asientos:
+
+- **Uso actual**: Rastrea el consumo en tiempo real
+- **Límites incluidos**: Ve qué está incluido en el plan
+- **Excedentes**: Monitorea el uso más allá de las cantidades incluidas
+- **Conteos de asientos**: Asignación actual de asientos por tipo de asiento
+
+<Callout type="info">
+Aprende más sobre cómo funcionan las características en los planes en la [documentación de Características](../plans-and-features/features).
+</Callout>
+
 ### Link de checkout
 
 - **Ver link actual**: Accede al link de pago generado para el cliente
 - **Regenerar link**: Si el checkout expiró o necesitas un nuevo link, puedes regenerarlo (solo disponible si la suscripción no está activa)
-- **Envío al cliente**: El link de checkout se envía automáticamente al correo del cliente. Si estás usando el SDK, también puedes integrar el link directamente en tu flujo de onboarding
+- **Entrega al cliente**: El link de checkout se envía automáticamente al correo del cliente. Si estás usando el SDK, también puedes integrar el link directamente en tu flujo de onboarding.
 
 ### Facturas generadas
 
-- **Historial completo**: Visualiza todas las facturas generadas para esta suscripción
+- **Historial completo**: Ve todas las facturas generadas para esta suscripción
 - **Facturación automática**: Cada período de facturación genera automáticamente una nueva factura
-- **Detalles de pago**: Revisa estado de pago, fechas de vencimiento y métodos de pago
+- **Detalles de pago**: Revisa el estado de pago, fechas de vencimiento y métodos de pago
 
 ### Información del cliente
 
@@ -92,26 +178,97 @@ Cada suscripción incluye información completa para gestionar el ciclo de factu
 - **Historial de suscripciones**: Ve todas las suscripciones activas e históricas del cliente
 - **Configuración de facturación**: Revisa moneda, términos de pago y dirección de facturación
 
+## Gestión de suscripciones
 
-## Mejores prácticas
+### Cambiar plan (actualizar/degradar)
 
-- **Verifica correo del cliente**: Confirma el correo antes de crear el cliente, ya que no puede modificarse en el checkout
-- **Aprovecha variantes de precio**: Usa variantes para condiciones permanentes del cliente en lugar de aplicar descuentos temporales
-- **Monitorea estados pendientes**: Revisa regularmente suscripciones en "Pendiente de pago" para seguimiento activo
-- **Regenera checkouts expirados**: Si un checkout expiró, regenera el link en lugar de crear una nueva suscripción
+<Steps>
+<Step>
 
-## Errores comunes a evitar
+Navega a la página de detalles del cliente
 
-- **Correo incorrecto del cliente**: Verifica el correo antes de crear el cliente, ya que se usa para el checkout y no puede cambiarse
-- **Crear múltiples suscripciones para el mismo cliente**: Si un checkout expiró, regenera el link en lugar de crear una nueva suscripción
-- **Olvidar activar borradores**: Las suscripciones en borrador no generan facturas hasta ser activadas manualmente
-- **No revisar variantes aplicadas**: Confirma que las variantes de precio aplicadas sean las correctas antes de iniciar la suscripción
+</Step>
+<Step>
+
+Haz clic en **Cambiar Plan** en la suscripción activa
+
+</Step>
+<Step>
+
+Selecciona el nuevo plan
+
+</Step>
+<Step>
+
+Commet maneja automáticamente la prorrateo:
+- Acredita el tiempo no utilizado del plan actual
+- Cobra por el nuevo plan a partir de ahora
+- Ajusta el ciclo de facturación en consecuencia
+
+</Step>
+</Steps>
+
+<Callout type="info">
+**Prorrateo automático**: Commet calcula créditos y cargos automáticamente al cambiar planes. El cliente es cobrado o acreditado basado en el tiempo restante en el período de facturación.
+</Callout>
+
+### Cancelar suscripción
+
+<Steps>
+<Step>
+
+Navega a la página de detalles del cliente
+
+</Step>
+<Step>
+
+Haz clic en **Cancelar Suscripción** en la suscripción activa
+
+</Step>
+<Step>
+
+Opcionalmente proporciona una razón de cancelación
+
+</Step>
+<Step>
+
+Elige cuándo toma efecto la cancelación:
+- **Inmediatamente**: Detiene la facturación de inmediato
+- **Fin de período**: Continúa facturando hasta que termine el período actual
+
+</Step>
+</Steps>
+
+Las suscripciones canceladas permanecen visibles para rastreo histórico pero ya no generan facturas.
+
+### Regenerar link de checkout
+
+Si un cliente no ha completado el pago y el link de checkout expiró:
+
+<Steps>
+<Step>
+
+Navega a los detalles de la suscripción
+
+</Step>
+<Step>
+
+Haz clic en **Regenerar Link de Checkout**
+
+</Step>
+<Step>
+
+Envía el nuevo link al cliente
+
+</Step>
+</Steps>
+
+Esto es más eficiente que reasignar el plan o crear una nueva suscripción.
+
 
 ## Integración mediante SDK
 
 Todos los pasos descritos anteriormente pueden realizarse programáticamente a través de nuestro SDK. Esta es la forma recomendada para integrar Commet directamente en tu aplicación.
-
-El siguiente diagrama de secuencia ilustra el flujo completo de suscripción al integrar Commet en tu aplicación. Ten en cuenta que este diagrama asume que ya tienes clientes y productos creados en tu sistema. Muestra la interacción entre tu frontend, backend y los servicios de Commet: desde que un usuario inicia una suscripción, pasando por el proceso de checkout donde ingresan su método de pago, hasta la activación final donde Commet envía un webhook a tu backend para habilitar las funcionalidades del usuario.
 
 ![Diagrama de secuencia del ciclo de vida de suscripciones](/images/platform/subs-sequence-diagram.png)
 
@@ -121,16 +278,46 @@ El siguiente diagrama de secuencia ilustra el flujo completo de suscripción al 
 
 ### Ventajas de usar el SDK
 
-- **Automatización completa**: Crea y gestiona suscripciones directamente desde tu código sin intervención manual
+- **Automatización completa**: Asigna planes y gestiona suscripciones directamente desde tu código sin intervención manual
 - **Sincronización en tiempo real**: Mantén tus datos sincronizados con Commet automáticamente
 - **Experiencia de usuario mejorada**: Integra el checkout directamente en tu aplicación sin redirigir a páginas externas
 - **Escalabilidad**: Gestiona miles de suscripciones programáticamente sin limitaciones de la interfaz
 
 ### Flujo típico con SDK
 
-1. **Crear cliente**: Usa `commet.customers.create()` cuando un usuario se registra en tu aplicación
-2. **Crear suscripción**: Llama a `commet.subscriptions.create()` cuando el usuario selecciona un plan
-3. **Obtener checkout**: Accede al link de checkout desde la respuesta de la suscripción
-4. **Gestionar estados**: Monitorea cambios de estado mediante webhooks o consultas periódicas
+<Steps>
+<Step>
+
+**Listar planes disponibles**: Usa `commet.plans.list()` para mostrar a los clientes las opciones disponibles
+
+</Step>
+<Step>
+
+**Asignar plan**: Llama a `commet.subscriptions.create()` con un `planCode` para crear la suscripción automáticamente
+
+</Step>
+<Step>
+
+**Obtener checkout**: Accede al link de checkout desde la respuesta de la suscripción
+
+</Step>
+<Step>
+
+**Monitorear uso**: Rastrea el uso de características y conteos de asientos a través de los detalles de la suscripción
+
+</Step>
+<Step>
+
+**Gestionar cambios**: Actualiza, degrada o cancela a través del SDK
+
+</Step>
+</Steps>
 
 Para ver ejemplos de código completos y la documentación completa de la API, visita la [Librería de Desarrolladores](/docs/library/features/subscriptions).
+
+## Recursos Relacionados
+
+- [Planes](../plans-and-features/plans) - Aprende cómo crear y configurar planes
+- [Características](../plans-and-features/features) - Entiende cómo funcionan las características en los planes
+- [Métricas de Uso](../usage-metrics/metrics) - Rastrea el consumo para características medidas
+- [Gestión de Asientos](../seats/seats-overview) - Gestiona características basadas en asientos

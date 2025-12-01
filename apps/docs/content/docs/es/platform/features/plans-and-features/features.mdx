@@ -1,0 +1,248 @@
+---
+title: Features
+description: Entiende cómo las características definen lo que los clientes pueden acceder en cada plan
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
+import { Steps, Step } from 'fumadocs-ui/components/steps'
+
+# Características
+
+Las Características definen lo que los clientes pueden acceder y usar dentro de un Plan. Especifican capacidades, límites de uso, asignaciones de asientos y precios para excedentes. Cuando añades características a un Plan, todos los clientes asignados a ese plan reciben esas características.
+
+<Callout type="success">
+La sección de Plataforma está diseñada para equipos de go-to-market, finanzas y operaciones. Si necesitas detalles de implementación, ve a la [Librería de Desarrolladores](/docs/library/quickstart).
+</Callout>
+
+## Ejemplo de inicio rápido
+
+Así es como funcionan las características en un plan SaaS típico:
+
+1. **Definir características**: Crea características para capacidades como llamadas API, almacenamiento o asientos
+2. **Añadir a planes**: Configura características en tus Planes con cantidades incluidas y límites
+3. **Acceso automático**: Cuando se asigna un plan a un cliente, automáticamente obtiene todas las características del plan
+4. **Rastrear uso**: Monitorea el consumo de características en tiempo real a través de suscripciones
+
+Las características hacen que los planes sean poderosos al combinar múltiples capacidades en un solo paquete de suscripción.
+
+## Por qué importan las características
+
+- **Definir capacidades**: Especifica exactamente lo que los clientes pueden acceder en cada plan
+- **Establecer límites**: Controla el uso con cantidades incluidas y precios de excedentes
+- **Rastrear consumo**: Monitorea cómo los clientes usan cada característica
+- **Precios flexibles**: Combina diferentes tipos de características (booleanas, medidas, asientos) en un plan
+- **Aplicación automática**: Las características se rastrean y facturan automáticamente según el uso
+
+## Tipos de características
+
+Los Planes soportan tres tipos de características, cada una sirviendo diferentes necesidades de negocio:
+
+<Tabs items={['Boolean', 'Metered', 'Seats']}>
+<Tab value="Boolean">
+
+Las características booleanas son capacidades simples de activar/desactivar. Un cliente tiene acceso o no lo tiene.
+
+| Aspecto | Detalles |
+| --- | --- |
+| **Cómo funciona** | Acceso de activar/desactivar a una capacidad |
+| **Ejemplos** | • Single Sign-On (SSO) habilitado<br />• Marca personalizada<br />• Opciones de marca blanca<br />• Acceso a soporte prioritario<br />• Panel de análisis avanzado |
+| **Configuración** | • **Habilitado**: El cliente tiene acceso<br />• **Deshabilitado**: El cliente no tiene acceso |
+| **Rastreo de uso** | Sin cantidades de uso o precios de excedentes—simplemente habilitado o deshabilitado según el plan |
+
+</Tab>
+<Tab value="Metered">
+
+Las características medidas rastrean el consumo y pueden incluir cantidades incluidas, precios de excedentes o uso ilimitado.
+
+| Aspecto | Detalles |
+| --- | --- |
+| **Cómo funciona** | Límites basados en uso con precios de excedentes opcionales |
+| **Ejemplos** | • Llamadas API: 10,000 incluidas, luego $0.01 por llamada<br />• Almacenamiento: 100 GB incluidos, luego $0.10 por GB<br />• Horas de cómputo: 50 horas incluidas, luego $2.00 por hora<br />• Envíos de email: 50,000 incluidos, luego $0.001 por email |
+| **Opciones de configuración** | • **Cantidad incluida**: Unidades gratuitas incluidas en el precio del plan<br />• **Ilimitado**: Sin límites (usa para planes premium)<br />• **Excedentes habilitados**: Permitir uso más allá de la cantidad incluida<br />• **Precio unitario de excedentes**: Precio por unidad para uso de excedentes |
+
+<Callout type="info">
+Para información detallada sobre cómo gestionar eventos, consulta la [documentación de Gestión de Eventos](../usage-metrics/events).
+</Callout>
+
+</Tab>
+<Tab value="Seats">
+
+Las características de asientos asignan licencias por usuario. Los clientes pagan por cada usuario que tiene acceso.
+
+| Aspecto | Detalles |
+| --- | --- |
+| **Cómo funciona** | Licencias por usuario con asientos incluidos y excedentes opcionales |
+| **Ejemplos** | • Asientos de editor: 5 incluidos, luego $10 por asiento adicional<br />• Asientos de administrador: 2 incluidos, luego $25 por asiento adicional<br />• Asientos de miembro del equipo: 10 incluidos, luego $5 por asiento adicional |
+| **Opciones de configuración** | • **Asientos incluidos**: Número de asientos incluidos en el precio del plan<br />• **Ilimitado**: Sin límites de asientos (usa para planes empresariales)<br />• **Excedentes habilitados**: Permitir asientos adicionales más allá de los incluidos<br />• **Precio de asiento**: Precio por asiento adicional por período de facturación |
+
+<Callout type="info">
+Para información detallada sobre cómo gestionar asientos, consulta la [documentación de Gestión de Asientos](../seats/seats-overview).
+</Callout>
+
+</Tab>
+</Tabs>
+
+## Cómo añadir características a un plan
+
+<Steps>
+<Step>
+
+### Navegar a la configuración del plan
+
+Al crear o editar un Plan, ve a la sección **Características**.
+
+</Step>
+<Step>
+
+### Añadir una característica
+
+Haz clic en **Añadir Característica** y selecciona la característica que quieres incluir. Las características se crean por separado y pueden reutilizarse en múltiples planes.
+
+Si la característica aún no existe, necesitarás crearla primero.
+
+</Step>
+<Step>
+
+### Configurar ajustes de características
+
+Configura cómo funciona la característica en este plan específico:
+
+**Para características booleanas:**
+- Habilita o deshabilita la característica
+
+**Para características medidas:**
+- Establece la cantidad incluida (ej: 10,000 llamadas API)
+- Elige ilimitado o establece límites
+- Habilita excedentes y establece el precio unitario si aplica
+
+**Para características de asientos:**
+- Establece el conteo de asientos incluidos (ej: 5 asientos de editor)
+- Elige ilimitado o establece límites
+- Habilita excedentes y establece el precio del asiento si aplica
+
+</Step>
+<Step>
+
+### Guardar y repetir
+
+Guarda la configuración de la característica y añade características adicionales según sea necesario. Un solo plan puede incluir múltiples características de diferentes tipos.
+
+</Step>
+</Steps>
+
+## Ejemplos de configuración de características
+
+<Tabs items={['Plan Starter','Plan Pro', 'Plan Enterprise']}>
+<Tab value="Plan Starter">
+
+Un Plan Starter con características básicas:
+
+| Tipo de Característica | Configuración |
+| --- | --- |
+| **Boolean** | SSO habilitado ✗ |
+| **Metered** | Llamadas API - 1,000 incluidas, sin excedentes (límite estricto) |
+| **Metered** | Almacenamiento - 10 GB incluidos, sin excedentes (límite estricto) |
+| **Seats** | Asientos de editor - 1 incluido, $15 por asiento adicional |
+
+</Tab>
+<Tab value="Plan Pro">
+
+Un Plan Pro con múltiples tipos de características:
+
+| Tipo de Característica | Configuración |
+| --- | --- |
+| **Boolean** | SSO habilitado ✓ |
+| **Boolean** | Marca personalizada ✓ |
+| **Metered** | Llamadas API - 10,000 incluidas, $0.01 por llamada de excedente |
+| **Metered** | Almacenamiento - 100 GB incluidos, $0.10 por GB de excedente |
+| **Seats** | Asientos de editor - 5 incluidos, $10 por asiento adicional |
+
+</Tab>
+<Tab value="Plan Enterprise">
+
+Un Plan Enterprise con características ilimitadas:
+
+| Tipo de Característica | Configuración |
+| --- | --- |
+| **Boolean** | SSO habilitado ✓ |
+| **Boolean** | Marca personalizada ✓ |
+| **Boolean** | Soporte prioritario ✓ |
+| **Metered** | Llamadas API - Ilimitadas |
+| **Metered** | Almacenamiento - Ilimitado |
+| **Seats** | Asientos de editor - Ilimitados |
+
+</Tab>
+</Tabs>
+
+## Rastreo de uso de características
+
+Una vez que un plan con características se asigna a un cliente y la suscripción está activa, puedes rastrear el uso de características:
+
+### Ver uso de características
+
+Desde la página de detalles de la suscripción, puedes ver:
+
+- **Uso actual**: Consumo en tiempo real para características medidas
+- **Límites incluidos**: Lo que está incluido en el plan
+- **Excedentes**: Uso más allá de las cantidades incluidas
+- **Conteos de asientos**: Asignación actual de asientos por tipo de asiento
+- **Estado de característica**: Estado habilitado/deshabilitado para características booleanas
+
+### Monitoreo de uso
+
+- **Rastreo en tiempo real**: El uso se rastrea mientras los clientes consumen características
+- **Reinicio del período de facturación**: El uso se reinicia al inicio de cada ciclo de facturación
+- **Alertas de excedentes**: Monitorea cuando los clientes se acercan o exceden los límites
+- **Datos históricos**: Ve tendencias de uso a lo largo del tiempo
+
+<Callout type="info">
+Para información detallada sobre cómo rastrear eventos de uso, consulta la [documentación de Métricas de Uso](../usage-metrics/events).
+</Callout>
+
+## Control de acceso a características: próximamente
+
+Estamos trabajando en métodos SDK y API para controlar y verificar programáticamente el acceso a características en tu aplicación:
+
+| Capacidad | Qué hace |
+| --- | --- |
+| **Verificar acceso a características** | Consulta si un cliente tiene acceso a una característica específica (bloquear características en tu app, verificar que el plan incluya la característica) |
+| **Consultar uso y límites** | Verifica el uso actual, capacidad restante, conteos de asientos y estado de excedentes para características medidas |
+| **Webhooks de excedencia de límites** | Recibe notificaciones en tiempo real cuando los clientes exceden límites (alertas de excedentes, advertencias de umbral, capacidad de asientos) |
+
+Casos de uso: Bloqueo de características, paneles de uso, barras de progreso, aplicación automatizada y notificaciones a clientes.
+
+<Callout type="info">
+Estos métodos de control de acceso estarán disponibles en una próxima versión. Por ahora, puedes ver el acceso y uso de características a través de la interfaz de la plataforma.
+</Callout>
+
+
+## Errores comunes a evitar
+
+- **Establecer límites muy bajos**: Incluye suficiente uso gratuito para proporcionar valor sin excedentes
+- **Nombres de características poco claros**: Usa nombres amigables para el cliente, no códigos internos
+- **Olvidar precios de excedentes**: Si permites excedentes, asegúrate de que los precios estén configurados
+- **Demasiadas características**: Comienza con características esenciales y añade más según los comentarios de los clientes
+- **No rastrear uso**: Asegúrate de que las características medidas estén correctamente configuradas para el rastreo
+
+## Editar características en planes
+
+Puedes modificar las configuraciones de características en un plan en cualquier momento:
+
+- **Cambiar cantidades incluidas**: Actualiza los límites de uso gratuito
+- **Modificar precios de excedentes**: Ajusta los precios para uso de excedentes
+- **Añadir o eliminar características**: Incluye nuevas características o elimina las no utilizadas
+- **Alternar características booleanas**: Habilita o deshabilita capacidades
+
+<Callout type="warning">
+**Importante**: Los cambios en las características de un plan solo afectan a las nuevas suscripciones. Las suscripciones existentes mantienen su configuración original de características. Si necesitas actualizar clientes existentes, necesitarás cambiar su asignación de plan.
+</Callout>
+
+## Recursos Relacionados
+
+- [Planes](./plans) - Aprende cómo crear y configurar planes
+- [Suscripciones](../subscriptions/subscriptions-overview) - Entiende cómo funcionan las características en las suscripciones
+- [Métricas de Uso](../usage-metrics/metrics) - Rastrea el consumo para características medidas
+- [Gestión de Asientos](../seats/seats-overview) - Gestiona características basadas en asientos
+
+
