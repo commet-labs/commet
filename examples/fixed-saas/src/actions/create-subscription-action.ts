@@ -2,6 +2,7 @@
 
 import { auth } from "@/lib/auth";
 import { COMMET_PLAN_ID, commet } from "@/lib/commet";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 interface CreateSubscriptionResult {
@@ -14,7 +15,7 @@ interface CreateSubscriptionResult {
 export async function createSubscriptionAction(): Promise<CreateSubscriptionResult> {
   try {
     const session = await auth.api.getSession({
-      headers: await import("next/headers").then((m) => m.headers()),
+      headers: await headers(),
     });
 
     if (!session?.user) {

@@ -2,6 +2,7 @@
 
 import { auth } from "@/lib/auth";
 import { commet } from "@/lib/commet";
+import { headers } from "next/headers";
 
 export async function getPortalUrl(): Promise<{
   success: boolean;
@@ -10,7 +11,7 @@ export async function getPortalUrl(): Promise<{
 }> {
   try {
     const session = await auth.api.getSession({
-      headers: await import("next/headers").then((m) => m.headers()),
+      headers: await headers(),
     });
 
     if (!session?.user) {
