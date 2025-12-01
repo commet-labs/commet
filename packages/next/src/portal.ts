@@ -61,8 +61,8 @@ export const CustomerPortal = ({
         );
       }
 
-      // Request portal access from Commet
-      const result = await commet.portal.requestAccess({
+      // Get portal URL from Commet
+      const result = await commet.portal.getUrl({
         externalId: customerId,
       });
 
