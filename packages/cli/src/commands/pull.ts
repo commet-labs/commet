@@ -99,7 +99,12 @@ export const pullCommand = new Command("pull")
     const { eventTypes, seatTypes, features, plans } = result.data;
 
     // Generate TypeScript definitions
-    const typeDefinitions = generateTypes(eventTypes, seatTypes, features, plans);
+    const typeDefinitions = generateTypes(
+      eventTypes,
+      seatTypes,
+      features,
+      plans,
+    );
 
     // Write to .commet/types.d.ts
     const commetDir = path.resolve(process.cwd(), ".commet");

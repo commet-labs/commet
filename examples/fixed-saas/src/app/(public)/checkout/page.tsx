@@ -2,7 +2,7 @@ import { SubscribeButton } from "@/components/subscribe-button";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
-import { COMMET_PLAN_ID, commet } from "@/lib/commet";
+import { commet } from "@/lib/commet";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -35,7 +35,7 @@ export default async function CheckoutPage() {
   }
 
   // Get plan details from Commet
-  const planResult = await commet.plans.get(COMMET_PLAN_ID);
+  const planResult = await commet.plans.get("pro"); // autocomplete after `commet pull`
 
   if (!planResult.success || !planResult.data) {
     return (
