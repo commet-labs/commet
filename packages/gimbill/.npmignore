@@ -1,8 +1,0 @@
-src/
-tsconfig.json
-tsup.config.ts
-node_modules/
-.turbo/
-*.test.ts
-*.spec.ts
-

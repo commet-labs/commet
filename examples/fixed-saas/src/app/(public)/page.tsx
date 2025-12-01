@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 
+// Revalidate pricing data every hour
+export const revalidate = 3600;
+
 export default function Home() {
   return (
     <div className="min-h-screen">

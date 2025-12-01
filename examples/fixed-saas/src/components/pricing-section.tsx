@@ -110,7 +110,14 @@ function PlanCard({ plan }: { plan: Plan }) {
 }
 
 export async function PricingSection() {
-  const result = await commet.plans.list();
+  let result: Awaited<ReturnType<typeof commet.plans.list>>;
+
+  try {
+    result = await commet.plans.list();
+  } catch {
+    // Handle any unexpected errors gracefully
+    result = { success: false, data: [] };
+  }
 
   if (!result.success || !result.data || result.data.length === 0) {
     return (
