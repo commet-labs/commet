@@ -81,16 +81,6 @@ export default async function CheckoutPage() {
   }
 
   const plan = planResult.data;
-  const defaultPrice = plan.prices.find((p) => p.isDefault) ?? plan.prices[0];
-  const priceDisplay = defaultPrice
-    ? `$${(defaultPrice.price / 100).toFixed(0)}`
-    : "Contact us";
-  const intervalDisplay =
-    defaultPrice?.billingInterval === "yearly"
-      ? "year"
-      : defaultPrice?.billingInterval === "quarterly"
-        ? "quarter"
-        : "month";
 
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -122,14 +112,21 @@ export default async function CheckoutPage() {
 
           <CardContent>
             <div className="border-t border-b py-6 mb-6">
-              <div className="flex justify-between items-center mb-4">
-                <span className="text-muted-foreground">{plan.name}</span>
-                <span className="text-2xl font-bold">
-                  {priceDisplay}
-                  <span className="text-sm text-muted-foreground">
-                    /{intervalDisplay}
-                  </span>
-                </span>
+              <div className="mb-4">
+                <h3 className="font-semibold text-lg">{plan.name}</h3>
+                {plan.prices.length === 1 && plan.prices[0] && (
+                  <p className="text-2xl font-bold mt-1">
+                    ${(plan.prices[0].price / 100).toFixed(0)}
+                    <span className="text-sm text-muted-foreground font-normal">
+                      /
+                      {plan.prices[0].billingInterval === "yearly"
+                        ? "year"
+                        : plan.prices[0].billingInterval === "quarterly"
+                          ? "quarter"
+                          : "month"}
+                    </span>
+                  </p>
+                )}
               </div>
               {plan.description && (
                 <p className="text-sm text-muted-foreground mb-4">
@@ -175,7 +172,7 @@ export default async function CheckoutPage() {
               )}
             </div>
 
-            <SubscribeButton />
+            <SubscribeButton prices={plan.prices} />
 
             <div className="mt-6 text-center">
               <Button variant="link" asChild>
