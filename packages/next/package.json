@@ -12,10 +12,7 @@
       "require": "./dist/index.js"
     }
   },
-  "files": [
-    "dist",
-    "README.md"
-  ],
+  "files": ["dist", "README.md"],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
@@ -25,17 +22,11 @@
     "test": "vitest run",
     "test:watch": "vitest"
   },
-  "keywords": [
-    "commet",
-    "billing",
-    "nextjs",
-    "webhooks",
-    "typescript"
-  ],
+  "keywords": ["commet", "billing", "nextjs", "webhooks", "typescript"],
   "author": "Commet Team",
   "license": "MIT",
   "dependencies": {
-    "@commet/node": "1.0.0"
+    "@commet/node": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "24.10.1",
