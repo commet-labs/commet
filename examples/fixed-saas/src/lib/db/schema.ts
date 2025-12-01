@@ -12,7 +12,6 @@ export const user = pgTable("user", {
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 
   // Custom fields for Commet integration
-  commetCustomerId: text("commetCustomerId"),
   subscriptionId: text("subscriptionId"),
   isPaid: boolean("isPaid").notNull().default(false),
 });

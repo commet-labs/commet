@@ -4,6 +4,13 @@ import { Webhooks } from "@commet/next";
 import type { WebhookPayload } from "@commet/next";
 import { eq } from "drizzle-orm";
 
+/**
+ * Get user ID from webhook payload using externalId
+ */
+function getUserIdFromPayload(payload: WebhookPayload): string | null {
+  return payload.data.externalId || null;
+}
+
 export const POST = Webhooks({
   webhookSecret: process.env.COMMET_WEBHOOK_SECRET!,
 
@@ -18,7 +25,7 @@ export const POST = Webhooks({
 
   // Handle subscription activation (payment successful)
   onSubscriptionActivated: async (payload) => {
-    const userId = await getUserIdFromPayload(payload);
+    const userId = getUserIdFromPayload(payload);
 
     if (!userId) {
       console.error(
@@ -45,7 +52,7 @@ export const POST = Webhooks({
 
   // Handle subscription cancellation
   onSubscriptionCanceled: async (payload) => {
-    const userId = await getUserIdFromPayload(payload);
+    const userId = getUserIdFromPayload(payload);
 
     if (!userId) {
       console.error(
@@ -83,29 +90,3 @@ export const POST = Webhooks({
     console.error("[Webhook] Payload:", payload);
   },
 });
-
-/**
- * Get user ID from webhook payload
- * Tries externalId first, falls back to customerId lookup
- */
-async function getUserIdFromPayload(
-  payload: WebhookPayload,
-): Promise<string | null> {
-  // Try externalId first (most efficient)
-  if (payload.data.externalId) {
-    return payload.data.externalId;
-  }
-
-  // Fallback: look up by Commet customer ID
-  if (payload.data.customerId) {
-    const [existingUser] = await db
-      .select({ id: user.id })
-      .from(user)
-      .where(eq(user.commetCustomerId, payload.data.customerId))
-      .limit(1);
-
-    return existingUser?.id || null;
-  }
-
-  return null;
-}

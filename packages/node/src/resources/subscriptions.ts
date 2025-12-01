@@ -67,6 +67,7 @@ export interface Subscription {
   currentPeriodStart?: string;
   currentPeriodEnd?: string;
   billingDayOfMonth: number;
+  checkoutUrl?: string;
   createdAt: string;
   updatedAt: string;
 }

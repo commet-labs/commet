@@ -69,6 +69,7 @@ export async function createSubscriptionAction(): Promise<CreateSubscriptionResu
     return {
       success: true,
       subscriptionId: result.data.id,
+      checkoutUrl: result.data.checkoutUrl,
     };
   } catch (error) {
     console.error("Error creating subscription:", error);
