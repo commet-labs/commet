@@ -1,4 +1,8 @@
-import type { ApiResponse, ListParams } from "../types/common";
+import type {
+  ApiResponse,
+  GeneratedPlanCode,
+  ListParams,
+} from "../types/common";
 import type { CommetHTTPClient } from "../utils/http";
 
 export type PlanID = `plan_${string}`;
@@ -82,16 +86,16 @@ export class PlansResource {
   }
 
   /**
-   * Get a specific plan by ID
+   * Get a specific plan by code
    *
    * @example
    * ```typescript
-   * const plan = await commet.plans.get('plan_xxx');
+   * const plan = await commet.plans.get('pro');
    * console.log(plan.data.name); // "Pro"
    * console.log(plan.data.prices); // [{ billingInterval: 'monthly', price: 9900 }]
    * ```
    */
-  async get(planId: string): Promise<ApiResponse<PlanDetail>> {
-    return this.httpClient.get(`/plans/${planId}`);
+  async get(planCode: GeneratedPlanCode): Promise<ApiResponse<PlanDetail>> {
+    return this.httpClient.get(`/plans/${planCode}`);
   }
 }
