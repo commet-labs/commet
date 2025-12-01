@@ -1,4 +1,8 @@
-import type { ApiResponse, ListParams, RequestOptions } from "../types/common";
+import type {
+  ApiResponse,
+  GeneratedPlanCode,
+  RequestOptions,
+} from "../types/common";
 import type { CommetHTTPClient } from "../utils/http";
 import type { BillingInterval } from "./plans";
 
@@ -77,19 +81,23 @@ type CustomerIdentifier =
   | { customerId: string; externalId?: never }
   | { customerId?: never; externalId: string };
 
-export type CreateSubscriptionParams = CustomerIdentifier & {
-  planId: string;
-  billingInterval?: BillingInterval;
-  initialSeats?: Record<string, number>;
-  skipTrial?: boolean;
-  name?: string;
-  startDate?: string;
-};
+// Plan identifier: use planCode (with autocomplete) or planId (legacy)
+type PlanIdentifier =
+  | { planCode: GeneratedPlanCode; planId?: never }
+  | { planCode?: never; planId: string };
 
-export interface ChangePlanParams {
-  planId: string;
+export type CreateSubscriptionParams = CustomerIdentifier &
+  PlanIdentifier & {
+    billingInterval?: BillingInterval;
+    initialSeats?: Record<string, number>;
+    skipTrial?: boolean;
+    name?: string;
+    startDate?: string;
+  };
+
+export type ChangePlanParams = PlanIdentifier & {
   billingInterval?: BillingInterval;
-}
+};
 
 export interface CancelParams {
   reason?: string;
@@ -113,7 +121,7 @@ export class SubscriptionsResource {
    * ```typescript
    * await commet.subscriptions.create({
    *   externalId: 'user_123',
-   *   planId: 'plan_pro',
+   *   planCode: 'pro', // autocomplete works after `commet pull`
    *   billingInterval: 'yearly',
    *   initialSeats: { editor: 5 }
    * });
@@ -146,7 +154,7 @@ export class SubscriptionsResource {
    * @example
    * ```typescript
    * await commet.subscriptions.changePlan('sub_xxx', {
-   *   planId: 'plan_enterprise'
+   *   planCode: 'enterprise' // autocomplete works after `commet pull`
    * });
    * ```
    */

@@ -29,8 +29,19 @@ interface SeatType {
   isFree: boolean;
 }
 
-interface Product {
+interface Feature {
+  id: string;
   publicId: string;
+  code: string;
+  name: string;
+  description?: string;
+  type: string;
+}
+
+interface Plan {
+  id: string;
+  publicId: string;
+  code: string;
   name: string;
   description?: string;
 }
@@ -39,7 +50,8 @@ interface TypesResponse {
   success: boolean;
   eventTypes: EventType[];
   seatTypes: SeatType[];
-  products: Product[];
+  features: Feature[];
+  plans: Plan[];
 }
 
 export const pullCommand = new Command("pull")
@@ -84,10 +96,10 @@ export const pullCommand = new Command("pull")
       return;
     }
 
-    const { eventTypes, seatTypes, products } = result.data;
+    const { eventTypes, seatTypes, features, plans } = result.data;
 
     // Generate TypeScript definitions
-    const typeDefinitions = generateTypes(eventTypes, seatTypes, products);
+    const typeDefinitions = generateTypes(eventTypes, seatTypes, features, plans);
 
     // Write to .commet/types.d.ts
     const commetDir = path.resolve(process.cwd(), ".commet");
@@ -146,7 +158,12 @@ export const pullCommand = new Command("pull")
     );
     console.log(
       chalk.dim(
-        `  Products: ${products.length > 0 ? products.map((p) => p.publicId).join(", ") : "none"}`,
+        `  Plans: ${plans.length > 0 ? plans.map((p) => p.code).join(", ") : "none"}`,
+      ),
+    );
+    console.log(
+      chalk.dim(
+        `  Features: ${features.length > 0 ? features.map((f) => f.code).join(", ") : "none"}`,
       ),
     );
     console.log(chalk.dim(`\nOutput: ${outputPath}`));
@@ -154,11 +171,12 @@ export const pullCommand = new Command("pull")
     if (
       eventTypes.length === 0 &&
       seatTypes.length === 0 &&
-      products.length === 0
+      plans.length === 0 &&
+      features.length === 0
     ) {
       console.log(
         chalk.yellow(
-          "\n⚠ No types found. Create event types, seat types, and products in your Commet dashboard.",
+          "\n⚠ No types found. Create event types, seat types, plans, and features in your Commet dashboard.",
         ),
       );
     }

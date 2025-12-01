@@ -11,8 +11,15 @@ interface SeatType {
   isFree: boolean;
 }
 
-interface Product {
-  publicId: string;
+interface Feature {
+  code: string;
+  name: string;
+  description?: string;
+  type: string;
+}
+
+interface Plan {
+  code: string;
   name: string;
   description?: string;
 }
@@ -20,7 +27,8 @@ interface Product {
 export function generateTypes(
   eventTypes: EventType[],
   seatTypes: SeatType[],
-  products: Product[],
+  features: Feature[],
+  plans: Plan[],
 ): string {
   // Generate event type union
   const eventTypeUnion =
@@ -34,10 +42,14 @@ export function generateTypes(
       ? seatTypes.map((s) => `"${s.code}"`).join(" | ")
       : "string";
 
-  // Generate product type union
-  const productTypeUnion =
-    products.length > 0
-      ? products.map((p) => `"${p.publicId}"`).join(" | ")
+  // Generate plan code union
+  const planCodeUnion =
+    plans.length > 0 ? plans.map((p) => `"${p.code}"`).join(" | ") : "string";
+
+  // Generate feature code union
+  const featureCodeUnion =
+    features.length > 0
+      ? features.map((f) => `"${f.code}"`).join(" | ")
       : "string";
 
   // Generate detailed comments
@@ -55,10 +67,17 @@ export function generateTypes(
     )
     .join("\n");
 
-  const productComments = products
+  const planComments = plans
     .map(
       (p) =>
-        ` * - "${p.publicId}": ${p.name}${p.description ? ` - ${p.description}` : ""}`,
+        ` * - "${p.code}": ${p.name}${p.description ? ` - ${p.description}` : ""}`,
+    )
+    .join("\n");
+
+  const featureComments = features
+    .map(
+      (f) =>
+        ` * - "${f.code}": ${f.name} (${f.type})${f.description ? ` - ${f.description}` : ""}`,
     )
     .join("\n");
 
@@ -67,7 +86,7 @@ export function generateTypes(
 
 /**
  * This augments the Commet SDK to automatically use your organization's
- * specific event types, seat types, and products without requiring generic type parameters.
+ * specific event types, seat types, plans, and features without requiring generic type parameters.
  * 
  * Event types available in your organization:
 ${eventComments || " * (none)"}
@@ -75,15 +94,19 @@ ${eventComments || " * (none)"}
  * Seat types available in your organization:
 ${seatComments || " * (none)"}
  * 
- * Products available in your organization:
-${productComments || " * (none)"}
+ * Plans available in your organization:
+${planComments || " * (none)"}
+ * 
+ * Features available in your organization:
+${featureComments || " * (none)"}
  * 
  */ 
 declare module '@commet/node' {
   interface CommetGeneratedTypes {
     eventType: ${eventTypeUnion};
     seatType: ${seatTypeUnion};
-    productId: ${productTypeUnion};
+    planCode: ${planCodeUnion};
+    featureCode: ${featureCodeUnion};
   }
 }
 

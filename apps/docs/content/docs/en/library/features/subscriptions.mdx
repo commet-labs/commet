@@ -8,7 +8,7 @@ description: Manage subscriptions with the plan-first model
 ```typescript
 const subscription = await commet.subscriptions.create({
   externalId: 'user_123',
-  planId: 'plan_pro'
+  planCode: 'pro' // autocomplete works after `commet pull`
 })
 ```
 
@@ -17,7 +17,7 @@ const subscription = await commet.subscriptions.create({
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `externalId` or `customerId` | string | Customer identifier (required) |
-| `planId` | string | Plan to subscribe to (required) |
+| `planCode` or `planId` | string | Plan to subscribe to (required). Use `planCode` for autocomplete. |
 | `billingInterval` | string | `monthly`, `quarterly`, or `yearly` |
 | `initialSeats` | object | Initial seat counts by type |
 | `skipTrial` | boolean | Skip the trial period if plan has one |
@@ -49,7 +49,7 @@ if (sub.data) {
 
 ```typescript
 await commet.subscriptions.changePlan('sub_xxx', {
-  planId: 'plan_enterprise'
+  planCode: 'enterprise' // autocomplete works after `commet pull`
 })
 ```
 
@@ -83,7 +83,7 @@ If a plan has trial days, new subscriptions start in `trialing` status:
 ```typescript
 const subscription = await commet.subscriptions.create({
   externalId: 'user_123',
-  planId: 'plan_with_trial'
+  planCode: 'starter' // plan with trial configured
 })
 
 console.log(subscription.data.status)  // "trialing"
@@ -92,7 +92,7 @@ console.log(subscription.data.trialEndsAt)
 // Skip trial if needed
 await commet.subscriptions.create({
   externalId: 'user_456',
-  planId: 'plan_with_trial',
+  planCode: 'starter',
   skipTrial: true
 })
 ```
@@ -110,7 +110,7 @@ const commet = new Commet({
 // 1. Subscribe to a plan
 const sub = await commet.subscriptions.create({
   externalId: 'user_123',
-  planId: 'plan_pro',
+  planCode: 'pro',
   initialSeats: { editor: 5 }
 })
 
@@ -134,7 +134,7 @@ console.log('Days remaining:', current.data?.currentPeriod.daysRemaining)
 
 // 5. Upgrade plan
 await commet.subscriptions.changePlan(sub.data.id, {
-  planId: 'plan_enterprise'
+  planCode: 'enterprise'
 })
 ```
 

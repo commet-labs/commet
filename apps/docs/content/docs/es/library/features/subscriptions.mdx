@@ -8,7 +8,7 @@ description: Gestiona suscripciones con el modelo plan-first
 ```typescript
 const subscription = await commet.subscriptions.create({
   externalId: 'user_123',
-  planId: 'plan_pro'
+  planCode: 'pro'
 })
 ```
 
@@ -17,7 +17,7 @@ const subscription = await commet.subscriptions.create({
 | Parámetro | Tipo | Descripción |
 |-----------|------|-------------|
 | `externalId` o `customerId` | string | Identificador del cliente (requerido) |
-| `planId` | string | Plan a suscribir (requerido) |
+| `planCode` o `planId` | string | Plan a suscribir (requerido). Usa `planCode` para autocompletado. |
 | `billingInterval` | string | `monthly`, `quarterly`, o `yearly` |
 | `initialSeats` | object | Cantidad inicial de seats por tipo |
 | `skipTrial` | boolean | Saltar el período de trial si el plan tiene |
@@ -49,7 +49,7 @@ if (sub.data) {
 
 ```typescript
 await commet.subscriptions.changePlan('sub_xxx', {
-  planId: 'plan_enterprise'
+  planCode: 'enterprise'
 })
 ```
 
@@ -83,16 +83,16 @@ Si un plan tiene días de trial, las nuevas suscripciones inician en estado `tri
 ```typescript
 const subscription = await commet.subscriptions.create({
   externalId: 'user_123',
-  planId: 'plan_with_trial'
+  planCode: 'starter'
 })
 
 console.log(subscription.data.status)  // "trialing"
 console.log(subscription.data.trialEndsAt)
 
-// Saltar trial si es necesario
+// Saltar trial
 await commet.subscriptions.create({
   externalId: 'user_456',
-  planId: 'plan_with_trial',
+  planCode: 'starter',
   skipTrial: true
 })
 ```
@@ -107,34 +107,29 @@ const commet = new Commet({
   environment: 'sandbox'
 })
 
-// 1. Suscribir a un plan
 const sub = await commet.subscriptions.create({
   externalId: 'user_123',
-  planId: 'plan_pro',
+  planCode: 'pro',
   initialSeats: { editor: 5 }
 })
 
-// 2. Trackear uso
 await commet.usage.track({
   externalId: 'user_123',
   eventType: 'api_call',
   idempotencyKey: `evt_${Date.now()}`
 })
 
-// 3. Agregar más seats
 await commet.seats.add({
   externalId: 'user_123',
   seatType: 'editor',
   count: 3
 })
 
-// 4. Verificar estado actual
 const current = await commet.subscriptions.get({ externalId: 'user_123' })
 console.log('Días restantes:', current.data?.currentPeriod.daysRemaining)
 
-// 5. Upgrade de plan
 await commet.subscriptions.changePlan(sub.data.id, {
-  planId: 'plan_enterprise'
+  planCode: 'enterprise'
 })
 ```
 
