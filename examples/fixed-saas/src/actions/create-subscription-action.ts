@@ -1,7 +1,7 @@
 "use server";
 
 import { auth } from "@/lib/auth";
-import { COMMET_PLAN_ID, commet } from "@/lib/commet";
+import { commet } from "@/lib/commet";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -60,10 +60,9 @@ export async function createSubscriptionAction(
       }
     }
 
-    // Create subscription with plan
     const result = await commet.subscriptions.create({
       externalId: user.id,
-      planId: COMMET_PLAN_ID,
+      planCode: "pro",
       billingInterval,
     });
 
