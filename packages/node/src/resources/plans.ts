@@ -95,4 +95,3 @@ export class PlansResource {
     return this.httpClient.get(`/plans/${planId}`);
   }
 }
-
