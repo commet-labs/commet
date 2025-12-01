@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -6,37 +7,27 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { commet } from "@/lib/commet";
+import type { BillingInterval, Plan, PlanPrice } from "@commet/node";
 import Link from "next/link";
-import type { Plan, PlanPrice } from "@commet/node";
 
-function formatPrice(price: PlanPrice) {
-  const amount = (price.price / 100).toFixed(0);
-  const interval =
-    price.billingInterval === "yearly"
-      ? "year"
-      : price.billingInterval === "quarterly"
-        ? "quarter"
-        : "month";
-  return { amount, interval };
-}
+const intervalLabels: Record<BillingInterval, string> = {
+  monthly: "month",
+  quarterly: "quarter",
+  yearly: "year",
+};
 
-function PlanCard({ plan, featured }: { plan: Plan; featured?: boolean }) {
-  const defaultPrice = plan.prices.find((p) => p.isDefault) ?? plan.prices[0];
+const intervalOrder: BillingInterval[] = ["monthly", "quarterly", "yearly"];
+
+function PlanCard({ plan }: { plan: Plan }) {
+  const sortedPrices = [...plan.prices].sort(
+    (a, b) =>
+      intervalOrder.indexOf(a.billingInterval) -
+      intervalOrder.indexOf(b.billingInterval),
+  );
 
   return (
-    <Card
-      className={`relative flex flex-col ${featured ? "border-primary shadow-lg scale-105" : ""}`}
-    >
-      {featured && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-          <Badge className="bg-primary text-primary-foreground">
-            Most Popular
-          </Badge>
-        </div>
-      )}
-
+    <Card className="flex flex-col">
       <CardHeader className="text-center pb-2">
         <CardTitle className="text-xl">{plan.name}</CardTitle>
         {plan.description && (
@@ -45,17 +36,29 @@ function PlanCard({ plan, featured }: { plan: Plan; featured?: boolean }) {
       </CardHeader>
 
       <CardContent className="flex-1 flex flex-col">
-        {/* Price */}
-        {defaultPrice && (
-          <div className="text-center mb-6">
-            <span className="text-4xl font-bold">
-              ${formatPrice(defaultPrice).amount}
-            </span>
-            <span className="text-muted-foreground">
-              /{formatPrice(defaultPrice).interval}
-            </span>
-          </div>
-        )}
+        {/* Prices */}
+        <div className="space-y-2 mb-6">
+          {sortedPrices.map((price) => (
+            <div
+              key={price.billingInterval}
+              className={`flex items-center justify-between p-3 rounded-lg ${
+                price.isDefault
+                  ? "bg-primary/10 border border-primary/20"
+                  : "bg-muted/50"
+              }`}
+            >
+              <span className="text-sm text-muted-foreground capitalize">
+                {price.billingInterval}
+              </span>
+              <span className="font-semibold">
+                ${(price.price / 100).toFixed(0)}
+                <span className="text-sm text-muted-foreground font-normal">
+                  /{intervalLabels[price.billingInterval]}
+                </span>
+              </span>
+            </div>
+          ))}
+        </div>
 
         {/* Trial */}
         {plan.trialDays > 0 && (
@@ -98,11 +101,7 @@ function PlanCard({ plan, featured }: { plan: Plan; featured?: boolean }) {
         )}
 
         {/* CTA */}
-        <Button
-          asChild
-          className="w-full mt-auto"
-          variant={featured ? "default" : "outline"}
-        >
+        <Button asChild className="w-full mt-auto">
           <Link href="/signup">Get Started</Link>
         </Button>
       </CardContent>
@@ -136,7 +135,6 @@ export async function PricingSection() {
   }
 
   const plans = result.data.sort((a, b) => a.sortOrder - b.sortOrder);
-  const featuredIndex = Math.floor(plans.length / 2);
 
   return (
     <section className="py-20">
@@ -161,15 +159,10 @@ export async function PricingSection() {
               : "md:grid-cols-3 max-w-5xl mx-auto"
         }`}
       >
-        {plans.map((plan, index) => (
-          <PlanCard
-            key={plan.id}
-            plan={plan}
-            featured={plans.length > 1 && index === featuredIndex}
-          />
+        {plans.map((plan) => (
+          <PlanCard key={plan.id} plan={plan} />
         ))}
       </div>
     </section>
   );
 }
-

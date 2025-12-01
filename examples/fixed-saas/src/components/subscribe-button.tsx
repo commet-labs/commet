@@ -32,11 +32,16 @@ export function SubscribeButton({ prices }: SubscribeButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedInterval, setSelectedInterval] = useState<BillingInterval>(
-    () => prices.find((p) => p.isDefault)?.billingInterval ?? prices[0]?.billingInterval ?? "monthly",
+    () =>
+      prices.find((p) => p.isDefault)?.billingInterval ??
+      prices[0]?.billingInterval ??
+      "monthly",
   );
   const router = useRouter();
 
-  const selectedPrice = prices.find((p) => p.billingInterval === selectedInterval);
+  const selectedPrice = prices.find(
+    (p) => p.billingInterval === selectedInterval,
+  );
 
   async function handleSubscribe() {
     setIsLoading(true);

@@ -1,8 +1,8 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { commet } from "./commet";
 import { db } from "./db/connection";
 import * as schema from "./db/schema";
-import { commet } from "./commet";
 
 // Get environment variables - use placeholders for build time
 const authSecret =
