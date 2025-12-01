@@ -88,7 +88,6 @@ export type CreateSubscriptionParams = CustomerIdentifier & {
 export interface ChangePlanParams {
   planId: string;
   billingInterval?: BillingInterval;
-  prorate?: boolean;
 }
 
 export interface PauseParams {
@@ -186,8 +185,7 @@ export class SubscriptionsResource {
    * @example
    * ```typescript
    * await commet.subscriptions.changePlan('sub_xxx', {
-   *   planId: 'plan_enterprise',
-   *   prorate: true
+   *   planId: 'plan_enterprise'
    * });
    * ```
    */

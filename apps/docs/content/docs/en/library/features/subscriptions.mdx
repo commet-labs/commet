@@ -59,14 +59,11 @@ Upgrade or downgrade:
 
 ```typescript
 await commet.subscriptions.changePlan('sub_xxx', {
-  planId: 'plan_enterprise',
-  prorate: true
+  planId: 'plan_enterprise'
 })
 ```
 
-<Callout type="info">
-When `prorate: true`, Commet calculates the credit for unused time on the old plan and the charge for the remaining time on the new plan.
-</Callout>
+Proration is automatic: Commet calculates credit for unused time on the old plan and charges for remaining time on the new plan.
 
 ## Pause and Resume
 
@@ -168,8 +165,7 @@ console.log('Days remaining:', current.data?.currentPeriod.daysRemaining)
 
 // 5. Upgrade plan
 await commet.subscriptions.changePlan(sub.data.id, {
-  planId: 'plan_enterprise',
-  prorate: true
+  planId: 'plan_enterprise'
 })
 ```
 
