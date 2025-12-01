@@ -1,7 +1,7 @@
 import type {
   ApiResponse,
-  CustomerID,
   ListParams as BaseListParams,
+  CustomerID,
   RequestOptions,
 } from "../types/common";
 import type { CommetHTTPClient } from "../utils/http";

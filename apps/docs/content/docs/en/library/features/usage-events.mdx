@@ -1,22 +1,9 @@
 ---
 title: Usage Events
-description: Track usage data for accurate billing
+description: Track usage for billing
 ---
 
-import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
-import { Callout } from 'fumadocs-ui/components/callout'
-
-# Usage Events
-
-Track customer usage for billing. Send events in real-time or batch them for high-volume scenarios.
-
-<Callout type="info">
-**Prerequisites:** Initialize your Commet client with a valid API key.
-</Callout>
-
 ## Track Event
-
-Use `track()` to record usage events:
 
 ```typescript
 await commet.usage.track({
@@ -38,15 +25,10 @@ await commet.usage.track({
 | `eventType` | string | Type of event (e.g., `api_call`) |
 | `idempotencyKey` | string | Unique key to prevent duplicates |
 | `value` | number | Event value (optional, default: 1) |
-| `timestamp` | string | ISO timestamp (optional, defaults to now) |
+| `timestamp` | string | ISO timestamp (optional) |
 | `properties` | object | Additional context as key-value pairs |
 
-<Callout type="info">
-**Idempotency:** Always include an `idempotencyKey` to prevent duplicate events.
-The same key will be deduplicated within the same customer.
-</Callout>
-
-## Batch Processing
+## Batch Tracking
 
 Send multiple events efficiently:
 
@@ -69,12 +51,7 @@ await commet.usage.trackBatch({
 })
 ```
 
-<Callout type="success">
-**Batch Performance:** Batch events for high-volume scenarios. 
-The SDK handles automatic retries and error handling.
-</Callout>
-
-## Event Properties
+## Properties
 
 Add context to events for filtering and aggregation:
 
@@ -83,54 +60,13 @@ await commet.usage.track({
   externalId: 'user_123',
   eventType: 'compute',
   idempotencyKey: `compute_${jobId}`,
-  value: 3600,  // seconds of compute time
+  value: 3600,
   properties: {
     region: 'us-east-1',
     instance_type: 'c5.xlarge',
     job_id: jobId
   }
 })
-```
-
-Properties can be used to:
-- Filter events in metrics (e.g., only count `region=us-east-1`)
-- Group events for reporting
-- Add audit context
-
-## List Events
-
-```typescript
-const events = await commet.usage.list({
-  externalId: 'user_123',
-  eventType: 'api_call',
-  limit: 100
-})
-
-console.log(`Found ${events.data.length} events`)
-
-// Pagination
-if (events.hasMore) {
-  const nextPage = await commet.usage.list({
-    externalId: 'user_123',
-    cursor: events.nextCursor
-  })
-}
-```
-
-## Retrieve Event
-
-```typescript
-const event = await commet.usage.retrieve('evt_xxx')
-console.log('Event type:', event.data.eventType)
-console.log('Timestamp:', event.data.ts)
-```
-
-## Delete Event
-
-Soft-delete an event (won't be counted in billing):
-
-```typescript
-await commet.usage.delete('evt_xxx')
 ```
 
 ## Complete Example
@@ -143,7 +79,7 @@ const commet = new Commet({
   environment: 'sandbox'
 })
 
-// Track API call with context
+// Track API call
 await commet.usage.track({
   externalId: 'user_123',
   eventType: 'api_call',
@@ -181,4 +117,3 @@ await commet.usage.trackBatch({
 
 - [Plans](/docs/library/features/plans) - Configure metered features
 - [Subscriptions](/docs/library/features/subscriptions) - View usage summary
-- [Customers](/docs/library/features/customers) - Manage customer data

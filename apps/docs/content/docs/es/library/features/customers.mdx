@@ -1,29 +1,28 @@
 ---
 title: Clientes
-description: Gestiona clientes con direcciones y tributación
+description: Gestiona clientes para facturación
 ---
 
-import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
 import { Callout } from 'fumadocs-ui/components/callout'
 
 ## Crear Cliente
 
 ```typescript
 const customer = await commet.customers.create({
-  legalName: 'Acme Corporation',
-  billingEmail: 'billing@acme.com'
+  email: 'billing@acme.com',
+  externalId: 'user_123'
 })
 ```
 
 ## Vincular con Tu Sistema
 
-Usa `externalId` para conectar clientes de Commet con tu base de datos:
+Usa `externalId` para conectar clientes con tu base de datos:
 
 ```typescript
 const customer = await commet.customers.create({
+  email: user.email,
   externalId: user.id,
-  legalName: 'Acme Corporation',
-  billingEmail: user.email
+  legalName: 'Acme Corporation'
 })
 
 // Después, busca por tu ID
@@ -35,13 +34,13 @@ const customers = await commet.customers.list({
 ## Operaciones Básicas
 
 ```typescript
-// Recuperar
-const customer = await commet.customers.retrieve('cus_xxx')
+// Obtener
+const customer = await commet.customers.get('cus_xxx')
 
 // Actualizar
 await commet.customers.update('cus_xxx', {
   displayName: 'Acme Corp',
-  billingEmail: 'accounts@acme.com'
+  email: 'accounts@acme.com'
 })
 
 // Listar
@@ -50,11 +49,25 @@ const customers = await commet.customers.list({
   limit: 50
 })
 
-// Desactivar
-await commet.customers.deactivate('cus_xxx')
+// Archivar
+await commet.customers.archive('cus_xxx')
 ```
 
-## Agregar Dirección Después
+## Creación en Batch
+
+Importa clientes en bulk para sincronización inicial:
+
+```typescript
+await commet.customers.createBatch({
+  customers: [
+    { email: 'user1@example.com', externalId: 'user_1' },
+    { email: 'user2@example.com', externalId: 'user_2' },
+    { email: 'user3@example.com', externalId: 'user_3' }
+  ]
+})
+```
+
+## Agregar Dirección
 
 Completa el perfil del cliente cuando la información esté disponible:
 
@@ -62,26 +75,23 @@ Completa el perfil del cliente cuando la información esté disponible:
 await commet.customers.update(customerId, {
   address: {
     line1: '123 Business St',
-    line2: 'Suite 100', // Opcional
     city: 'San Francisco',
-    state: 'CA', // Requerido para US/CA
+    state: 'CA',
     postalCode: '94105',
-    country: 'US', // Formato ISO-2
-    region: 'North America' // Opcional
+    country: 'US'
   }
 })
 ```
 
-## Metadata Personalizada
+## Metadata
 
-Almacena datos adicionales con clientes:
+Almacena datos adicionales:
 
 ```typescript
 await commet.customers.update('cus_xxx', {
   metadata: {
     crm_id: 'sf_123456',
-    tier: 'enterprise',
-    account_manager: 'john.doe@company.com'
+    tier: 'enterprise'
   }
 })
 ```
@@ -89,5 +99,4 @@ await commet.customers.update('cus_xxx', {
 ## Recursos Relacionados
 
 - [Suscripciones](/es/docs/library/features/subscriptions) - Crear facturación recurrente
-- [Acceso al Portal](/es/docs/library/features/portal-access) - Generar links del portal de cliente
-- [Paginación](/es/docs/library/core/pagination) - Manejar listas grandes de clientes
+- [Acceso al Portal](/es/docs/library/features/portal-access) - Generar links del portal

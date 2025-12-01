@@ -1,206 +1,145 @@
 ---
 title: Suscripciones
-description: Crea y gestiona suscripciones con múltiples productos
+description: Gestiona suscripciones con el modelo plan-first
 ---
-
-import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
-import { Callout } from 'fumadocs-ui/components/callout'
-
-<Callout type="info">
-**Prerrequisitos:** Inicializa tu cliente Commet con una clave API válida.
-</Callout>
-
-<Callout type="success">
-**¿Probando suscripciones?** Usa el entorno sandbox y las [tarjetas de prueba de Stripe](/es/docs/library/core/testing#tarjetas-de-prueba-de-stripe) para probar flujos de checkout de forma segura.
-</Callout>
 
 ## Crear Suscripción
 
-Crea una suscripción con uno o más productos:
+```typescript
+const subscription = await commet.subscriptions.create({
+  externalId: 'user_123',
+  planId: 'plan_pro'
+})
+```
+
+### Opciones
+
+| Parámetro | Tipo | Descripción |
+|-----------|------|-------------|
+| `externalId` o `customerId` | string | Identificador del cliente (requerido) |
+| `planId` | string | Plan a suscribir (requerido) |
+| `billingInterval` | string | `monthly`, `quarterly`, o `yearly` |
+| `initialSeats` | object | Cantidad inicial de seats por tipo |
+| `skipTrial` | boolean | Saltar el período de trial si el plan tiene |
+| `startDate` | string | Fecha ISO para suscripción futura |
+
+## Obtener Suscripción
+
+Cada cliente tiene una suscripción activa. Esto la retorna con resumen completo:
+
+```typescript
+const sub = await commet.subscriptions.get({
+  externalId: 'user_123'
+})
+
+if (sub.data) {
+  console.log('Plan:', sub.data.plan.name)
+  console.log('Estado:', sub.data.status)
+  console.log('Días restantes:', sub.data.currentPeriod.daysRemaining)
+  
+  for (const feature of sub.data.features) {
+    if (feature.usage) {
+      console.log(`${feature.name}: ${feature.usage.current}/${feature.usage.included}`)
+    }
+  }
+}
+```
+
+## Cambiar Plan
+
+```typescript
+await commet.subscriptions.changePlan('sub_xxx', {
+  planId: 'plan_enterprise'
+})
+```
+
+Proration automático: Commet calcula crédito por tiempo no usado y cobra el nuevo plan.
+
+## Cancelar
+
+```typescript
+await commet.subscriptions.cancel('sub_xxx', {
+  reason: 'switched_to_competitor'
+})
+```
+
+## Estados de Suscripción
+
+| Estado | Descripción |
+|--------|-------------|
+| `draft` | Creada pero no activada |
+| `pending_payment` | Esperando primer pago |
+| `trialing` | En período de trial |
+| `active` | Activa y facturando normalmente |
+| `paused` | Pausada temporalmente |
+| `past_due` | Pago falló, período de gracia |
+| `canceled` | Cancelada |
+| `expired` | Llegó a fecha de fin |
+
+## Períodos de Trial
+
+Si un plan tiene días de trial, las nuevas suscripciones inician en estado `trialing`:
 
 ```typescript
 const subscription = await commet.subscriptions.create({
-  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
-  items: [
-    { priceId: 'price_tasks_free', quantity: 1 }
-  ]
+  externalId: 'user_123',
+  planId: 'plan_with_trial'
 })
 
-console.log('Suscripción creada:', subscription.data.id)
-```
+console.log(subscription.data.status)  // "trialing"
+console.log(subscription.data.trialEndsAt)
 
-### Múltiples Productos
-
-Agrupa múltiples productos en una sola suscripción:
-
-```typescript
-const subscription = await commet.subscriptions.create({
-  externalId: 'org_123',
-  items: [
-    { priceId: 'price_tasks_pro', quantity: 1 },
-    { priceId: 'price_usage_pro' },
-    { priceId: 'price_seats_pro', initialSeats: 5 }
-  ],
-  status: 'active'
+// Saltar trial si es necesario
+await commet.subscriptions.create({
+  externalId: 'user_456',
+  planId: 'plan_with_trial',
+  skipTrial: true
 })
-```
-
-### Tipos de Productos
-
-<Tabs items={['Fijo', 'Por Uso', 'Por Asientos']}>
-<Tab value="Fijo">
-```typescript
-const subscription = await commet.subscriptions.create({
-  customerId: 'cus_xxx',
-  items: [
-    { priceId: 'price_fixed_plan', quantity: 1 }
-  ]
-})
-```
-</Tab>
-<Tab value="Por Uso">
-```typescript
-const subscription = await commet.subscriptions.create({
-  customerId: 'cus_xxx',
-  items: [
-    { priceId: 'price_api_calls' }
-  ]
-})
-
-// Rastrea uso
-await commet.usage.create({
-  eventType: 'api_call',
-  customerId: 'cus_xxx',
-  idempotencyKey: `evt_${Date.now()}`
-})
-```
-</Tab>
-<Tab value="Por Asientos">
-```typescript
-const subscription = await commet.subscriptions.create({
-  customerId: 'cus_xxx',
-  items: [
-    { priceId: 'price_user_licenses', initialSeats: 10 }
-  ]
-})
-
-// Gestiona asientos
-await commet.seats.add({
-  customerId: 'cus_xxx',
-  seatType: 'editor',
-  count: 5
-})
-```
-</Tab>
-</Tabs>
-
-## Opciones
-
-### Suscripción Borrador
-
-Crea suscripción para revisión antes de activación:
-
-```typescript
-const draft = await commet.subscriptions.create({
-  customerId: 'cus_xxx',
-  items: [
-    { priceId: 'price_enterprise', quantity: 100 }
-  ],
-  status: 'draft'
-})
-```
-
-<Callout type="info">
-**Suscripciones borrador** no generan facturas hasta ser activadas manualmente en la plataforma.
-</Callout>
-
-### Fecha de Inicio Personalizada
-
-Programa suscripciones para facturación futura:
-
-```typescript
-const subscription = await commet.subscriptions.create({
-  customerId: 'cus_xxx',
-  items: [
-    { priceId: 'price_monthly', quantity: 1 }
-  ],
-  startDate: '2025-02-01T00:00:00Z',
-  status: 'active'
-})
-```
-
-### Suscripción con Nombre
-
-```typescript
-const subscription = await commet.subscriptions.create({
-  externalId: 'startup-xyz',
-  name: 'Startup XYZ - Plan Growth',
-  items: [
-    { priceId: 'price_growth', quantity: 1 }
-  ]
-})
-```
-
-## Operaciones Básicas
-
-```typescript
-// Recuperar suscripción
-const subscription = await commet.subscriptions.retrieve('sub_A1b2C3d4E5f6G7h8I9j0K1l2')
-
-// Listar suscripciones
-const subscriptions = await commet.subscriptions.list({
-  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
-  status: 'active'
-})
-
-// Listar por ID externo
-const subscriptions = await commet.subscriptions.list({
-  externalId: 'org_123'
-})
-
-// Cancelar suscripción
-await commet.subscriptions.cancel('sub_A1b2C3d4E5f6G7h8I9j0K1l2')
 ```
 
 ## Ejemplo Completo
 
 ```typescript
-// Crear suscripción con múltiples productos
-const sub = await commet.subscriptions.create({
-  externalId: 'startup-xyz',
-  name: 'Startup XYZ - Plan Growth',
-  items: [
-    { priceId: 'price_base_plan', quantity: 1 },
-    { priceId: 'price_api_usage' },
-    { priceId: 'price_user_seats', initialSeats: 5 }
-  ],
-  status: 'active'
+import { Commet } from '@commet/node'
+
+const commet = new Commet({
+  apiKey: process.env.COMMET_API_KEY!,
+  environment: 'sandbox'
 })
 
-// Rastrear uso de API
-await commet.usage.create({
+// 1. Suscribir a un plan
+const sub = await commet.subscriptions.create({
+  externalId: 'user_123',
+  planId: 'plan_pro',
+  initialSeats: { editor: 5 }
+})
+
+// 2. Trackear uso
+await commet.usage.track({
+  externalId: 'user_123',
   eventType: 'api_call',
-  externalId: 'startup-xyz',
   idempotencyKey: `evt_${Date.now()}`
 })
 
-// Agregar miembros del equipo
+// 3. Agregar más seats
 await commet.seats.add({
-  externalId: 'startup-xyz',
+  externalId: 'user_123',
   seatType: 'editor',
   count: 3
 })
 
-// Verificar balance de asientos
-const balance = await commet.seats.getBalance({
-  externalId: 'startup-xyz',
-  seatType: 'editor'
+// 4. Verificar estado actual
+const current = await commet.subscriptions.get({ externalId: 'user_123' })
+console.log('Días restantes:', current.data?.currentPeriod.daysRemaining)
+
+// 5. Upgrade de plan
+await commet.subscriptions.changePlan(sub.data.id, {
+  planId: 'plan_enterprise'
 })
-console.log('Total asientos:', balance.data.current) // 8
 ```
 
 ## Recursos Relacionados
 
-- [Eventos de Uso](/es/docs/library/features/usage-events) - Rastrea consumo para facturación por uso
-- [Gestión de Asientos](/es/docs/library/features/seat-management) - Gestiona licencias por asiento
-- [Clientes](/es/docs/library/features/customers) - Crea y gestiona clientes
+- [Planes](/es/docs/library/features/plans) - Listar planes disponibles
+- [Eventos de Uso](/es/docs/library/features/usage-events) - Trackear consumo
+- [Seats](/es/docs/library/features/seat-management) - Gestionar licencias

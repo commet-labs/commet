@@ -3,18 +3,12 @@ title: Subscriptions
 description: Manage subscriptions with the plan-first model
 ---
 
-import { Callout } from 'fumadocs-ui/components/callout'
-
 ## Create Subscription
-
-Subscribe a customer to a plan:
 
 ```typescript
 const subscription = await commet.subscriptions.create({
   externalId: 'user_123',
-  planId: 'plan_pro',
-  billingInterval: 'yearly',
-  initialSeats: { editor: 5 }
+  planId: 'plan_pro'
 })
 ```
 
@@ -29,10 +23,9 @@ const subscription = await commet.subscriptions.create({
 | `skipTrial` | boolean | Skip the trial period if plan has one |
 | `startDate` | string | ISO date for future-dated subscription |
 
-
 ## Get Subscription
 
-Each customer has only one active subscription. This returns it with full summary:
+Each customer has one active subscription. This returns it with full summary:
 
 ```typescript
 const sub = await commet.subscriptions.get({
@@ -44,7 +37,6 @@ if (sub.data) {
   console.log('Status:', sub.data.status)
   console.log('Days remaining:', sub.data.currentPeriod.daysRemaining)
   
-  // Check feature usage
   for (const feature of sub.data.features) {
     if (feature.usage) {
       console.log(`${feature.name}: ${feature.usage.current}/${feature.usage.included}`)
@@ -55,27 +47,13 @@ if (sub.data) {
 
 ## Change Plan
 
-Upgrade or downgrade:
-
 ```typescript
 await commet.subscriptions.changePlan('sub_xxx', {
   planId: 'plan_enterprise'
 })
 ```
 
-Proration is automatic: Commet calculates credit for unused time on the old plan and charges for remaining time on the new plan.
-
-## Pause and Resume
-
-```typescript
-// Pause
-await commet.subscriptions.pause('sub_xxx', {
-  reason: 'seasonal'
-})
-
-// Resume
-await commet.subscriptions.resume('sub_xxx')
-```
+Proration is automatic: Commet calculates credit for unused time and charges for the new plan.
 
 ## Cancel
 
@@ -100,7 +78,7 @@ await commet.subscriptions.cancel('sub_xxx', {
 
 ## Trial Periods
 
-If a plan has trial days configured, new subscriptions start in `trialing` status:
+If a plan has trial days, new subscriptions start in `trialing` status:
 
 ```typescript
 const subscription = await commet.subscriptions.create({
@@ -116,15 +94,6 @@ await commet.subscriptions.create({
   externalId: 'user_456',
   planId: 'plan_with_trial',
   skipTrial: true
-})
-```
-
-## List Subscription History
-
-```typescript
-const history = await commet.subscriptions.list({
-  externalId: 'user_123',
-  status: 'canceled'
 })
 ```
 
@@ -159,7 +128,7 @@ await commet.seats.add({
   count: 3
 })
 
-// 4. Check current status (includes summary)
+// 4. Check current status
 const current = await commet.subscriptions.get({ externalId: 'user_123' })
 console.log('Days remaining:', current.data?.currentPeriod.daysRemaining)
 

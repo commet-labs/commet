@@ -1,17 +1,16 @@
 ---
-title: Customer
-description: Manage customers with addresses and taxation
+title: Customers
+description: Manage customers for billing
 ---
 
-import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
 import { Callout } from 'fumadocs-ui/components/callout'
 
 ## Create Customer
 
 ```typescript
 const customer = await commet.customers.create({
-  legalName: 'Acme Corporation',
-  billingEmail: 'billing@acme.com'
+  email: 'billing@acme.com',
+  externalId: 'user_123'
 })
 ```
 
@@ -21,9 +20,9 @@ Use `externalId` to connect Commet customers with your database:
 
 ```typescript
 const customer = await commet.customers.create({
+  email: user.email,
   externalId: user.id,
-  legalName: 'Acme Corporation',
-  billingEmail: user.email
+  legalName: 'Acme Corporation'
 })
 
 // Later, find by your ID
@@ -35,13 +34,13 @@ const customers = await commet.customers.list({
 ## Basic Operations
 
 ```typescript
-// Retrieve
-const customer = await commet.customers.retrieve('cus_xxx')
+// Get
+const customer = await commet.customers.get('cus_xxx')
 
 // Update
 await commet.customers.update('cus_xxx', {
   displayName: 'Acme Corp',
-  billingEmail: 'accounts@acme.com'
+  email: 'accounts@acme.com'
 })
 
 // List
@@ -50,11 +49,25 @@ const customers = await commet.customers.list({
   limit: 50
 })
 
-// Deactivate
-await commet.customers.deactivate('cus_xxx')
+// Archive
+await commet.customers.archive('cus_xxx')
 ```
 
-## Add Address Later
+## Batch Create
+
+Import customers in bulk for initial sync:
+
+```typescript
+await commet.customers.createBatch({
+  customers: [
+    { email: 'user1@example.com', externalId: 'user_1' },
+    { email: 'user2@example.com', externalId: 'user_2' },
+    { email: 'user3@example.com', externalId: 'user_3' }
+  ]
+})
+```
+
+## Add Address
 
 Complete customer profile when information becomes available:
 
@@ -62,17 +75,15 @@ Complete customer profile when information becomes available:
 await commet.customers.update(customerId, {
   address: {
     line1: '123 Business St',
-    line2: 'Suite 100', // Optional
     city: 'San Francisco',
-    state: 'CA', // Required for US/CA
+    state: 'CA',
     postalCode: '94105',
-    country: 'US', // ISO-2 format
-    region: 'North America' // Optional
+    country: 'US'
   }
 })
 ```
 
-## Custom Metadata
+## Metadata
 
 Store additional data with customers:
 
@@ -80,8 +91,7 @@ Store additional data with customers:
 await commet.customers.update('cus_xxx', {
   metadata: {
     crm_id: 'sf_123456',
-    tier: 'enterprise',
-    account_manager: 'john.doe@company.com'
+    tier: 'enterprise'
   }
 })
 ```
@@ -90,4 +100,3 @@ await commet.customers.update('cus_xxx', {
 
 - [Subscriptions](/docs/library/features/subscriptions) - Create recurring billing
 - [Portal Access](/docs/library/features/portal-access) - Generate customer portal links
-- [Pagination](/docs/library/core/pagination) - Handle large customer lists

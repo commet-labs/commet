@@ -1,111 +1,119 @@
 ---
 title: Eventos de Uso
-description: Rastrea datos de uso para facturación precisa
+description: Trackea uso para facturación
 ---
 
-import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
-import { Callout } from 'fumadocs-ui/components/callout'
-
-# Eventos de Uso
-
-Rastrea el uso del cliente para facturación. Envía eventos en tiempo real o agrúpalos para escenarios de alto volumen.
-
-<Callout type="info">
-**Prerrequisitos:** Inicializa tu cliente Commet con una clave API válida.
-</Callout>
-
-## Crear Evento
+## Trackear Evento
 
 ```typescript
-const result = await commet.usage.create({
+await commet.usage.track({
+  externalId: 'user_123',
   eventType: 'api_call',
-  customerId: 'cus_xxx',
-  idempotencyKey: `evt_${Date.now()}`,
+  idempotencyKey: `evt_${requestId}`,
+  properties: {
+    endpoint: '/api/users',
+    method: 'GET'
+  }
 })
 ```
 
-<Callout type="info">
-**Identificación de Cliente**: Usa `customerId` o `externalId` para identificar clientes.
-</Callout>
+### Parámetros
 
-## Usando IDs Externos
+| Parámetro | Tipo | Descripción |
+|-----------|------|-------------|
+| `externalId` o `customerId` | string | Identificador del cliente (requerido) |
+| `eventType` | string | Tipo de evento (ej: `api_call`) |
+| `idempotencyKey` | string | Key única para prevenir duplicados |
+| `value` | number | Valor del evento (opcional, default: 1) |
+| `timestamp` | string | Timestamp ISO (opcional) |
+| `properties` | object | Contexto adicional como key-value |
 
-```typescript
-const result = await commet.usage.create({
-  eventType: 'api_call',
-  externalId: 'stripe_cus_abc123',
-  idempotencyKey: `evt_${Date.now()}`,
-})
-```
-
-## Properties de Evento
-
-Agrega contexto a eventos:
-
-```typescript
-await commet.usage.create({
-  eventType: 'api_call',
-  customerId: 'cus_xxx',
-  idempotencyKey: `evt_${Date.now()}`,
-  properties: [
-    { property: 'endpoint', value: '/api/users' },
-    { property: 'method', value: 'GET' }
-  ]
-})
-```
-
-## Procesamiento en Lotes
+## Tracking en Batch
 
 Envía múltiples eventos eficientemente:
 
 ```typescript
-const result = await commet.usage.createBatch({
+await commet.usage.trackBatch({
   events: [
     {
+      externalId: 'user_123',
       eventType: 'api_call',
-      customerId: 'cus_xxx',
       idempotencyKey: `evt_${Date.now()}_1`,
+      properties: { endpoint: '/users' }
     },
     {
+      externalId: 'user_456',
       eventType: 'api_call',
-      externalId: 'stripe_cus_abc',
       idempotencyKey: `evt_${Date.now()}_2`,
+      properties: { endpoint: '/orders' }
     }
   ]
 })
 ```
 
-## Listar Eventos
+## Properties
+
+Agrega contexto a eventos para filtrado y agregación:
 
 ```typescript
-const events = await commet.usage.list({
-  customerId: 'cus_xxx',
-  eventType: 'api_call',
-  limit: 100
+await commet.usage.track({
+  externalId: 'user_123',
+  eventType: 'compute',
+  idempotencyKey: `compute_${jobId}`,
+  value: 3600,
+  properties: {
+    region: 'us-east-1',
+    instance_type: 'c5.xlarge',
+    job_id: jobId
+  }
+})
+```
+
+## Ejemplo Completo
+
+```typescript
+import { Commet } from '@commet/node'
+
+const commet = new Commet({
+  apiKey: process.env.COMMET_API_KEY!,
+  environment: 'sandbox'
 })
 
-// Paginación
-if (events.hasMore) {
-  const nextPage = await commet.usage.list({
-    customerId: 'cus_xxx',
-    cursor: events.nextCursor
-  })
-}
-```
+// Trackear llamada API
+await commet.usage.track({
+  externalId: 'user_123',
+  eventType: 'api_call',
+  idempotencyKey: `req_${crypto.randomUUID()}`,
+  properties: {
+    endpoint: '/api/users',
+    method: 'POST',
+    status: '201'
+  }
+})
 
-## Recuperar Evento
+// Trackear uso de compute
+await commet.usage.track({
+  externalId: 'user_123',
+  eventType: 'compute_seconds',
+  idempotencyKey: `job_${jobId}`,
+  value: 3600,
+  properties: {
+    region: 'us-east-1',
+    job_type: 'ml_training'
+  }
+})
 
-```typescript
-const event = await commet.usage.retrieve('evt_xxx')
-```
-
-## Eliminar Evento
-
-```typescript
-await commet.usage.delete('evt_xxx')
+// Batch de múltiples eventos
+await commet.usage.trackBatch({
+  events: Array.from({ length: 100 }, (_, i) => ({
+    externalId: 'user_123',
+    eventType: 'api_call',
+    idempotencyKey: `batch_${Date.now()}_${i}`,
+  }))
+})
 ```
 
 ## Recursos Relacionados
 
-- [Suscripciones](/es/docs/library/features/subscriptions) - Crear facturación recurrente
-- [Clientes](/es/docs/library/features/customers) - Gestionar datos de clientes
+- [Planes](/es/docs/library/features/plans) - Configurar features de uso
+- [Suscripciones](/es/docs/library/features/subscriptions) - Ver resumen de uso

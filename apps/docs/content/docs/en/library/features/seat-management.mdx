@@ -1,34 +1,23 @@
 ---
-title: Seat
-description: Manage subscription seats with automatic audit trails
+title: Seats
+description: Manage seat-based licenses
 ---
-
-import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
-import { Callout } from 'fumadocs-ui/components/callout'
-
-<Callout type="info">
-**Prerequisites:** Customer must exist and have seat types configured.
-</Callout>
 
 ## Add Seats
 
 ```typescript
-const result = await commet.seats.add({
-  customerId: 'cus_xxx',
+await commet.seats.add({
+  externalId: 'user_123',
   seatType: 'editor',
   count: 5
 })
 ```
 
-<Callout type="info">
-**Customer Identification**: Use `customerId` or `externalId` to identify customers.
-</Callout>
-
 ## Remove Seats
 
 ```typescript
-const result = await commet.seats.remove({
-  customerId: 'cus_xxx',
+await commet.seats.remove({
+  externalId: 'user_123',
   seatType: 'editor',
   count: 2
 })
@@ -37,30 +26,20 @@ const result = await commet.seats.remove({
 ## Set Exact Count
 
 ```typescript
-const result = await commet.seats.set({
-  customerId: 'cus_xxx',
+await commet.seats.set({
+  externalId: 'user_123',
   seatType: 'editor',
   count: 10
 })
 ```
 
-## Using External IDs
-
-```typescript
-const result = await commet.seats.add({
-  externalId: 'stripe_cus_abc123',
-  seatType: 'editor',
-  count: 5
-})
-```
-
-## Bulk Update
+## Set All Seat Types
 
 Update multiple seat types at once:
 
 ```typescript
-const result = await commet.seats.bulkUpdate({
-  customerId: 'cus_xxx',
+await commet.seats.setAll({
+  externalId: 'user_123',
   seats: {
     admin: 3,
     editor: 50,
@@ -73,7 +52,7 @@ const result = await commet.seats.bulkUpdate({
 
 ```typescript
 const balance = await commet.seats.getBalance({
-  customerId: 'cus_xxx',
+  externalId: 'user_123',
   seatType: 'editor'
 })
 
@@ -83,30 +62,32 @@ console.log(`Current seats: ${balance.data.current}`)
 ## Get All Balances
 
 ```typescript
-const allBalances = await commet.seats.getAllBalances({
-  customerId: 'cus_xxx'
+const balances = await commet.seats.getAllBalances({
+  externalId: 'user_123'
 })
 
-console.log(allBalances.data)
+console.log(balances.data)
 // { editor: { current: 50, asOf: '...' }, viewer: { current: 100, asOf: '...' } }
 ```
 
-## List Events
+## Customer Identification
+
+Use `customerId` or `externalId`:
 
 ```typescript
-const events = await commet.seats.listEvents({
+// By Commet ID
+await commet.seats.add({
   customerId: 'cus_xxx',
   seatType: 'editor',
-  limit: 50
+  count: 5
 })
 
-// Pagination
-if (events.hasMore) {
-  const nextPage = await commet.seats.listEvents({
-    customerId: 'cus_xxx',
-    cursor: events.nextCursor
-  })
-}
+// By your system's ID
+await commet.seats.add({
+  externalId: 'stripe_cus_abc123',
+  seatType: 'editor',
+  count: 5
+})
 ```
 
 ## Related Resources
