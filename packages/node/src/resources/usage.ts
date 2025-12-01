@@ -27,28 +27,12 @@ export interface UsageEventProperty {
   createdAt: string;
 }
 
-export interface CreateUsageEventParams {
-  eventType: GeneratedEventType;
-  customerId?: CustomerID;
-  externalId?: string;
-  idempotencyKey?: string; // For idempotency
-  timestamp?: string; // ISO string, defaults to now
-  properties?: Array<{
-    property: string;
-    value: string;
-  }>;
-}
-
-export interface CreateBatchUsageEventsParams {
-  events: CreateUsageEventParams[];
-}
-
 export interface BatchResult<T> {
   successful: T[];
   failed: Array<{
     index: number;
     error: string;
-    data: CreateUsageEventParams;
+    data: TrackUsageParams;
   }>;
 }
 
@@ -159,32 +143,7 @@ export class UsageResource {
     return this.httpClient.post("/usage/events/batch", { events }, options);
   }
 
-  /**
-   * @deprecated Use `track()` instead
-   */
-  async create(
-    params: CreateUsageEventParams,
-    options?: RequestOptions,
-  ): Promise<ApiResponse<UsageEvent>> {
-    const eventData = {
-      ...params,
-      ts: params.timestamp || new Date().toISOString(),
-    };
-
-    return this.httpClient.post("/usage/events", eventData, options);
-  }
-
-  /**
-   * @deprecated Use `trackBatch()` instead
-   */
-  async createBatch(
-    params: CreateBatchUsageEventsParams,
-    options?: RequestOptions,
-  ): Promise<ApiResponse<BatchResult<UsageEvent>>> {
-    return this.httpClient.post("/usage/events/batch", params, options);
-  }
-
-  async retrieve(eventId: EventID): Promise<ApiResponse<UsageEvent>> {
+  async get(eventId: EventID): Promise<ApiResponse<UsageEvent>> {
     return this.httpClient.get(`/usage/events/${eventId}`);
   }
 

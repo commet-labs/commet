@@ -115,7 +115,7 @@ export class CustomersResource {
     return this.httpClient.post("/customers", params, options);
   }
 
-  async retrieve(
+  async get(
     customerId: CustomerID,
     options?: RetrieveOptions,
   ): Promise<ApiResponse<Customer>> {

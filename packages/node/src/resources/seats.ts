@@ -154,7 +154,7 @@ export class SeatsResource {
     );
   }
 
-  async getBalance(
+  async get(
     params: GetBalanceParams,
   ): Promise<ApiResponse<SeatBalanceResponse>> {
     return this.httpClient.get("/seats/balance", {
@@ -164,7 +164,7 @@ export class SeatsResource {
     });
   }
 
-  async getAllBalances(
+  async listBalances(
     params: GetAllBalancesParams,
   ): Promise<ApiResponse<Record<string, SeatBalanceResponse>>> {
     return this.httpClient.get("/seats/balances", {

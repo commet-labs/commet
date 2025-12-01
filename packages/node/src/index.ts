@@ -46,8 +46,6 @@ export type {
 export type {
   UsageEvent,
   UsageEventProperty,
-  CreateUsageEventParams,
-  CreateBatchUsageEventsParams,
   BatchResult,
   ListUsageEventsParams,
   TrackUsageParams,

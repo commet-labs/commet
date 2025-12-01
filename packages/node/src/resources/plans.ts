@@ -82,16 +82,16 @@ export class PlansResource {
   }
 
   /**
-   * Retrieve a specific plan by ID
+   * Get a specific plan by ID
    *
    * @example
    * ```typescript
-   * const plan = await commet.plans.retrieve('plan_xxx');
+   * const plan = await commet.plans.get('plan_xxx');
    * console.log(plan.data.name); // "Pro"
    * console.log(plan.data.prices); // [{ billingInterval: 'monthly', price: 9900 }]
    * ```
    */
-  async retrieve(planId: string): Promise<ApiResponse<PlanDetail>> {
+  async get(planId: string): Promise<ApiResponse<PlanDetail>> {
     return this.httpClient.get(`/plans/${planId}`);
   }
 }
