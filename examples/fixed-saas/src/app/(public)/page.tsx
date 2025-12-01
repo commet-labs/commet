@@ -3,10 +3,10 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { PricingSection } from "@/components/pricing-section";
 import Link from "next/link";
 
 export default function Home() {
@@ -92,6 +92,9 @@ export default function Home() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Pricing Section */}
+        <PricingSection />
       </main>
       {/* Footer */}
       <footer className="border-t mt-32">
