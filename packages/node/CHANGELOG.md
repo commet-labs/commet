@@ -1,5 +1,11 @@
 # @commet/node
 
+## 1.0.1
+
+### Patch Changes
+
+- 1f619fe: Use `GeneratedPlanCode` type in `plans.get()` method for autocomplete support after `commet pull`
+
 ## 1.0.0
 
 ### Major Changes
