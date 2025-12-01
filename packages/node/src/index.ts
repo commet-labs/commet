@@ -1,5 +1,5 @@
 /**
- * Commet SDK - Billing and usage tracking SDK
+ * Commet SDK - Billing and usage tracking for SaaS
  */
 export { Commet } from "./client";
 
@@ -9,22 +9,13 @@ export type {
   CommetGeneratedTypes,
   GeneratedEventType,
   GeneratedSeatType,
-  GeneratedProductId,
   Environment,
   ApiResponse,
   PaginatedResponse,
   PaginatedList,
   Currency,
   CustomerID,
-  AgreementID,
-  InvoiceID,
-  PhaseID,
-  ItemID,
-  ProductID,
   EventID,
-  WebhookID,
-  ListParams,
-  RetrieveOptions,
   RequestOptions,
 } from "./types/common";
 
@@ -35,38 +26,37 @@ export {
   CommetValidationError,
 } from "./types/common";
 
-// Resource type exports
+// Customers
 export type {
   Customer,
-  CreateCustomerParams,
-  UpdateCustomerParams,
+  CustomerAddress,
+  CreateParams as CreateCustomerParams,
+  UpdateParams as UpdateCustomerParams,
   ListCustomersParams,
+  BatchResult as CustomersBatchResult,
 } from "./resources/customers";
 
+// Usage
 export type {
   UsageEvent,
   UsageEventProperty,
-  BatchResult,
-  ListUsageEventsParams,
-  TrackUsageParams,
-  UsageSummary,
-  GetUsageSummaryParams,
+  TrackParams,
+  BatchResult as UsageBatchResult,
 } from "./resources/usage";
 
+// Seats
 export type {
-  SeatBalance,
   SeatEvent,
-  SeatBalanceResponse,
-  BulkSeatUpdate,
-  AddSeatsParams,
-  RemoveSeatsParams,
-  SetSeatsParams,
-  BulkUpdateSeatsParams,
+  SeatBalance,
+  AddParams as AddSeatsParams,
+  RemoveParams as RemoveSeatsParams,
+  SetParams as SetSeatsParams,
+  SetAllParams as SetAllSeatsParams,
   GetBalanceParams,
   GetAllBalancesParams,
-  ListSeatEventsParams,
 } from "./resources/seats";
 
+// Plans
 export type {
   Plan,
   PlanDetail,
@@ -78,6 +68,7 @@ export type {
   ListPlansParams,
 } from "./resources/plans";
 
+// Subscriptions
 export type {
   Subscription,
   ActiveSubscription,
@@ -85,17 +76,14 @@ export type {
   FeatureSummary,
   CreateSubscriptionParams,
   ChangePlanParams,
-  PauseParams,
   CancelParams,
-  ListSubscriptionsParams,
   GetSubscriptionParams,
 } from "./resources/subscriptions";
 
-export type {
-  PortalAccess,
-  RequestAccessParams,
-} from "./resources/portal";
+// Portal
+export type { PortalAccess, GetUrlParams } from "./resources/portal";
 
+// Webhooks
 export { Webhooks } from "./resources/webhooks";
 export type {
   WebhookPayload,

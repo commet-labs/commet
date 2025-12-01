@@ -2,21 +2,9 @@ import type {
   ApiResponse,
   CustomerID,
   GeneratedSeatType,
-  ListParams,
   RequestOptions,
 } from "../types/common";
 import type { CommetHTTPClient } from "../utils/http";
-
-export interface SeatBalance {
-  id: string;
-  organizationId: string;
-  customerId: CustomerID;
-  seatType: GeneratedSeatType;
-  balance: number;
-  asOf: string;
-  createdAt: string;
-  updatedAt: string;
-}
 
 export interface SeatEvent {
   id: string;
@@ -31,40 +19,36 @@ export interface SeatEvent {
   createdAt: string;
 }
 
-export interface SeatBalanceResponse {
+export interface SeatBalance {
   current: number;
   asOf: string;
 }
 
-export interface BulkSeatUpdate {
-  [seatType: string]: number;
-}
-
-export interface AddSeatsParams {
+export interface AddParams {
   customerId?: CustomerID;
   externalId?: string;
   seatType: GeneratedSeatType;
   count: number;
 }
 
-export interface RemoveSeatsParams {
+export interface RemoveParams {
   customerId?: CustomerID;
   externalId?: string;
   seatType: GeneratedSeatType;
   count: number;
 }
 
-export interface SetSeatsParams {
+export interface SetParams {
   customerId?: CustomerID;
   externalId?: string;
   seatType: GeneratedSeatType;
   count: number;
 }
 
-export interface BulkUpdateSeatsParams {
+export interface SetAllParams {
   customerId?: CustomerID;
   externalId?: string;
-  seats: BulkSeatUpdate;
+  seats: Record<string, number>;
 }
 
 export interface GetBalanceParams {
@@ -78,85 +62,101 @@ export interface GetAllBalancesParams {
   externalId?: string;
 }
 
-export interface ListSeatEventsParams extends ListParams {
-  customerId?: CustomerID;
-  externalId?: string;
-  seatType?: GeneratedSeatType;
-  eventType?: "add" | "remove" | "set";
-}
-
 /**
- * Seats resource for seat-based billing management
+ * Seats resource - Manage seat-based licenses
  */
 export class SeatsResource {
   constructor(private httpClient: CommetHTTPClient) {}
 
+  /**
+   * Add seats
+   *
+   * @example
+   * ```typescript
+   * await commet.seats.add({
+   *   externalId: 'user_123',
+   *   seatType: 'editor',
+   *   count: 5
+   * });
+   * ```
+   */
   async add(
-    params: AddSeatsParams,
+    params: AddParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<SeatEvent>> {
-    return this.httpClient.post(
-      "/seats",
-      {
-        customerId: params.customerId,
-        externalId: params.externalId,
-        seatType: params.seatType,
-        count: params.count,
-      },
-      options,
-    );
+    return this.httpClient.post("/seats", params, options);
   }
 
+  /**
+   * Remove seats
+   *
+   * @example
+   * ```typescript
+   * await commet.seats.remove({
+   *   externalId: 'user_123',
+   *   seatType: 'editor',
+   *   count: 2
+   * });
+   * ```
+   */
   async remove(
-    params: RemoveSeatsParams,
+    params: RemoveParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<SeatEvent>> {
-    return this.httpClient.delete(
-      "/seats",
-      {
-        customerId: params.customerId,
-        externalId: params.externalId,
-        seatType: params.seatType,
-        count: params.count,
-      },
-      options,
-    );
+    return this.httpClient.delete("/seats", params, options);
   }
 
+  /**
+   * Set seats to a specific count
+   *
+   * @example
+   * ```typescript
+   * await commet.seats.set({
+   *   externalId: 'user_123',
+   *   seatType: 'editor',
+   *   count: 10
+   * });
+   * ```
+   */
   async set(
-    params: SetSeatsParams,
+    params: SetParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<SeatEvent>> {
-    return this.httpClient.put(
-      "/seats",
-      {
-        customerId: params.customerId,
-        externalId: params.externalId,
-        seatType: params.seatType,
-        count: params.count,
-      },
-      options,
-    );
+    return this.httpClient.put("/seats", params, options);
   }
 
-  async bulkUpdate(
-    params: BulkUpdateSeatsParams,
+  /**
+   * Set all seat types
+   *
+   * @example
+   * ```typescript
+   * await commet.seats.setAll({
+   *   externalId: 'user_123',
+   *   seats: { editor: 10, viewer: 50 }
+   * });
+   * ```
+   */
+  async setAll(
+    params: SetAllParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<SeatEvent[]>> {
-    return this.httpClient.put(
-      "/seats/bulk",
-      {
-        customerId: params.customerId,
-        externalId: params.externalId,
-        seats: params.seats,
-      },
-      options,
-    );
+    return this.httpClient.put("/seats/bulk", params, options);
   }
 
-  async get(
+  /**
+   * Get balance for a seat type
+   *
+   * @example
+   * ```typescript
+   * const balance = await commet.seats.getBalance({
+   *   externalId: 'user_123',
+   *   seatType: 'editor'
+   * });
+   * ```
+   */
+  async getBalance(
     params: GetBalanceParams,
-  ): Promise<ApiResponse<SeatBalanceResponse>> {
+  ): Promise<ApiResponse<SeatBalance>> {
     return this.httpClient.get("/seats/balance", {
       customerId: params.customerId,
       externalId: params.externalId,
@@ -164,18 +164,22 @@ export class SeatsResource {
     });
   }
 
-  async listBalances(
+  /**
+   * Get all seat balances
+   *
+   * @example
+   * ```typescript
+   * const balances = await commet.seats.getAllBalances({
+   *   externalId: 'user_123'
+   * });
+   * ```
+   */
+  async getAllBalances(
     params: GetAllBalancesParams,
-  ): Promise<ApiResponse<Record<string, SeatBalanceResponse>>> {
+  ): Promise<ApiResponse<Record<string, SeatBalance>>> {
     return this.httpClient.get("/seats/balances", {
       customerId: params.customerId,
       externalId: params.externalId,
     });
-  }
-
-  async listEvents(
-    params?: ListSeatEventsParams,
-  ): Promise<ApiResponse<SeatEvent[]>> {
-    return this.httpClient.get("/seats/events", params);
   }
 }

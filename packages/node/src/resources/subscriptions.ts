@@ -90,19 +90,9 @@ export interface ChangePlanParams {
   billingInterval?: BillingInterval;
 }
 
-export interface PauseParams {
-  reason?: string;
-}
-
 export interface CancelParams {
   reason?: string;
   immediate?: boolean;
-}
-
-export interface ListSubscriptionsParams extends ListParams {
-  customerId?: string;
-  externalId?: string;
-  status?: SubscriptionStatus;
 }
 
 export type GetSubscriptionParams = CustomerIdentifier;
@@ -116,7 +106,7 @@ export class SubscriptionsResource {
   constructor(private httpClient: CommetHTTPClient) {}
 
   /**
-   * Create a subscription with a plan (plan-first model)
+   * Create a subscription with a plan
    *
    * @example
    * ```typescript
@@ -136,47 +126,17 @@ export class SubscriptionsResource {
   }
 
   /**
-   * Get the active subscription for a customer (includes summary)
-   *
-   * Returns the subscription with plan info, current period, and feature usage.
-   * Since each customer can only have one active subscription, this returns
-   * that subscription or null if none exists.
+   * Get the active subscription for a customer
    *
    * @example
    * ```typescript
    * const sub = await commet.subscriptions.get({ externalId: 'user_123' });
-   * if (sub.data) {
-   *   console.log('Plan:', sub.data.plan.name);
-   *   console.log('Days remaining:', sub.data.currentPeriod.daysRemaining);
-   *   for (const feature of sub.data.features) {
-   *     if (feature.usage) {
-   *       console.log(`${feature.name}: ${feature.usage.current}/${feature.usage.included}`);
-   *     }
-   *   }
-   * }
    * ```
    */
   async get(
     params: GetSubscriptionParams,
   ): Promise<ApiResponse<ActiveSubscription | null>> {
     return this.httpClient.get("/subscriptions/active", params);
-  }
-
-  /**
-   * List subscriptions (includes canceled/expired for history)
-   *
-   * @example
-   * ```typescript
-   * const history = await commet.subscriptions.list({
-   *   externalId: 'user_123',
-   *   status: 'canceled'
-   * });
-   * ```
-   */
-  async list(
-    params?: ListSubscriptionsParams,
-  ): Promise<ApiResponse<Subscription[]>> {
-    return this.httpClient.get("/subscriptions", params);
   }
 
   /**
@@ -197,45 +157,6 @@ export class SubscriptionsResource {
     return this.httpClient.post(
       `/subscriptions/${subscriptionId}/change-plan`,
       params,
-      options,
-    );
-  }
-
-  /**
-   * Pause a subscription
-   *
-   * @example
-   * ```typescript
-   * await commet.subscriptions.pause('sub_xxx', { reason: 'seasonal' });
-   * ```
-   */
-  async pause(
-    subscriptionId: string,
-    params?: PauseParams,
-    options?: RequestOptions,
-  ): Promise<ApiResponse<Subscription>> {
-    return this.httpClient.post(
-      `/subscriptions/${subscriptionId}/pause`,
-      params || {},
-      options,
-    );
-  }
-
-  /**
-   * Resume a paused subscription
-   *
-   * @example
-   * ```typescript
-   * await commet.subscriptions.resume('sub_xxx');
-   * ```
-   */
-  async resume(
-    subscriptionId: string,
-    options?: RequestOptions,
-  ): Promise<ApiResponse<Subscription>> {
-    return this.httpClient.post(
-      `/subscriptions/${subscriptionId}/resume`,
-      {},
       options,
     );
   }

@@ -3,7 +3,6 @@ import type {
   CustomerID,
   EventID,
   GeneratedEventType,
-  ListParams,
   RequestOptions,
 } from "../types/common";
 import type { CommetHTTPClient } from "../utils/http";
@@ -32,18 +31,11 @@ export interface BatchResult<T> {
   failed: Array<{
     index: number;
     error: string;
-    data: TrackUsageParams;
+    data: TrackParams;
   }>;
 }
 
-export interface ListUsageEventsParams extends ListParams {
-  customerId?: CustomerID;
-  externalId?: string;
-  eventType?: GeneratedEventType;
-  idempotencyKey?: string;
-}
-
-export interface TrackUsageParams {
+export interface TrackParams {
   eventType: GeneratedEventType;
   customerId?: CustomerID;
   externalId?: string;
@@ -53,30 +45,14 @@ export interface TrackUsageParams {
   properties?: Record<string, string>;
 }
 
-export interface GetUsageSummaryParams {
-  customerId?: CustomerID;
-  externalId?: string;
-  eventType?: GeneratedEventType;
-}
-
-export interface UsageSummary {
-  eventType: string;
-  total: number;
-  included: number;
-  overage: number;
-  estimatedCost: number;
-  periodStart: string;
-  periodEnd: string;
-}
-
 /**
- * Usage Events resource - Track business events for usage-based billing
+ * Usage resource - Track consumption events for usage-based billing
  */
 export class UsageResource {
   constructor(private httpClient: CommetHTTPClient) {}
 
   /**
-   * Track a usage event (preferred method)
+   * Track a usage event
    *
    * @example
    * ```typescript
@@ -89,7 +65,7 @@ export class UsageResource {
    * ```
    */
   async track(
-    params: TrackUsageParams,
+    params: TrackParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<UsageEvent>> {
     const eventData = {
@@ -123,7 +99,7 @@ export class UsageResource {
    * ```
    */
   async trackBatch(
-    params: { events: TrackUsageParams[] },
+    params: { events: TrackParams[] },
     options?: RequestOptions,
   ): Promise<ApiResponse<BatchResult<UsageEvent>>> {
     const events = params.events.map((event) => ({
@@ -141,26 +117,5 @@ export class UsageResource {
     }));
 
     return this.httpClient.post("/usage/events/batch", { events }, options);
-  }
-
-  async get(eventId: EventID): Promise<ApiResponse<UsageEvent>> {
-    return this.httpClient.get(`/usage/events/${eventId}`);
-  }
-
-  async list(
-    params?: ListUsageEventsParams,
-  ): Promise<ApiResponse<UsageEvent[]>> {
-    return this.httpClient.get("/usage/events", params);
-  }
-
-  async delete(
-    eventId: EventID,
-    options?: RequestOptions,
-  ): Promise<ApiResponse<{ deleted: boolean }>> {
-    return this.httpClient.delete(
-      `/usage/events/${eventId}`,
-      undefined,
-      options,
-    );
   }
 }
