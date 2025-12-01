@@ -4,29 +4,35 @@ Billing integration for a fixed-price SaaS using Commet's plan-first model.
 
 **Stack:** Next.js 16, Better Auth, Drizzle ORM, PostgreSQL, Commet SDK
 
-## Installation
-
-From the monorepo root:
+## Quick Start
 
 ```bash
+# Clone this example
+npx degit commet-labs/commet-node/examples/fixed-saas my-saas
+cd my-saas
+
+# Install dependencies
 pnpm install
-```
 
-## Database Setup
-
-```bash
-cd examples/fixed-saas
+# Start database
 docker-compose up -d
+
+# Configure environment
+cp .env.example .env
+# Edit .env with your credentials
+
+# Setup database
 pnpm db:push
+
+# Run
+pnpm dev
 ```
+
+Open [http://localhost:3000](http://localhost:3000)
 
 ## Configuration
 
-```bash
-cp .env.example .env
-```
-
-Configure:
+Edit `.env` with your credentials:
 
 ```bash
 # Database
@@ -40,24 +46,20 @@ NEXT_PUBLIC_BETTER_AUTH_URL=http://localhost:3000
 # Commet
 COMMET_API_KEY=ck_sandbox_xxxxx
 COMMET_ENVIRONMENT=sandbox
-COMMET_PLAN_ID=plan_xxxxx
 COMMET_WEBHOOK_SECRET=whsec_xxxxx
 ```
 
 **Get Commet credentials:**
 
 1. Sign up at [commet.co](https://commet.co)
-2. Create a **Plan** with a price (e.g., $50/month)
+2. Create a **Plan** with code `pro` and a price (e.g., $50/month)
 3. Copy API key from Settings → API Keys
-4. Copy Plan ID from Plans page
 
 ## Run
 
 ```bash
 pnpm dev
 ```
-
-Open [http://localhost:3000](http://localhost:3000)
 
 ## Flow
 

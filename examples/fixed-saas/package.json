@@ -3,6 +3,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "build": "next build",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf .turbo node_modules .next",
     "start": "next start",
     "lint": "biome lint .",
     "db:generate": "drizzle-kit generate",
@@ -11,8 +14,8 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "@commet/next": "workspace:*",
-    "@commet/node": "workspace:*",
+    "@commet/next": "0.2.1",
+    "@commet/node": "1.0.0",
     "@radix-ui/react-avatar": "1.1.11",
     "@radix-ui/react-label": "2.1.8",
     "@radix-ui/react-separator": "1.1.8",
