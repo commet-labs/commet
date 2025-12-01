@@ -34,8 +34,10 @@ export default async function CheckoutPage() {
     }
   }
 
-  // Validate plan ID
-  if (COMMET_PLAN_ID === "build_placeholder" || !COMMET_PLAN_ID) {
+  // Get plan details from Commet
+  const planResult = await commet.plans.get(COMMET_PLAN_ID);
+
+  if (!planResult.success || !planResult.data) {
     return (
       <div className="min-h-screen flex items-center justify-center py-12 px-4">
         <Card className="max-w-md w-full">
@@ -66,7 +68,7 @@ export default async function CheckoutPage() {
                 </code>{" "}
                 in your{" "}
                 <code className="bg-muted px-2 py-1 rounded text-sm">.env</code>{" "}
-                file with a Plan ID from your Commet dashboard.
+                file with a valid Plan ID from your Commet dashboard.
               </p>
               <Button asChild>
                 <Link href="/">Return to Home</Link>
@@ -77,6 +79,18 @@ export default async function CheckoutPage() {
       </div>
     );
   }
+
+  const plan = planResult.data;
+  const defaultPrice = plan.prices.find((p) => p.isDefault) ?? plan.prices[0];
+  const priceDisplay = defaultPrice
+    ? `$${(defaultPrice.price / 100).toFixed(0)}`
+    : "Contact us";
+  const intervalDisplay =
+    defaultPrice?.billingInterval === "yearly"
+      ? "year"
+      : defaultPrice?.billingInterval === "quarterly"
+        ? "quarter"
+        : "month";
 
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -109,56 +123,56 @@ export default async function CheckoutPage() {
           <CardContent>
             <div className="border-t border-b py-6 mb-6">
               <div className="flex justify-between items-center mb-4">
-                <span className="text-muted-foreground">Pro Plan</span>
+                <span className="text-muted-foreground">{plan.name}</span>
                 <span className="text-2xl font-bold">
-                  $50
-                  <span className="text-sm text-muted-foreground">/month</span>
+                  {priceDisplay}
+                  <span className="text-sm text-muted-foreground">
+                    /{intervalDisplay}
+                  </span>
                 </span>
               </div>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li className="flex items-center gap-2">
-                  <svg
-                    className="w-4 h-4 text-green-500"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  Full platform access
-                </li>
-                <li className="flex items-center gap-2">
-                  <svg
-                    className="w-4 h-4 text-green-500"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  Priority support
-                </li>
-                <li className="flex items-center gap-2">
-                  <svg
-                    className="w-4 h-4 text-green-500"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  Advanced analytics
-                </li>
-              </ul>
+              {plan.description && (
+                <p className="text-sm text-muted-foreground mb-4">
+                  {plan.description}
+                </p>
+              )}
+              {plan.features.length > 0 && (
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  {plan.features.map((feature) => (
+                    <li key={feature.code} className="flex items-center gap-2">
+                      <svg
+                        className="w-4 h-4 text-green-500"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      {feature.name}
+                      {feature.type !== "boolean" &&
+                        feature.includedAmount != null &&
+                        !feature.unlimited && (
+                          <span className="text-xs text-muted-foreground/70">
+                            ({feature.includedAmount} included)
+                          </span>
+                        )}
+                      {feature.unlimited && (
+                        <span className="text-xs text-muted-foreground/70">
+                          (unlimited)
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {plan.trialDays > 0 && (
+                <p className="text-sm text-primary mt-4">
+                  {plan.trialDays}-day free trial included
+                </p>
+              )}
             </div>
 
             <SubscribeButton />

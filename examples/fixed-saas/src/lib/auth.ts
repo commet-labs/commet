@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "./db/connection";
 import * as schema from "./db/schema";
+import { commet } from "./commet";
 
 // Get environment variables - use placeholders for build time
 const authSecret =
@@ -22,6 +23,29 @@ export const auth = betterAuth({
   secret: authSecret,
   baseURL: authUrl,
   trustedOrigins: [authUrl],
+  user: {
+    // Create customer in Commet when user signs up
+    additionalFields: {},
+  },
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          // Create customer in Commet automatically on signup
+          try {
+            await commet.customers.create({
+              email: user.email,
+              externalId: user.id,
+              legalName: user.name || undefined,
+            });
+          } catch (error) {
+            // Log but don't fail signup - customer can be created later
+            console.error("Failed to create Commet customer on signup:", error);
+          }
+        },
+      },
+    },
+  },
 });
 
 // Export types

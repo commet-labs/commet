@@ -53,16 +53,45 @@ export default async function PendingCheckoutPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="p-4 border rounded-lg">
+          <div className="p-4 border rounded-lg space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-semibold">{subscription.plan.name}</p>
                 <p className="text-sm text-muted-foreground">
                   ${subscription.plan.basePrice / 100}/
-                  {subscription.plan.billingInterval}
+                  {subscription.plan.billingInterval === "yearly"
+                    ? "year"
+                    : subscription.plan.billingInterval === "quarterly"
+                      ? "quarter"
+                      : "month"}
                 </p>
               </div>
             </div>
+            {subscription.features.length > 0 && (
+              <ul className="space-y-2 text-sm text-muted-foreground border-t pt-4">
+                {subscription.features.map((feature) => (
+                  <li key={feature.code} className="flex items-center gap-2">
+                    <svg
+                      className="w-4 h-4 text-green-500 flex-shrink-0"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    {feature.name}
+                    {feature.type !== "boolean" && feature.usage && (
+                      <span className="text-xs text-muted-foreground/70">
+                        ({feature.usage.included} included)
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
           {checkoutUrl ? (
