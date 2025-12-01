@@ -3,9 +3,9 @@ title: Customers
 description: Manage customers for billing
 ---
 
-import { Callout } from 'fumadocs-ui/components/callout'
-
 ## Create Customer
+
+Create is idempotent with `externalId` - if the customer exists, returns it:
 
 ```typescript
 const customer = await commet.customers.create({
@@ -14,86 +14,52 @@ const customer = await commet.customers.create({
 })
 ```
 
-## Link to Your System
-
-Use `externalId` to connect Commet customers with your database:
+## Get Customer
 
 ```typescript
-const customer = await commet.customers.create({
-  email: user.email,
-  externalId: user.id,
-  legalName: 'Acme Corporation'
-})
+const customer = await commet.customers.get('cus_xxx')
+```
 
-// Later, find by your ID
-const customers = await commet.customers.list({
-  externalId: user.id
+## Update Customer
+
+```typescript
+await commet.customers.update('cus_xxx', {
+  displayName: 'Acme Corp',
+  legalName: 'Acme Corporation',
+  email: 'accounts@acme.com',
+  metadata: { tier: 'enterprise' }
 })
 ```
 
-## Basic Operations
+## List Customers
 
 ```typescript
-// Get
-const customer = await commet.customers.get('cus_xxx')
+// All customers
+const customers = await commet.customers.list()
 
-// Update
-await commet.customers.update('cus_xxx', {
-  displayName: 'Acme Corp',
-  email: 'accounts@acme.com'
-})
-
-// List
-const customers = await commet.customers.list({
+// With filters
+const filtered = await commet.customers.list({
   isActive: true,
+  externalId: 'user_123',
   limit: 50
 })
-
-// Archive
-await commet.customers.archive('cus_xxx')
 ```
 
 ## Batch Create
-
-Import customers in bulk for initial sync:
 
 ```typescript
 await commet.customers.createBatch({
   customers: [
     { email: 'user1@example.com', externalId: 'user_1' },
-    { email: 'user2@example.com', externalId: 'user_2' },
-    { email: 'user3@example.com', externalId: 'user_3' }
+    { email: 'user2@example.com', externalId: 'user_2' }
   ]
 })
 ```
 
-## Add Address
-
-Complete customer profile when information becomes available:
+## Archive Customer
 
 ```typescript
-await commet.customers.update(customerId, {
-  address: {
-    line1: '123 Business St',
-    city: 'San Francisco',
-    state: 'CA',
-    postalCode: '94105',
-    country: 'US'
-  }
-})
-```
-
-## Metadata
-
-Store additional data with customers:
-
-```typescript
-await commet.customers.update('cus_xxx', {
-  metadata: {
-    crm_id: 'sf_123456',
-    tier: 'enterprise'
-  }
-})
+await commet.customers.archive('cus_xxx')
 ```
 
 ## Related Resources

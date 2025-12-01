@@ -3,17 +3,12 @@
 import { auth } from "@/lib/auth";
 import { commet } from "@/lib/commet";
 
-/**
- * Request access to the customer portal
- * Returns a secure URL for the customer to manage their billing
- */
 export async function getPortalUrl(): Promise<{
   success: boolean;
   url?: string;
   error?: string;
 }> {
   try {
-    // Get current session
     const session = await auth.api.getSession({
       headers: await import("next/headers").then((m) => m.headers()),
     });
@@ -22,29 +17,17 @@ export async function getPortalUrl(): Promise<{
       return { success: false, error: "Not authenticated" };
     }
 
-    const userId = session.user.id;
-
-    // Request portal access using externalId
-    const result = await commet.portal.requestAccess({
-      externalId: userId,
+    const result = await commet.portal.getUrl({
+      externalId: session.user.id,
     });
 
     if (!result.success || !result.data) {
-      return {
-        success: false,
-        error: result.error || "Failed to generate portal URL",
-      };
+      return { success: false, error: "Failed to generate portal URL" };
     }
 
-    return {
-      success: true,
-      url: result.data.portalUrl,
-    };
+    return { success: true, url: result.data.portalUrl };
   } catch (error) {
     console.error("Error requesting portal access:", error);
-    return {
-      success: false,
-      error: "An unexpected error occurred",
-    };
+    return { success: false, error: "An unexpected error occurred" };
   }
 }

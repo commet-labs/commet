@@ -1,20 +1,13 @@
 import { SubscribeButton } from "@/components/subscribe-button";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
-import { COMMET_PRICE_ID, commet } from "@/lib/commet";
+import { COMMET_PLAN_ID, commet } from "@/lib/commet";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
 export default async function CheckoutPage() {
-  // Get current session
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -23,37 +16,26 @@ export default async function CheckoutPage() {
     redirect("/login");
   }
 
-  const user = session.user;
-
-  // Check if user already has a subscription
-  const existingSubscriptions = await commet.subscriptions.list({
-    externalId: user.id,
+  // Check existing subscription
+  const existing = await commet.subscriptions.get({
+    externalId: session.user.id,
   });
 
-  if (
-    existingSubscriptions.success &&
-    existingSubscriptions.data &&
-    existingSubscriptions.data.length > 0
-  ) {
-    // If active subscription exists, redirect to dashboard
-    const activeSubscription = existingSubscriptions.data.find(
-      (sub) => sub.status === "active",
-    );
-    if (activeSubscription) {
+  if (existing.data) {
+    if (
+      existing.data.status === "active" ||
+      existing.data.status === "trialing"
+    ) {
       redirect("/dashboard");
     }
 
-    // If pending subscription exists, redirect to pending page
-    const pendingSubscription = existingSubscriptions.data.find(
-      (sub) => sub.status === "pending_payment",
-    );
-    if (pendingSubscription) {
-      redirect(`/checkout/pending?subscriptionId=${pendingSubscription.id}`);
+    if (existing.data.status === "pending_payment") {
+      redirect(`/checkout/pending?subscriptionId=${existing.data.id}`);
     }
   }
 
-  // Validate COMMET_PRICE_ID
-  if (COMMET_PRICE_ID === "build_placeholder" || !COMMET_PRICE_ID) {
+  // Validate plan ID
+  if (COMMET_PLAN_ID === "build_placeholder" || !COMMET_PLAN_ID) {
     return (
       <div className="min-h-screen flex items-center justify-center py-12 px-4">
         <Card className="max-w-md w-full">
@@ -78,28 +60,14 @@ export default async function CheckoutPage() {
                 Configuration Required
               </h1>
               <p className="text-muted-foreground mb-6">
-                Please configure{" "}
+                Configure{" "}
                 <code className="bg-muted px-2 py-1 rounded text-sm">
-                  COMMET_PRICE_ID
+                  COMMET_PLAN_ID
                 </code>{" "}
                 in your{" "}
                 <code className="bg-muted px-2 py-1 rounded text-sm">.env</code>{" "}
-                file with a valid price ID from your Commet dashboard.
+                file with a Plan ID from your Commet dashboard.
               </p>
-              <Card className="border-primary/50 bg-primary/5 mb-6 text-left">
-                <CardContent className="pt-6">
-                  <p className="text-sm font-semibold mb-2">
-                    How to get your Price ID:
-                  </p>
-                  <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
-                    <li>Go to your Commet dashboard</li>
-                    <li>Navigate to Products</li>
-                    <li>Create or select a product</li>
-                    <li>Copy the Price ID</li>
-                    <li>Update COMMET_PRICE_ID in .env</li>
-                  </ol>
-                </CardContent>
-              </Card>
               <Button asChild>
                 <Link href="/">Return to Home</Link>
               </Button>
@@ -110,7 +78,6 @@ export default async function CheckoutPage() {
     );
   }
 
-  // Show checkout page
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full">

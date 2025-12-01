@@ -83,15 +83,7 @@ export class CustomersResource {
   constructor(private httpClient: CommetHTTPClient) {}
 
   /**
-   * Create a customer
-   *
-   * @example
-   * ```typescript
-   * await commet.customers.create({
-   *   email: 'billing@acme.com',
-   *   externalId: 'user_123'
-   * });
-   * ```
+   * Create a customer (idempotent with externalId)
    */
   async create(
     params: CreateParams,
@@ -118,16 +110,6 @@ export class CustomersResource {
 
   /**
    * Create multiple customers in batch
-   *
-   * @example
-   * ```typescript
-   * await commet.customers.createBatch({
-   *   customers: [
-   *     { email: 'user1@example.com', externalId: 'user_1' },
-   *     { email: 'user2@example.com', externalId: 'user_2' }
-   *   ]
-   * });
-   * ```
    */
   async createBatch(
     params: { customers: CreateParams[] },
@@ -151,11 +133,6 @@ export class CustomersResource {
 
   /**
    * Get a customer by ID
-   *
-   * @example
-   * ```typescript
-   * const customer = await commet.customers.get('cus_xxx');
-   * ```
    */
   async get(customerId: CustomerID): Promise<ApiResponse<Customer>> {
     return this.httpClient.get(`/customers/${customerId}`);
@@ -163,13 +140,6 @@ export class CustomersResource {
 
   /**
    * Update a customer
-   *
-   * @example
-   * ```typescript
-   * await commet.customers.update('cus_xxx', {
-   *   legalName: 'Acme Corporation'
-   * });
-   * ```
    */
   async update(
     customerId: CustomerID,
@@ -195,12 +165,7 @@ export class CustomersResource {
   }
 
   /**
-   * List customers
-   *
-   * @example
-   * ```typescript
-   * const customers = await commet.customers.list({ isActive: true });
-   * ```
+   * List customers with optional filters
    */
   async list(params?: ListCustomersParams): Promise<ApiResponse<Customer[]>> {
     return this.httpClient.get("/customers", params as Record<string, unknown>);
@@ -208,11 +173,6 @@ export class CustomersResource {
 
   /**
    * Archive a customer
-   *
-   * @example
-   * ```typescript
-   * await commet.customers.archive('cus_xxx');
-   * ```
    */
   async archive(
     customerId: CustomerID,

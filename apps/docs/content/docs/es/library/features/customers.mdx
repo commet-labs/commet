@@ -3,9 +3,9 @@ title: Clientes
 description: Gestiona clientes para facturación
 ---
 
-import { Callout } from 'fumadocs-ui/components/callout'
-
 ## Crear Cliente
+
+Create es idempotente con `externalId` - si el cliente existe, lo retorna:
 
 ```typescript
 const customer = await commet.customers.create({
@@ -14,86 +14,52 @@ const customer = await commet.customers.create({
 })
 ```
 
-## Vincular con Tu Sistema
-
-Usa `externalId` para conectar clientes con tu base de datos:
+## Obtener Cliente
 
 ```typescript
-const customer = await commet.customers.create({
-  email: user.email,
-  externalId: user.id,
-  legalName: 'Acme Corporation'
-})
+const customer = await commet.customers.get('cus_xxx')
+```
 
-// Después, busca por tu ID
-const customers = await commet.customers.list({
-  externalId: user.id
+## Actualizar Cliente
+
+```typescript
+await commet.customers.update('cus_xxx', {
+  displayName: 'Acme Corp',
+  legalName: 'Acme Corporation',
+  email: 'accounts@acme.com',
+  metadata: { tier: 'enterprise' }
 })
 ```
 
-## Operaciones Básicas
+## Listar Clientes
 
 ```typescript
-// Obtener
-const customer = await commet.customers.get('cus_xxx')
+// Todos los clientes
+const customers = await commet.customers.list()
 
-// Actualizar
-await commet.customers.update('cus_xxx', {
-  displayName: 'Acme Corp',
-  email: 'accounts@acme.com'
-})
-
-// Listar
-const customers = await commet.customers.list({
+// Con filtros
+const filtered = await commet.customers.list({
   isActive: true,
+  externalId: 'user_123',
   limit: 50
 })
-
-// Archivar
-await commet.customers.archive('cus_xxx')
 ```
 
 ## Creación en Batch
-
-Importa clientes en bulk para sincronización inicial:
 
 ```typescript
 await commet.customers.createBatch({
   customers: [
     { email: 'user1@example.com', externalId: 'user_1' },
-    { email: 'user2@example.com', externalId: 'user_2' },
-    { email: 'user3@example.com', externalId: 'user_3' }
+    { email: 'user2@example.com', externalId: 'user_2' }
   ]
 })
 ```
 
-## Agregar Dirección
-
-Completa el perfil del cliente cuando la información esté disponible:
+## Archivar Cliente
 
 ```typescript
-await commet.customers.update(customerId, {
-  address: {
-    line1: '123 Business St',
-    city: 'San Francisco',
-    state: 'CA',
-    postalCode: '94105',
-    country: 'US'
-  }
-})
-```
-
-## Metadata
-
-Almacena datos adicionales:
-
-```typescript
-await commet.customers.update('cus_xxx', {
-  metadata: {
-    crm_id: 'sf_123456',
-    tier: 'enterprise'
-  }
-})
+await commet.customers.archive('cus_xxx')
 ```
 
 ## Recursos Relacionados
