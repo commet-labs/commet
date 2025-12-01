@@ -144,9 +144,28 @@ export type GeneratedSeatType = CommetGeneratedTypes extends {
 
 /**
  * Helper type that provides fallback to string if types are not generated
+ * @deprecated Use GeneratedPlanCode instead
  */
 export type GeneratedProductId = CommetGeneratedTypes extends {
   productId: infer T;
+}
+  ? T
+  : string;
+
+/**
+ * Helper type that provides fallback to string if types are not generated
+ */
+export type GeneratedPlanCode = CommetGeneratedTypes extends {
+  planCode: infer T;
+}
+  ? T
+  : string;
+
+/**
+ * Helper type that provides fallback to string if types are not generated
+ */
+export type GeneratedFeatureCode = CommetGeneratedTypes extends {
+  featureCode: infer T;
 }
   ? T
   : string;

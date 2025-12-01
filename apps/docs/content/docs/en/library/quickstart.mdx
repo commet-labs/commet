@@ -62,17 +62,32 @@ const commet = new Commet({
 
 <Step>
 
+## Subscribe to a Plan
+
+Each customer can have one active subscription at a time.
+
+```typescript
+// Subscribe customer to a plan
+const subscription = await commet.subscriptions.create({
+  externalId: 'user_123',  // Your user ID
+  planId: 'plan_pro',
+  billingInterval: 'monthly',
+  initialSeats: { editor: 5 }
+})
+```
+
+</Step>
+
+<Step>
+
 ## Track Usage
 
 ```typescript
-await commet.usage.create({
+await commet.usage.track({
+  externalId: 'user_123',
   eventType: 'api_call',
-  customerId: 'cus_xyz',
   idempotencyKey: `evt_${Date.now()}`,
-  properties: [
-    { property: 'endpoint', value: '/users' },
-    { property: 'method', value: 'GET' }
-  ]
+  properties: { endpoint: '/users', method: 'GET' }
 })
 ```
 
@@ -85,31 +100,16 @@ await commet.usage.create({
 ```typescript
 // Add seats
 await commet.seats.add({
-  customerId: 'cus_xyz',
+  externalId: 'user_123',
   seatType: 'editor',
   count: 5
 })
 
 // Set exact count
 await commet.seats.set({
-  customerId: 'cus_xyz',
+  externalId: 'user_123',
   seatType: 'editor',
   count: 10
-})
-```
-
-</Step>
-
-<Step>
-
-## Create Subscription
-
-```typescript
-const subscription = await commet.subscriptions.create({
-  customerId: 'cus_xyz',
-  items: [
-    { priceId: 'price_xxx', quantity: 1 }
-  ]
 })
 ```
 
@@ -118,9 +118,9 @@ const subscription = await commet.subscriptions.create({
 
 ## What's Next?
 
-- [Installation](/docs/library/installation/node) - Framework-specific setup
+- [Plans](/docs/library/features/plans) - List available plans
+- [Subscriptions](/docs/library/features/subscriptions) - Manage subscriptions
 - [Usage Events](/docs/library/features/usage-events) - Track consumption
 - [Seat Management](/docs/library/features/seat-management) - Manage licenses
-- [Subscriptions](/docs/library/features/subscriptions) - Create recurring billing
 
 **Need help?** [support@commet.co](mailto:support@commet.co)

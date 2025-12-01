@@ -1,206 +1,145 @@
 ---
 title: Subscriptions
-description: Create and manage subscriptions with multiple products
+description: Manage subscriptions with the plan-first model
 ---
-
-import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
-import { Callout } from 'fumadocs-ui/components/callout'
-
-<Callout type="info">
-**Prerequisites:** Initialize your Commet client with a valid API key.
-</Callout>
-
-<Callout type="success">
-**Testing subscriptions?** Use the sandbox environment and [Stripe test cards](/docs/library/core/testing#stripe-test-cards) to test checkout flows safely.
-</Callout>
 
 ## Create Subscription
 
-Create a subscription with one or more products:
+```typescript
+const subscription = await commet.subscriptions.create({
+  externalId: 'user_123',
+  planCode: 'pro' // autocomplete works after `commet pull`
+})
+```
+
+### Options
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `externalId` or `customerId` | string | Customer identifier (required) |
+| `planCode` or `planId` | string | Plan to subscribe to (required). Use `planCode` for autocomplete. |
+| `billingInterval` | string | `monthly`, `quarterly`, or `yearly` |
+| `initialSeats` | object | Initial seat counts by type |
+| `skipTrial` | boolean | Skip the trial period if plan has one |
+| `startDate` | string | ISO date for future-dated subscription |
+
+## Get Subscription
+
+Each customer has one active subscription. This returns it with full summary:
+
+```typescript
+const sub = await commet.subscriptions.get({
+  externalId: 'user_123'
+})
+
+if (sub.data) {
+  console.log('Plan:', sub.data.plan.name)
+  console.log('Status:', sub.data.status)
+  console.log('Days remaining:', sub.data.currentPeriod.daysRemaining)
+  
+  for (const feature of sub.data.features) {
+    if (feature.usage) {
+      console.log(`${feature.name}: ${feature.usage.current}/${feature.usage.included}`)
+    }
+  }
+}
+```
+
+## Change Plan
+
+```typescript
+await commet.subscriptions.changePlan('sub_xxx', {
+  planCode: 'enterprise' // autocomplete works after `commet pull`
+})
+```
+
+Proration is automatic: Commet calculates credit for unused time and charges for the new plan.
+
+## Cancel
+
+```typescript
+await commet.subscriptions.cancel('sub_xxx', {
+  reason: 'switched_to_competitor'
+})
+```
+
+## Subscription Status
+
+| Status | Description |
+|--------|-------------|
+| `draft` | Created but not activated |
+| `pending_payment` | Waiting for first payment |
+| `trialing` | In trial period |
+| `active` | Active and billing normally |
+| `paused` | Temporarily paused |
+| `past_due` | Payment failed, grace period |
+| `canceled` | Canceled, no longer billing |
+| `expired` | Reached end date |
+
+## Trial Periods
+
+If a plan has trial days, new subscriptions start in `trialing` status:
 
 ```typescript
 const subscription = await commet.subscriptions.create({
-  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
-  items: [
-    { priceId: 'price_tasks_free', quantity: 1 }
-  ]
+  externalId: 'user_123',
+  planCode: 'starter' // plan with trial configured
 })
 
-console.log('Subscription created:', subscription.data.id)
-```
+console.log(subscription.data.status)  // "trialing"
+console.log(subscription.data.trialEndsAt)
 
-### Multiple Products
-
-Bundle multiple products in a single subscription:
-
-```typescript
-const subscription = await commet.subscriptions.create({
-  externalId: 'org_123',
-  items: [
-    { priceId: 'price_tasks_pro', quantity: 1 },
-    { priceId: 'price_usage_pro' },
-    { priceId: 'price_seats_pro', initialSeats: 5 }
-  ],
-  status: 'active'
+// Skip trial if needed
+await commet.subscriptions.create({
+  externalId: 'user_456',
+  planCode: 'starter',
+  skipTrial: true
 })
-```
-
-### Product Types
-
-<Tabs items={['Fixed', 'Usage-Based', 'Seat-Based']}>
-<Tab value="Fixed">
-```typescript
-const subscription = await commet.subscriptions.create({
-  customerId: 'cus_xxx',
-  items: [
-    { priceId: 'price_fixed_plan', quantity: 1 }
-  ]
-})
-```
-</Tab>
-<Tab value="Usage-Based">
-```typescript
-const subscription = await commet.subscriptions.create({
-  customerId: 'cus_xxx',
-  items: [
-    { priceId: 'price_api_calls' }
-  ]
-})
-
-// Track usage
-await commet.usage.create({
-  eventType: 'api_call',
-  customerId: 'cus_xxx',
-  idempotencyKey: `evt_${Date.now()}`
-})
-```
-</Tab>
-<Tab value="Seat-Based">
-```typescript
-const subscription = await commet.subscriptions.create({
-  customerId: 'cus_xxx',
-  items: [
-    { priceId: 'price_user_licenses', initialSeats: 10 }
-  ]
-})
-
-// Manage seats
-await commet.seats.add({
-  customerId: 'cus_xxx',
-  seatType: 'editor',
-  count: 5
-})
-```
-</Tab>
-</Tabs>
-
-## Options
-
-### Draft Subscription
-
-Create subscription for review before activation:
-
-```typescript
-const draft = await commet.subscriptions.create({
-  customerId: 'cus_xxx',
-  items: [
-    { priceId: 'price_enterprise', quantity: 100 }
-  ],
-  status: 'draft'
-})
-```
-
-<Callout type="info">
-**Draft subscriptions** don't generate invoices until manually activated in the platform.
-</Callout>
-
-### Custom Start Date
-
-Schedule subscriptions for future billing:
-
-```typescript
-const subscription = await commet.subscriptions.create({
-  customerId: 'cus_xxx',
-  items: [
-    { priceId: 'price_monthly', quantity: 1 }
-  ],
-  startDate: '2025-02-01T00:00:00Z',
-  status: 'active'
-})
-```
-
-### Named Subscription
-
-```typescript
-const subscription = await commet.subscriptions.create({
-  externalId: 'startup-xyz',
-  name: 'Startup XYZ - Growth Plan',
-  items: [
-    { priceId: 'price_growth', quantity: 1 }
-  ]
-})
-```
-
-## Basic Operations
-
-```typescript
-// Retrieve subscription
-const subscription = await commet.subscriptions.retrieve('sub_A1b2C3d4E5f6G7h8I9j0K1l2')
-
-// List subscriptions
-const subscriptions = await commet.subscriptions.list({
-  customerId: 'cus_A1b2C3d4E5f6G7h8I9j0K1l2',
-  status: 'active'
-})
-
-// List by external ID
-const subscriptions = await commet.subscriptions.list({
-  externalId: 'org_123'
-})
-
-// Cancel subscription
-await commet.subscriptions.cancel('sub_A1b2C3d4E5f6G7h8I9j0K1l2')
 ```
 
 ## Complete Example
 
 ```typescript
-// Create subscription with multiple products
-const sub = await commet.subscriptions.create({
-  externalId: 'startup-xyz',
-  name: 'Startup XYZ - Growth Plan',
-  items: [
-    { priceId: 'price_base_plan', quantity: 1 },
-    { priceId: 'price_api_usage' },
-    { priceId: 'price_user_seats', initialSeats: 5 }
-  ],
-  status: 'active'
+import { Commet } from '@commet/node'
+
+const commet = new Commet({
+  apiKey: process.env.COMMET_API_KEY!,
+  environment: 'sandbox'
 })
 
-// Track API usage
-await commet.usage.create({
+// 1. Subscribe to a plan
+const sub = await commet.subscriptions.create({
+  externalId: 'user_123',
+  planCode: 'pro',
+  initialSeats: { editor: 5 }
+})
+
+// 2. Track usage
+await commet.usage.track({
+  externalId: 'user_123',
   eventType: 'api_call',
-  externalId: 'startup-xyz',
   idempotencyKey: `evt_${Date.now()}`
 })
 
-// Add team members
+// 3. Add more seats
 await commet.seats.add({
-  externalId: 'startup-xyz',
+  externalId: 'user_123',
   seatType: 'editor',
   count: 3
 })
 
-// Check seat balance
-const balance = await commet.seats.getBalance({
-  externalId: 'startup-xyz',
-  seatType: 'editor'
+// 4. Check current status
+const current = await commet.subscriptions.get({ externalId: 'user_123' })
+console.log('Days remaining:', current.data?.currentPeriod.daysRemaining)
+
+// 5. Upgrade plan
+await commet.subscriptions.changePlan(sub.data.id, {
+  planCode: 'enterprise'
 })
-console.log('Total seats:', balance.data.current) // 8
 ```
 
 ## Related Resources
 
-- [Usage Events](/docs/library/features/usage-events) - Track consumption for usage-based billing
-- [Seat Management](/docs/library/features/seat-management) - Manage per-seat licensing
-- [Customers](/docs/library/features/customers) - Create and manage customers
+- [Plans](/docs/library/features/plans) - List available plans
+- [Usage Events](/docs/library/features/usage-events) - Track consumption
+- [Seat Management](/docs/library/features/seat-management) - Manage licenses

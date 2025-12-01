@@ -1,10 +1,8 @@
 import type {
   ApiResponse,
-  Currency,
+  ListParams as BaseListParams,
   CustomerID,
-  ListParams,
   RequestOptions,
-  RetrieveOptions,
 } from "../types/common";
 import type { CommetHTTPClient } from "../utils/http";
 
@@ -12,15 +10,11 @@ export interface Customer {
   id: CustomerID;
   organizationId: string;
   externalId?: string;
-  legalName: string;
+  legalName?: string;
   displayName?: string;
   domain?: string;
   website?: string;
-  taxStatus: "TAXED" | "TAX_EXEMPT" | "REVERSE_CHARGE" | "NOT_APPLICABLE";
-  currency: Currency;
-  addressId: string;
-  billingEmail?: string;
-  paymentTerms?: string;
+  billingEmail: string;
   timezone?: string;
   language?: string;
   industry?: string;
@@ -31,24 +25,6 @@ export interface Customer {
   updatedAt: string;
 }
 
-// Base fields shared by all customer creation scenarios
-interface CreateCustomerBaseParams {
-  externalId?: string;
-  legalName: string;
-  displayName?: string;
-  domain?: string;
-  website?: string;
-  currency?: Currency;
-  billingEmail?: string;
-  paymentTerms?: string;
-  timezone?: string;
-  language?: string;
-  industry?: string;
-  employeeCount?: string;
-  metadata?: Record<string, unknown>;
-}
-
-// Address structure
 export interface CustomerAddress {
   line1: string;
   line2?: string;
@@ -56,91 +32,149 @@ export interface CustomerAddress {
   state?: string;
   postalCode: string;
   country: string; // ISO-2
-  region?: string;
 }
 
-// When taxStatus is TAXED, address is required
-interface CreateCustomerTaxed extends CreateCustomerBaseParams {
-  taxStatus: "TAXED";
-  address: CustomerAddress;
-}
-
-// For other tax statuses, address is optional
-interface CreateCustomerOtherTaxStatus extends CreateCustomerBaseParams {
-  taxStatus?: "TAX_EXEMPT" | "REVERSE_CHARGE" | "NOT_APPLICABLE";
-  address?: CustomerAddress;
-}
-
-// Union type that enforces the constraint
-export type CreateCustomerParams =
-  | CreateCustomerTaxed
-  | CreateCustomerOtherTaxStatus;
-
-export interface UpdateCustomerParams {
+export interface CreateParams {
+  email: string; // billingEmail - the only required field
   externalId?: string;
   legalName?: string;
   displayName?: string;
   domain?: string;
   website?: string;
-  taxStatus?: "TAXED" | "TAX_EXEMPT" | "REVERSE_CHARGE" | "NOT_APPLICABLE";
-  currency?: Currency;
-  billingEmail?: string;
-  paymentTerms?: string;
   timezone?: string;
   language?: string;
   industry?: string;
-  employeeCount?: string;
   metadata?: Record<string, unknown>;
-  isActive?: boolean;
+  address?: CustomerAddress;
 }
 
-export interface ListCustomersParams extends ListParams {
+export interface UpdateParams {
   externalId?: string;
-  taxStatus?: "TAXED" | "TAX_EXEMPT" | "REVERSE_CHARGE" | "NOT_APPLICABLE";
-  currency?: Currency;
+  email?: string;
+  legalName?: string;
+  displayName?: string;
+  domain?: string;
+  website?: string;
+  timezone?: string;
+  language?: string;
+  industry?: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface ListCustomersParams extends BaseListParams {
+  externalId?: string;
   isActive?: boolean;
   search?: string;
 }
 
+export interface BatchResult {
+  successful: Customer[];
+  failed: Array<{
+    index: number;
+    error: string;
+    data: CreateParams;
+  }>;
+}
+
 /**
- * Customer resource for managing customer data
+ * Customers resource - Manage your customers
  */
 export class CustomersResource {
   constructor(private httpClient: CommetHTTPClient) {}
 
+  /**
+   * Create a customer (idempotent with externalId)
+   */
   async create(
-    params: CreateCustomerParams,
+    params: CreateParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<Customer>> {
-    return this.httpClient.post("/customers", params, options);
-  }
-
-  async retrieve(
-    customerId: CustomerID,
-    options?: RetrieveOptions,
-  ): Promise<ApiResponse<Customer>> {
-    const params = options?.expand
-      ? { expand: options.expand.join(",") }
-      : undefined;
-    return this.httpClient.get(`/customers/${customerId}`, params);
-  }
-
-  async update(
-    customerId: CustomerID,
-    params: UpdateCustomerParams,
-    options?: RequestOptions,
-  ): Promise<ApiResponse<Customer>> {
-    return this.httpClient.put(`/customers/${customerId}`, params, options);
-  }
-
-  async list(params?: ListCustomersParams): Promise<ApiResponse<Customer[]>> {
-    return this.httpClient.get("/customers", params);
+    return this.httpClient.post(
+      "/customers",
+      {
+        billingEmail: params.email,
+        externalId: params.externalId,
+        legalName: params.legalName,
+        displayName: params.displayName,
+        domain: params.domain,
+        website: params.website,
+        timezone: params.timezone,
+        language: params.language,
+        industry: params.industry,
+        metadata: params.metadata,
+        address: params.address,
+      },
+      options,
+    );
   }
 
   /**
-   * Deactivate a customer (soft delete)
+   * Create multiple customers in batch
    */
-  async deactivate(
+  async createBatch(
+    params: { customers: CreateParams[] },
+    options?: RequestOptions,
+  ): Promise<ApiResponse<BatchResult>> {
+    const customers = params.customers.map((c) => ({
+      billingEmail: c.email,
+      externalId: c.externalId,
+      legalName: c.legalName,
+      displayName: c.displayName,
+      domain: c.domain,
+      website: c.website,
+      timezone: c.timezone,
+      language: c.language,
+      industry: c.industry,
+      metadata: c.metadata,
+      address: c.address,
+    }));
+    return this.httpClient.post("/customers/batch", { customers }, options);
+  }
+
+  /**
+   * Get a customer by ID
+   */
+  async get(customerId: CustomerID): Promise<ApiResponse<Customer>> {
+    return this.httpClient.get(`/customers/${customerId}`);
+  }
+
+  /**
+   * Update a customer
+   */
+  async update(
+    customerId: CustomerID,
+    params: UpdateParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<Customer>> {
+    return this.httpClient.put(
+      `/customers/${customerId}`,
+      {
+        billingEmail: params.email,
+        externalId: params.externalId,
+        legalName: params.legalName,
+        displayName: params.displayName,
+        domain: params.domain,
+        website: params.website,
+        timezone: params.timezone,
+        language: params.language,
+        industry: params.industry,
+        metadata: params.metadata,
+      },
+      options,
+    );
+  }
+
+  /**
+   * List customers with optional filters
+   */
+  async list(params?: ListCustomersParams): Promise<ApiResponse<Customer[]>> {
+    return this.httpClient.get("/customers", params as Record<string, unknown>);
+  }
+
+  /**
+   * Archive a customer
+   */
+  async archive(
     customerId: CustomerID,
     options?: RequestOptions,
   ): Promise<ApiResponse<Customer>> {

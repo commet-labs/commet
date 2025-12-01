@@ -1,0 +1,98 @@
+---
+title: Planes
+description: Listar y obtener planes de pricing disponibles
+---
+
+## Listar Planes
+
+Obtén todos los planes disponibles:
+
+```typescript
+const plans = await commet.plans.list()
+
+for (const plan of plans.data) {
+  console.log(`${plan.name}: $${plan.prices[0].price / 100}/mes`)
+}
+```
+
+### Incluir Planes Privados
+
+```typescript
+const allPlans = await commet.plans.list({
+  includePrivate: true
+})
+```
+
+## Obtener Plan
+
+```typescript
+const plan = await commet.plans.get('plan_pro')
+
+console.log('Plan:', plan.data.name)
+console.log('Días de trial:', plan.data.trialDays)
+
+// Precios por intervalo
+for (const price of plan.data.prices) {
+  console.log(`${price.billingInterval}: $${price.price / 100}`)
+}
+
+// Features incluidas
+for (const feature of plan.data.features) {
+  if (feature.type === 'boolean') {
+    console.log(`${feature.name}: ${feature.enabled ? 'Sí' : 'No'}`)
+  } else {
+    console.log(`${feature.name}: ${feature.includedAmount} incluidas`)
+  }
+}
+```
+
+## Estructura del Plan
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `id` | string | ID del plan (ej: `plan_xxx`) |
+| `name` | string | Nombre |
+| `description` | string | Descripción |
+| `isPublic` | boolean | Visible en pricing page |
+| `trialDays` | number | Días de trial (0 = sin trial) |
+| `sortOrder` | number | Orden de display |
+
+### Precios
+
+Cada plan puede tener múltiples precios para diferentes intervalos:
+
+```typescript
+interface PlanPrice {
+  billingInterval: 'monthly' | 'quarterly' | 'yearly'
+  price: number  // en centavos
+  isDefault: boolean
+}
+```
+
+### Features
+
+```typescript
+interface PlanFeature {
+  code: string
+  name: string
+  type: 'boolean' | 'metered' | 'seats'
+  enabled?: boolean
+  includedAmount?: number
+  unlimited?: boolean
+  overageEnabled?: boolean
+  overageUnitPrice?: number
+}
+```
+
+| Tipo | Descripción | Ejemplo |
+|------|-------------|---------|
+| `boolean` | Acceso on/off | Custom branding, SSO |
+| `metered` | Por uso | API calls, storage GB |
+| `seats` | Por usuario | Team members |
+
+## Recursos Relacionados
+
+- [Suscripciones](/es/docs/library/features/subscriptions) - Suscribir clientes a planes
+- [Eventos de Uso](/es/docs/library/features/usage-events) - Trackear uso de features
+- [Seats](/es/docs/library/features/seat-management) - Gestionar licencias por asiento
+

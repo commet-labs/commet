@@ -3,7 +3,6 @@ import type {
   CustomerID,
   EventID,
   GeneratedEventType,
-  ListParams,
   RequestOptions,
 } from "../types/common";
 import type { CommetHTTPClient } from "../utils/http";
@@ -27,81 +26,96 @@ export interface UsageEventProperty {
   createdAt: string;
 }
 
-export interface CreateUsageEventParams {
-  eventType: GeneratedEventType;
-  customerId?: CustomerID;
-  externalId?: string;
-  idempotencyKey?: string; // For idempotency
-  timestamp?: string; // ISO string, defaults to now
-  properties?: Array<{
-    property: string;
-    value: string;
-  }>;
-}
-
-export interface CreateBatchUsageEventsParams {
-  events: CreateUsageEventParams[];
-}
-
 export interface BatchResult<T> {
   successful: T[];
   failed: Array<{
     index: number;
     error: string;
-    data: CreateUsageEventParams;
+    data: TrackParams;
   }>;
 }
 
-export interface ListUsageEventsParams extends ListParams {
+export interface TrackParams {
+  eventType: GeneratedEventType;
   customerId?: CustomerID;
   externalId?: string;
-  eventType?: GeneratedEventType;
   idempotencyKey?: string;
+  value?: number;
+  timestamp?: string;
+  properties?: Record<string, string>;
 }
 
 /**
- * Usage Events resource - Track business events for usage-based billing
+ * Usage resource - Track consumption events for usage-based billing
  */
 export class UsageResource {
   constructor(private httpClient: CommetHTTPClient) {}
 
-  async create(
-    params: CreateUsageEventParams,
+  /**
+   * Track a usage event
+   *
+   * @example
+   * ```typescript
+   * await commet.usage.track({
+   *   externalId: 'user_123',
+   *   eventType: 'api_call',
+   *   idempotencyKey: `evt_${requestId}`,
+   *   properties: { endpoint: '/users', method: 'GET' }
+   * });
+   * ```
+   */
+  async track(
+    params: TrackParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<UsageEvent>> {
     const eventData = {
-      ...params,
+      eventType: params.eventType,
+      customerId: params.customerId,
+      externalId: params.externalId,
+      idempotencyKey: params.idempotencyKey,
       ts: params.timestamp || new Date().toISOString(),
+      properties: params.properties
+        ? Object.entries(params.properties).map(([property, value]) => ({
+            property,
+            value,
+          }))
+        : undefined,
     };
 
     return this.httpClient.post("/usage/events", eventData, options);
   }
 
-  async createBatch(
-    params: CreateBatchUsageEventsParams,
+  /**
+   * Track multiple usage events in a batch
+   *
+   * @example
+   * ```typescript
+   * await commet.usage.trackBatch({
+   *   events: [
+   *     { externalId: 'user_123', eventType: 'api_call', idempotencyKey: 'evt_1' },
+   *     { externalId: 'user_456', eventType: 'api_call', idempotencyKey: 'evt_2' }
+   *   ]
+   * });
+   * ```
+   */
+  async trackBatch(
+    params: { events: TrackParams[] },
     options?: RequestOptions,
   ): Promise<ApiResponse<BatchResult<UsageEvent>>> {
-    return this.httpClient.post("/usage/events/batch", params, options);
-  }
+    const events = params.events.map((event) => ({
+      eventType: event.eventType,
+      customerId: event.customerId,
+      externalId: event.externalId,
+      idempotencyKey: event.idempotencyKey,
+      ts: event.timestamp || new Date().toISOString(),
+      properties: event.properties
+        ? Object.entries(event.properties).map(([property, value]) => ({
+            property,
+            value,
+          }))
+        : undefined,
+    }));
 
-  async retrieve(eventId: EventID): Promise<ApiResponse<UsageEvent>> {
-    return this.httpClient.get(`/usage/events/${eventId}`);
-  }
-
-  async list(
-    params?: ListUsageEventsParams,
-  ): Promise<ApiResponse<UsageEvent[]>> {
-    return this.httpClient.get("/usage/events", params);
-  }
-
-  async delete(
-    eventId: EventID,
-    options?: RequestOptions,
-  ): Promise<ApiResponse<{ deleted: boolean }>> {
-    return this.httpClient.delete(
-      `/usage/events/${eventId}`,
-      undefined,
-      options,
-    );
+    return this.httpClient.post("/usage/events/batch", { events }, options);
   }
 }

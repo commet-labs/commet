@@ -1,20 +1,13 @@
 import { SubscribeButton } from "@/components/subscribe-button";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
-import { COMMET_PRICE_ID, commet } from "@/lib/commet";
+import { commet } from "@/lib/commet";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
 export default async function CheckoutPage() {
-  // Get current session
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -23,37 +16,28 @@ export default async function CheckoutPage() {
     redirect("/login");
   }
 
-  const user = session.user;
-
-  // Check if user already has a subscription
-  const existingSubscriptions = await commet.subscriptions.list({
-    externalId: user.id,
+  // Check existing subscription
+  const existing = await commet.subscriptions.get({
+    externalId: session.user.id,
   });
 
-  if (
-    existingSubscriptions.success &&
-    existingSubscriptions.data &&
-    existingSubscriptions.data.length > 0
-  ) {
-    // If active subscription exists, redirect to dashboard
-    const activeSubscription = existingSubscriptions.data.find(
-      (sub) => sub.status === "active",
-    );
-    if (activeSubscription) {
+  if (existing.data) {
+    if (
+      existing.data.status === "active" ||
+      existing.data.status === "trialing"
+    ) {
       redirect("/dashboard");
     }
 
-    // If pending subscription exists, redirect to pending page
-    const pendingSubscription = existingSubscriptions.data.find(
-      (sub) => sub.status === "pending_payment",
-    );
-    if (pendingSubscription) {
-      redirect(`/checkout/pending?subscriptionId=${pendingSubscription.id}`);
+    if (existing.data.status === "pending_payment") {
+      redirect(`/checkout/pending?subscriptionId=${existing.data.id}`);
     }
   }
 
-  // Validate COMMET_PRICE_ID
-  if (COMMET_PRICE_ID === "build_placeholder" || !COMMET_PRICE_ID) {
+  // Get plan details from Commet
+  const planResult = await commet.plans.get("pro"); // autocomplete after `commet pull`
+
+  if (!planResult.success || !planResult.data) {
     return (
       <div className="min-h-screen flex items-center justify-center py-12 px-4">
         <Card className="max-w-md w-full">
@@ -78,28 +62,14 @@ export default async function CheckoutPage() {
                 Configuration Required
               </h1>
               <p className="text-muted-foreground mb-6">
-                Please configure{" "}
+                Configure{" "}
                 <code className="bg-muted px-2 py-1 rounded text-sm">
-                  COMMET_PRICE_ID
+                  COMMET_PLAN_ID
                 </code>{" "}
                 in your{" "}
                 <code className="bg-muted px-2 py-1 rounded text-sm">.env</code>{" "}
-                file with a valid price ID from your Commet dashboard.
+                file with a valid Plan ID from your Commet dashboard.
               </p>
-              <Card className="border-primary/50 bg-primary/5 mb-6 text-left">
-                <CardContent className="pt-6">
-                  <p className="text-sm font-semibold mb-2">
-                    How to get your Price ID:
-                  </p>
-                  <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
-                    <li>Go to your Commet dashboard</li>
-                    <li>Navigate to Products</li>
-                    <li>Create or select a product</li>
-                    <li>Copy the Price ID</li>
-                    <li>Update COMMET_PRICE_ID in .env</li>
-                  </ol>
-                </CardContent>
-              </Card>
               <Button asChild>
                 <Link href="/">Return to Home</Link>
               </Button>
@@ -110,7 +80,8 @@ export default async function CheckoutPage() {
     );
   }
 
-  // Show checkout page
+  const plan = planResult.data;
+
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full">
@@ -141,60 +112,67 @@ export default async function CheckoutPage() {
 
           <CardContent>
             <div className="border-t border-b py-6 mb-6">
-              <div className="flex justify-between items-center mb-4">
-                <span className="text-muted-foreground">Pro Plan</span>
-                <span className="text-2xl font-bold">
-                  $50
-                  <span className="text-sm text-muted-foreground">/month</span>
-                </span>
+              <div className="mb-4">
+                <h3 className="font-semibold text-lg">{plan.name}</h3>
+                {plan.prices.length === 1 && plan.prices[0] && (
+                  <p className="text-2xl font-bold mt-1">
+                    ${(plan.prices[0].price / 100).toFixed(0)}
+                    <span className="text-sm text-muted-foreground font-normal">
+                      /
+                      {plan.prices[0].billingInterval === "yearly"
+                        ? "year"
+                        : plan.prices[0].billingInterval === "quarterly"
+                          ? "quarter"
+                          : "month"}
+                    </span>
+                  </p>
+                )}
               </div>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li className="flex items-center gap-2">
-                  <svg
-                    className="w-4 h-4 text-green-500"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  Full platform access
-                </li>
-                <li className="flex items-center gap-2">
-                  <svg
-                    className="w-4 h-4 text-green-500"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  Priority support
-                </li>
-                <li className="flex items-center gap-2">
-                  <svg
-                    className="w-4 h-4 text-green-500"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  Advanced analytics
-                </li>
-              </ul>
+              {plan.description && (
+                <p className="text-sm text-muted-foreground mb-4">
+                  {plan.description}
+                </p>
+              )}
+              {plan.features.length > 0 && (
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  {plan.features.map((feature) => (
+                    <li key={feature.code} className="flex items-center gap-2">
+                      <svg
+                        className="w-4 h-4 text-green-500"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      {feature.name}
+                      {feature.type !== "boolean" &&
+                        feature.includedAmount != null &&
+                        !feature.unlimited && (
+                          <span className="text-xs text-muted-foreground/70">
+                            ({feature.includedAmount} included)
+                          </span>
+                        )}
+                      {feature.unlimited && (
+                        <span className="text-xs text-muted-foreground/70">
+                          (unlimited)
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {plan.trialDays > 0 && (
+                <p className="text-sm text-primary mt-4">
+                  {plan.trialDays}-day free trial included
+                </p>
+              )}
             </div>
 
-            <SubscribeButton />
+            <SubscribeButton prices={plan.prices} />
 
             <div className="mt-6 text-center">
               <Button variant="link" asChild>

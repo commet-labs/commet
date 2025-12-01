@@ -1,13 +1,11 @@
+import { PricingSection } from "@/components/pricing-section";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
+
+// Revalidate pricing data every hour
+export const revalidate = 3600;
 
 export default function Home() {
   return (
@@ -92,6 +90,9 @@ export default function Home() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Pricing Section */}
+        <PricingSection />
       </main>
       {/* Footer */}
       <footer className="border-t mt-32">

@@ -1,0 +1,97 @@
+---
+title: Plans
+description: List and retrieve available pricing plans
+---
+
+## List Plans
+
+Get all available plans:
+
+```typescript
+const plans = await commet.plans.list()
+
+for (const plan of plans.data) {
+  console.log(`${plan.name}: $${plan.prices[0].price / 100}/month`)
+}
+```
+
+### Include Private Plans
+
+```typescript
+const allPlans = await commet.plans.list({
+  includePrivate: true
+})
+```
+
+## Get Plan
+
+```typescript
+const plan = await commet.plans.get('plan_pro')
+
+console.log('Plan:', plan.data.name)
+console.log('Trial days:', plan.data.trialDays)
+
+// Prices by interval
+for (const price of plan.data.prices) {
+  console.log(`${price.billingInterval}: $${price.price / 100}`)
+}
+
+// Features included
+for (const feature of plan.data.features) {
+  if (feature.type === 'boolean') {
+    console.log(`${feature.name}: ${feature.enabled ? 'Yes' : 'No'}`)
+  } else {
+    console.log(`${feature.name}: ${feature.includedAmount} included`)
+  }
+}
+```
+
+## Plan Structure
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Plan ID (e.g., `plan_xxx`) |
+| `name` | string | Display name |
+| `description` | string | Description |
+| `isPublic` | boolean | Visible on pricing page |
+| `trialDays` | number | Free trial period (0 = no trial) |
+| `sortOrder` | number | Display order |
+
+### Prices
+
+Each plan can have multiple prices for different billing intervals:
+
+```typescript
+interface PlanPrice {
+  billingInterval: 'monthly' | 'quarterly' | 'yearly'
+  price: number  // in cents
+  isDefault: boolean
+}
+```
+
+### Features
+
+```typescript
+interface PlanFeature {
+  code: string
+  name: string
+  type: 'boolean' | 'metered' | 'seats'
+  enabled?: boolean
+  includedAmount?: number
+  unlimited?: boolean
+  overageEnabled?: boolean
+  overageUnitPrice?: number
+}
+```
+
+| Type | Description | Example |
+|------|-------------|---------|
+| `boolean` | On/off access | Custom branding, SSO |
+| `metered` | Usage-based | API calls, storage GB |
+| `seats` | Per-user licenses | Team members |
+
+## Related Resources
+
+- [Subscriptions](/docs/library/features/subscriptions) - Subscribe customers to plans
+- [Usage Events](/docs/library/features/usage-events) - Track metered feature usage
+- [Seat Management](/docs/library/features/seat-management) - Manage seat-based features

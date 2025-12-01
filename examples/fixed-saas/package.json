@@ -4,8 +4,6 @@
   "scripts": {
     "dev": "next dev",
     "start": "next start",
-    "build": "next build",
-    "typecheck": "tsc --noEmit",
     "lint": "biome lint .",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
@@ -13,8 +11,8 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "@commet/next": "0.1.0",
-    "@commet/node": "0.11.0",
+    "@commet/next": "workspace:*",
+    "@commet/node": "workspace:*",
     "@radix-ui/react-avatar": "1.1.11",
     "@radix-ui/react-label": "2.1.8",
     "@radix-ui/react-separator": "1.1.8",

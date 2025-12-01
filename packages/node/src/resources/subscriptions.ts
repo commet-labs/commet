@@ -1,31 +1,79 @@
 import type {
   ApiResponse,
-  GeneratedProductId,
-  ListParams,
+  GeneratedPlanCode,
   RequestOptions,
-  RetrieveOptions,
 } from "../types/common";
 import type { CommetHTTPClient } from "../utils/http";
+import type { BillingInterval } from "./plans";
 
-export interface Subscription {
-  id: string; // publicId (e.g., "sub_xxx")
+export type SubscriptionStatus =
+  | "draft"
+  | "pending_payment"
+  | "trialing"
+  | "active"
+  | "paused"
+  | "past_due"
+  | "canceled"
+  | "expired";
+
+export interface FeatureSummary {
+  code: string;
+  name: string;
+  type: "boolean" | "metered" | "seats";
+  enabled?: boolean;
+  usage?: {
+    current: number;
+    included: number;
+    overage: number;
+  };
+}
+
+export interface ActiveSubscription {
+  id: string;
   customerId: string;
+  plan: {
+    id: string;
+    name: string;
+    basePrice: number;
+    billingInterval: BillingInterval;
+  };
   name: string;
   description?: string;
-  status: "draft" | "pending_payment" | "active" | "completed" | "canceled";
-  startDate: string; // ISO datetime
-  endDate?: string; // ISO datetime (puede ser null)
-  billingDayOfMonth: number; // 1-31
-  isTemplate?: boolean;
-  checkoutUrl?: string; // Secure checkout URL for pending payment subscriptions
+  status: SubscriptionStatus;
+  trialEndsAt?: string;
+  currentPeriod: {
+    start: string;
+    end: string;
+    daysRemaining: number;
+  };
+  features: FeatureSummary[];
+  startDate: string;
+  endDate?: string;
+  billingDayOfMonth: number;
+  nextBillingDate: string;
+  checkoutUrl?: string;
   createdAt: string;
   updatedAt: string;
 }
 
-export interface SubscriptionItem {
-  priceId: string; // List price ID
-  quantity?: number; // For fixed pricing
-  initialSeats?: number; // For seat-based pricing
+export interface Subscription {
+  id: string;
+  customerId: string;
+  planId: string;
+  planName: string;
+  name: string;
+  description?: string;
+  status: SubscriptionStatus;
+  billingInterval: BillingInterval;
+  trialEndsAt?: string;
+  startDate: string;
+  endDate?: string;
+  currentPeriodStart?: string;
+  currentPeriodEnd?: string;
+  billingDayOfMonth: number;
+  checkoutUrl?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 // Customer identifier: mutually exclusive customerId or externalId
@@ -33,49 +81,49 @@ type CustomerIdentifier =
   | { customerId: string; externalId?: never }
   | { customerId?: never; externalId: string };
 
-export type CreateSubscriptionParams = CustomerIdentifier & {
-  items: SubscriptionItem[];
-  name?: string;
-  startDate?: string;
-  status?: "draft" | "pending_payment" | "active";
+// Plan identifier: use planCode (with autocomplete) or planId (legacy)
+type PlanIdentifier =
+  | { planCode: GeneratedPlanCode; planId?: never }
+  | { planCode?: never; planId: string };
+
+export type CreateSubscriptionParams = CustomerIdentifier &
+  PlanIdentifier & {
+    billingInterval?: BillingInterval;
+    initialSeats?: Record<string, number>;
+    skipTrial?: boolean;
+    name?: string;
+    startDate?: string;
+  };
+
+export type ChangePlanParams = PlanIdentifier & {
+  billingInterval?: BillingInterval;
 };
 
-export interface ListSubscriptionsParams extends ListParams {
-  customerId?: string;
-  externalId?: string;
-  status?: "draft" | "pending_payment" | "active" | "completed" | "canceled";
+export interface CancelParams {
+  reason?: string;
+  immediate?: boolean;
 }
 
+export type GetSubscriptionParams = CustomerIdentifier;
+
 /**
- * Subscription resource for managing subscriptions
+ * Subscription resource for managing subscriptions (plan-first model)
+ *
+ * Each customer can only have ONE active subscription at a time.
  */
 export class SubscriptionsResource {
   constructor(private httpClient: CommetHTTPClient) {}
 
   /**
-   * Create a subscription with multiple items (products)
+   * Create a subscription with a plan
    *
    * @example
    * ```typescript
-   * // Free plan - Multiple products
    * await commet.subscriptions.create({
-   *   externalId: "org_123",
-   *   items: [
-   *     { priceId: "price_tasks_free", quantity: 1 },
-   *     { priceId: "price_usage_free" },
-   *     { priceId: "price_seats_free", initialSeats: 1 }
-   *   ]
-   * });
-   *
-   * // Pro plan upgrade
-   * await commet.subscriptions.create({
-   *   customerId: "cus_xxx",
-   *   items: [
-   *     { priceId: "price_tasks_pro" },
-   *     { priceId: "price_usage_pro" },
-   *     { priceId: "price_seats_pro", initialSeats: 5 }
-   *   ],
-   *   status: "active"
+   *   externalId: 'user_123',
+   *   planCode: 'pro', // autocomplete works after `commet pull`
+   *   billingInterval: 'yearly',
+   *   initialSeats: { editor: 5 }
    * });
    * ```
    */
@@ -87,39 +135,39 @@ export class SubscriptionsResource {
   }
 
   /**
-   * Retrieve a subscription by ID
-   */
-  async retrieve(
-    subscriptionId: string,
-    options?: RetrieveOptions,
-  ): Promise<ApiResponse<Subscription>> {
-    const params = options?.expand
-      ? { expand: options.expand.join(",") }
-      : undefined;
-    return this.httpClient.get(`/subscriptions/${subscriptionId}`, params);
-  }
-
-  /**
-   * List subscriptions with optional filters
+   * Get the active subscription for a customer
    *
    * @example
    * ```typescript
-   * // List all active subscriptions for a customer
-   * await commet.subscriptions.list({
-   *   customerId: "cus_xxx",
-   *   status: "active"
-   * });
+   * const sub = await commet.subscriptions.get({ externalId: 'user_123' });
+   * ```
+   */
+  async get(
+    params: GetSubscriptionParams,
+  ): Promise<ApiResponse<ActiveSubscription | null>> {
+    return this.httpClient.get("/subscriptions/active", params);
+  }
+
+  /**
+   * Change the plan of a subscription (upgrade/downgrade)
    *
-   * // Using externalId
-   * await commet.subscriptions.list({
-   *   externalId: "my-customer-123"
+   * @example
+   * ```typescript
+   * await commet.subscriptions.changePlan('sub_xxx', {
+   *   planCode: 'enterprise' // autocomplete works after `commet pull`
    * });
    * ```
    */
-  async list(
-    params?: ListSubscriptionsParams,
-  ): Promise<ApiResponse<Subscription[]>> {
-    return this.httpClient.get("/subscriptions", params);
+  async changePlan(
+    subscriptionId: string,
+    params: ChangePlanParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<Subscription>> {
+    return this.httpClient.post(
+      `/subscriptions/${subscriptionId}/change-plan`,
+      params,
+      options,
+    );
   }
 
   /**
@@ -127,16 +175,19 @@ export class SubscriptionsResource {
    *
    * @example
    * ```typescript
-   * await commet.subscriptions.cancel("sub_xxx");
+   * await commet.subscriptions.cancel('sub_xxx', {
+   *   reason: 'switched_to_competitor'
+   * });
    * ```
    */
   async cancel(
     subscriptionId: string,
+    params?: CancelParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<Subscription>> {
     return this.httpClient.post(
       `/subscriptions/${subscriptionId}/cancel`,
-      {},
+      params || {},
       options,
     );
   }

@@ -1,93 +1,68 @@
 ---
 title: Clientes
-description: Gestiona clientes con direcciones y tributación
+description: Gestiona clientes para facturación
 ---
-
-import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
-import { Callout } from 'fumadocs-ui/components/callout'
 
 ## Crear Cliente
 
-```typescript
-const customer = await commet.customers.create({
-  legalName: 'Acme Corporation',
-  billingEmail: 'billing@acme.com'
-})
-```
-
-## Vincular con Tu Sistema
-
-Usa `externalId` para conectar clientes de Commet con tu base de datos:
+Create es idempotente con `externalId` - si el cliente existe, lo retorna:
 
 ```typescript
 const customer = await commet.customers.create({
-  externalId: user.id,
-  legalName: 'Acme Corporation',
-  billingEmail: user.email
-})
-
-// Después, busca por tu ID
-const customers = await commet.customers.list({
-  externalId: user.id
+  email: 'billing@acme.com',
+  externalId: 'user_123'
 })
 ```
 
-## Operaciones Básicas
+## Obtener Cliente
 
 ```typescript
-// Recuperar
-const customer = await commet.customers.retrieve('cus_xxx')
+const customer = await commet.customers.get('cus_xxx')
+```
 
-// Actualizar
+## Actualizar Cliente
+
+```typescript
 await commet.customers.update('cus_xxx', {
   displayName: 'Acme Corp',
-  billingEmail: 'accounts@acme.com'
+  legalName: 'Acme Corporation',
+  email: 'accounts@acme.com',
+  metadata: { tier: 'enterprise' }
 })
+```
 
-// Listar
-const customers = await commet.customers.list({
+## Listar Clientes
+
+```typescript
+// Todos los clientes
+const customers = await commet.customers.list()
+
+// Con filtros
+const filtered = await commet.customers.list({
   isActive: true,
+  externalId: 'user_123',
   limit: 50
 })
-
-// Desactivar
-await commet.customers.deactivate('cus_xxx')
 ```
 
-## Agregar Dirección Después
-
-Completa el perfil del cliente cuando la información esté disponible:
+## Creación en Batch
 
 ```typescript
-await commet.customers.update(customerId, {
-  address: {
-    line1: '123 Business St',
-    line2: 'Suite 100', // Opcional
-    city: 'San Francisco',
-    state: 'CA', // Requerido para US/CA
-    postalCode: '94105',
-    country: 'US', // Formato ISO-2
-    region: 'North America' // Opcional
-  }
+await commet.customers.createBatch({
+  customers: [
+    { email: 'user1@example.com', externalId: 'user_1' },
+    { email: 'user2@example.com', externalId: 'user_2' }
+  ]
 })
 ```
 
-## Metadata Personalizada
-
-Almacena datos adicionales con clientes:
+## Archivar Cliente
 
 ```typescript
-await commet.customers.update('cus_xxx', {
-  metadata: {
-    crm_id: 'sf_123456',
-    tier: 'enterprise',
-    account_manager: 'john.doe@company.com'
-  }
-})
+await commet.customers.archive('cus_xxx')
 ```
 
 ## Recursos Relacionados
 
 - [Suscripciones](/es/docs/library/features/subscriptions) - Crear facturación recurrente
-- [Acceso al Portal](/es/docs/library/features/portal-access) - Generar links del portal de cliente
-- [Paginación](/es/docs/library/core/pagination) - Manejar listas grandes de clientes
+- [Acceso al Portal](/es/docs/library/features/portal-access) - Generar links del portal

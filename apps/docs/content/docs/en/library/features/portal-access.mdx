@@ -1,37 +1,24 @@
 ---
-title: Customer Portal Access
-description: Generate secure portal URLs for customers to view their billing information
+title: Customer Portal
+description: Generate secure portal URLs for customers
 ---
 
-import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
-import { Callout } from 'fumadocs-ui/components/callout'
-
-# Customer Portal Access
-
-Generate secure, time-limited portal URLs that let your customers view subscriptions, invoices, and usage data.
-
-<Callout type="info">
-**Prerequisites:** Initialize your Commet client with a valid API key.
-</Callout>
-
-## Request Portal Access
+## Get Portal URL
 
 ### External ID (Recommended)
 
 ```typescript
-const portal = await commet.portal.requestAccess({
-  externalId: 'my-customer-123'
+const portal = await commet.portal.getUrl({
+  externalId: 'user_123'
 })
-```
 
-<Callout type="tip">
-Use `externalId` to avoid storing Commet customer IDs in your database.
-</Callout>
+console.log(portal.data.portalUrl)
+```
 
 ### Customer ID
 
 ```typescript
-const portal = await commet.portal.requestAccess({
+const portal = await commet.portal.getUrl({
   customerId: 'cus_abc123'
 })
 ```
@@ -39,155 +26,53 @@ const portal = await commet.portal.requestAccess({
 ### Email
 
 ```typescript
-const portal = await commet.portal.requestAccess({
+const portal = await commet.portal.getUrl({
   email: 'customer@example.com'
 })
 ```
 
-## TypeScript Autocomplete
+## Integration Examples
 
-The SDK enforces mutually exclusive parameters. TypeScript prevents invalid combinations:
-
-<Tabs items={['Valid', 'Invalid']}>
-<Tab value="Valid">
-```typescript
-// ✅ External ID
-await commet.portal.requestAccess({
-  externalId: 'my-customer-123'
-})
-
-// ✅ Customer ID
-await commet.portal.requestAccess({
-  customerId: 'cus_abc123'
-})
-
-// ✅ Email
-await commet.portal.requestAccess({
-  email: 'customer@example.com'
-})
-```
-</Tab>
-<Tab value="Invalid">
-```typescript
-// ❌ Cannot mix identifiers
-await commet.portal.requestAccess({
-  customerId: 'cus_abc123',
-  externalId: 'my-customer-123'
-})
-
-await commet.portal.requestAccess({
-  customerId: 'cus_abc123',
-  email: 'customer@example.com'
-})
-```
-</Tab>
-</Tabs>
-
-## Integration Patterns
-
-### Send via Email
-
-```typescript
-async function sendPortalToCustomer(customerId: string) {
-  const portal = await commet.portal.requestAccess({
-    externalId: customerId
-  })
-
-  if (portal.success && portal.data) {
-    await sendEmail({
-      to: customerEmail,
-      subject: 'Access Your Billing Portal',
-      body: `View your billing information: ${portal.data.portalUrl}`
-    })
-  }
-}
-```
-
-### Embed in Your App
+### Redirect to Portal
 
 ```typescript
 export async function GET(request: Request) {
   const userId = getUserFromSession(request)
 
-  const portal = await commet.portal.requestAccess({
+  const portal = await commet.portal.getUrl({
     externalId: userId
   })
 
-  if (portal.success && portal.data) {
+  if (portal.data) {
     return Response.redirect(portal.data.portalUrl)
   }
 }
 ```
 
-### Express.js Integration
+### Express.js
 
 ```typescript
-app.post('/api/customer-portal', async (req, res) => {
-  const { customerId } = req.body
-
-  const portal = await commet.portal.requestAccess({
-    externalId: customerId
+app.post('/api/portal', async (req, res) => {
+  const portal = await commet.portal.getUrl({
+    externalId: req.body.customerId
   })
 
-  if (portal.success && portal.data) {
-    res.json({ portalUrl: portal.data.portalUrl })
-  }
+  res.json({ url: portal.data.portalUrl })
 })
 ```
 
-## Error Handling
-
-```typescript
-try {
-  const portal = await commet.portal.requestAccess({
-    externalId: 'customer-123'
-  })
-
-  if (portal.success && portal.data) {
-    console.log('Portal generated:', portal.data.portalUrl)
-  }
-} catch (error) {
-  if (error.statusCode === 404) {
-    console.error('Customer not found')
-  } else if (error.statusCode === 400) {
-    console.error('Invalid identifier or validation error')
-  } else if (error.statusCode === 429) {
-    console.error('Rate limit exceeded')
-  }
-}
-```
-
-## Security Features
-
-Portal URLs include automatic security measures:
-
-- **Time-Limited Tokens**: URLs expire after a configured period
-- **Email Verification**: Customer email must match the account record
-- **Organization Isolation**: Customers only see their own data
-- **Rate Limiting**: Prevents abuse of portal generation
-
-<Callout type="warning">
-**Portal URLs are sensitive:** Treat them like passwords. Send via secure channels and never log them in plain text.
-</Callout>
-
-## Response Format
-
-Successful portal generation returns:
+## Response
 
 ```typescript
 {
   success: true,
-  message: "Portal access created successfully",
   data: {
-    success: true,
-    message: "Portal access created successfully",
-    portalUrl: "https://app.commet.co/acme/portal/overview?customer_session_token=..."
+    portalUrl: "https://app.commet.co/acme/portal/overview?token=..."
   }
 }
 ```
 
-## What's Next
+## Related Resources
 
-- [Customer Management](/docs/library/features/customers) - Manage customer data
+- [Customers](/docs/library/features/customers) - Manage customer data
 - [Subscriptions](/docs/library/features/subscriptions) - View what customers see in the portal
-

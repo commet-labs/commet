@@ -134,7 +134,6 @@ export class CommetHTTPClient {
       let responseText: string;
 
       try {
-        const responseClone = response.clone();
         responseData = await response.json();
         responseText = "";
       } catch (jsonError) {
@@ -149,6 +148,16 @@ export class CommetHTTPClient {
             responseText,
           );
         }
+
+        // For 404 errors with invalid JSON, return a graceful response
+        // This handles cases like HTML error pages or empty responses
+        if (response.status === 404) {
+          return {
+            success: false,
+            error: "Resource not found",
+          } as ApiResponse<T>;
+        }
+
         throw new CommetAPIError(
           `Invalid JSON response: ${response.status} ${response.statusText}`,
           response.status,

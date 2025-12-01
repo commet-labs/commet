@@ -1,8 +1,11 @@
 "use server";
 
 import { auth } from "@/lib/auth";
-import { COMMET_PRICE_ID, commet } from "@/lib/commet";
+import { commet } from "@/lib/commet";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+
+type BillingInterval = "monthly" | "quarterly" | "yearly";
 
 interface CreateSubscriptionResult {
   success: boolean;
@@ -11,15 +14,12 @@ interface CreateSubscriptionResult {
   subscriptionId?: string;
 }
 
-/**
- * Create a subscription for the current user
- * Ensures customer exists and creates subscription with checkout URL
- */
-export async function createSubscriptionAction(): Promise<CreateSubscriptionResult> {
+export async function createSubscriptionAction(
+  billingInterval?: BillingInterval,
+): Promise<CreateSubscriptionResult> {
   try {
-    // Get current session
     const session = await auth.api.getSession({
-      headers: await import("next/headers").then((m) => m.headers()),
+      headers: await headers(),
     });
 
     if (!session?.user) {
@@ -27,93 +27,53 @@ export async function createSubscriptionAction(): Promise<CreateSubscriptionResu
     }
 
     const user = session.user;
-
-    // Ensure customer exists in Commet
-    const customerCheck = await commet.customers.list({
+    // Ensure customer exists (create is idempotent with externalId)
+    const customerResult = await commet.customers.create({
+      email: user.email,
       externalId: user.id,
+      legalName: user.name || undefined,
     });
 
-    // Create customer if doesn't exist
-    if (
-      !customerCheck.success ||
-      !customerCheck.data ||
-      customerCheck.data.length === 0
-    ) {
-      const createResult = await commet.customers.create({
-        externalId: user.id,
-        legalName: user.name || user.email,
-        billingEmail: user.email,
-        taxStatus: "NOT_APPLICABLE",
-        currency: "USD",
-      });
-
-      if (!createResult.success) {
-        return {
-          success: false,
-          error: "Failed to create customer in billing system",
-        };
-      }
+    if (!customerResult.success) {
+      return { success: false, error: "Failed to create customer" };
     }
 
-    // Check if user already has an active subscription
-    const existingSubscriptions = await commet.subscriptions.list({
+    // Check if already has active subscription
+    const existing = await commet.subscriptions.get({
       externalId: user.id,
     });
 
-    if (
-      existingSubscriptions.success &&
-      existingSubscriptions.data &&
-      existingSubscriptions.data.length > 0
-    ) {
-      // Check for active subscription
-      const activeSubscription = existingSubscriptions.data.find(
-        (sub) => sub.status === "active",
-      );
-      if (activeSubscription) {
+    if (existing.data) {
+      if (
+        existing.data.status === "active" ||
+        existing.data.status === "trialing"
+      ) {
         redirect("/dashboard");
       }
 
-      // Check for pending subscription (don't create duplicate)
-      const pendingSubscription = existingSubscriptions.data.find(
-        (sub) => sub.status === "pending_payment",
-      );
-      if (pendingSubscription) {
-        const checkoutUrl = (pendingSubscription as { checkoutUrl?: string })
-          .checkoutUrl;
+      if (existing.data.status === "pending_payment") {
         return {
           success: true,
-          subscriptionId: pendingSubscription.id,
-          checkoutUrl: checkoutUrl || undefined,
+          subscriptionId: existing.data.id,
+          checkoutUrl: existing.data.checkoutUrl,
         };
       }
     }
 
-    // Create new subscription
-    const subscriptionResult = await commet.subscriptions.create({
+    const result = await commet.subscriptions.create({
       externalId: user.id,
-      items: [
-        {
-          priceId: COMMET_PRICE_ID,
-          quantity: 1,
-        },
-      ],
-      status: "pending_payment",
+      planCode: "pro",
+      billingInterval,
     });
 
-    if (!subscriptionResult.success || !subscriptionResult.data) {
-      return {
-        success: false,
-        error: "Failed to create subscription",
-      };
+    if (!result.success || !result.data) {
+      return { success: false, error: "Failed to create subscription" };
     }
-
-    const subscription = subscriptionResult.data;
-    const checkoutUrl = (subscription as { checkoutUrl?: string }).checkoutUrl;
 
     return {
       success: true,
-      subscriptionId: subscription.id,
-      checkoutUrl: checkoutUrl || undefined,
+      subscriptionId: result.data.id,
+      checkoutUrl: result.data.checkoutUrl,
     };
   } catch (error) {
     console.error("Error creating subscription:", error);
