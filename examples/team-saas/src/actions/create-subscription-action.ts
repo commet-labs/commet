@@ -16,7 +16,7 @@ interface CreateSubscriptionResult {
 
 export async function createSubscriptionAction(
   billingInterval?: BillingInterval,
-  planCode: string = "team",
+  planCode = "team",
 ): Promise<CreateSubscriptionResult> {
   try {
     const session = await auth.api.getSession({
@@ -86,4 +86,3 @@ export async function createSubscriptionAction(
     };
   }
 }
-

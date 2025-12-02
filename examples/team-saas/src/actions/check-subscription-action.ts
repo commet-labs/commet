@@ -48,7 +48,7 @@ export async function checkSubscriptionStatus(): Promise<SubscriptionStatus> {
     // Get seat balance from Commet
     let seatsUsed = 0;
     let seatsIncluded = 3;
-    let seatOveragePrice = 1000;
+    const seatOveragePrice = 1000;
 
     try {
       const seatBalance = await commet.seats.getBalance({
@@ -65,14 +65,12 @@ export async function checkSubscriptionStatus(): Promise<SubscriptionStatus> {
 
     // Get seat configuration from subscription features
     const seatFeature = subscription.features.find((f) => f.type === "seats");
-    if (seatFeature) {
-      if (seatFeature.usage?.included) {
-        seatsIncluded = seatFeature.usage.included;
-      }
-      if (seatFeature.overageUnitPrice) {
-        seatOveragePrice = seatFeature.overageUnitPrice;
-      }
+    if (seatFeature?.usage?.included) {
+      seatsIncluded = seatFeature.usage.included;
     }
+
+    // Note: overageUnitPrice is not available in FeatureSummary,
+    // using default value. For accurate pricing, fetch from plan.
 
     return {
       isPaid: isActive,
@@ -89,4 +87,3 @@ export async function checkSubscriptionStatus(): Promise<SubscriptionStatus> {
     return defaultStatus;
   }
 }
-
