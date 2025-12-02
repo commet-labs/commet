@@ -1,5 +1,11 @@
 {
   "title": "Features",
   "description": "Core capabilities of the Commet platform",
-  "pages": ["products", "subscriptions", "usage-metrics", "seats", "payouts"]
+  "pages": [
+    "plans-and-features",
+    "subscriptions",
+    "usage-metrics",
+    "seats",
+    "payouts"
+  ]
 }
