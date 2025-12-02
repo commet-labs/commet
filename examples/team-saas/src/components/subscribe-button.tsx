@@ -52,7 +52,7 @@ export function SubscribeButton({
     setError(null);
 
     try {
-      const result = await createSubscriptionAction(selectedInterval, planCode);
+      const result = await createSubscriptionAction(selectedInterval);
 
       if (!result.success) {
         setError(result.error || "Failed to create subscription");
