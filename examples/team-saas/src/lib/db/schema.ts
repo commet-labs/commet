@@ -104,4 +104,3 @@ export type Workspace = typeof workspace.$inferSelect;
 export type NewWorkspace = typeof workspace.$inferInsert;
 export type Member = typeof member.$inferSelect;
 export type NewMember = typeof member.$inferInsert;
-

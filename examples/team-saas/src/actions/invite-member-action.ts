@@ -40,7 +40,9 @@ export async function inviteMemberAction(
     if (!canAdd.success || !canAdd.data?.allowed) {
       return {
         success: false,
-        error: canAdd.data?.reason || "Seat limit reached. Please upgrade your plan.",
+        error:
+          canAdd.data?.reason ||
+          "Seat limit reached. Please upgrade your plan.",
       };
     }
 

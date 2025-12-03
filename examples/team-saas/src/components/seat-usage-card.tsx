@@ -62,14 +62,14 @@ export function SeatUsageCard({
             {overage > 0 && hasOveragePrice && (
               <div className="flex justify-between text-yellow-500">
                 <span>Extra seats ({overage})</span>
-                <span>
-                  +${((overage * overagePrice) / 100).toFixed(0)}/mo
-                </span>
+                <span>+${((overage * overagePrice) / 100).toFixed(0)}/mo</span>
               </div>
             )}
             {hasOveragePrice && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Price per extra seat</span>
+                <span className="text-muted-foreground">
+                  Price per extra seat
+                </span>
                 <span>${(overagePrice / 100).toFixed(0)}/mo</span>
               </div>
             )}

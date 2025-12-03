@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
-import { Users, Settings, BarChart3 } from "lucide-react";
+import { BarChart3, Settings, Users } from "lucide-react";
 import { headers } from "next/headers";
 import Link from "next/link";
 
@@ -66,7 +66,8 @@ export default async function DashboardPage({
                       Payment Successful!
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      Your subscription is now active. Start inviting team members!
+                      Your subscription is now active. Start inviting team
+                      members!
                     </p>
                   </div>
                 </div>
@@ -150,7 +151,8 @@ export default async function DashboardPage({
                           No Active Subscription
                         </h3>
                         <p className="text-sm text-muted-foreground mb-3">
-                          Complete your checkout to activate your subscription and start inviting team members.
+                          Complete your checkout to activate your subscription
+                          and start inviting team members.
                         </p>
                         <Button asChild>
                           <Link href="/checkout">Complete Checkout</Link>
@@ -218,4 +220,3 @@ export default async function DashboardPage({
     </div>
   );
 }
-

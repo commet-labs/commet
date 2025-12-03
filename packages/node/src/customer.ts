@@ -1,9 +1,9 @@
-import type { RequestOptions } from "./types/common";
 import type { FeaturesResource } from "./resources/features";
-import type { SeatsResource } from "./resources/seats";
-import type { UsageResource } from "./resources/usage";
-import type { SubscriptionsResource } from "./resources/subscriptions";
 import type { PortalResource } from "./resources/portal";
+import type { SeatsResource } from "./resources/seats";
+import type { SubscriptionsResource } from "./resources/subscriptions";
+import type { UsageResource } from "./resources/usage";
+import type { RequestOptions } from "./types/common";
 
 /**
  * Customer-scoped API context

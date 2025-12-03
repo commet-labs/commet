@@ -145,7 +145,10 @@ export default async function CheckoutPage() {
                   {plan.features
                     .filter((f) => f.type !== "seats")
                     .map((feature) => (
-                      <li key={feature.code} className="flex items-center gap-2">
+                      <li
+                        key={feature.code}
+                        className="flex items-center gap-2"
+                      >
                         <svg
                           className="w-4 h-4 text-green-500"
                           fill="currentColor"
@@ -183,4 +186,3 @@ export default async function CheckoutPage() {
     </div>
   );
 }
-

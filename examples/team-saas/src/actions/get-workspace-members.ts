@@ -2,7 +2,7 @@
 
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db/connection";
-import { member, workspace, type Member } from "@/lib/db/schema";
+import { type Member, member, workspace } from "@/lib/db/schema";
 import { and, eq } from "drizzle-orm";
 import { headers } from "next/headers";
 

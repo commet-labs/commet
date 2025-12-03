@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Member } from "@/lib/db/schema";
-import { Trash2, Crown } from "lucide-react";
+import { Crown, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 interface MemberListProps {
@@ -60,9 +60,7 @@ function MemberRow({ member }: { member: Member }) {
         </Avatar>
         <div>
           <div className="flex items-center gap-2">
-            <span className="font-medium">
-              {member.name || member.email}
-            </span>
+            <span className="font-medium">{member.name || member.email}</span>
             {isOwner && (
               <Badge variant="secondary" className="gap-1">
                 <Crown className="w-3 h-3" />
@@ -75,9 +73,7 @@ function MemberRow({ member }: { member: Member }) {
       </div>
 
       <div className="flex items-center gap-2">
-        {error && (
-          <span className="text-sm text-destructive">{error}</span>
-        )}
+        {error && <span className="text-sm text-destructive">{error}</span>}
         {!isOwner && (
           <Button
             variant="ghost"
@@ -111,4 +107,3 @@ export function MemberList({ members }: MemberListProps) {
     </div>
   );
 }
-

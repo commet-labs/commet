@@ -2,7 +2,7 @@ import { PricingSection } from "@/components/pricing-section";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Zap, Shield } from "lucide-react";
+import { Shield, Users, Zap } from "lucide-react";
 import Link from "next/link";
 
 // Revalidate pricing data every hour
@@ -124,4 +124,3 @@ export default function Home() {
     </div>
   );
 }
-

@@ -79,9 +79,7 @@ export default async function TeamPage() {
           {/* Member List */}
           <Card>
             <CardHeader>
-              <CardTitle>
-                Team Members ({members.length})
-              </CardTitle>
+              <CardTitle>Team Members ({members.length})</CardTitle>
             </CardHeader>
             <CardContent>
               <MemberList members={members} />
@@ -123,4 +121,3 @@ export default async function TeamPage() {
     </div>
   );
 }
-

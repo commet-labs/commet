@@ -80,7 +80,9 @@ function PlanCard({ plan }: { plan: Plan }) {
             <p className="text-xs text-muted-foreground">
               {seatFeature.includedAmount} included
               {seatFeature.overageUnitPrice && (
-                <>, then ${(seatFeature.overageUnitPrice / 100).toFixed(0)}/seat</>
+                <>
+                  , then ${(seatFeature.overageUnitPrice / 100).toFixed(0)}/seat
+                </>
               )}
             </p>
           </div>
@@ -193,4 +195,3 @@ export async function PricingSection() {
     </section>
   );
 }
-
