@@ -1,16 +1,9 @@
-import type {
-  ApiResponse,
-  GeneratedEventType,
-  GeneratedFeatureCode,
-  GeneratedSeatType,
-  RequestOptions,
-} from "./types/common";
-import type { CommetHTTPClient } from "./utils/http";
-import type { FeatureAccess, CanUseResult, CheckResult } from "./resources/features";
-import type { SeatBalance, SeatEvent } from "./resources/seats";
-import type { UsageEvent } from "./resources/usage";
-import type { ActiveSubscription, Subscription } from "./resources/subscriptions";
-import type { PortalAccess } from "./resources/portal";
+import type { RequestOptions } from "./types/common";
+import type { FeaturesResource } from "./resources/features";
+import type { SeatsResource } from "./resources/seats";
+import type { UsageResource } from "./resources/usage";
+import type { SubscriptionsResource } from "./resources/subscriptions";
+import type { PortalResource } from "./resources/portal";
 
 /**
  * Customer-scoped API context
@@ -30,230 +23,100 @@ import type { PortalAccess } from "./resources/portal";
  */
 export class CustomerContext {
   private readonly externalId: string;
-  private readonly httpClient: CommetHTTPClient;
+  private readonly featuresResource: FeaturesResource;
+  private readonly seatsResource: SeatsResource;
+  private readonly usageResource: UsageResource;
+  private readonly subscriptionsResource: SubscriptionsResource;
+  private readonly portalResource: PortalResource;
 
-  constructor(httpClient: CommetHTTPClient, externalId: string) {
-    this.httpClient = httpClient;
+  constructor(
+    externalId: string,
+    resources: {
+      features: FeaturesResource;
+      seats: SeatsResource;
+      usage: UsageResource;
+      subscriptions: SubscriptionsResource;
+      portal: PortalResource;
+    },
+  ) {
     this.externalId = externalId;
+    this.featuresResource = resources.features;
+    this.seatsResource = resources.seats;
+    this.usageResource = resources.usage;
+    this.subscriptionsResource = resources.subscriptions;
+    this.portalResource = resources.portal;
   }
 
   /**
-   * Feature access methods - check what the customer can use
+   * Feature access methods - delegates to FeaturesResource
    */
   features = {
-    /**
-     * Get detailed feature access/usage
-     */
-    get: (
-      code: GeneratedFeatureCode,
-      options?: RequestOptions,
-    ): Promise<ApiResponse<FeatureAccess>> => {
-      return this.httpClient.get(
-        `/features/${code}`,
-        { externalId: this.externalId },
-        options,
-      );
-    },
+    get: (code: string, options?: RequestOptions) =>
+      this.featuresResource.get(code, this.externalId, options),
 
-    /**
-     * Check if a boolean feature is enabled
-     */
-    check: async (
-      code: GeneratedFeatureCode,
-      options?: RequestOptions,
-    ): Promise<ApiResponse<CheckResult>> => {
-      const result = await this.httpClient.get<FeatureAccess>(
-        `/features/${code}`,
-        { externalId: this.externalId },
-        options,
-      );
+    check: (code: string, options?: RequestOptions) =>
+      this.featuresResource.check(code, this.externalId, options),
 
-      if (!result.success || !result.data) {
-        return {
-          success: false,
-          data: { allowed: false },
-          message: result.message,
-        };
-      }
+    canUse: (code: string, options?: RequestOptions) =>
+      this.featuresResource.canUse(code, this.externalId, options),
 
-      return {
-        success: true,
-        data: { allowed: result.data.allowed },
-        message: result.message,
-      };
-    },
-
-    /**
-     * Check if customer can use one more unit
-     */
-    canUse: (
-      code: GeneratedFeatureCode,
-      options?: RequestOptions,
-    ): Promise<ApiResponse<CanUseResult>> => {
-      return this.httpClient.get(
-        `/features/${code}`,
-        { externalId: this.externalId, action: "canUse" },
-        options,
-      );
-    },
-
-    /**
-     * List all features
-     */
-    list: (options?: RequestOptions): Promise<ApiResponse<FeatureAccess[]>> => {
-      return this.httpClient.get(
-        "/features",
-        { externalId: this.externalId },
-        options,
-      );
-    },
+    list: (options?: RequestOptions) =>
+      this.featuresResource.list(this.externalId, options),
   };
 
   /**
-   * Seat management methods
+   * Seat management methods - delegates to SeatsResource
    */
   seats = {
-    /**
-     * Add seats
-     */
-    add: (
-      seatType: GeneratedSeatType,
-      count = 1,
-      options?: RequestOptions,
-    ): Promise<ApiResponse<SeatEvent>> => {
-      return this.httpClient.post(
-        "/seats/add",
+    add: (seatType: string, count = 1, options?: RequestOptions) =>
+      this.seatsResource.add(
         { externalId: this.externalId, seatType, count },
         options,
-      );
-    },
+      ),
 
-    /**
-     * Remove seats
-     */
-    remove: (
-      seatType: GeneratedSeatType,
-      count = 1,
-      options?: RequestOptions,
-    ): Promise<ApiResponse<SeatEvent>> => {
-      return this.httpClient.post(
-        "/seats/remove",
+    remove: (seatType: string, count = 1, options?: RequestOptions) =>
+      this.seatsResource.remove(
         { externalId: this.externalId, seatType, count },
         options,
-      );
-    },
+      ),
 
-    /**
-     * Set total seat count
-     */
-    set: (
-      seatType: GeneratedSeatType,
-      count: number,
-      options?: RequestOptions,
-    ): Promise<ApiResponse<SeatEvent>> => {
-      return this.httpClient.post(
-        "/seats/set",
+    set: (seatType: string, count: number, options?: RequestOptions) =>
+      this.seatsResource.set(
         { externalId: this.externalId, seatType, count },
         options,
-      );
-    },
+      ),
 
-    /**
-     * Get current seat balance
-     */
-    getBalance: (
-      seatType: GeneratedSeatType,
-      options?: RequestOptions,
-    ): Promise<ApiResponse<SeatBalance>> => {
-      return this.httpClient.get(
-        "/seats/balance",
-        { externalId: this.externalId, seatType },
-        options,
-      );
-    },
+    getBalance: (seatType: string) =>
+      this.seatsResource.getBalance({ externalId: this.externalId, seatType }),
   };
 
   /**
-   * Usage tracking methods
+   * Usage tracking methods - delegates to UsageResource
    */
   usage = {
-    /**
-     * Track a usage event
-     */
     track: (
-      eventType: GeneratedEventType,
+      eventType: string,
       properties?: Record<string, string>,
       options?: RequestOptions,
-    ): Promise<ApiResponse<UsageEvent>> => {
-      return this.httpClient.post(
-        "/usage",
-        {
-          externalId: this.externalId,
-          eventType,
-          properties,
-        },
+    ) =>
+      this.usageResource.track(
+        { externalId: this.externalId, eventType, properties },
         options,
-      );
-    },
+      ),
   };
 
   /**
-   * Subscription methods
+   * Subscription methods - delegates to SubscriptionsResource
    */
   subscription = {
-    /**
-     * Get active subscription
-     */
-    get: (options?: RequestOptions): Promise<ApiResponse<ActiveSubscription | null>> => {
-      return this.httpClient.get(
-        "/subscriptions/active",
-        { externalId: this.externalId },
-        options,
-      );
-    },
-
-    /**
-     * Cancel subscription
-     */
-    cancel: (
-      params?: { reason?: string; immediate?: boolean },
-      options?: RequestOptions,
-    ): Promise<ApiResponse<Subscription>> => {
-      // First get the subscription to get its ID
-      return this.httpClient.get<ActiveSubscription | null>(
-        "/subscriptions/active",
-        { externalId: this.externalId },
-      ).then((result) => {
-        if (!result.success || !result.data) {
-          return {
-            success: false,
-            data: null as unknown as Subscription,
-            message: "No active subscription found",
-          };
-        }
-        return this.httpClient.post(
-          `/subscriptions/${result.data.id}/cancel`,
-          params || {},
-          options,
-        );
-      });
-    },
+    get: () => this.subscriptionsResource.get({ externalId: this.externalId }),
   };
 
   /**
-   * Portal methods
+   * Portal methods - delegates to PortalResource
    */
   portal = {
-    /**
-     * Get customer portal URL
-     */
-    getUrl: (options?: RequestOptions): Promise<ApiResponse<PortalAccess>> => {
-      return this.httpClient.get(
-        "/portal/url",
-        { externalId: this.externalId },
-        options,
-      );
-    },
+    getUrl: (options?: RequestOptions) =>
+      this.portalResource.getUrl({ externalId: this.externalId }, options),
   };
 }
-

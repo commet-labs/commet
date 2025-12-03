@@ -75,7 +75,13 @@ export class Commet {
    * ```
    */
   customer(externalId: string): CustomerContext {
-    return new CustomerContext(this.httpClient, externalId);
+    return new CustomerContext(externalId, {
+      features: this.features,
+      seats: this.seats,
+      usage: this.usage,
+      subscriptions: this.subscriptions,
+      portal: this.portal,
+    });
   }
 
   getEnvironment(): Environment {
