@@ -3,23 +3,15 @@ title: CLI Commands
 description: Complete reference for all Commet CLI commands
 ---
 
-import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
-
-# CLI Commands
-
 ## Authentication
 
 ### `commet login`
 
-Authenticate with Commet using OAuth device flow.
+Opens browser for OAuth authentication. Stores credentials in `~/.commet/auth.json`.
 
 ```bash
 commet login
 ```
-
-Prompts for environment (Sandbox/Production), opens browser, stores credentials in `~/.commet/auth.json`.
-
----
 
 ### `commet logout`
 
@@ -27,33 +19,23 @@ Prompts for environment (Sandbox/Production), opens browser, stores credentials 
 commet logout
 ```
 
-Removes `~/.commet/auth.json`.
-
----
-
 ### `commet whoami`
+
+Shows auth status and current organization.
 
 ```bash
 commet whoami
 ```
 
-Shows authentication status and linked organization.
-
----
-
-## Project Management
+## Project
 
 ### `commet link`
 
-Link project to a Commet organization.
+Links project to an organization. Creates `.commet` file.
 
 ```bash
 commet link
 ```
-
-Creates `.commet` file with organization config.
-
----
 
 ### `commet unlink`
 
@@ -61,146 +43,54 @@ Creates `.commet` file with organization config.
 commet unlink
 ```
 
-Removes `.commet` file.
-
----
-
 ### `commet switch`
 
-Switch to a different organization.
+Switch to different organization (same environment).
 
 ```bash
 commet switch
 ```
 
-Updates `.commet` with new organization (same environment).
-
----
-
 ### `commet info`
+
+Shows current project and auth status.
 
 ```bash
 commet info
 ```
 
-Shows current authentication and project status.
-
-**Output:**
-```
-📦 Project Information
-
-Authentication: Logged in ✓
-
-Project: Linked ✓
-  Organization: Acme Corp
-  Organization ID: org_A1b2C3d4E5f6G7h8
-  Environment: sandbox
-  
-Run `commet pull` to generate type definitions
-```
-
----
-
-## Type Generation
+## Types
 
 ### `commet pull`
 
-Generate TypeScript types in `.commet/types.d.ts`.
+Generates `.commet/types.d.ts` with your event types, seat types, plans, and features. Enables autocomplete in your code.
 
 ```bash
 commet pull
 ```
 
-Creates:
-- `.commet/` directory
-- `.commet/types.d.ts` with event types, seat types, plans, and features
-- Updates `tsconfig.json` to include the types
-- Updates `.gitignore` to ignore `.commet/`
+After running, your SDK calls get autocomplete:
 
-**Generated file:**
 ```typescript
-// .commet/types.d.ts
-/**
- * Event types available in your organization:
- * - "api_call": API Calls - Track API usage
- * - "email_sent": Emails Sent - Email delivery events
- * 
- * Seat types available in your organization:
- * - "admin": Administrator - Full access (Free)
- * - "user": Standard User - Regular access
- * 
- * Plans available in your organization:
- * - "starter": Starter - For individuals
- * - "pro": Pro - For teams
- * 
- * Features available in your organization:
- * - "api_calls": API Calls (metered)
- * - "team_members": Team Members (seats)
- */
-declare module '@commet/node' {
-  interface CommetGeneratedTypes {
-    eventType: "api_call" | "email_sent";
-    seatType: "admin" | "user";
-    planCode: "starter" | "pro";
-    featureCode: "api_calls" | "team_members";
-  }
-}
-```
-
-**Usage:**
-```typescript
-import { Commet } from '@commet/node'
-
-const commet = new Commet({ apiKey: '...' })
-
-// Autocomplete for event types
 await commet.usage.track({
   externalId: 'user_123',
   eventType: 'api_call', // ✓ autocomplete
 })
 
-// Autocomplete for seat types
-await commet.seats.add({
-  externalId: 'user_123',
-  seatType: 'admin', // ✓ autocomplete
-  count: 5
-})
-
-// Autocomplete for plan codes
 await commet.subscriptions.create({
   externalId: 'user_123',
   planCode: 'pro', // ✓ autocomplete
 })
-
-// Autocomplete for feature codes
-const access = await commet.features.get('api_calls', 'user_123') // ✓ autocomplete
 ```
 
----
-
 ### `commet list events`
-
-List event types in your organization.
 
 ```bash
 commet list events
 ```
 
----
-
 ### `commet list seats`
-
-List seat types in your organization.
 
 ```bash
 commet list seats
-```
-
----
-
-## Global Options
-
-```bash
-commet --version
-commet [command] --help
 ```

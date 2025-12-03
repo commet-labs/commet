@@ -3,65 +3,22 @@ title: Configuration
 description: Commet CLI configuration files
 ---
 
-# Configuration
+## Files
 
-The CLI uses two configuration files.
-
-## `~/.commet/auth.json`
-
-Global authentication credentials.
-
-**Created by**: `commet login`
-
-**Structure**:
-```json
-{
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "environment": "sandbox"
-}
-```
-
-- `token`: Access token
-- `environment`: `"sandbox"` or `"production"`
-
----
-
-## `.commet`
-
-Project organization settings.
-
-**Created by**: `commet link`
-
-**Structure**:
-```json
-{
-  "orgId": "org_A1b2C3d4E5f6G7h8I9j0K1l2",
-  "orgName": "Acme Corporation",
-  "environment": "sandbox"
-}
-```
-
----
-
-## `.commet/types.d.ts`
-
-Generated TypeScript types.
-
-**Created by**: `commet pull`
-
-Contains type definitions for your event types, seat types, and products.
-
----
+| File | Created by | Purpose |
+|------|------------|---------|
+| `~/.commet/auth.json` | `commet login` | Global auth credentials |
+| `.commet` | `commet link` | Project organization settings |
+| `.commet/types.d.ts` | `commet pull` | Generated TypeScript types |
 
 ## Environments
 
-Commet has two completely isolated environments:
+Two isolated environments:
 
-**Sandbox** (`sandbox.commet.co`): Development and testing
+- **Sandbox** (`sandbox.commet.co`) - Development
+- **Production** (`commet.co`) - Live billing
 
-**Production** (`commet.co`): Live billing
-
-Switch environments:
+To switch:
 
 ```bash
 commet logout
@@ -69,18 +26,6 @@ commet login  # Select different environment
 commet link
 ```
 
----
+## Git
 
-## Git Integration
-
-**Commit `.commet`** if all team members use the same organization.
-
-**Ignore `.commet`** if developers use personal organizations.
-
-**Commit `.commet/types.d.ts`** for consistent types across the team.
-
-**Example `.gitignore`**:
-```bash
-# Ignore if using personal orgs
-.commet
-```
+Commit `.commet/types.d.ts` for consistent types across the team. The `.commet/` folder itself is auto-added to `.gitignore` by `commet pull`.

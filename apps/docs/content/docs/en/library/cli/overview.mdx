@@ -3,58 +3,25 @@ title: CLI Overview
 description: Command-line interface for managing Commet projects
 ---
 
-# Commet CLI
-
-Authenticate, link projects, and generate TypeScript types from your Commet configuration.
+Generate TypeScript types from your Commet dashboard for autocomplete in your code.
 
 ## Quick Start
 
 ```bash
-# Install
-npm install -g commet
-
-# Authenticate
+pnpm add -g commet
 commet login
-
-# Link to organization
 commet link
-
-# Generate types
 commet pull
 ```
 
-## What It Does
-
-**Authentication**: OAuth device flow with sandbox and production environments.
-
-**Project Linking**: Creates `.commet` file with organization config.
-
-**Type Generation**: Generates `.commet/types.d.ts` with your event types, seat types, plans, and features for autocomplete in your code.
-
 ## Commands
 
-### Authentication
-- `commet login` - Authenticate with Commet
-- `commet logout` - Remove credentials
-- `commet whoami` - Display auth status
-
-### Project Management
-- `commet link` - Link project to organization
-- `commet unlink` - Unlink project
-- `commet switch` - Switch organization
-- `commet info` - Show project details
-
-### Type Generation
-- `commet pull` - Generate TypeScript types
-- `commet list events` - List event types
-- `commet list seats` - List seat types
+| Command | Description |
+|---------|-------------|
+| `login` | Authenticate with Commet |
+| `logout` | Remove credentials |
+| `link` | Link project to organization |
+| `pull` | Generate TypeScript types |
+| `info` | Show project status |
 
 See [Commands](/docs/library/cli/commands) for full reference.
-
-## Configuration
-
-**`~/.commet/auth.json`**: Global auth credentials
-
-**`.commet`**: Project organization settings
-
-**`.commet/types.d.ts`**: Generated TypeScript types

@@ -3,62 +3,28 @@ title: Workflows
 description: Common CLI workflows
 ---
 
-import { Steps, Step } from 'fumadocs-ui/components/steps'
-
-# CLI Workflows
-
 ## Initial Setup
 
-<Steps>
-<Step>
-
-### Install and Authenticate
-
 ```bash
-npm install -g commet
+pnpm add -g commet
 commet login
-```
-
-</Step>
-
-<Step>
-
-### Link and Generate Types
-
-```bash
-cd your-project
 commet link
 commet pull
 ```
 
-</Step>
-</Steps>
-
----
-
 ## Daily Development
 
-After adding event/seat types in the dashboard:
+After adding types in the dashboard:
 
 ```bash
 commet pull
 ```
 
-Your code now has autocomplete for the new types.
-
----
-
 ## Switch Organizations
 
 ```bash
-cd project-a
-commet switch  # Select Organization A
-
-cd project-b
-commet switch  # Select Organization B
+commet switch
 ```
-
----
 
 ## Switch Environments
 
@@ -66,17 +32,4 @@ commet switch  # Select Organization B
 commet logout
 commet login  # Select different environment
 commet link
-commet pull
 ```
-
----
-
-## Team Sync
-
-**Option 1**: Commit `.commet/types.d.ts` to git
-
-Team members get types automatically from git.
-
-**Option 2**: Each developer runs `commet pull`
-
-Add `.commet/` to `.gitignore`.
