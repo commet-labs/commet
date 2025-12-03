@@ -5,28 +5,21 @@ description: Use Commet SDK in Next.js applications
 
 import { Steps, Step } from 'fumadocs-ui/components/steps'
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
-import { Callout } from 'fumadocs-ui/components/callout'
-
-# Next.js Setup
-
-<Callout type="info">
-**Requirements:** Next.js 13.4+
-</Callout>
 
 <Steps>
 <Step>
 
 ## Install
 
-<Tabs items={['npm', 'pnpm', 'yarn', 'bun']}>
-<Tab value="npm">
-```bash
-npm install @commet/node @commet/next
-```
-</Tab>
+<Tabs items={['pnpm', 'npm', 'yarn', 'bun']}>
 <Tab value="pnpm">
 ```bash
 pnpm add @commet/node @commet/next
+```
+</Tab>
+<Tab value="npm">
+```bash
+npm install @commet/node @commet/next
 ```
 </Tab>
 <Tab value="yarn">
@@ -48,8 +41,8 @@ bun add @commet/node @commet/next
 ## Configure
 
 ```bash title=".env.local"
-COMMET_API_KEY=your_api_key_here
-COMMET_WEBHOOK_SECRET=your_webhook_secret
+COMMET_API_KEY=ck_sandbox_xxx
+COMMET_WEBHOOK_SECRET=whsec_xxx
 ```
 
 </Step>
@@ -68,9 +61,37 @@ export const commet = new Commet({
 ```
 
 </Step>
-</Steps>
 
-## Webhooks
+<Step>
+
+## Create Subscription
+
+```typescript title="app/actions/billing.ts"
+'use server'
+
+import { redirect } from 'next/navigation'
+import { commet } from '@/lib/commet'
+
+export async function subscribe(externalId: string) {
+  await commet.customers.create({
+    email: 'user@example.com',
+    externalId,
+  })
+
+  const subscription = await commet.subscriptions.create({
+    externalId,
+    planCode: 'pro',
+  })
+
+  redirect(subscription.data.checkoutUrl!)
+}
+```
+
+</Step>
+
+<Step>
+
+## Handle Payment
 
 ```typescript title="app/api/webhooks/commet/route.ts"
 import { Webhooks } from '@commet/next'
@@ -78,28 +99,38 @@ import { Webhooks } from '@commet/next'
 export const POST = Webhooks({
   webhookSecret: process.env.COMMET_WEBHOOK_SECRET!,
   onSubscriptionActivated: async (payload) => {
-    // Grant access
-    console.log('Activated:', payload.data.externalId)
-  },
-  onSubscriptionCanceled: async (payload) => {
-    // Revoke access
-    console.log('Canceled:', payload.data.externalId)
+    // Grant access to payload.data.externalId
   },
 })
 ```
+
+</Step>
+
+<Step>
+
+## Check Access
+
+```typescript
+const subscription = await commet.subscriptions.get({ externalId: 'user_123' })
+
+if (subscription.data?.status === 'active') {
+  // User has paid
+}
+```
+
+</Step>
+</Steps>
 
 ## Customer Portal
 
 ```typescript title="app/api/commet/portal/route.ts"
 import { CustomerPortal } from '@commet/next'
-import { auth } from '@/lib/auth'
 
 export const GET = CustomerPortal({
   apiKey: process.env.COMMET_API_KEY!,
-  environment: 'sandbox',
   getCustomerId: async (req) => {
-    const session = await auth.api.getSession({ headers: req.headers })
-    return session?.user.id ?? null
+    // Return user's externalId from your auth
+    return 'user_123'
   },
 })
 ```
@@ -108,24 +139,8 @@ export const GET = CustomerPortal({
 <a href="/api/commet/portal">Manage Billing</a>
 ```
 
-## Server Actions
+## Related
 
-```typescript title="app/actions/billing.ts"
-'use server'
-
-import { commet } from '@/lib/commet'
-
-export async function trackUsage(eventType: string, externalId: string) {
-  return commet.usage.track({
-    eventType,
-    externalId,
-    idempotencyKey: `${externalId}_${Date.now()}`,
-  })
-}
-```
-
-## Related Resources
-
-- [Node.js Setup](/docs/library/installation/node) - General setup
-- [Usage Events](/docs/library/features/usage-events) - Track consumption
-- [Portal Access](/docs/library/features/portal-access) - Portal details
+- [Node.js Setup](/docs/library/installation/node)
+- [Webhooks](/docs/library/features/webhooks)
+- [Customer Portal](/docs/library/features/portal-access)
