@@ -4,7 +4,7 @@ import { Users } from "lucide-react";
 interface SeatUsageCardProps {
   used: number;
   included: number;
-  overagePrice: number;
+  overagePrice?: number;
 }
 
 export function SeatUsageCard({
@@ -15,6 +15,7 @@ export function SeatUsageCard({
   const overage = Math.max(0, used - included);
   const percentUsed = Math.min(100, (used / Math.max(included, 1)) * 100);
   const isOverLimit = used > included;
+  const hasOveragePrice = overagePrice !== undefined && overagePrice > 0;
 
   return (
     <Card>
@@ -58,7 +59,7 @@ export function SeatUsageCard({
               <span className="text-muted-foreground">Included seats</span>
               <span>{included}</span>
             </div>
-            {overage > 0 && (
+            {overage > 0 && hasOveragePrice && (
               <div className="flex justify-between text-yellow-500">
                 <span>Extra seats ({overage})</span>
                 <span>
@@ -66,14 +67,15 @@ export function SeatUsageCard({
                 </span>
               </div>
             )}
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Price per extra seat</span>
-              <span>${(overagePrice / 100).toFixed(0)}/mo</span>
-            </div>
+            {hasOveragePrice && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Price per extra seat</span>
+                <span>${(overagePrice / 100).toFixed(0)}/mo</span>
+              </div>
+            )}
           </div>
         </div>
       </CardContent>
     </Card>
   );
 }
-

@@ -14,8 +14,8 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "@commet/next": "0.2.2",
-    "@commet/node": "1.0.1",
+    "@commet/next": "0.2.3",
+    "@commet/node": "1.1.0",
     "@radix-ui/react-avatar": "1.1.11",
     "@radix-ui/react-label": "2.1.8",
     "@radix-ui/react-separator": "1.1.8",

@@ -18,9 +18,8 @@ export async function getPortalUrl(): Promise<{
       return { success: false, error: "Not authenticated" };
     }
 
-    const result = await commet.portal.getUrl({
-      externalId: session.user.id,
-    });
+    // Use customer-scoped API
+    const result = await commet.customer(session.user.id).portal.getUrl();
 
     if (!result.success || !result.data) {
       return { success: false, error: "Failed to generate portal URL" };
@@ -32,4 +31,3 @@ export async function getPortalUrl(): Promise<{
     return { success: false, error: "An unexpected error occurred" };
   }
 }
-

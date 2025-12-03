@@ -13,15 +13,14 @@ export interface SubscriptionStatus {
   // Seat information
   seatsUsed: number;
   seatsIncluded: number;
-  seatOveragePrice: number;
+  seatOveragePrice?: number;
 }
 
 export async function checkSubscriptionStatus(): Promise<SubscriptionStatus> {
   const defaultStatus: SubscriptionStatus = {
     isPaid: false,
     seatsUsed: 0,
-    seatsIncluded: 3,
-    seatOveragePrice: 1000,
+    seatsIncluded: 0,
   };
 
   try {
@@ -33,10 +32,10 @@ export async function checkSubscriptionStatus(): Promise<SubscriptionStatus> {
       return defaultStatus;
     }
 
-    const result = await commet.subscriptions.get({
-      externalId: session.user.id,
-    });
+    const customer = commet.customer(session.user.id);
 
+    // Get subscription status
+    const result = await customer.subscription.get();
     if (!result.success || !result.data) {
       return defaultStatus;
     }
@@ -45,32 +44,8 @@ export async function checkSubscriptionStatus(): Promise<SubscriptionStatus> {
     const isActive =
       subscription.status === "active" || subscription.status === "trialing";
 
-    // Get seat balance from Commet
-    let seatsUsed = 0;
-    let seatsIncluded = 3;
-    const seatOveragePrice = 1000;
-
-    try {
-      const seatBalance = await commet.seats.getBalance({
-        externalId: session.user.id,
-        seatType: "member",
-      });
-
-      if (seatBalance.success && seatBalance.data) {
-        seatsUsed = seatBalance.data.current;
-      }
-    } catch (error) {
-      console.error("Error fetching seat balance:", error);
-    }
-
-    // Get seat configuration from subscription features
-    const seatFeature = subscription.features.find((f) => f.type === "seats");
-    if (seatFeature?.usage?.included) {
-      seatsIncluded = seatFeature.usage.included;
-    }
-
-    // Note: overageUnitPrice is not available in FeatureSummary,
-    // using default value. For accurate pricing, fetch from plan.
+    // Get seat feature - all data comes from the API
+    const seatResult = await customer.features.get("team_members");
 
     return {
       isPaid: isActive,
@@ -78,9 +53,9 @@ export async function checkSubscriptionStatus(): Promise<SubscriptionStatus> {
       status: subscription.status,
       planName: subscription.plan.name,
       daysRemaining: subscription.currentPeriod.daysRemaining,
-      seatsUsed,
-      seatsIncluded,
-      seatOveragePrice,
+      seatsUsed: seatResult.data?.current ?? 0,
+      seatsIncluded: seatResult.data?.included ?? 0,
+      seatOveragePrice: seatResult.data?.overageUnitPrice,
     };
   } catch (error) {
     console.error("Error checking subscription status:", error);

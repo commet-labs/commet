@@ -67,13 +67,10 @@ export async function removeMemberAction(
       })
       .where(eq(member.id, memberId));
 
-    // Report seat removal to Commet
+    // Report seat removal to Commet using customer-scoped API
+    const customer = commet.customer(session.user.id);
     try {
-      await commet.seats.remove({
-        externalId: session.user.id,
-        seatType: "member",
-        count: 1,
-      });
+      await customer.seats.remove("member");
     } catch (error) {
       // Log but don't fail - seat can be synced later
       console.error("Failed to report seat removal to Commet:", error);
@@ -92,4 +89,3 @@ export async function removeMemberAction(
     };
   }
 }
-

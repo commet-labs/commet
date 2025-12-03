@@ -11,6 +11,7 @@ import { headers } from "next/headers";
 interface InviteMemberResult {
   success: boolean;
   error?: string;
+  willBeCharged?: boolean;
   member?: {
     id: string;
     email: string;
@@ -29,6 +30,18 @@ export async function inviteMemberAction(
 
     if (!session?.user) {
       return { success: false, error: "Not authenticated" };
+    }
+
+    // Use customer-scoped API
+    const customer = commet.customer(session.user.id);
+
+    // Check if can add another seat
+    const canAdd = await customer.features.canUse("team_members");
+    if (!canAdd.success || !canAdd.data?.allowed) {
+      return {
+        success: false,
+        error: canAdd.data?.reason || "Seat limit reached. Please upgrade your plan.",
+      };
     }
 
     // Get user's workspace
@@ -75,13 +88,9 @@ export async function inviteMemberAction(
       return { success: false, error: "Failed to add member" };
     }
 
-    // Report seat to Commet
+    // Report seat to Commet using customer-scoped API
     try {
-      await commet.seats.add({
-        externalId: session.user.id,
-        seatType: "member",
-        count: 1,
-      });
+      await customer.seats.add("member");
     } catch (error) {
       // Log but don't fail - seat can be synced later
       console.error("Failed to report seat to Commet:", error);
@@ -92,6 +101,7 @@ export async function inviteMemberAction(
 
     return {
       success: true,
+      willBeCharged: canAdd.data.willBeCharged,
       member: {
         id: newMember.id,
         email: newMember.email,
@@ -107,4 +117,3 @@ export async function inviteMemberAction(
     };
   }
 }
-
