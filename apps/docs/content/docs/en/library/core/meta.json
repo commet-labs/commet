@@ -1,5 +1,5 @@
 {
   "title": "Core",
   "description": "SDK fundamentals",
-  "pages": ["authentication", "testing", "error-handling", "pagination"]
+  "pages": ["reference", "testing", "error-handling"]
 }
