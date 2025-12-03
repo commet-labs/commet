@@ -3,76 +3,39 @@ title: Portal de Cliente
 description: Genera URLs seguras del portal para clientes
 ---
 
-## Obtener URL del Portal
+Portal de autoservicio donde los clientes gestionan facturación, actualizan métodos de pago y ven facturas.
 
-### External ID (Recomendado)
+## Obtener URL
+
+La URL es de un solo uso y expira - genera una nueva en cada solicitud.
 
 ```typescript
-const portal = await commet.portal.getUrl({
-  externalId: 'user_123'
-})
+const portal = await commet.portal.getUrl({ externalId: 'user_123' })
 
-console.log(portal.data.portalUrl)
+redirect(portal.data.portalUrl)
 ```
 
-### Customer ID
+## Next.js
 
-```typescript
-const portal = await commet.portal.getUrl({
-  customerId: 'cus_abc123'
-})
-```
+Configuración de una línea con `@commet/next`.
 
-### Email
+```typescript title="app/api/commet/portal/route.ts"
+import { CustomerPortal } from '@commet/next'
 
-```typescript
-const portal = await commet.portal.getUrl({
-  email: 'customer@example.com'
-})
-```
-
-## Ejemplos de Integración
-
-### Redirección al Portal
-
-```typescript
-export async function GET(request: Request) {
-  const userId = getUserFromSession(request)
-
-  const portal = await commet.portal.getUrl({
-    externalId: userId
-  })
-
-  if (portal.data) {
-    return Response.redirect(portal.data.portalUrl)
-  }
-}
-```
-
-### Express.js
-
-```typescript
-app.post('/api/portal', async (req, res) => {
-  const portal = await commet.portal.getUrl({
-    externalId: req.body.customerId
-  })
-
-  res.json({ url: portal.data.portalUrl })
+export const GET = CustomerPortal({
+  apiKey: process.env.COMMET_API_KEY!,
+  getCustomerId: async (req) => {
+    // Retornar el externalId del usuario desde tu auth
+    return 'user_123'
+  },
 })
 ```
 
-## Respuesta
-
-```typescript
-{
-  success: true,
-  data: {
-    portalUrl: "https://app.commet.co/acme/portal/overview?token=..."
-  }
-}
+```tsx
+<a href="/api/commet/portal">Gestionar Facturación</a>
 ```
 
-## Recursos Relacionados
+## Relacionado
 
-- [Clientes](/es/docs/library/features/customers) - Gestionar datos de clientes
-- [Suscripciones](/es/docs/library/features/subscriptions) - Ver lo que los clientes ven en el portal
+- [Next.js Setup](/docs/library/installation/nextjs)
+- [Subscriptions](/docs/library/features/subscriptions)

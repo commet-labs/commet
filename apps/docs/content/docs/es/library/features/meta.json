@@ -2,11 +2,13 @@
   "title": "Características",
   "description": "Capacidades del SDK",
   "pages": [
+    "customers",
     "plans",
     "subscriptions",
-    "customers",
     "usage-events",
     "seat-management",
+    "features",
+    "customer",
     "portal-access"
   ]
 }

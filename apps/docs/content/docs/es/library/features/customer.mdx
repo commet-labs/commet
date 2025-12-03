@@ -1,0 +1,85 @@
+---
+title: Contexto de Cliente
+description: API más limpia para operaciones con alcance de cliente
+---
+
+Cuando trabajas con un solo cliente, usa `commet.customer()` para evitar repetir `externalId` en cada llamada.
+
+## Antes vs Después
+
+**Sin Contexto de Cliente:**
+
+```typescript
+await commet.usage.track({ externalId: 'user_123', eventType: 'api_call' })
+await commet.seats.add({ externalId: 'user_123', seatType: 'editor', count: 1 })
+await commet.features.check('custom_branding', 'user_123')
+await commet.subscriptions.get({ externalId: 'user_123' })
+await commet.portal.getUrl({ externalId: 'user_123' })
+```
+
+**Con Contexto de Cliente:**
+
+```typescript
+const customer = commet.customer('user_123')
+
+await customer.usage.track('api_call')
+await customer.seats.add('editor')
+await customer.features.check('custom_branding')
+await customer.subscription.get()
+await customer.portal.getUrl()
+```
+
+## Métodos Disponibles
+
+Todas las operaciones con alcance de cliente:
+
+```typescript
+const customer = commet.customer('user_123')
+
+// Features
+await customer.features.check('custom_branding')
+await customer.features.get('team_members')
+await customer.features.canUse('team_members')
+await customer.features.list()
+
+// Seats
+await customer.seats.add('editor', 5)
+await customer.seats.remove('editor', 2)
+await customer.seats.set('editor', 10)
+await customer.seats.getBalance('editor')
+
+// Usage
+await customer.usage.track('api_call', { endpoint: '/users' })
+
+// Subscription
+await customer.subscription.get()
+
+// Portal
+await customer.portal.getUrl()
+```
+
+## Cuándo Usar
+
+Usa Contexto de Cliente cuando haces múltiples operaciones para el mismo cliente en una solicitud - común en rutas API y server actions.
+
+```typescript
+export async function handleUserAction(userId: string) {
+  const customer = commet.customer(userId)
+  
+  const { data } = await customer.features.canUse('api_calls')
+  
+  if (!data.allowed) {
+    return { error: 'Actualización requerida' }
+  }
+  
+  await customer.usage.track('api_call')
+  return { success: true }
+}
+```
+
+## Relacionado
+
+- [Features](/docs/library/features/features)
+- [Seats](/docs/library/features/seat-management)
+- [Usage](/docs/library/features/usage-events)
+

@@ -1,119 +1,33 @@
 ---
 title: Eventos de Uso
-description: Trackea uso para facturación
+description: Rastrea uso para facturación
 ---
 
-## Trackear Evento
+El uso se agrega y factura al final del período.
+
+## Track
 
 ```typescript
 await commet.usage.track({
   externalId: 'user_123',
   eventType: 'api_call',
-  idempotencyKey: `evt_${requestId}`,
-  properties: {
-    endpoint: '/api/users',
-    method: 'GET'
-  }
 })
 ```
 
-### Parámetros
+## Batch
 
-| Parámetro | Tipo | Descripción |
-|-----------|------|-------------|
-| `externalId` o `customerId` | string | Identificador del cliente (requerido) |
-| `eventType` | string | Tipo de evento (ej: `api_call`) |
-| `idempotencyKey` | string | Key única para prevenir duplicados |
-| `value` | number | Valor del evento (opcional, default: 1) |
-| `timestamp` | string | Timestamp ISO (opcional) |
-| `properties` | object | Contexto adicional como key-value |
-
-## Tracking en Batch
-
-Envía múltiples eventos eficientemente:
+Más eficiente para rastreo de alto volumen.
 
 ```typescript
 await commet.usage.trackBatch({
   events: [
-    {
-      externalId: 'user_123',
-      eventType: 'api_call',
-      idempotencyKey: `evt_${Date.now()}_1`,
-      properties: { endpoint: '/users' }
-    },
-    {
-      externalId: 'user_456',
-      eventType: 'api_call',
-      idempotencyKey: `evt_${Date.now()}_2`,
-      properties: { endpoint: '/orders' }
-    }
+    { externalId: 'user_123', eventType: 'api_call' },
+    { externalId: 'user_456', eventType: 'api_call' },
   ]
 })
 ```
 
-## Properties
+## Relacionado
 
-Agrega contexto a eventos para filtrado y agregación:
-
-```typescript
-await commet.usage.track({
-  externalId: 'user_123',
-  eventType: 'compute',
-  idempotencyKey: `compute_${jobId}`,
-  value: 3600,
-  properties: {
-    region: 'us-east-1',
-    instance_type: 'c5.xlarge',
-    job_id: jobId
-  }
-})
-```
-
-## Ejemplo Completo
-
-```typescript
-import { Commet } from '@commet/node'
-
-const commet = new Commet({
-  apiKey: process.env.COMMET_API_KEY!,
-  environment: 'sandbox'
-})
-
-// Trackear llamada API
-await commet.usage.track({
-  externalId: 'user_123',
-  eventType: 'api_call',
-  idempotencyKey: `req_${crypto.randomUUID()}`,
-  properties: {
-    endpoint: '/api/users',
-    method: 'POST',
-    status: '201'
-  }
-})
-
-// Trackear uso de compute
-await commet.usage.track({
-  externalId: 'user_123',
-  eventType: 'compute_seconds',
-  idempotencyKey: `job_${jobId}`,
-  value: 3600,
-  properties: {
-    region: 'us-east-1',
-    job_type: 'ml_training'
-  }
-})
-
-// Batch de múltiples eventos
-await commet.usage.trackBatch({
-  events: Array.from({ length: 100 }, (_, i) => ({
-    externalId: 'user_123',
-    eventType: 'api_call',
-    idempotencyKey: `batch_${Date.now()}_${i}`,
-  }))
-})
-```
-
-## Recursos Relacionados
-
-- [Planes](/es/docs/library/features/plans) - Configurar features de uso
-- [Suscripciones](/es/docs/library/features/subscriptions) - Ver resumen de uso
+- [Subscriptions](/docs/library/features/subscriptions)
+- [Features](/docs/library/features/features)

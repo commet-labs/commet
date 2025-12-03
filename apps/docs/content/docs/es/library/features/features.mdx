@@ -1,0 +1,53 @@
+---
+title: Features
+description: Verificar acceso y uso de features para clientes
+---
+
+## Check
+
+Verificación booleana rápida - usa para controlar acceso a features.
+
+```typescript
+const { data } = await commet.features.check('custom_branding', 'user_123')
+
+if (!data.allowed) {
+  redirect('/upgrade')
+}
+```
+
+## Get
+
+Detalles completos incluyendo números de uso.
+
+```typescript
+const feature = await commet.features.get('team_members', 'user_123')
+```
+
+## Can Use
+
+Verificación previa antes de agregar seats - te dice si se les cobrará extra.
+
+```typescript
+const { data } = await commet.features.canUse('team_members', 'user_123')
+
+if (!data.allowed) {
+  return { error: 'Actualiza para agregar más miembros' }
+}
+
+if (data.willBeCharged) {
+  // Mostrar confirmación de sobrecosto
+}
+```
+
+## List
+
+```typescript
+const features = await commet.features.list('user_123')
+```
+
+## Relacionado
+
+- [Subscriptions](/docs/library/features/subscriptions)
+- [Seats](/docs/library/features/seat-management)
+- [Plans](/docs/library/features/plans)
+

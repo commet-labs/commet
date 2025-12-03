@@ -1,50 +1,39 @@
 ---
 title: Seats
-description: Gestiona licencias por asiento
+description: Gestiona licencias basadas en seats
 ---
 
-## Agregar Seats
+Los cambios de seats se facturan al final del período (modelo true-up).
+
+## Agregar
 
 ```typescript
 await commet.seats.add({
   externalId: 'user_123',
   seatType: 'editor',
-  count: 5
+  count: 5,
 })
 ```
 
-## Remover Seats
+## Remover
 
 ```typescript
 await commet.seats.remove({
   externalId: 'user_123',
   seatType: 'editor',
-  count: 2
+  count: 2,
 })
 ```
 
-## Establecer Cantidad Exacta
+## Establecer
+
+Establece la cantidad exacta - usa cuando sincronizas desde tu sistema.
 
 ```typescript
 await commet.seats.set({
   externalId: 'user_123',
   seatType: 'editor',
-  count: 10
-})
-```
-
-## Establecer Todos los Tipos
-
-Actualiza múltiples tipos de seat a la vez:
-
-```typescript
-await commet.seats.setAll({
-  externalId: 'user_123',
-  seats: {
-    admin: 3,
-    editor: 50,
-    viewer: 100
-  }
+  count: 10,
 })
 ```
 
@@ -53,44 +42,11 @@ await commet.seats.setAll({
 ```typescript
 const balance = await commet.seats.getBalance({
   externalId: 'user_123',
-  seatType: 'editor'
-})
-
-console.log(`Seats actuales: ${balance.data.current}`)
-```
-
-## Obtener Todos los Balances
-
-```typescript
-const balances = await commet.seats.getAllBalances({
-  externalId: 'user_123'
-})
-
-console.log(balances.data)
-// { editor: { current: 50, asOf: '...' }, viewer: { current: 100, asOf: '...' } }
-```
-
-## Identificación de Cliente
-
-Usa `customerId` o `externalId`:
-
-```typescript
-// Por ID de Commet
-await commet.seats.add({
-  customerId: 'cus_xxx',
   seatType: 'editor',
-  count: 5
-})
-
-// Por ID de tu sistema
-await commet.seats.add({
-  externalId: 'stripe_cus_abc123',
-  seatType: 'editor',
-  count: 5
 })
 ```
 
-## Recursos Relacionados
+## Relacionado
 
-- [Suscripciones](/es/docs/library/features/subscriptions) - Crear facturación recurrente
-- [Clientes](/es/docs/library/features/customers) - Gestionar datos de clientes
+- [Subscriptions](/docs/library/features/subscriptions)
+- [Features](/docs/library/features/features)

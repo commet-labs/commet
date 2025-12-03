@@ -1,152 +1,55 @@
 ---
 title: Manejo de Errores
-description: Manejo de errores con reintentos automáticos y clases de error tipadas
+description: Maneja errores con reintentos automáticos y clases de error tipadas
 ---
-
-# Manejo de Errores
-
-El SDK proporciona clases de error y reintentos automáticos.
 
 ## Clases de Error
 
-### CommetError
-
-Clase de error base:
-
 ```typescript
-import { CommetError } from '@commet/node'
+import { CommetAPIError, CommetValidationError } from '@commet/node'
 
 try {
-  await commet.customers.create(data)
-} catch (error) {
-  if (error instanceof CommetError) {
-    console.log(error.message)
-    console.log(error.code)
-    console.log(error.statusCode)
-  }
-}
-```
-
-### CommetAPIError
-
-Errores de API con códigos de estado HTTP:
-
-```typescript
-import { CommetAPIError } from '@commet/node'
-
-try {
-  await commet.customers.retrieve('invalid_id')
-} catch (error) {
-  if (error instanceof CommetAPIError) {
-    console.log(error.statusCode)  // 404
-    console.log(error.message)
-  }
-}
-```
-
-### CommetValidationError
-
-Errores de validación con detalles por campo:
-
-```typescript
-import { CommetValidationError } from '@commet/node'
-
-try {
-  await commet.customers.create({
-    legalName: ''  // Requerido
-  })
+  await commet.customers.create({ email: 'invalid' })
 } catch (error) {
   if (error instanceof CommetValidationError) {
     console.log(error.validationErrors)
-    // { legalName: ['Legal name is required'] }
+    // { email: ['Invalid email format'] }
+  }
+  
+  if (error instanceof CommetAPIError) {
+    console.log(error.statusCode, error.message)
   }
 }
 ```
+
+| Clase | Caso de uso |
+|-------|----------|
+| `CommetAPIError` | Errores HTTP (4xx, 5xx) |
+| `CommetValidationError` | Input inválido con detalles por campo |
+| `CommetError` | Clase base para todos los errores |
 
 ## Reintentos Automáticos
 
-Los requests fallidos se reintentan automáticamente con backoff exponencial.
+Los requests fallidos se reintentan con backoff exponencial (1s → 2s → 4s, máx 8s).
 
-**Configuración de reintentos:**
-
-```typescript
-const commet = new Commet({
-  apiKey: process.env.COMMET_API_KEY!,
-  retries: 3,      // Máximo de intentos (default: 3)
-  timeout: 30000   // Timeout de request (default: 30000ms)
-})
-```
-
-**Códigos de estado reintentables:** 408, 429, 500, 502, 503, 504
-
-**Delays de reintento:** 1s → 2s → 4s (backoff exponencial, max 8s)
-
-Habilita modo debug para ver los reintentos:
+**Reintentables:** 408, 429, 500, 502, 503, 504
 
 ```typescript
 const commet = new Commet({
   apiKey: process.env.COMMET_API_KEY!,
-  debug: true
+  retries: 3,  // por defecto
 })
-
-// Salida en consola:
-// [Commet SDK] Retrying in 1000ms (attempt 1/3)
-// [Commet SDK] Retrying in 2000ms (attempt 2/3)
 ```
 
-## Patrón de Manejo de Errores
+## Uso No Bloqueante
+
+No dejes que errores de rastreo rompan tu app:
 
 ```typescript
-import { CommetError, CommetAPIError, CommetValidationError } from '@commet/node'
+commet.usage.track({
+  externalId: 'user_123',
+  eventType: 'api_call',
+}).catch(console.error)
 
-async function createCustomer(data) {
-  try {
-    const customer = await commet.customers.create(data)
-    return { success: true, data: customer.data }
-  } catch (error) {
-    if (error instanceof CommetValidationError) {
-      return {
-        success: false,
-        type: 'validation',
-        errors: error.validationErrors
-      }
-    }
-    
-    if (error instanceof CommetAPIError) {
-      return {
-        success: false,
-        type: 'api',
-        statusCode: error.statusCode,
-        message: error.message
-      }
-      }
-    
-      return {
-        success: false,
-        type: 'unknown',
-      message: 'An unexpected error occurred'
-    }
-  }
-}
-```
-
-## Operaciones No Bloqueantes
-
-No dejes que errores de facturación rompan tu app:
-
-```typescript
-// Tracking de uso sin bloquear
-async function processRequest(request) {
-  const result = await handleRequest(request)
-  
-  // Track usage asíncrono
-  commet.usage.create({
-    eventType: 'api_call',
-    customerId: request.customerId
-  }).catch(error => {
-    console.error('Usage tracking failed:', error.message)
-  })
-  
-  return result
-}
+// Continúa sin esperar
 ```

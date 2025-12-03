@@ -3,138 +3,51 @@ title: Suscripciones
 description: Gestiona suscripciones con el modelo plan-first
 ---
 
-## Crear Suscripción
+Cada cliente solo puede tener una suscripción activa a la vez.
+
+## Crear
+
+Retorna un `checkoutUrl` - redirige al usuario ahí para completar el pago.
 
 ```typescript
 const subscription = await commet.subscriptions.create({
   externalId: 'user_123',
-  planCode: 'pro'
+  planCode: 'pro',
 })
+
+redirect(subscription.data.checkoutUrl)
 ```
 
-### Opciones
+## Obtener
 
-| Parámetro | Tipo | Descripción |
-|-----------|------|-------------|
-| `externalId` o `customerId` | string | Identificador del cliente (requerido) |
-| `planCode` o `planId` | string | Plan a suscribir (requerido). Usa `planCode` para autocompletado. |
-| `billingInterval` | string | `monthly`, `quarterly`, o `yearly` |
-| `initialSeats` | object | Cantidad inicial de seats por tipo |
-| `skipTrial` | boolean | Saltar el período de trial si el plan tiene |
-| `startDate` | string | Fecha ISO para suscripción futura |
-
-## Obtener Suscripción
-
-Cada cliente tiene una suscripción activa. Esto la retorna con resumen completo:
+Retorna detalles completos de la suscripción incluyendo resumen de uso de features.
 
 ```typescript
-const sub = await commet.subscriptions.get({
-  externalId: 'user_123'
-})
+const sub = await commet.subscriptions.get({ externalId: 'user_123' })
 
-if (sub.data) {
-  console.log('Plan:', sub.data.plan.name)
-  console.log('Estado:', sub.data.status)
-  console.log('Días restantes:', sub.data.currentPeriod.daysRemaining)
-  
-  for (const feature of sub.data.features) {
-    if (feature.usage) {
-      console.log(`${feature.name}: ${feature.usage.current}/${feature.usage.included}`)
-    }
-  }
+if (sub.data?.status === 'active') {
+  // El usuario ha pagado
 }
 ```
 
 ## Cambiar Plan
 
-```typescript
-await commet.subscriptions.changePlan('sub_xxx', {
-  planCode: 'enterprise'
-})
-```
+La prorrateación es automática - acredita tiempo no usado y cobra por el nuevo plan.
 
-Proration automático: Commet calcula crédito por tiempo no usado y cobra el nuevo plan.
+```typescript
+await commet.subscriptions.changePlan('sub_xxx', { planCode: 'enterprise' })
+```
 
 ## Cancelar
 
-```typescript
-await commet.subscriptions.cancel('sub_xxx', {
-  reason: 'switched_to_competitor'
-})
-```
-
-## Estados de Suscripción
-
-| Estado | Descripción |
-|--------|-------------|
-| `draft` | Creada pero no activada |
-| `pending_payment` | Esperando primer pago |
-| `trialing` | En período de trial |
-| `active` | Activa y facturando normalmente |
-| `paused` | Pausada temporalmente |
-| `past_due` | Pago falló, período de gracia |
-| `canceled` | Cancelada |
-| `expired` | Llegó a fecha de fin |
-
-## Períodos de Trial
-
-Si un plan tiene días de trial, las nuevas suscripciones inician en estado `trialing`:
+Cancela al final del período actual por defecto.
 
 ```typescript
-const subscription = await commet.subscriptions.create({
-  externalId: 'user_123',
-  planCode: 'starter'
-})
-
-console.log(subscription.data.status)  // "trialing"
-console.log(subscription.data.trialEndsAt)
-
-// Saltar trial
-await commet.subscriptions.create({
-  externalId: 'user_456',
-  planCode: 'starter',
-  skipTrial: true
-})
+await commet.subscriptions.cancel('sub_xxx')
 ```
 
-## Ejemplo Completo
+## Relacionado
 
-```typescript
-import { Commet } from '@commet/node'
-
-const commet = new Commet({
-  apiKey: process.env.COMMET_API_KEY!,
-  environment: 'sandbox'
-})
-
-const sub = await commet.subscriptions.create({
-  externalId: 'user_123',
-  planCode: 'pro',
-  initialSeats: { editor: 5 }
-})
-
-await commet.usage.track({
-  externalId: 'user_123',
-  eventType: 'api_call',
-  idempotencyKey: `evt_${Date.now()}`
-})
-
-await commet.seats.add({
-  externalId: 'user_123',
-  seatType: 'editor',
-  count: 3
-})
-
-const current = await commet.subscriptions.get({ externalId: 'user_123' })
-console.log('Días restantes:', current.data?.currentPeriod.daysRemaining)
-
-await commet.subscriptions.changePlan(sub.data.id, {
-  planCode: 'enterprise'
-})
-```
-
-## Recursos Relacionados
-
-- [Planes](/es/docs/library/features/plans) - Listar planes disponibles
-- [Eventos de Uso](/es/docs/library/features/usage-events) - Trackear consumo
-- [Seats](/es/docs/library/features/seat-management) - Gestionar licencias
+- [Plans](/docs/library/features/plans)
+- [Usage](/docs/library/features/usage-events)
+- [Seats](/docs/library/features/seat-management)

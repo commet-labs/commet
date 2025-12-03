@@ -1,0 +1,71 @@
+---
+title: Referencia del SDK
+description: Configuración, entornos y paginación
+---
+
+## Setup
+
+```typescript
+import { Commet } from '@commet/node'
+
+const commet = new Commet({
+  apiKey: process.env.COMMET_API_KEY!,
+})
+```
+
+Obtén tu API key desde el [dashboard](https://commet.co/settings/api-keys).
+
+## Opciones
+
+| Opción | Tipo | Por defecto | Descripción |
+|--------|------|-------------|-------------|
+| `apiKey` | string | requerido | Tu API key (comienza con `ck_`) |
+| `environment` | `'sandbox'` \| `'production'` | `'sandbox'` | Entorno de destino |
+| `debug` | boolean | `false` | Registrar requests/responses |
+| `timeout` | number | `30000` | Timeout de request (ms) |
+| `retries` | number | `3` | Máximo de intentos de reintento |
+
+## Entornos
+
+- **Sandbox** (`sandbox.commet.co`) - Desarrollo, por defecto
+- **Production** (`commet.co`) - Facturación en vivo
+
+```typescript
+commet.isSandbox()     // true
+commet.isProduction()  // false
+```
+
+## Modo Debug
+
+Ver todos los requests y responses:
+
+```typescript
+const commet = new Commet({
+  apiKey: process.env.COMMET_API_KEY!,
+  debug: true,
+})
+
+// [Commet SDK] POST https://sandbox.commet.co/api/customers
+// [Commet SDK] Response status: 200 OK
+```
+
+## Paginación
+
+Los endpoints de listado usan paginación basada en cursor.
+
+```typescript
+const page = await commet.customers.list({ limit: 25 })
+
+if (page.hasMore) {
+  const nextPage = await commet.customers.list({ 
+    limit: 25,
+    cursor: page.nextCursor,
+  })
+}
+```
+
+| Parámetro | Tipo | Por defecto | Descripción |
+|-----------|------|-------------|-------------|
+| `limit` | number | 25 | Items por página (máx 100) |
+| `cursor` | string | - | Cursor de la respuesta anterior |
+

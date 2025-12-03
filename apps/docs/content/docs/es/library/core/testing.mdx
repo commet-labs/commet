@@ -3,18 +3,14 @@ title: Pruebas
 description: Prueba de forma segura con el entorno sandbox
 ---
 
-# Pruebas
-
-Usa el entorno sandbox para probar de forma segura antes de producción.
+Sandbox es el entorno por defecto - completamente aislado de producción.
 
 ## Tarjetas de Prueba
-
-Usa estas tarjetas de prueba en sandbox:
 
 **Pagos exitosos:**
 
 | Tarjeta | Marca |
-|---------|-------|
+|------|-------|
 | `4242 4242 4242 4242` | Visa |
 | `5555 5555 5555 4444` | Mastercard |
 
@@ -23,117 +19,45 @@ Usa cualquier fecha de vencimiento futura y cualquier CVC de 3 dígitos.
 **Pagos fallidos:**
 
 | Tarjeta | Escenario |
-|---------|-----------|
+|------|----------|
 | `4000 0000 0000 9995` | Fondos insuficientes |
-| `4000 0000 0000 9987` | Tarjeta perdida |
-| `4000 0000 0000 9979` | Tarjeta robada |
+| `4000 0000 0000 0002` | Tarjeta declinada |
 
 **3D Secure:**
 
 | Tarjeta | Descripción |
-|---------|-------------|
+|------|-------------|
 | `4000 0025 0000 3155` | Requiere autenticación |
-
-## Entorno Sandbox
-
-Sandbox es el entorno por defecto con datos completamente aislados:
-
-```typescript
-const commet = new Commet({
-  apiKey: process.env.COMMET_SANDBOX_KEY!,
-  environment: 'sandbox'  // Default
-})
-
-// Todas las operaciones usan sandbox.commet.co
-await commet.customers.create({
-  legalName: 'Test Customer',
-  currency: 'USD'
-})
-```
-
-**Características de sandbox:**
-- Base de datos separada de producción
-- Comportamiento real de la API
-- Operaciones gratuitas
-- Experimentación segura
 
 ## Flujo de Prueba
 
 ```typescript
-// 1. Crear customer de prueba
+// 1. Crear cliente
 const customer = await commet.customers.create({
-  legalName: 'Test Company',
-  currency: 'USD'
+  email: 'test@example.com',
+  externalId: `test_${Date.now()}`,
 })
 
 // 2. Crear suscripción
 const subscription = await commet.subscriptions.create({
-  productId: 'prd_test_123',
-  customerId: customer.data.id
+  externalId: customer.data.externalId,
+  planCode: 'pro',
 })
 
-// 3. Enviar eventos de uso
-await commet.usage.create({
+// 3. Pagar con tarjeta de prueba en checkoutUrl
+
+// 4. Rastrear uso
+await commet.usage.track({
+  externalId: customer.data.externalId,
   eventType: 'api_call',
-  customerId: customer.data.id,
-  idempotencyKey: `test_${Date.now()}`
-})
-
-// 4. Verificar
-const events = await commet.usage.list({
-  customerId: customer.data.id
-})
-console.log('Events:', events.data.length)
-```
-
-## Identificadores Únicos
-
-Usa IDs únicos para evitar conflictos:
-
-```typescript
-const testId = `test_${Date.now()}`
-
-await commet.customers.create({
-  legalName: `Test Customer ${testId}`,
-  externalId: testId,
-  currency: 'USD'
 })
 ```
 
-## Probar Idempotencia
+## Producción
 
 ```typescript
-const eventId = `test_${Date.now()}`
-
-// Enviar dos veces con mismo idempotencyKey
-await commet.usage.create({
-  eventType: 'api_call',
-  customerId: 'cus_123',
-  idempotencyKey: eventId
-})
-
-// Segunda llamada no crea duplicado
-await commet.usage.create({
-  eventType: 'api_call',
-  customerId: 'cus_123',
-  idempotencyKey: eventId  // Mismo ID
-})
-```
-
-## Cambiar a Producción
-
-```typescript
-// Sandbox (pruebas)
-const sandbox = new Commet({
-  apiKey: process.env.COMMET_SANDBOX_KEY!,
-  environment: 'sandbox'
-})
-
-// Production (en vivo)
-const production = new Commet({
+const commet = new Commet({
   apiKey: process.env.COMMET_PRODUCTION_KEY!,
-  environment: 'production'
+  environment: 'production',
 })
 ```
-
-Obtén tu API key de producción desde el [dashboard](https://commet.co/settings/api-keys).

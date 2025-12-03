@@ -5,22 +5,21 @@ description: Usa Commet SDK en cualquier proyecto Node.js o TypeScript
 
 import { Steps, Step } from 'fumadocs-ui/components/steps'
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
-import { Callout } from 'fumadocs-ui/components/callout'
 
 <Steps>
 <Step>
 
 ## Instalar
 
-<Tabs items={['npm', 'pnpm', 'yarn', 'bun']}>
-<Tab value="npm">
-```bash
-npm install @commet/node
-```
-</Tab>
+<Tabs items={['pnpm', 'npm', 'yarn', 'bun']}>
 <Tab value="pnpm">
 ```bash
 pnpm add @commet/node
+```
+</Tab>
+<Tab value="npm">
+```bash
+npm install @commet/node
 ```
 </Tab>
 <Tab value="yarn">
@@ -42,8 +41,7 @@ bun add @commet/node
 ## Configurar
 
 ```bash title=".env"
-COMMET_API_KEY=tu_clave_api_aqui
-COMMET_ENV=sandbox
+COMMET_API_KEY=ck_sandbox_xxx
 ```
 
 </Step>
@@ -57,7 +55,7 @@ import { Commet } from '@commet/node'
 
 export const commet = new Commet({
   apiKey: process.env.COMMET_API_KEY!,
-  environment: 'sandbox', // o 'production'
+  environment: 'sandbox',
 })
 ```
 
@@ -68,156 +66,55 @@ export const commet = new Commet({
 ## Usar
 
 ```typescript
-// Rastrear uso
-await commet.usage.create({
-  eventType: 'api_call',
-  customerId: 'cus_xxx',
-  idempotencyKey: `evt_${Date.now()}`,
-})
-
 // Crear cliente
 const customer = await commet.customers.create({
-  legalName: 'Acme Corp',
-  billingEmail: 'billing@acme.com',
-  address: {
-    line1: '123 Main St',
-    city: 'San Francisco',
-    postalCode: '94102',
-    country: 'US',
-  },
+  email: 'billing@acme.com',
+  externalId: 'user_123',
 })
 
-// Crear suscripción
+// Crear suscripción y obtener link de pago
 const subscription = await commet.subscriptions.create({
-  customerId: customer.data.id,
-  items: [
-    { priceId: 'price_xxx', quantity: 1 }
-  ],
+  externalId: 'user_123',
+  planCode: 'pro',
 })
+
+// Redirigir al usuario para pagar
+redirect(subscription.data.checkoutUrl)
+```
+
+</Step>
+
+<Step>
+
+## Verificar Suscripción
+
+```typescript
+const subscription = await commet.subscriptions.get({ externalId: 'user_123' })
+
+if (subscription.data?.status === 'active') {
+  // El usuario ha pagado
+}
+```
+
+</Step>
+
+<Step>
+
+## Verificar Features
+
+```typescript
+const { data } = await commet.features.check('custom_branding', 'user_123')
+
+if (!data.allowed) {
+  redirect('/upgrade')
+}
 ```
 
 </Step>
 </Steps>
 
-## Ejemplos por Framework
+## Relacionado
 
-### Express
-
-```typescript title="src/server.ts"
-import express from 'express'
-import { commet } from './lib/commet'
-
-const app = express()
-app.use(express.json())
-
-app.post('/api/usage', async (req, res) => {
-  const { eventType, customerId } = req.body
-  
-  const result = await commet.usage.create({
-    eventType,
-    customerId,
-    idempotencyKey: `${customerId}_${Date.now()}`,
-  })
-  
-  res.json(result.data)
-})
-
-app.listen(3000)
-```
-
-### Fastify
-
-```typescript title="src/server.ts"
-import Fastify from 'fastify'
-import { commet } from './lib/commet'
-
-const fastify = Fastify()
-
-fastify.post('/api/usage', async (request, reply) => {
-  const { eventType, customerId } = request.body
-  
-  const result = await commet.usage.create({
-    eventType,
-    customerId,
-    idempotencyKey: `${customerId}_${Date.now()}`,
-  })
-  
-  return result.data
-})
-
-fastify.listen({ port: 3000 })
-```
-
-## Manejo de Errores
-
-```typescript
-import { CommetAPIError } from '@commet/node'
-
-try {
-  await commet.usage.create({
-    eventType: 'api_call',
-    customerId: 'cus_xxx',
-    idempotencyKey: 'unique_key',
-  })
-} catch (error) {
-  if (error instanceof CommetAPIError) {
-    console.error('Error de API:', error.statusCode, error.message)
-  }
-}
-```
-
-## Mejores Prácticas
-
-### Siempre Usa Claves de Idempotencia
-
-```typescript
-// ✅ Bueno
-await commet.usage.create({
-  eventType: 'api_call',
-  customerId: 'cus_xxx',
-  idempotencyKey: `${customerId}_${requestId}`,
-})
-
-// ❌ Malo - puede crear duplicados
-await commet.usage.create({
-  eventType: 'api_call',
-  customerId: 'cus_xxx',
-})
-```
-
-### Rastreo Sin Bloquear
-
-```typescript
-// ✅ Bueno - no bloquea la petición
-commet.usage.create({
-  eventType: 'api_call',
-  customerId: 'cus_xxx',
-  idempotencyKey: 'unique_key',
-}).catch(console.error)
-
-// Continúa procesando...
-
-// ❌ Malo - bloquea la petición
-await commet.usage.create({
-  eventType: 'api_call',
-  customerId: 'cus_xxx',
-  idempotencyKey: 'unique_key',
-})
-```
-
-### Operaciones por Lotes
-
-```typescript
-const events = Array.from({ length: 100 }, (_, i) => ({
-  eventType: 'api_call',
-  customerId: 'cus_xxx',
-  idempotencyKey: `batch_${Date.now()}_${i}`,
-}))
-
-const result = await commet.usage.createBatch({ events })
-```
-
-## Recursos Relacionados
-
-- [Testing](/es/docs/library/core/testing) - Prueba con entorno sandbox
-- [Manejo de Errores](/es/docs/library/core/error-handling) - Maneja errores correctamente
+- [Customers](/docs/library/features/customers)
+- [Subscriptions](/docs/library/features/subscriptions)
+- [Usage](/docs/library/features/usage)

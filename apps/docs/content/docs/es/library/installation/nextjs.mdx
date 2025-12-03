@@ -5,40 +5,31 @@ description: Usa Commet SDK en aplicaciones Next.js
 
 import { Steps, Step } from 'fumadocs-ui/components/steps'
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
-import { Callout } from 'fumadocs-ui/components/callout'
-
-# Configuración Next.js
-
-Usa Commet SDK en Next.js (App Router o Pages Router).
-
-<Callout type="info">
-**Requisitos:** Next.js 13.4+
-</Callout>
 
 <Steps>
 <Step>
 
 ## Instalar
 
-<Tabs items={['npm', 'pnpm', 'yarn', 'bun']}>
-<Tab value="npm">
-```bash
-npm install @commet/node
-```
-</Tab>
+<Tabs items={['pnpm', 'npm', 'yarn', 'bun']}>
 <Tab value="pnpm">
 ```bash
-pnpm add @commet/node
+pnpm add @commet/node @commet/next
+```
+</Tab>
+<Tab value="npm">
+```bash
+npm install @commet/node @commet/next
 ```
 </Tab>
 <Tab value="yarn">
 ```bash
-yarn add @commet/node
+yarn add @commet/node @commet/next
 ```
 </Tab>
 <Tab value="bun">
 ```bash
-bun add @commet/node
+bun add @commet/node @commet/next
 ```
 </Tab>
 </Tabs>
@@ -50,13 +41,9 @@ bun add @commet/node
 ## Configurar
 
 ```bash title=".env.local"
-COMMET_API_KEY=tu_clave_api_aqui
-COMMET_ENV=sandbox
+COMMET_API_KEY=ck_sandbox_xxx
+COMMET_WEBHOOK_SECRET=whsec_xxx
 ```
-
-<Callout type="warn">
-**Solo del lado del servidor:** Nunca expongas tu clave API en código del cliente. Usa Server Actions, API Routes, o Server Components.
-</Callout>
 
 </Step>
 
@@ -69,7 +56,7 @@ import { Commet } from '@commet/node'
 
 export const commet = new Commet({
   apiKey: process.env.COMMET_API_KEY!,
-  environment: process.env.COMMET_ENV === 'production' ? 'production' : 'sandbox',
+  environment: 'sandbox',
 })
 ```
 
@@ -77,245 +64,83 @@ export const commet = new Commet({
 
 <Step>
 
-## Usar
-
-<Tabs items={['App Router', 'Pages Router']}>
-<Tab value="App Router">
-
-### Server Actions
+## Crear Suscripción
 
 ```typescript title="app/actions/billing.ts"
 'use server'
 
+import { redirect } from 'next/navigation'
 import { commet } from '@/lib/commet'
 
-export async function trackUsage(eventType: string, customerId: string) {
-  const result = await commet.usage.create({
-    eventType,
-    customerId,
-    idempotencyKey: `${customerId}_${Date.now()}`,
-  })
-  
-  return result.data
-}
-```
-
-Usar en componentes:
-
-```typescript title="app/dashboard/page.tsx"
-'use client'
-
-import { trackUsage } from '@/app/actions/billing'
-
-export default function Dashboard() {
-  const handleAction = async () => {
-    await trackUsage('api_call', 'cus_xxx')
-  }
-
-  return <button onClick={handleAction}>Rastrear</button>
-}
-```
-
-### Server Components
-
-```typescript title="app/usage/page.tsx"
-import { commet } from '@/lib/commet'
-
-export default async function UsagePage({
-  searchParams,
-}: {
-  searchParams: { customerId: string }
-}) {
-  const events = await commet.usage.list({
-    customerId: searchParams.customerId,
+export async function subscribe(externalId: string) {
+  await commet.customers.create({
+    email: 'user@example.com',
+    externalId,
   })
 
-  return (
-    <div>
-      {events.data.map(event => (
-        <div key={event.id}>{event.eventType}</div>
-      ))}
-    </div>
-  )
+  const subscription = await commet.subscriptions.create({
+    externalId,
+    planCode: 'pro',
+  })
+
+  redirect(subscription.data.checkoutUrl!)
 }
 ```
 
-### API Routes
+</Step>
 
-```typescript title="app/api/usage/route.ts"
-import { NextRequest, NextResponse } from 'next/server'
-import { commet } from '@/lib/commet'
+<Step>
 
-export async function POST(request: NextRequest) {
-  const { eventType, customerId } = await request.json()
-    
-    const result = await commet.usage.create({
-      eventType,
-      customerId,
-    idempotencyKey: `${customerId}_${Date.now()}`,
-    })
-    
-    return NextResponse.json(result.data)
-}
+## Manejar Pagos
+
+```typescript title="app/api/webhooks/commet/route.ts"
+import { Webhooks } from '@commet/next'
+
+export const POST = Webhooks({
+  webhookSecret: process.env.COMMET_WEBHOOK_SECRET!,
+  onSubscriptionActivated: async (payload) => {
+    // Otorgar acceso a payload.data.externalId
+  },
+})
 ```
 
-</Tab>
-<Tab value="Pages Router">
+</Step>
 
-### API Routes
+<Step>
 
-```typescript title="pages/api/usage.ts"
-import type { NextApiRequest, NextApiResponse } from 'next'
-import { commet } from '@/lib/commet'
+## Verificar Acceso
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  const { eventType, customerId } = req.body
-    
-    const result = await commet.usage.create({
-      eventType,
-      customerId,
-    idempotencyKey: `${customerId}_${Date.now()}`,
-    })
-    
-  res.json(result.data)
+```typescript
+const subscription = await commet.subscriptions.get({ externalId: 'user_123' })
+
+if (subscription.data?.status === 'active') {
+  // El usuario ha pagado
 }
 ```
-
-### Client Hook
-
-```typescript title="hooks/useBilling.ts"
-export function useBilling() {
-  const trackUsage = async (eventType: string, customerId: string) => {
-    const res = await fetch('/api/usage', {
-        method: 'POST',
-      body: JSON.stringify({ eventType, customerId }),
-      })
-    return res.json()
-  }
-
-  return { trackUsage }
-}
-```
-
-</Tab>
-</Tabs>
 
 </Step>
 </Steps>
 
-## Ejemplo de Middleware
+## Portal de Cliente
 
-Rastrea uso de API automáticamente:
+```typescript title="app/api/commet/portal/route.ts"
+import { CustomerPortal } from '@commet/next'
 
-```typescript title="middleware.ts"
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
-import { Commet } from '@commet/node'
-
-export async function middleware(request: NextRequest) {
-    const customerId = request.headers.get('x-customer-id')
-  
-  if (customerId && request.nextUrl.pathname.startsWith('/api/')) {
-    const commet = new Commet({
-      apiKey: process.env.COMMET_API_KEY!,
-    })
-    
-      commet.usage.create({
-        eventType: 'api_call',
-        customerId,
-      idempotencyKey: `${customerId}_${Date.now()}`,
-      }).catch(console.error)
-  }
-
-  return NextResponse.next()
-}
-
-export const config = {
-  matcher: '/api/:path*',
-}
-```
-
-## Webhooks
-
-```typescript title="app/api/webhooks/commet/route.ts"
-import { NextRequest, NextResponse } from 'next/server'
-import { Webhooks } from '@commet/node'
-
-const webhooks = new Webhooks()
-
-export async function POST(request: NextRequest) {
-  const body = await request.text()
-  const signature = request.headers.get('x-commet-signature')!
-  
-  const event = webhooks.constructEvent(
-    body,
-    signature,
-    process.env.COMMET_WEBHOOK_SECRET!
-  )
-  
-  // Manejar evento
-  console.log('Webhook recibido:', event.type)
-  
-  return NextResponse.json({ received: true })
-}
-```
-
-## Manejo de Errores
-
-```typescript
-import { CommetAPIError } from '@commet/node'
-
-try {
-  await commet.usage.create({
-    eventType: 'api_call',
-    customerId: 'cus_xxx',
-    idempotencyKey: 'unique_key',
-  })
-} catch (error) {
-  if (error instanceof CommetAPIError) {
-    console.error('Error de API:', error.statusCode, error.message)
-  }
-}
-```
-
-## Mejores Prácticas
-
-### Rastreo Sin Bloquear
-
-```typescript
-// ✅ Bueno - no bloquea
-commet.usage.create({
-  eventType: 'api_call',
-  customerId: 'cus_xxx',
-  idempotencyKey: 'unique_key',
-}).catch(console.error)
-
-// ❌ Malo - bloquea la petición
-await commet.usage.create({
-  eventType: 'api_call',
-  customerId: 'cus_xxx',
-  idempotencyKey: 'unique_key',
-})
-```
-
-### Configuración de Entornos
-
-```typescript title="lib/commet.ts"
-import { Commet } from '@commet/node'
-
-const isDev = process.env.NODE_ENV === 'development'
-
-export const commet = new Commet({
+export const GET = CustomerPortal({
   apiKey: process.env.COMMET_API_KEY!,
-  environment: isDev ? 'sandbox' : 'production',
-  debug: isDev,
+  getCustomerId: async (req) => {
+    // Retornar el externalId del usuario desde tu auth
+    return 'user_123'
+  },
 })
 ```
 
-## Recursos Relacionados
+```tsx
+<a href="/api/commet/portal">Gestionar Facturación</a>
+```
 
-- [Configuración Node.js General](/es/docs/library/installation/node) - Usa en cualquier proyecto Node.js
-- [Testing](/es/docs/library/core/testing) - Prueba con sandbox
+## Relacionado
+
+- [Node.js Setup](/docs/library/installation/node)
+- [Webhooks](/docs/library/features/webhooks)
+- [Customer Portal](/docs/library/features/portal-access)
