@@ -3,143 +3,51 @@ title: Subscriptions
 description: Manage subscriptions with the plan-first model
 ---
 
-## Create Subscription
+Each customer can only have one active subscription at a time.
+
+## Create
+
+Returns a `checkoutUrl` - redirect user there to complete payment.
 
 ```typescript
 const subscription = await commet.subscriptions.create({
   externalId: 'user_123',
-  planCode: 'pro' // autocomplete works after `commet pull`
+  planCode: 'pro',
 })
+
+redirect(subscription.data.checkoutUrl)
 ```
 
-### Options
+## Get
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `externalId` or `customerId` | string | Customer identifier (required) |
-| `planCode` or `planId` | string | Plan to subscribe to (required). Use `planCode` for autocomplete. |
-| `billingInterval` | string | `monthly`, `quarterly`, or `yearly` |
-| `initialSeats` | object | Initial seat counts by type |
-| `skipTrial` | boolean | Skip the trial period if plan has one |
-| `startDate` | string | ISO date for future-dated subscription |
-
-## Get Subscription
-
-Each customer has one active subscription. This returns it with full summary:
+Returns full subscription details including feature usage summary.
 
 ```typescript
-const sub = await commet.subscriptions.get({
-  externalId: 'user_123'
-})
+const sub = await commet.subscriptions.get({ externalId: 'user_123' })
 
-if (sub.data) {
-  console.log('Plan:', sub.data.plan.name)
-  console.log('Status:', sub.data.status)
-  console.log('Days remaining:', sub.data.currentPeriod.daysRemaining)
-  
-  for (const feature of sub.data.features) {
-    if (feature.usage) {
-      console.log(`${feature.name}: ${feature.usage.current}/${feature.usage.included}`)
-    }
-  }
+if (sub.data?.status === 'active') {
+  // User has paid
 }
 ```
 
 ## Change Plan
 
-```typescript
-await commet.subscriptions.changePlan('sub_xxx', {
-  planCode: 'enterprise' // autocomplete works after `commet pull`
-})
-```
+Proration is automatic - credits unused time and charges for new plan.
 
-Proration is automatic: Commet calculates credit for unused time and charges for the new plan.
+```typescript
+await commet.subscriptions.changePlan('sub_xxx', { planCode: 'enterprise' })
+```
 
 ## Cancel
 
-```typescript
-await commet.subscriptions.cancel('sub_xxx', {
-  reason: 'switched_to_competitor'
-})
-```
-
-## Subscription Status
-
-| Status | Description |
-|--------|-------------|
-| `draft` | Created but not activated |
-| `pending_payment` | Waiting for first payment |
-| `trialing` | In trial period |
-| `active` | Active and billing normally |
-| `paused` | Temporarily paused |
-| `past_due` | Payment failed, grace period |
-| `canceled` | Canceled, no longer billing |
-| `expired` | Reached end date |
-
-## Trial Periods
-
-If a plan has trial days, new subscriptions start in `trialing` status:
+Cancels at end of current period by default.
 
 ```typescript
-const subscription = await commet.subscriptions.create({
-  externalId: 'user_123',
-  planCode: 'starter' // plan with trial configured
-})
-
-console.log(subscription.data.status)  // "trialing"
-console.log(subscription.data.trialEndsAt)
-
-// Skip trial if needed
-await commet.subscriptions.create({
-  externalId: 'user_456',
-  planCode: 'starter',
-  skipTrial: true
-})
+await commet.subscriptions.cancel('sub_xxx')
 ```
 
-## Complete Example
+## Related
 
-```typescript
-import { Commet } from '@commet/node'
-
-const commet = new Commet({
-  apiKey: process.env.COMMET_API_KEY!,
-  environment: 'sandbox'
-})
-
-// 1. Subscribe to a plan
-const sub = await commet.subscriptions.create({
-  externalId: 'user_123',
-  planCode: 'pro',
-  initialSeats: { editor: 5 }
-})
-
-// 2. Track usage
-await commet.usage.track({
-  externalId: 'user_123',
-  eventType: 'api_call',
-  idempotencyKey: `evt_${Date.now()}`
-})
-
-// 3. Add more seats
-await commet.seats.add({
-  externalId: 'user_123',
-  seatType: 'editor',
-  count: 3
-})
-
-// 4. Check current status
-const current = await commet.subscriptions.get({ externalId: 'user_123' })
-console.log('Days remaining:', current.data?.currentPeriod.daysRemaining)
-
-// 5. Upgrade plan
-await commet.subscriptions.changePlan(sub.data.id, {
-  planCode: 'enterprise'
-})
-```
-
-## Related Resources
-
-- [Plans](/docs/library/features/plans) - List available plans
-- [Usage Events](/docs/library/features/usage-events) - Track consumption
-- [Seat Management](/docs/library/features/seat-management) - Manage licenses
+- [Plans](/docs/library/features/plans)
+- [Usage](/docs/library/features/usage-events)
+- [Seats](/docs/library/features/seat-management)

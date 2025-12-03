@@ -3,117 +3,31 @@ title: Usage Events
 description: Track usage for billing
 ---
 
-## Track Event
+Usage is aggregated and billed at end of period.
+
+## Track
 
 ```typescript
 await commet.usage.track({
   externalId: 'user_123',
   eventType: 'api_call',
-  idempotencyKey: `evt_${requestId}`,
-  properties: {
-    endpoint: '/api/users',
-    method: 'GET'
-  }
 })
 ```
 
-### Parameters
+## Batch
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `externalId` or `customerId` | string | Customer identifier (required) |
-| `eventType` | string | Type of event (e.g., `api_call`) |
-| `idempotencyKey` | string | Unique key to prevent duplicates |
-| `value` | number | Event value (optional, default: 1) |
-| `timestamp` | string | ISO timestamp (optional) |
-| `properties` | object | Additional context as key-value pairs |
-
-## Batch Tracking
-
-Send multiple events efficiently:
+More efficient for high-volume tracking.
 
 ```typescript
 await commet.usage.trackBatch({
   events: [
-    {
-      externalId: 'user_123',
-      eventType: 'api_call',
-      idempotencyKey: `evt_${Date.now()}_1`,
-      properties: { endpoint: '/users' }
-    },
-    {
-      externalId: 'user_456',
-      eventType: 'api_call',
-      idempotencyKey: `evt_${Date.now()}_2`,
-      properties: { endpoint: '/orders' }
-    }
+    { externalId: 'user_123', eventType: 'api_call' },
+    { externalId: 'user_456', eventType: 'api_call' },
   ]
 })
 ```
 
-## Properties
+## Related
 
-Add context to events for filtering and aggregation:
-
-```typescript
-await commet.usage.track({
-  externalId: 'user_123',
-  eventType: 'compute',
-  idempotencyKey: `compute_${jobId}`,
-  value: 3600,
-  properties: {
-    region: 'us-east-1',
-    instance_type: 'c5.xlarge',
-    job_id: jobId
-  }
-})
-```
-
-## Complete Example
-
-```typescript
-import { Commet } from '@commet/node'
-
-const commet = new Commet({
-  apiKey: process.env.COMMET_API_KEY!,
-  environment: 'sandbox'
-})
-
-// Track API call
-await commet.usage.track({
-  externalId: 'user_123',
-  eventType: 'api_call',
-  idempotencyKey: `req_${crypto.randomUUID()}`,
-  properties: {
-    endpoint: '/api/users',
-    method: 'POST',
-    status: '201'
-  }
-})
-
-// Track compute usage
-await commet.usage.track({
-  externalId: 'user_123',
-  eventType: 'compute_seconds',
-  idempotencyKey: `job_${jobId}`,
-  value: 3600,
-  properties: {
-    region: 'us-east-1',
-    job_type: 'ml_training'
-  }
-})
-
-// Batch multiple events
-await commet.usage.trackBatch({
-  events: Array.from({ length: 100 }, (_, i) => ({
-    externalId: 'user_123',
-    eventType: 'api_call',
-    idempotencyKey: `batch_${Date.now()}_${i}`,
-  }))
-})
-```
-
-## Related Resources
-
-- [Plans](/docs/library/features/plans) - Configure metered features
-- [Subscriptions](/docs/library/features/subscriptions) - View usage summary
+- [Subscriptions](/docs/library/features/subscriptions)
+- [Features](/docs/library/features/features)

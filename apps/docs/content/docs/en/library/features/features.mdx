@@ -3,43 +3,9 @@ title: Features
 description: Check feature access and usage for customers
 ---
 
-## Get Feature
+## Check
 
-Get detailed access information for a feature:
-
-```typescript
-const feature = await commet.features.get('team_members', 'user_123')
-
-console.log('Allowed:', feature.data.allowed)
-console.log('Current:', feature.data.current)
-console.log('Included:', feature.data.included)
-console.log('Remaining:', feature.data.remaining)
-```
-
-### Response
-
-```typescript
-interface FeatureAccess {
-  code: string
-  name: string
-  type: 'boolean' | 'metered' | 'seats'
-  allowed: boolean
-  // For metered/seats
-  current?: number
-  included?: number
-  remaining?: number
-  overage?: number
-  overageUnitPrice?: number
-  unlimited?: boolean
-  overageEnabled?: boolean
-  // For boolean
-  enabled?: boolean
-}
-```
-
-## Check Access
-
-Quick check if a feature is allowed:
+Quick boolean check - use for gating features.
 
 ```typescript
 const { data } = await commet.features.check('custom_branding', 'user_123')
@@ -49,9 +15,17 @@ if (!data.allowed) {
 }
 ```
 
+## Get
+
+Full details including usage numbers.
+
+```typescript
+const feature = await commet.features.get('team_members', 'user_123')
+```
+
 ## Can Use
 
-Check if customer can use one more unit (seats/metered):
+Pre-flight check before adding seats - tells you if they'll be charged extra.
 
 ```typescript
 const { data } = await commet.features.canUse('team_members', 'user_123')
@@ -61,68 +35,19 @@ if (!data.allowed) {
 }
 
 if (data.willBeCharged) {
-  // Show confirmation: "Adding a member will cost $10/month extra"
+  // Show overage confirmation
 }
 ```
 
-### Response
+## List
 
 ```typescript
-interface CanUseResult {
-  allowed: boolean
-  willBeCharged: boolean
-  reason?: string
-}
+const features = await commet.features.list('user_123')
 ```
 
-## List Features
+## Related
 
-Get all features for a customer:
-
-```typescript
-const { data: features } = await commet.features.list('user_123')
-
-for (const feature of features) {
-  if (feature.type === 'boolean') {
-    console.log(`${feature.name}: ${feature.allowed ? 'Yes' : 'No'}`)
-  } else {
-    console.log(`${feature.name}: ${feature.current}/${feature.included}`)
-  }
-}
-```
-
-## Use Cases
-
-### Gating Features
-
-```typescript
-export async function canAccessFeature(userId: string, feature: string) {
-  const { data } = await commet.features.check(feature, userId)
-  return data.allowed
-}
-
-// In your API route
-if (!await canAccessFeature(userId, 'advanced_analytics')) {
-  return Response.json({ error: 'Upgrade required' }, { status: 403 })
-}
-```
-
-### Before Adding Seats
-
-```typescript
-export async function canAddTeamMember(userId: string) {
-  const { data } = await commet.features.canUse('team_members', userId)
-  
-  return {
-    canAdd: data.allowed,
-    willBeCharged: data.willBeCharged,
-  }
-}
-```
-
-## Related Resources
-
-- [Subscriptions](/docs/library/features/subscriptions) - Get full subscription details
-- [Seat Management](/docs/library/features/seat-management) - Add/remove seats
-- [Plans](/docs/library/features/plans) - View plan features
+- [Subscriptions](/docs/library/features/subscriptions)
+- [Seats](/docs/library/features/seat-management)
+- [Plans](/docs/library/features/plans)
 

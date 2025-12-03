@@ -3,101 +3,39 @@ title: Customer Portal
 description: Generate secure portal URLs for customers
 ---
 
-## Get Portal URL
+Self-service portal where customers manage billing, update payment methods, and view invoices.
 
-### External ID (Recommended)
+## Get URL
 
-```typescript
-const portal = await commet.portal.getUrl({
-  externalId: 'user_123'
-})
-
-console.log(portal.data.portalUrl)
-```
-
-### Customer ID
+URL is single-use and expires - generate fresh on each request.
 
 ```typescript
-const portal = await commet.portal.getUrl({
-  customerId: 'cus_abc123'
-})
+const portal = await commet.portal.getUrl({ externalId: 'user_123' })
+
+redirect(portal.data.portalUrl)
 ```
 
-### Email
+## Next.js
 
-```typescript
-const portal = await commet.portal.getUrl({
-  email: 'customer@example.com'
-})
-```
-
-## Next.js Integration
-
-Use `@commet/next` for a one-line portal redirect:
+One-line setup with `@commet/next`.
 
 ```typescript title="app/api/commet/portal/route.ts"
 import { CustomerPortal } from '@commet/next'
-import { auth } from '@/lib/auth'
 
 export const GET = CustomerPortal({
   apiKey: process.env.COMMET_API_KEY!,
-  environment: 'sandbox',
   getCustomerId: async (req) => {
-    const session = await auth.api.getSession({ headers: req.headers })
-    return session?.user.id ?? null
+    // Return user's externalId from your auth
+    return 'user_123'
   },
 })
 ```
-
-Link to the portal:
 
 ```tsx
 <a href="/api/commet/portal">Manage Billing</a>
 ```
 
-## Manual Integration
+## Related
 
-### Redirect to Portal
-
-```typescript
-export async function GET(request: Request) {
-  const userId = getUserFromSession(request)
-
-  const portal = await commet.portal.getUrl({
-    externalId: userId
-  })
-
-  if (portal.data) {
-    return Response.redirect(portal.data.portalUrl)
-  }
-}
-```
-
-### Express.js
-
-```typescript
-app.post('/api/portal', async (req, res) => {
-  const portal = await commet.portal.getUrl({
-    externalId: req.body.customerId
-  })
-
-  res.json({ url: portal.data.portalUrl })
-})
-```
-
-## Response
-
-```typescript
-{
-  success: true,
-  data: {
-    portalUrl: "https://app.commet.co/acme/portal/overview?token=..."
-  }
-}
-```
-
-## Related Resources
-
-- [Next.js Setup](/docs/library/installation/nextjs) - Full Next.js integration guide
-- [Customers](/docs/library/features/customers) - Manage customer data
-- [Subscriptions](/docs/library/features/subscriptions) - View what customers see in the portal
+- [Next.js Setup](/docs/library/installation/nextjs)
+- [Subscriptions](/docs/library/features/subscriptions)

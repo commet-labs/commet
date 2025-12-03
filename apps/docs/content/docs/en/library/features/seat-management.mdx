@@ -3,48 +3,37 @@ title: Seats
 description: Manage seat-based licenses
 ---
 
-## Add Seats
+Seat changes are billed at the end of the period (true-up model).
+
+## Add
 
 ```typescript
 await commet.seats.add({
   externalId: 'user_123',
   seatType: 'editor',
-  count: 5
+  count: 5,
 })
 ```
 
-## Remove Seats
+## Remove
 
 ```typescript
 await commet.seats.remove({
   externalId: 'user_123',
   seatType: 'editor',
-  count: 2
+  count: 2,
 })
 ```
 
-## Set Exact Count
+## Set
+
+Sets exact count - use when syncing from your system.
 
 ```typescript
 await commet.seats.set({
   externalId: 'user_123',
   seatType: 'editor',
-  count: 10
-})
-```
-
-## Set All Seat Types
-
-Update multiple seat types at once:
-
-```typescript
-await commet.seats.setAll({
-  externalId: 'user_123',
-  seats: {
-    admin: 3,
-    editor: 50,
-    viewer: 100
-  }
+  count: 10,
 })
 ```
 
@@ -53,44 +42,11 @@ await commet.seats.setAll({
 ```typescript
 const balance = await commet.seats.getBalance({
   externalId: 'user_123',
-  seatType: 'editor'
-})
-
-console.log(`Current seats: ${balance.data.current}`)
-```
-
-## Get All Balances
-
-```typescript
-const balances = await commet.seats.getAllBalances({
-  externalId: 'user_123'
-})
-
-console.log(balances.data)
-// { editor: { current: 50, asOf: '...' }, viewer: { current: 100, asOf: '...' } }
-```
-
-## Customer Identification
-
-Use `customerId` or `externalId`:
-
-```typescript
-// By Commet ID
-await commet.seats.add({
-  customerId: 'cus_xxx',
   seatType: 'editor',
-  count: 5
-})
-
-// By your system's ID
-await commet.seats.add({
-  externalId: 'stripe_cus_abc123',
-  seatType: 'editor',
-  count: 5
 })
 ```
 
-## Related Resources
+## Related
 
-- [Subscriptions](/docs/library/features/subscriptions) - Create recurring billing
-- [Customers](/docs/library/features/customers) - Manage customer data
+- [Subscriptions](/docs/library/features/subscriptions)
+- [Features](/docs/library/features/features)

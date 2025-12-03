@@ -3,66 +3,38 @@ title: Customers
 description: Manage customers for billing
 ---
 
-## Create Customer
+## Create
 
-Create is idempotent with `externalId` - if the customer exists, returns it:
+Idempotent with `externalId` - if customer exists, returns it instead of creating duplicate.
 
 ```typescript
-const customer = await commet.customers.create({
+await commet.customers.create({
   email: 'billing@acme.com',
-  externalId: 'user_123'
+  externalId: 'user_123',
 })
 ```
 
-## Get Customer
+## Get
 
 ```typescript
 const customer = await commet.customers.get('cus_xxx')
 ```
 
-## Update Customer
+## Update
 
 ```typescript
 await commet.customers.update('cus_xxx', {
-  displayName: 'Acme Corp',
-  legalName: 'Acme Corporation',
-  email: 'accounts@acme.com',
-  metadata: { tier: 'enterprise' }
+  email: 'new@acme.com',
 })
 ```
 
-## List Customers
+## List
 
 ```typescript
-// All customers
 const customers = await commet.customers.list()
-
-// With filters
-const filtered = await commet.customers.list({
-  isActive: true,
-  externalId: 'user_123',
-  limit: 50
-})
 ```
 
-## Batch Create
+## Related
 
-```typescript
-await commet.customers.createBatch({
-  customers: [
-    { email: 'user1@example.com', externalId: 'user_1' },
-    { email: 'user2@example.com', externalId: 'user_2' }
-  ]
-})
-```
-
-## Archive Customer
-
-```typescript
-await commet.customers.archive('cus_xxx')
-```
-
-## Related Resources
-
-- [Subscriptions](/docs/library/features/subscriptions) - Create recurring billing
-- [Portal Access](/docs/library/features/portal-access) - Generate customer portal links
+- [Subscriptions](/docs/library/features/subscriptions)
+- [Customer Portal](/docs/library/features/portal-access)
