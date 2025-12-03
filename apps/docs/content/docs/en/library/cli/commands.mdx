@@ -113,7 +113,7 @@ commet pull
 
 Creates:
 - `.commet/` directory
-- `.commet/types.d.ts` with event types, seat types, and products
+- `.commet/types.d.ts` with event types, seat types, plans, and features
 - Updates `tsconfig.json` to include the types
 - Updates `.gitignore` to ignore `.commet/`
 
@@ -129,43 +129,51 @@ Creates:
  * - "admin": Administrator - Full access (Free)
  * - "user": Standard User - Regular access
  * 
- * Products available in your organization:
- * - "prd_c2JV8SjRxSD2y6cRSMzYJPJ2": API Platform - Usage-based billing
- * - "prd_fnvJZwETRrYTmt9y42tLQEMH": Support Plan - Fixed monthly fee
+ * Plans available in your organization:
+ * - "starter": Starter - For individuals
+ * - "pro": Pro - For teams
+ * 
+ * Features available in your organization:
+ * - "api_calls": API Calls (metered)
+ * - "team_members": Team Members (seats)
  */
 declare module '@commet/node' {
   interface CommetGeneratedTypes {
     eventType: "api_call" | "email_sent";
     seatType: "admin" | "user";
-    productId: "prd_c2JV8SjRxSD2y6cRSMzYJPJ2" | "prd_fnvJZwETRrYTmt9y42tLQEMH";
+    planCode: "starter" | "pro";
+    featureCode: "api_calls" | "team_members";
   }
 }
 ```
 
 **Usage:**
 ```typescript
-import { Commet } from '@commet/node';
+import { Commet } from '@commet/node'
 
-const commet = new Commet({ apiKey: '...' });
+const commet = new Commet({ apiKey: '...' })
 
 // Autocomplete for event types
-await commet.usage.create({
-  customerId: 'cus_123',
+await commet.usage.track({
+  externalId: 'user_123',
   eventType: 'api_call', // ✓ autocomplete
-});
+})
 
 // Autocomplete for seat types
 await commet.seats.add({
-  customerId: 'cus_123',
+  externalId: 'user_123',
   seatType: 'admin', // ✓ autocomplete
   count: 5
-});
+})
 
-// Autocomplete for products
+// Autocomplete for plan codes
 await commet.subscriptions.create({
-  customerId: 'cus_123',
-  productId: 'prd_c2JV8SjRxSD2y6cRSMzYJPJ2', // ✓ autocomplete
-});
+  externalId: 'user_123',
+  planCode: 'pro', // ✓ autocomplete
+})
+
+// Autocomplete for feature codes
+const access = await commet.features.get('api_calls', 'user_123') // ✓ autocomplete
 ```
 
 ---
@@ -196,4 +204,3 @@ commet list seats
 commet --version
 commet [command] --help
 ```
-

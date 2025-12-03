@@ -31,7 +31,31 @@ const portal = await commet.portal.getUrl({
 })
 ```
 
-## Integration Examples
+## Next.js Integration
+
+Use `@commet/next` for a one-line portal redirect:
+
+```typescript title="app/api/commet/portal/route.ts"
+import { CustomerPortal } from '@commet/next'
+import { auth } from '@/lib/auth'
+
+export const GET = CustomerPortal({
+  apiKey: process.env.COMMET_API_KEY!,
+  environment: 'sandbox',
+  getCustomerId: async (req) => {
+    const session = await auth.api.getSession({ headers: req.headers })
+    return session?.user.id ?? null
+  },
+})
+```
+
+Link to the portal:
+
+```tsx
+<a href="/api/commet/portal">Manage Billing</a>
+```
+
+## Manual Integration
 
 ### Redirect to Portal
 
@@ -74,5 +98,6 @@ app.post('/api/portal', async (req, res) => {
 
 ## Related Resources
 
+- [Next.js Setup](/docs/library/installation/nextjs) - Full Next.js integration guide
 - [Customers](/docs/library/features/customers) - Manage customer data
 - [Subscriptions](/docs/library/features/subscriptions) - View what customers see in the portal

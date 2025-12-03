@@ -1,0 +1,89 @@
+---
+title: Customer
+description: Simplified API scoped to a single customer
+---
+
+## Overview
+
+The `commet.customer()` method creates a customer-scoped context where you don't need to pass `externalId` on every call.
+
+```typescript
+const customer = commet.customer('user_123')
+
+await customer.usage.track('api_call')
+await customer.seats.add('editor', 5)
+const access = await customer.features.check('custom_branding')
+```
+
+## Usage
+
+### Track Usage
+
+```typescript
+const customer = commet.customer('user_123')
+
+await customer.usage.track('api_call', {
+  endpoint: '/api/users',
+  method: 'POST'
+})
+```
+
+### Manage Seats
+
+```typescript
+const customer = commet.customer('user_123')
+
+await customer.seats.add('editor', 3)
+await customer.seats.remove('editor', 1)
+await customer.seats.set('editor', 10)
+
+const balance = await customer.seats.getBalance('editor')
+console.log(balance.data.current)
+```
+
+### Check Features
+
+```typescript
+const customer = commet.customer('user_123')
+
+const { data } = await customer.features.check('custom_branding')
+if (!data.allowed) redirect('/upgrade')
+
+const feature = await customer.features.get('team_members')
+console.log(`${feature.data.current}/${feature.data.included} seats used`)
+
+const canUse = await customer.features.canUse('team_members')
+if (canUse.data.willBeCharged) {
+  // Show overage warning
+}
+
+const features = await customer.features.list()
+```
+
+### Get Subscription
+
+```typescript
+const customer = commet.customer('user_123')
+
+const sub = await customer.subscription.get()
+if (sub.data) {
+  console.log('Plan:', sub.data.plan.name)
+  console.log('Status:', sub.data.status)
+}
+```
+
+### Portal URL
+
+```typescript
+const customer = commet.customer('user_123')
+
+const portal = await customer.portal.getUrl()
+redirect(portal.data.portalUrl)
+```
+
+## Related Resources
+
+- [Usage Events](/docs/library/features/usage-events) - Track consumption
+- [Seat Management](/docs/library/features/seat-management) - Manage licenses
+- [Feature Access](/docs/library/features/feature-access) - Check access
+

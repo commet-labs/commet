@@ -9,8 +9,6 @@ import { Callout } from 'fumadocs-ui/components/callout'
 
 # Next.js Setup
 
-Use Commet SDK in Next.js (App Router or Pages Router).
-
 <Callout type="info">
 **Requirements:** Next.js 13.4+
 </Callout>
@@ -23,22 +21,22 @@ Use Commet SDK in Next.js (App Router or Pages Router).
 <Tabs items={['npm', 'pnpm', 'yarn', 'bun']}>
 <Tab value="npm">
 ```bash
-npm install @commet/node
+npm install @commet/node @commet/next
 ```
 </Tab>
 <Tab value="pnpm">
 ```bash
-pnpm add @commet/node
+pnpm add @commet/node @commet/next
 ```
 </Tab>
 <Tab value="yarn">
 ```bash
-yarn add @commet/node
+yarn add @commet/node @commet/next
 ```
 </Tab>
 <Tab value="bun">
 ```bash
-bun add @commet/node
+bun add @commet/node @commet/next
 ```
 </Tab>
 </Tabs>
@@ -51,12 +49,8 @@ bun add @commet/node
 
 ```bash title=".env.local"
 COMMET_API_KEY=your_api_key_here
-COMMET_ENV=sandbox
+COMMET_WEBHOOK_SECRET=your_webhook_secret
 ```
-
-<Callout type="warn">
-**Server-side only:** Never expose your API key in client code. Use Server Actions, API Routes, or Server Components.
-</Callout>
 
 </Step>
 
@@ -69,253 +63,69 @@ import { Commet } from '@commet/node'
 
 export const commet = new Commet({
   apiKey: process.env.COMMET_API_KEY!,
-  environment: process.env.COMMET_ENV === 'production' ? 'production' : 'sandbox',
+  environment: 'sandbox',
 })
 ```
 
 </Step>
+</Steps>
 
-<Step>
+## Webhooks
 
-## Use
+```typescript title="app/api/webhooks/commet/route.ts"
+import { Webhooks } from '@commet/next'
 
-<Tabs items={['App Router', 'Pages Router']}>
-<Tab value="App Router">
+export const POST = Webhooks({
+  webhookSecret: process.env.COMMET_WEBHOOK_SECRET!,
+  onSubscriptionActivated: async (payload) => {
+    // Grant access
+    console.log('Activated:', payload.data.externalId)
+  },
+  onSubscriptionCanceled: async (payload) => {
+    // Revoke access
+    console.log('Canceled:', payload.data.externalId)
+  },
+})
+```
 
-### Server Actions
+## Customer Portal
+
+```typescript title="app/api/commet/portal/route.ts"
+import { CustomerPortal } from '@commet/next'
+import { auth } from '@/lib/auth'
+
+export const GET = CustomerPortal({
+  apiKey: process.env.COMMET_API_KEY!,
+  environment: 'sandbox',
+  getCustomerId: async (req) => {
+    const session = await auth.api.getSession({ headers: req.headers })
+    return session?.user.id ?? null
+  },
+})
+```
+
+```tsx
+<a href="/api/commet/portal">Manage Billing</a>
+```
+
+## Server Actions
 
 ```typescript title="app/actions/billing.ts"
 'use server'
 
 import { commet } from '@/lib/commet'
 
-export async function trackUsage(eventType: string, customerId: string) {
-  const result = await commet.usage.create({
+export async function trackUsage(eventType: string, externalId: string) {
+  return commet.usage.track({
     eventType,
-    customerId,
-    idempotencyKey: `${customerId}_${Date.now()}`,
+    externalId,
+    idempotencyKey: `${externalId}_${Date.now()}`,
   })
-  
-  return result.data
 }
-```
-
-Use in components:
-
-```typescript title="app/dashboard/page.tsx"
-'use client'
-
-import { trackUsage } from '@/app/actions/billing'
-
-export default function Dashboard() {
-  const handleAction = async () => {
-    await trackUsage('api_call', 'cus_xxx')
-  }
-
-  return <button onClick={handleAction}>Track</button>
-}
-```
-
-### Server Components
-
-```typescript title="app/usage/page.tsx"
-import { commet } from '@/lib/commet'
-
-export default async function UsagePage({
-  searchParams,
-}: {
-  searchParams: { customerId: string }
-}) {
-  const events = await commet.usage.list({
-    customerId: searchParams.customerId,
-  })
-
-  return (
-    <div>
-      {events.data.map(event => (
-        <div key={event.id}>{event.eventType}</div>
-      ))}
-    </div>
-  )
-}
-```
-
-### API Routes
-
-```typescript title="app/api/usage/route.ts"
-import { NextRequest, NextResponse } from 'next/server'
-import { commet } from '@/lib/commet'
-
-export async function POST(request: NextRequest) {
-  const { eventType, customerId } = await request.json()
-    
-    const result = await commet.usage.create({
-      eventType,
-      customerId,
-    idempotencyKey: `${customerId}_${Date.now()}`,
-    })
-    
-    return NextResponse.json(result.data)
-}
-```
-
-</Tab>
-<Tab value="Pages Router">
-
-### API Routes
-
-```typescript title="pages/api/usage.ts"
-import type { NextApiRequest, NextApiResponse } from 'next'
-import { commet } from '@/lib/commet'
-
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  const { eventType, customerId } = req.body
-    
-    const result = await commet.usage.create({
-      eventType,
-      customerId,
-    idempotencyKey: `${customerId}_${Date.now()}`,
-    })
-    
-  res.json(result.data)
-}
-```
-
-### Client Hook
-
-```typescript title="hooks/useBilling.ts"
-export function useBilling() {
-  const trackUsage = async (eventType: string, customerId: string) => {
-    const res = await fetch('/api/usage', {
-        method: 'POST',
-      body: JSON.stringify({ eventType, customerId }),
-      })
-    return res.json()
-  }
-
-  return { trackUsage }
-}
-```
-
-</Tab>
-</Tabs>
-
-</Step>
-</Steps>
-
-## Middleware Example
-
-Track API usage automatically:
-
-```typescript title="middleware.ts"
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
-import { Commet } from '@commet/node'
-
-export async function middleware(request: NextRequest) {
-    const customerId = request.headers.get('x-customer-id')
-  
-  if (customerId && request.nextUrl.pathname.startsWith('/api/')) {
-    const commet = new Commet({
-      apiKey: process.env.COMMET_API_KEY!,
-    })
-    
-      commet.usage.create({
-        eventType: 'api_call',
-        customerId,
-      idempotencyKey: `${customerId}_${Date.now()}`,
-      }).catch(console.error)
-  }
-
-  return NextResponse.next()
-}
-
-export const config = {
-  matcher: '/api/:path*',
-}
-```
-
-## Webhooks
-
-```typescript title="app/api/webhooks/commet/route.ts"
-import { NextRequest, NextResponse } from 'next/server'
-import { Webhooks } from '@commet/node'
-
-const webhooks = new Webhooks()
-
-export async function POST(request: NextRequest) {
-  const body = await request.text()
-  const signature = request.headers.get('x-commet-signature')!
-  
-  const event = webhooks.constructEvent(
-    body,
-    signature,
-    process.env.COMMET_WEBHOOK_SECRET!
-  )
-  
-  // Handle event
-  console.log('Webhook received:', event.type)
-  
-  return NextResponse.json({ received: true })
-}
-```
-
-## Error Handling
-
-```typescript
-import { CommetAPIError } from '@commet/node'
-
-try {
-  await commet.usage.create({
-    eventType: 'api_call',
-    customerId: 'cus_xxx',
-    idempotencyKey: 'unique_key',
-  })
-} catch (error) {
-  if (error instanceof CommetAPIError) {
-    console.error('API Error:', error.statusCode, error.message)
-  }
-}
-```
-
-## Best Practices
-
-### Non-Blocking Tracking
-
-```typescript
-// ✅ Good - doesn't block
-commet.usage.create({
-  eventType: 'api_call',
-  customerId: 'cus_xxx',
-  idempotencyKey: 'unique_key',
-}).catch(console.error)
-
-// ❌ Bad - blocks request
-await commet.usage.create({
-  eventType: 'api_call',
-  customerId: 'cus_xxx',
-  idempotencyKey: 'unique_key',
-})
-```
-
-### Environment Configuration
-
-```typescript title="lib/commet.ts"
-import { Commet } from '@commet/node'
-
-const isDev = process.env.NODE_ENV === 'development'
-
-export const commet = new Commet({
-  apiKey: process.env.COMMET_API_KEY!,
-  environment: isDev ? 'sandbox' : 'production',
-  debug: isDev,
-})
 ```
 
 ## Related Resources
 
-- [General Node.js Setup](/docs/library/installation/node) - Use in any Node.js project
-- [Testing](/docs/library/core/testing) - Test with sandbox
+- [Node.js Setup](/docs/library/installation/node) - General setup
+- [Usage Events](/docs/library/features/usage-events) - Track consumption
+- [Portal Access](/docs/library/features/portal-access) - Portal details
