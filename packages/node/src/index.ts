@@ -2,6 +2,7 @@
  * Commet SDK - Billing and usage tracking for SaaS
  */
 export { Commet } from "./client";
+export { CustomerContext } from "./customer";
 
 // Type exports
 export type {
@@ -84,6 +85,13 @@ export type {
 
 // Portal
 export type { PortalAccess, GetUrlParams } from "./resources/portal";
+
+// Features
+export type {
+  FeatureAccess,
+  CanUseResult,
+  CheckResult,
+} from "./resources/features";
 
 // Webhooks
 export { Webhooks } from "./resources/webhooks";

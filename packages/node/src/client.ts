@@ -1,4 +1,6 @@
+import { CustomerContext } from "./customer";
 import { CustomersResource } from "./resources/customers";
+import { FeaturesResource } from "./resources/features";
 import { PlansResource } from "./resources/plans";
 import { PortalResource } from "./resources/portal";
 import { SeatsResource } from "./resources/seats";
@@ -21,6 +23,7 @@ export class Commet {
   public readonly seats: SeatsResource;
   public readonly subscriptions: SubscriptionsResource;
   public readonly portal: PortalResource;
+  public readonly features: FeaturesResource;
   public readonly webhooks: Webhooks;
 
   constructor(config: CommetConfig) {
@@ -44,6 +47,7 @@ export class Commet {
     this.seats = new SeatsResource(this.httpClient);
     this.subscriptions = new SubscriptionsResource(this.httpClient);
     this.portal = new PortalResource(this.httpClient);
+    this.features = new FeaturesResource(this.httpClient);
     this.webhooks = new Webhooks();
 
     if (config.debug) {
@@ -55,6 +59,23 @@ export class Commet {
           : "https://sandbox.commet.co";
       console.log("Base URL:", baseURL);
     }
+  }
+
+  /**
+   * Create a customer-scoped context for cleaner API usage
+   *
+   * @example
+   * ```typescript
+   * const customer = commet.customer("user_123");
+   *
+   * // All operations are now scoped to this customer
+   * const seats = await customer.features.get("team_members");
+   * await customer.seats.add("member");
+   * await customer.usage.track("api_call");
+   * ```
+   */
+  customer(externalId: string): CustomerContext {
+    return new CustomerContext(this.httpClient, externalId);
   }
 
   getEnvironment(): Environment {
