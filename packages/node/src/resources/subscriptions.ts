@@ -25,6 +25,7 @@ export interface FeatureSummary {
     current: number;
     included: number;
     overage: number;
+    overageUnitPrice?: number;
   };
 }
 
