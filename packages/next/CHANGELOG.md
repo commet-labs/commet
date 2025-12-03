@@ -1,5 +1,12 @@
 # @commet/next
 
+## 0.2.3
+
+### Patch Changes
+
+- Updated dependencies [d655a3d]
+  - @commet/node@1.1.0
+
 ## 0.2.2
 
 ### Patch Changes
