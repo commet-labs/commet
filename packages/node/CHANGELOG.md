@@ -1,5 +1,13 @@
 # @commet/node
 
+## 1.1.1
+
+### Patch Changes
+
+- c505d8f: ### CustomerContext fixes
+  - Fixed `customer.portal.getUrl()` using wrong endpoint (was GET `/portal/url`, now correctly uses POST `/portal/request-access`)
+  - Refactored `CustomerContext` to delegate to existing resources.
+
 ## 1.1.0
 
 ### Minor Changes
