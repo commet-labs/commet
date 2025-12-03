@@ -1,9 +1,23 @@
 ---
 title: Customer Context
-description: Simplified API scoped to a single customer
+description: Cleaner API for customer-scoped operations
 ---
 
-`commet.customer()` creates a scoped context where you don't pass `externalId` on every call.
+When working with a single customer, use `commet.customer()` to avoid repeating `externalId` on every call.
+
+## Before vs After
+
+**Without Customer Context:**
+
+```typescript
+await commet.usage.track({ externalId: 'user_123', eventType: 'api_call' })
+await commet.seats.add({ externalId: 'user_123', seatType: 'editor', count: 1 })
+await commet.features.check('custom_branding', 'user_123')
+await commet.subscriptions.get({ externalId: 'user_123' })
+await commet.portal.getUrl({ externalId: 'user_123' })
+```
+
+**With Customer Context:**
 
 ```typescript
 const customer = commet.customer('user_123')
@@ -13,6 +27,54 @@ await customer.seats.add('editor')
 await customer.features.check('custom_branding')
 await customer.subscription.get()
 await customer.portal.getUrl()
+```
+
+## Available Methods
+
+All operations scoped to the customer:
+
+```typescript
+const customer = commet.customer('user_123')
+
+// Features
+await customer.features.check('custom_branding')
+await customer.features.get('team_members')
+await customer.features.canUse('team_members')
+await customer.features.list()
+
+// Seats
+await customer.seats.add('editor', 5)
+await customer.seats.remove('editor', 2)
+await customer.seats.set('editor', 10)
+await customer.seats.getBalance('editor')
+
+// Usage
+await customer.usage.track('api_call', { endpoint: '/users' })
+
+// Subscription
+await customer.subscription.get()
+
+// Portal
+await customer.portal.getUrl()
+```
+
+## When to Use
+
+Use Customer Context when you're doing multiple operations for the same customer in one request - common in API routes and server actions.
+
+```typescript
+export async function handleUserAction(userId: string) {
+  const customer = commet.customer(userId)
+  
+  const { data } = await customer.features.canUse('api_calls')
+  
+  if (!data.allowed) {
+    return { error: 'Upgrade required' }
+  }
+  
+  await customer.usage.track('api_call')
+  return { success: true }
+}
 ```
 
 ## Related
