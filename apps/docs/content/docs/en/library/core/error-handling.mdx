@@ -3,150 +3,53 @@ title: Error Handling
 description: Handle errors with automatic retries and typed error classes
 ---
 
-# Error Handling
-
-The SDK provides error classes and automatic retries.
-
 ## Error Classes
 
-### CommetError
-
-Base error class:
-
 ```typescript
-import { CommetError } from '@commet/node'
+import { CommetAPIError, CommetValidationError } from '@commet/node'
 
 try {
-  await commet.customers.create(data)
-} catch (error) {
-  if (error instanceof CommetError) {
-    console.log(error.message)
-    console.log(error.code)
-    console.log(error.statusCode)
-  }
-}
-```
-
-### CommetAPIError
-
-API errors with HTTP status codes:
-
-```typescript
-import { CommetAPIError } from '@commet/node'
-
-try {
-  await commet.customers.retrieve('invalid_id')
-} catch (error) {
-  if (error instanceof CommetAPIError) {
-    console.log(error.statusCode)  // 404
-    console.log(error.message)
-  }
-}
-```
-
-### CommetValidationError
-
-Validation errors with field details:
-
-```typescript
-import { CommetValidationError } from '@commet/node'
-
-try {
-  await commet.customers.create({
-    legalName: ''  // Required
-  })
+  await commet.customers.create({ email: 'invalid' })
 } catch (error) {
   if (error instanceof CommetValidationError) {
     console.log(error.validationErrors)
-    // { legalName: ['Legal name is required'] }
+    // { email: ['Invalid email format'] }
+  }
+  
+  if (error instanceof CommetAPIError) {
+    console.log(error.statusCode, error.message)
   }
 }
 ```
+
+| Class | Use case |
+|-------|----------|
+| `CommetAPIError` | HTTP errors (4xx, 5xx) |
+| `CommetValidationError` | Invalid input with field details |
+| `CommetError` | Base class for all errors |
 
 ## Automatic Retries
 
-Failed requests are retried automatically with exponential backoff.
+Failed requests retry with exponential backoff (1s → 2s → 4s, max 8s).
 
-**Retry configuration:**
-
-```typescript
-const commet = new Commet({
-  apiKey: process.env.COMMET_API_KEY!,
-  retries: 3,      // Max attempts (default: 3)
-  timeout: 30000   // Request timeout (default: 30000ms)
-})
-```
-
-**Retryable status codes:** 408, 429, 500, 502, 503, 504
-
-**Retry delays:** 1s → 2s → 4s (exponential backoff, max 8s)
-
-Enable debug mode to see retries:
+**Retryable:** 408, 429, 500, 502, 503, 504
 
 ```typescript
 const commet = new Commet({
   apiKey: process.env.COMMET_API_KEY!,
-  debug: true
+  retries: 3,  // default
 })
-
-// Console output:
-// [Commet SDK] Retrying in 1000ms (attempt 1/3)
-// [Commet SDK] Retrying in 2000ms (attempt 2/3)
 ```
 
-## Error Handling Pattern
+## Non-Blocking Usage
+
+Don't let tracking errors break your app:
 
 ```typescript
-import { CommetError, CommetAPIError, CommetValidationError } from '@commet/node'
+commet.usage.track({
+  externalId: 'user_123',
+  eventType: 'api_call',
+}).catch(console.error)
 
-async function createCustomer(data) {
-  try {
-    const customer = await commet.customers.create(data)
-    return { success: true, data: customer.data }
-  } catch (error) {
-    if (error instanceof CommetValidationError) {
-      return {
-        success: false,
-        type: 'validation',
-        errors: error.validationErrors
-      }
-    }
-    
-    if (error instanceof CommetAPIError) {
-      return {
-        success: false,
-        type: 'api',
-        statusCode: error.statusCode,
-        message: error.message
-      }
-      }
-    
-      return {
-        success: false,
-        type: 'unknown',
-        message: 'An unexpected error occurred'
-    }
-  }
-}
-```
-
-## Non-Blocking Operations
-
-Don't let billing errors break your app:
-
-```typescript
-// Usage tracking without blocking
-async function processRequest(request) {
-  const result = await handleRequest(request)
-  
-  // Track usage asynchronously
-  commet.usage.create({
-    eventType: 'api_call',
-    customerId: request.customerId
-  }).catch(error => {
-    console.error('Usage tracking failed:', error.message)
-  })
-  
-  return result
-}
+// Continue without waiting
 ```

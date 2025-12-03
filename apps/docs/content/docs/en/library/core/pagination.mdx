@@ -3,102 +3,37 @@ title: Pagination
 description: Retrieve large datasets with cursor-based pagination
 ---
 
-# Pagination
+List endpoints use cursor-based pagination.
 
-The API uses cursor-based pagination for list operations.
-
-## Basic Usage
+## Usage
 
 ```typescript
 const page = await commet.customers.list({ limit: 25 })
 
-console.log(page.data)        // Array of customers
-console.log(page.hasMore)     // true if more pages exist
-console.log(page.nextCursor)  // Cursor for next page
-```
-
-Fetch next page:
-
-```typescript
 if (page.hasMore) {
   const nextPage = await commet.customers.list({ 
     limit: 25,
-    cursor: page.nextCursor 
+    cursor: page.nextCursor,
   })
 }
 ```
 
 ## Parameters
 
-| Parameter | Type | Default | Max | Description |
-|-----------|------|---------|-----|-------------|
-| `limit` | number | 25 | 100 | Items per page |
-| `cursor` | string | - | - | Cursor from previous response |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `limit` | number | 25 | Items per page (max 100) |
+| `cursor` | string | - | Cursor from previous response |
 
-## Response Format
-
-```typescript
-{
-  success: true,
-  data: [...],           // Array of results
-  hasMore: true,         // More pages exist
-  nextCursor: "2024-01-15T10:30:00Z"  // Cursor for next page
-}
-```
-
-## Fetch All Pages
+## Fetch All
 
 ```typescript
-const allCustomers = []
+const all = []
 let cursor = undefined
 
 do {
   const page = await commet.customers.list({ limit: 100, cursor })
-  allCustomers.push(...page.data)
+  all.push(...page.data)
   cursor = page.nextCursor
 } while (page.hasMore)
-
-console.log(`Total: ${allCustomers.length}`)
-```
-
-## With Filters
-
-Maintain filters across pages:
-
-```typescript
-// First page with filters
-const page = await commet.customers.list({
-  currency: "USD",
-  limit: 50
-})
-
-// Next page with same filters
-if (page.hasMore) {
-  const nextPage = await commet.customers.list({
-    currency: "USD",
-    limit: 50,
-    cursor: page.nextCursor
-  })
-}
-```
-
-## Batch Processing
-
-```typescript
-async function processAll(callback) {
-  let cursor = undefined
-
-  do {
-    const page = await commet.customers.list({ limit: 100, cursor })
-    await callback(page.data)
-    cursor = page.nextCursor
-  } while (page.hasMore)
-}
-
-// Usage
-await processAll(async (customers) => {
-  for (const customer of customers) {
-    console.log(`Processing ${customer.id}`)
-  }
-})
 ```

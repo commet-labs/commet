@@ -3,111 +3,48 @@ title: Authentication
 description: API key authentication with sandbox and production environments
 ---
 
-import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
-
-# Authentication
-
-Initialize the SDK with your API key.
-
-## Basic Setup
+## Setup
 
 ```typescript
 import { Commet } from '@commet/node'
 
 const commet = new Commet({
-  apiKey: process.env.COMMET_API_KEY!
+  apiKey: process.env.COMMET_API_KEY!,
 })
 ```
 
 Get your API key from the [dashboard](https://commet.co/settings/api-keys).
 
-## Configuration Options
-
-```typescript
-const commet = new Commet({
-  apiKey: process.env.COMMET_API_KEY!,
-  environment: 'sandbox',  // 'sandbox' (default) or 'production'
-  debug: true,             // Enable logging
-  timeout: 30000,          // Request timeout (ms)
-  retries: 3               // Max retry attempts
-})
-```
-
-### Options
+## Options
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `apiKey` | string | *required* | Your API key (starts with `ck_`) |
-| `environment` | `'sandbox'` \| `'production'` | `'sandbox'` | Environment to use |
-| `debug` | boolean | `false` | Enable detailed logging |
-| `timeout` | number | `30000` | Request timeout in milliseconds |
-| `retries` | number | `3` | Maximum retry attempts for failed requests |
+| `apiKey` | string | required | Your API key (starts with `ck_`) |
+| `environment` | `'sandbox'` \| `'production'` | `'sandbox'` | Target environment |
+| `debug` | boolean | `false` | Log requests/responses |
+| `timeout` | number | `30000` | Request timeout (ms) |
+| `retries` | number | `3` | Max retry attempts |
 
 ## Environments
 
-Commet has two isolated environments:
-
-**Sandbox** (`sandbox.commet.co`): Development and testing
-
-**Production** (`commet.co`): Live billing
+- **Sandbox** (`sandbox.commet.co`) - Development, default
+- **Production** (`commet.co`) - Live billing
 
 ```typescript
-// Sandbox (default)
-const sandbox = new Commet({
-  apiKey: process.env.COMMET_SANDBOX_KEY!,
-  environment: 'sandbox'
-})
-
-// Production
-const production = new Commet({
-  apiKey: process.env.COMMET_PRODUCTION_KEY!,
-  environment: 'production'
-})
-```
-
-Check current environment:
-
-```typescript
-console.log(commet.getEnvironment())  // 'sandbox' or 'production'
-console.log(commet.isSandbox())       // true or false
-console.log(commet.isProduction())    // true or false
+commet.isSandbox()     // true
+commet.isProduction()  // false
 ```
 
 ## Debug Mode
 
-Enable logging to see request/response details:
+See all requests and responses:
 
 ```typescript
 const commet = new Commet({
   apiKey: process.env.COMMET_API_KEY!,
-  debug: true
+  debug: true,
 })
 
-// Console output:
-// [Commet SDK] Initialized in sandbox mode
-// API Key: ck_xxx12345...
-// Base URL: https://sandbox.commet.co
-// [Commet SDK] GET https://sandbox.commet.co/api/customers
+// [Commet SDK] POST https://sandbox.commet.co/api/customers
 // [Commet SDK] Response status: 200 OK
-```
-
-## Validation
-
-API key is validated on initialization:
-
-```typescript
-// ❌ Missing API key
-const commet = new Commet({})
-// Error: Commet SDK: API key is required
-
-// ❌ Invalid format
-const commet = new Commet({
-  apiKey: 'invalid-key'
-})
-// Error: Commet SDK: Invalid API key format. Expected format: ck_xxx...
-
-// ✅ Valid
-const commet = new Commet({
-  apiKey: 'ck_xxx1234567890abcdef'
-})
 ```
