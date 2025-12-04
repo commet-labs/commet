@@ -176,45 +176,25 @@ An Enterprise Plan with unlimited features:
 </Tab>
 </Tabs>
 
-## Feature usage tracking
+## Feature access control
 
-Once a plan with features is assigned to a customer and the subscription is active, you can track feature usage:
-
-### Viewing feature usage
-
-From the subscription details page, you can see:
-
-- **Current usage**: Real-time consumption for metered features
-- **Included limits**: What's included in the plan
-- **Overage**: Usage beyond included amounts
-- **Seat counts**: Current seat allocation per seat type
-- **Feature status**: Enabled/disabled status for boolean features
-
-### Usage monitoring
-
-- **Real-time tracking**: Usage is tracked as customers consume features
-- **Billing period reset**: Usage resets at the start of each billing cycle
-- **Overage alerts**: Monitor when customers approach or exceed limits
-- **Historical data**: View usage trends over time
-
-<Callout type="info">
-For detailed information about tracking usage events, see the [Usage Metrics documentation](../usage-metrics/events).
-</Callout>
-
-## Feature access control: coming soon
-
-We're working on SDK and API methods to programmatically control and check feature access in your application:
+Programmatic feature access checks and usage limits are now available! You can use our SDK and API to control and monitor feature access in your application.
 
 | Capability | What it does |
 | --- | --- |
 | **Check feature access** | Query if a customer has access to a specific feature (gate features in your app, verify plan includes feature) |
 | **Query usage and limits** | Check current usage, remaining capacity, seat counts, and overage status for metered features |
-| **Limit exceedance webhooks** | Receive real-time notifications when customers exceed limits (overage alerts, threshold warnings, seat capacity) |
+| **Limit exceedance webhooks** | Receive real-time notifications when customers exceed limits (overage alerts, threshold warnings, seat capacity) <br /><span style={{ color: '#ffa500' }}>Coming soon</span> |
 
 Use cases: Feature gating, usage dashboards, progress bars, automated enforcement, and customer notifications.
 
 <Callout type="info">
-These access control methods will be available in an upcoming release. For now, you can view feature access and usage through the platform interface.
+**SDK & API feature checks are live!**  
+Learn how to check and control feature access and usage in your application in the [Feature Access & Usage documentation](/docs/library/features/features).
+
+<small>
+Webhook notifications for usage limit exceedance are coming soon.
+</small>
 </Callout>
 
 
