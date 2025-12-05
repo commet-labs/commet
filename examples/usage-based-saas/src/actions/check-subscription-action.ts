@@ -46,5 +46,3 @@ export async function checkSubscriptionStatus(): Promise<SubscriptionStatus> {
     return { isPaid: false };
   }
 }
-
-

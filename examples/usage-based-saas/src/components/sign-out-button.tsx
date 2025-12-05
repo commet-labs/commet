@@ -27,9 +27,15 @@ export function SignOutButton() {
 
   return (
     <div className="flex flex-col items-start gap-1">
-    <Button type="button" variant="ghost" size="sm" onClick={handleSignOut} disabled={loading}>
-      {loading ? "Signing out..." : "Sign out"}
-    </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        onClick={handleSignOut}
+        disabled={loading}
+      >
+        {loading ? "Signing out..." : "Sign out"}
+      </Button>
       {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
   );

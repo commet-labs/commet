@@ -9,5 +9,3 @@ export const commet = new Commet({
   apiKey,
   environment,
 });
-
-

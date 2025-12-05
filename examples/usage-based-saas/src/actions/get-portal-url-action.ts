@@ -32,5 +32,3 @@ export async function getPortalUrl(): Promise<{
     return { success: false, error: "An unexpected error occurred" };
   }
 }
-
-

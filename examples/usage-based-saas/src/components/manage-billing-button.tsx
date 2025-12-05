@@ -39,5 +39,3 @@ export function ManageBillingButton({ portalUrl }: ManageBillingButtonProps) {
     </Button>
   );
 }
-
-

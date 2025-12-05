@@ -42,7 +42,7 @@ export default async function PendingCheckoutPage() {
 
   const checkoutUrl = subscription.checkoutUrl;
 
-  return (  
+  return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4">
       <Card className="max-w-md w-full">
         <CardHeader>
@@ -118,5 +118,3 @@ export default async function PendingCheckoutPage() {
     </div>
   );
 }
-
-

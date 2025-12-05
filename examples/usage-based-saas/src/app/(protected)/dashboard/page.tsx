@@ -2,9 +2,9 @@ import { checkSubscriptionStatus } from "@/actions/check-subscription-action";
 import { getPortalUrl } from "@/actions/get-portal-url-action";
 import { getUsageAction } from "@/actions/get-usage-action";
 import { ManageBillingButton } from "@/components/manage-billing-button";
+import { SignOutButton } from "@/components/sign-out-button";
 import { SubscribeButton } from "@/components/subscribe-button";
 import { Badge } from "@/components/ui/badge";
-import { SignOutButton } from "@/components/sign-out-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { UsageEventButton } from "@/components/usage-event-button";
@@ -110,7 +110,6 @@ export default async function DashboardPage({
                           Your {subscription.planName} plan is active.
                         </p>
                         <div className="text-sm space-y-1 mb-4">
-                
                           {subscription.daysRemaining !== undefined && (
                             <p>
                               <strong>Days remaining:</strong>{" "}
@@ -146,7 +145,6 @@ export default async function DashboardPage({
                       </div>
                     </div>
                     <SubscribeButton />
-    
                   </CardContent>
                 </Card>
               )}
@@ -182,7 +180,6 @@ export default async function DashboardPage({
                   Manage your account settings and billing preferences.
                 </p>
                 <ManageBillingButton portalUrl={portalUrl} />
-
               </CardContent>
             </Card>
 
@@ -207,7 +204,7 @@ export default async function DashboardPage({
                 <p className="text-muted-foreground text-sm">
                   Dispara un evento <code>api_call</code> con amount 1.
                 </p>
-        
+
                 <UsageEventButton />
               </CardContent>
             </Card>
@@ -233,8 +230,8 @@ export default async function DashboardPage({
                 Current Usage
               </CardTitle>
               <p className="text-muted-foreground text-sm">
-                Revisa en tiempo real cuántas llamadas de API llevas este período
-                y cuánto te queda incluido en tu plan.
+                Revisa en tiempo real cuántas llamadas de API llevas este
+                período y cuánto te queda incluido en tu plan.
               </p>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -257,7 +254,7 @@ export default async function DashboardPage({
                       <Progress
                         value={Math.min(
                           (usage.data.current / usage.data.included) * 100,
-                          100
+                          100,
                         )}
                         className="h-2"
                       />
@@ -315,4 +312,3 @@ export default async function DashboardPage({
     </div>
   );
 }
-

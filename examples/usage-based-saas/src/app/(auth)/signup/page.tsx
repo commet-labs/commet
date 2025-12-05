@@ -131,5 +131,3 @@ export default function SignUpPage() {
     </Card>
   );
 }
-
-

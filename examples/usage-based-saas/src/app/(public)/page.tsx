@@ -36,9 +36,9 @@ export default function Home() {
           </h1>
 
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Experience seamless usage-based billing integration with Commet. This
-            example demonstrates how easy it is to add metered billing to your
-            SaaS application.
+            Experience seamless usage-based billing integration with Commet.
+            This example demonstrates how easy it is to add metered billing to
+            your SaaS application.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -64,8 +64,8 @@ export default function Home() {
               <CardTitle>Usage Tracking</CardTitle>
             </CardHeader>
             <CardContent>
-              Track every API call, email sent, or action taken. Real-time
-              usage monitoring with automatic billing.
+              Track every API call, email sent, or action taken. Real-time usage
+              monitoring with automatic billing.
             </CardContent>
           </Card>
 
@@ -89,7 +89,6 @@ export default function Home() {
             </CardContent>
           </Card>
         </div>
-
       </main>
       {/* Footer */}
       <footer className="border-t mt-32">
@@ -111,5 +110,3 @@ export default function Home() {
     </div>
   );
 }
-
-

@@ -15,5 +15,3 @@ export function validateEnv() {
     }
   }
 }
-
-

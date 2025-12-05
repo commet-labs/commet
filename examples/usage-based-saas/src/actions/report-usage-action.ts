@@ -11,9 +11,7 @@ interface ReportUsageResult {
   error?: string;
 }
 
-export async function reportUsageAction(
-  count = 1,
-): Promise<ReportUsageResult> {
+export async function reportUsageAction(count = 1): Promise<ReportUsageResult> {
   try {
     const session = await auth.api.getSession({
       headers: await headers(),
@@ -34,12 +32,15 @@ export async function reportUsageAction(
       });
 
       if (!result.success) {
-        return { success: false, error: result.error || "Failed to send event" };
+        return {
+          success: false,
+          error: result.error || "Failed to send event",
+        };
       }
 
       return { success: true };
     }
-    
+
     // Use trackBatch() for multiple events
     const events = Array.from({ length: eventCount }, (_, index) => ({
       externalId: session.user.id,
