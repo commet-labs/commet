@@ -4,7 +4,7 @@ import { getUsageAction } from "@/actions/get-usage-action";
 import { ManageBillingButton } from "@/components/manage-billing-button";
 import { SubscribeButton } from "@/components/subscribe-button";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { SignOutButton } from "@/components/sign-out-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { UsageEventButton } from "@/components/usage-event-button";
@@ -20,11 +20,9 @@ export default async function DashboardPage({
   const session = await auth.api.getSession({
     headers: await headers(),
   });
-
   const user = session?.user;
   const params = await searchParams;
   const paymentSuccess = params.payment === "success";
-
   const subscription = await checkSubscriptionStatus();
   const portalAccess = await getPortalUrl();
   const portalUrl = portalAccess.success ? portalAccess.url : undefined;
@@ -39,11 +37,7 @@ export default async function DashboardPage({
           </Link>
           <div className="flex items-center gap-4">
             <span className="text-sm text-muted-foreground">{user?.email}</span>
-            <form action="/api/auth/sign-out" method="POST">
-              <Button type="submit" variant="ghost" size="sm">
-                Sign out
-              </Button>
-            </form>
+            <SignOutButton />
           </div>
         </div>
       </header>

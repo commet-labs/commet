@@ -29,7 +29,7 @@ export function UsageEventButton() {
       setError(result.error || "No se pudo enviar el evento");
     } else {
       const eventText = eventCount === 1 ? "evento" : "eventos";
-      setMessage(`${eventCount} ${eventText} de uso enviado${eventCount > 1 ? "s" : ""} (api_call).`);
+      setMessage(`${eventCount} ${eventText} de uso enviado${eventCount > 1 ? "s" : ""}.`);
     }
 
     setIsLoading(false);

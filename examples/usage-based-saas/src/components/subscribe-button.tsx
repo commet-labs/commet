@@ -44,7 +44,7 @@ export function SubscribeButton() {
         onClick={handleSubscribe}
         disabled={isLoading}
       >
-        {isLoading ? "Creando suscripción..." : "Ir al checkout del plan Pro"}
+        {isLoading ? "Creando suscripción..." : `Ir al checkout del plan ${process.env.NEXT_PUBLIC_COMMET_PLAN_CODE}`}
       </Button>
       {error && <p className="text-sm text-destructive text-center">{error}</p>}
     </div>

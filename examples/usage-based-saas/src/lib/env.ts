@@ -6,6 +6,7 @@ export function validateEnv() {
     "BETTER_AUTH_URL",
     "COMMET_API_KEY",
     "COMMET_ENVIRONMENT",
+    "COMMET_PLAN_CODE",
   ];
 
   for (const key of required) {

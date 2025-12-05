@@ -56,10 +56,12 @@ export async function createSubscriptionAction(): Promise<CreateSubscriptionResu
       }
     }
 
+    const planCode = process.env.COMMET_PLAN_CODE || "";
+
     // Create subscription with plan
     const result = await commet.subscriptions.create({
       externalId: user.id,
-      planCode: "pro",
+      planCode,
     });
 
     if (!result.success || !result.data) {

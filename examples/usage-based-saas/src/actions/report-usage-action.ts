@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth";
 import { commet } from "@/lib/commet";
 import { headers } from "next/headers";
 
-const EVENT_TYPE = "api_call";
+const EVENT_TYPE = "storage";
 
 interface ReportUsageResult {
   success: boolean;
