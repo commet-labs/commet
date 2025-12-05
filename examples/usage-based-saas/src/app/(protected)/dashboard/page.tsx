@@ -126,7 +126,6 @@ export default async function DashboardPage({
                             </p>
                           )}
                         </div>
-                        <ManageBillingButton portalUrl={portalUrl} />
                       </div>
                     </div>
                   </CardContent>
