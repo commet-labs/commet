@@ -12,7 +12,7 @@ interface ReportUsageResult {
 }
 
 export async function reportUsageAction(
-  properties?: Record<string, unknown>,
+  count = 1,
 ): Promise<ReportUsageResult> {
   try {
     const session = await auth.api.getSession({
@@ -23,13 +23,36 @@ export async function reportUsageAction(
       return { success: false, error: "Not authenticated" };
     }
 
-    const result = await commet.usage.track({
-      eventType: EVENT_TYPE,
+    // Ensure count is at least 1
+    const eventCount = Math.max(1, Math.floor(count));
+
+    if (eventCount === 1) {
+      // Use track() for single event
+      const result = await commet.usage.track({
+        eventType: EVENT_TYPE,
+        externalId: session.user.id,
+      });
+
+      if (!result.success) {
+        return { success: false, error: result.error || "Failed to send event" };
+      }
+
+      return { success: true };
+    }
+    
+    // Use trackBatch() for multiple events
+    const events = Array.from({ length: eventCount }, (_, index) => ({
       externalId: session.user.id,
+      eventType: EVENT_TYPE,
+      idempotencyKey: `batch_${Date.now()}_${index}`,
+    }));
+
+    const result = await commet.usage.trackBatch({
+      events,
     });
 
     if (!result.success) {
-      return { success: false, error: result.error || "Failed to send event" };
+      return { success: false, error: result.error || "Failed to send events" };
     }
 
     return { success: true };
