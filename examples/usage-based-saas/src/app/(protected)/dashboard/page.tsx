@@ -1,9 +1,11 @@
 import { checkSubscriptionStatus } from "@/actions/check-subscription-action";
 import { getPortalUrl } from "@/actions/get-portal-url-action";
 import { ManageBillingButton } from "@/components/manage-billing-button";
+import { SubscribeButton } from "@/components/subscribe-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { UsageEventButton } from "@/components/usage-event-button";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import Link from "next/link";
@@ -131,7 +133,7 @@ export default async function DashboardPage({
                 </Card>
               ) : (
                 <Card className="border-yellow-500/50 bg-yellow-500/10">
-                  <CardContent className="pt-6">
+                  <CardContent className="pt-6 space-y-4">
                     <div className="flex items-start gap-3">
                       <svg
                         className="w-6 h-6 text-yellow-500"
@@ -144,18 +146,16 @@ export default async function DashboardPage({
                           clipRule="evenodd"
                         />
                       </svg>
-                      <div className="flex-1">
-                        <h3 className="font-semibold mb-1">
-                          No Active Subscription
-                        </h3>
-                        <p className="text-sm text-muted-foreground mb-3">
-                          Complete your checkout to activate your subscription.
+                      <div className="flex-1 space-y-2">
+                        <h3 className="font-semibold">Plan Pro pendiente</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Ve al checkout del plan <strong>pro</strong> y vuelve
+                          aquí automáticamente cuando completes el pago.
                         </p>
-                        <Button asChild>
-                          <Link href="/checkout">Complete Checkout</Link>
-                        </Button>
                       </div>
                     </div>
+                    <SubscribeButton />
+    
                   </CardContent>
                 </Card>
               )}
@@ -215,8 +215,34 @@ export default async function DashboardPage({
                 <p className="text-muted-foreground text-sm mb-6">
                   Manage your account settings and billing preferences.
                 </p>
-                  <ManageBillingButton portalUrl={portalUrl} />
+                <ManageBillingButton portalUrl={portalUrl} />
 
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6 space-y-3">
+                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                  <svg
+                    className="w-6 h-6 text-primary"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 10V3L4 14h7v7l9-11h-7z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold">Enviar evento de uso</h3>
+                <p className="text-muted-foreground text-sm">
+                  Dispara un evento <code>api_call</code> con amount 1.
+                </p>
+        
+                <UsageEventButton />
               </CardContent>
             </Card>
           </div>

@@ -1,11 +1,9 @@
 "use server";
 
 import { auth } from "@/lib/auth";
-import { COMMET_PLAN_ID, commet } from "@/lib/commet";
+import { commet } from "@/lib/commet";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-
-type BillingInterval = "monthly" | "quarterly" | "yearly";
 
 interface CreateSubscriptionResult {
   success: boolean;
@@ -14,9 +12,7 @@ interface CreateSubscriptionResult {
   subscriptionId?: string;
 }
 
-export async function createSubscriptionAction(
-  billingInterval?: BillingInterval,
-): Promise<CreateSubscriptionResult> {
+export async function createSubscriptionAction(): Promise<CreateSubscriptionResult> {
   try {
     const session = await auth.api.getSession({
       headers: await headers(),
@@ -63,8 +59,7 @@ export async function createSubscriptionAction(
     // Create subscription with plan
     const result = await commet.subscriptions.create({
       externalId: user.id,
-      planId: COMMET_PLAN_ID,
-      billingInterval,
+      planCode: "pro",
     });
 
     if (!result.success || !result.data) {

@@ -1,8 +1,8 @@
 import { SubscribeButton } from "@/components/subscribe-button";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { COMMET_PLAN_ID, commet } from "@/lib/commet";
 import { auth } from "@/lib/auth";
+import { commet } from "@/lib/commet";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -16,7 +16,6 @@ export default async function CheckoutPage() {
     redirect("/login");
   }
 
-  // Check existing subscription
   const existing = await commet.subscriptions.get({
     externalId: session.user.id,
   });
@@ -33,54 +32,6 @@ export default async function CheckoutPage() {
       redirect(`/checkout/pending?subscriptionId=${existing.data.id}`);
     }
   }
-
-  // Get plan details from Commet
-  const planResult = await commet.plans.get(COMMET_PLAN_ID);
-
-  if (!planResult.success || !planResult.data) {
-    return (
-      <div className="min-h-screen flex items-center justify-center py-12 px-4">
-        <Card className="max-w-md w-full">
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg
-                  className="w-8 h-8 text-yellow-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                  />
-                </svg>
-              </div>
-              <h1 className="text-2xl font-bold mb-2">
-                Configuration Required
-              </h1>
-              <p className="text-muted-foreground mb-6">
-                Configure{" "}
-                <code className="bg-muted px-2 py-1 rounded text-sm">
-                  COMMET_PLAN_ID
-                </code>{" "}
-                in your{" "}
-                <code className="bg-muted px-2 py-1 rounded text-sm">.env</code>{" "}
-                file with a valid Plan ID from your Commet dashboard.
-              </p>
-              <Button asChild>
-                <Link href="/">Return to Home</Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  const plan = planResult.data;
 
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -102,81 +53,23 @@ export default async function CheckoutPage() {
                 />
               </svg>
             </div>
-            <CardTitle className="text-3xl mb-2">
-              Complete Your Purchase
-            </CardTitle>
+            <CardTitle className="text-3xl mb-2">Plan Pro</CardTitle>
             <p className="text-muted-foreground">
-              You're one step away from accessing UsageSaaS
+              Cierra tu compra y vuelve al dashboard.
             </p>
           </CardHeader>
 
-          <CardContent>
-            <div className="border-t border-b py-6 mb-6">
-              <div className="mb-4">
-                <h3 className="font-semibold text-lg">{plan.name}</h3>
-                {plan.prices.length === 1 && plan.prices[0] && (
-                  <p className="text-2xl font-bold mt-1">
-                    ${(plan.prices[0].price / 100).toFixed(0)}
-                    <span className="text-sm text-muted-foreground font-normal">
-                      /
-                      {plan.prices[0].billingInterval === "yearly"
-                        ? "year"
-                        : plan.prices[0].billingInterval === "quarterly"
-                          ? "quarter"
-                          : "month"}
-                    </span>
-                  </p>
-                )}
-              </div>
-              {plan.description && (
-                <p className="text-sm text-muted-foreground mb-4">
-                  {plan.description}
-                </p>
-              )}
-              {plan.features.length > 0 && (
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  {plan.features.map((feature) => (
-                    <li key={feature.code} className="flex items-center gap-2">
-                      <svg
-                        className="w-4 h-4 text-green-500"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      {feature.name}
-                      {feature.type === "metered" &&
-                        feature.includedAmount != null &&
-                        !feature.unlimited && (
-                          <span className="text-xs text-muted-foreground/70">
-                            ({feature.includedAmount.toLocaleString()} included)
-                          </span>
-                        )}
-                      {feature.unlimited && (
-                        <span className="text-xs text-muted-foreground/70">
-                          (unlimited)
-                        </span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              )}
-              {plan.trialDays > 0 && (
-                <p className="text-sm text-primary mt-4">
-                  {plan.trialDays}-day free trial included
-                </p>
-              )}
-            </div>
+          <CardContent className="space-y-6">
+            <p className="text-sm text-muted-foreground text-center">
+              Este ejemplo usa un único plan hardcodeado <strong>pro</strong>.
+              Al hacer checkout te redirigiremos automáticamente a tu panel.
+            </p>
 
-            <SubscribeButton prices={plan.prices} />
+            <SubscribeButton />
 
-            <div className="mt-6 text-center">
+            <div className="text-center">
               <Button variant="link" asChild>
-                <Link href="/">← Back to home</Link>
+                <Link href="/">← Volver</Link>
               </Button>
             </div>
           </CardContent>
