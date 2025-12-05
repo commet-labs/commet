@@ -1,22 +1,24 @@
 "use client";
 
-import { getPortalUrl } from "@/actions/get-portal-url-action";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
-export function ManageBillingButton() {
+type ManageBillingButtonProps = {
+  portalUrl?: string;
+};
+
+export function ManageBillingButton({ portalUrl }: ManageBillingButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   async function handleClick() {
+    if (!portalUrl) {
+      alert("Portal URL not available. Please try again.");
+      return;
+    }
+
     setIsLoading(true);
     try {
-      const result = await getPortalUrl();
-      if (result.success && result.url) {
-        window.location.href = result.url;
-      } else {
-        console.error("Failed to get portal URL:", result.error);
-        alert(result.error || "Failed to open billing portal");
-      }
+      window.location.href = portalUrl;
     } catch (error) {
       console.error("Error:", error);
       alert("An unexpected error occurred");
@@ -31,7 +33,7 @@ export function ManageBillingButton() {
       variant="outline"
       size="sm"
       onClick={handleClick}
-      disabled={isLoading}
+      disabled={isLoading || !portalUrl}
     >
       {isLoading ? "Opening..." : "Manage Billing"}
     </Button>

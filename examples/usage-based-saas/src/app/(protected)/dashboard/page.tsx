@@ -1,4 +1,5 @@
 import { checkSubscriptionStatus } from "@/actions/check-subscription-action";
+import { getPortalUrl } from "@/actions/get-portal-url-action";
 import { ManageBillingButton } from "@/components/manage-billing-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,8 @@ export default async function DashboardPage({
   const paymentSuccess = params.payment === "success";
 
   const subscription = await checkSubscriptionStatus();
+  const portalAccess = await getPortalUrl();
+  const portalUrl = portalAccess.success ? portalAccess.url : undefined;
 
   return (
     <div className="min-h-screen">
@@ -121,7 +124,7 @@ export default async function DashboardPage({
                             </p>
                           )}
                         </div>
-                        <ManageBillingButton />
+                        <ManageBillingButton portalUrl={portalUrl} />
                       </div>
                     </div>
                   </CardContent>
@@ -209,9 +212,11 @@ export default async function DashboardPage({
                   </svg>
                 </div>
                 <h3 className="text-lg font-semibold mb-2">Settings</h3>
-                <p className="text-muted-foreground text-sm">
+                <p className="text-muted-foreground text-sm mb-6">
                   Manage your account settings and billing preferences.
                 </p>
+                  <ManageBillingButton portalUrl={portalUrl} />
+
               </CardContent>
             </Card>
           </div>
