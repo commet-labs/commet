@@ -113,12 +113,6 @@ export default async function DashboardPage({
                           Your {subscription.planName} plan is active.
                         </p>
                         <div className="text-sm space-y-1 mb-4">
-                          <p>
-                            <strong>Status:</strong>{" "}
-                            <Badge variant="secondary">
-                              {subscription.status}
-                            </Badge>
-                          </p>
                           {subscription.daysRemaining !== undefined && (
                             <p>
                               <strong>Days remaining:</strong>{" "}

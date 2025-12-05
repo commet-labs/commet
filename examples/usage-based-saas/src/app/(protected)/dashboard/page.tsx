@@ -1,10 +1,12 @@
 import { checkSubscriptionStatus } from "@/actions/check-subscription-action";
 import { getPortalUrl } from "@/actions/get-portal-url-action";
+import { getUsageAction } from "@/actions/get-usage-action";
 import { ManageBillingButton } from "@/components/manage-billing-button";
 import { SubscribeButton } from "@/components/subscribe-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { UsageEventButton } from "@/components/usage-event-button";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
@@ -26,6 +28,7 @@ export default async function DashboardPage({
   const subscription = await checkSubscriptionStatus();
   const portalAccess = await getPortalUrl();
   const portalUrl = portalAccess.success ? portalAccess.url : undefined;
+  const usage = await getUsageAction();
 
   return (
     <div className="min-h-screen">
@@ -113,12 +116,7 @@ export default async function DashboardPage({
                           Your {subscription.planName} plan is active.
                         </p>
                         <div className="text-sm space-y-1 mb-4">
-                          <p>
-                            <strong>Status:</strong>{" "}
-                            <Badge variant="secondary">
-                              {subscription.status}
-                            </Badge>
-                          </p>
+                
                           {subscription.daysRemaining !== undefined && (
                             <p>
                               <strong>Days remaining:</strong>{" "}
@@ -162,30 +160,7 @@ export default async function DashboardPage({
           </Card>
 
           <div className="grid md:grid-cols-2 gap-6">
-            <Card>
-              <CardContent className="pt-6">
-                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                  <svg
-                    className="w-6 h-6 text-primary"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold mb-2">Usage Analytics</h3>
-                <p className="text-muted-foreground text-sm">
-                  View detailed analytics and insights about your usage patterns
-                  and billing.
-                </p>
-              </CardContent>
-            </Card>
+
 
             <Card>
               <CardContent className="pt-6">
@@ -245,6 +220,104 @@ export default async function DashboardPage({
               </CardContent>
             </Card>
           </div>
+
+          {/* Usage Visualization Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <svg
+                  className="w-5 h-5 text-primary"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  />
+                </svg>
+                Current Usage
+              </CardTitle>
+              <p className="text-muted-foreground text-sm">
+                Revisa en tiempo real cuántas llamadas de API llevas este período
+                y cuánto te queda incluido en tu plan.
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {usage.success && usage.data ? (
+                <>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium">API Calls</span>
+                    {usage.data.unlimited ? (
+                      <Badge variant="secondary">Unlimited</Badge>
+                    ) : (
+                      <span className="text-sm text-muted-foreground">
+                        {usage.data.current.toLocaleString()} /{" "}
+                        {usage.data.included.toLocaleString()}
+                      </span>
+                    )}
+                  </div>
+
+                  {!usage.data.unlimited && (
+                    <>
+                      <Progress
+                        value={Math.min(
+                          (usage.data.current / usage.data.included) * 100,
+                          100
+                        )}
+                        className="h-2"
+                      />
+
+                      <div className="grid grid-cols-3 gap-4 text-center">
+                        <div className="space-y-1">
+                          <p className="text-2xl font-bold text-primary">
+                            {usage.data.current.toLocaleString()}
+                          </p>
+                          <p className="text-xs text-muted-foreground">Used</p>
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-2xl font-bold text-green-600">
+                            {usage.data.remaining.toLocaleString()}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Remaining
+                          </p>
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-2xl font-bold text-orange-500">
+                            {usage.data.overage.toLocaleString()}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Overage
+                          </p>
+                        </div>
+                      </div>
+
+                      {usage.data.overage > 0 && (
+                        <div className="bg-orange-500/10 border border-orange-500/50 rounded-lg p-3">
+                          <p className="text-sm text-orange-600">
+                            You've exceeded your included quota. Overage charges
+                            will apply.
+                          </p>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </>
+              ) : (
+                <div className="text-center py-4 text-muted-foreground">
+                  <p className="text-sm">
+                    {usage.error || "Unable to load usage data"}
+                  </p>
+                  <p className="text-xs mt-1">
+                    Subscribe to a plan to start tracking usage
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </main>
     </div>
