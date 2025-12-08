@@ -20,7 +20,8 @@
     "lint:fix": "biome lint --write src/",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "clean": "rm -rf dist node_modules .turbo"
   },
   "keywords": ["commet", "billing", "nextjs", "webhooks", "typescript"],
   "author": "Commet Team",

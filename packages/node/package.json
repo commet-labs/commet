@@ -18,7 +18,8 @@
     "dev": "tsup --watch",
     "lint": "biome lint src/",
     "lint:fix": "biome lint --write src/",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist node_modules .turbo"
   },
   "keywords": [
     "billing",
