@@ -7,5 +7,14 @@ export default async function Layout({
 }: LayoutProps<"/[lang]">) {
   const { lang } = await params;
 
-  return <HomeLayout {...baseOptions(lang)}>{children}</HomeLayout>;
+  return (
+    <HomeLayout
+      {...baseOptions(lang)}
+      i18n={false}
+      searchToggle={{ enabled: false }}
+      themeSwitch={{ enabled: false }}
+    >
+      {children}
+    </HomeLayout>
+  );
 }
