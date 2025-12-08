@@ -1,6 +1,5 @@
 import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
 import { i18n } from "./i18n";
-import { source } from "./source";
 
 /**
  * Shared layout configurations
@@ -50,7 +49,27 @@ export function baseOptions(locale: string): BaseLayoutProps {
       ),
     },
     githubUrl: "https://github.com/commet-labs/commet",
-    // see https://fumadocs.dev/docs/ui/navigation/links
-    links: [],
+    links: [
+      {
+        text: "Usage Metrics",
+        url: "/usage-metrics",
+      },
+      {
+        text: "Seats",
+        url: "/seats",
+      },
+      {
+        text: "Payments",
+        url: "/payments",
+      },
+      {
+        text: "Pricing",
+        url: "/pricing",
+      },
+      {
+        text: "Documentation",
+        url: "/docs",
+      },
+    ],
   };
 }
