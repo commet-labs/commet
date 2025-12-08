@@ -8,7 +8,7 @@ import {
   DocsDescription,
   DocsPage,
   DocsTitle,
-} from "fumadocs-ui/page";
+} from "@/components/layout/notebook/page";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 

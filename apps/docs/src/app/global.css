@@ -3,6 +3,15 @@
 @import "fumadocs-ui/css/preset.css";
 @import "fumadocs-openapi/css/preset.css";
 
+/* Define/override layout variables (from fumadocs preset) */
+@variant layout {
+  #nd-docs-layout:has(&),
+  #nd-notebook-layout:has(&),
+  #nd-home-layout:has(&) {
+    @slot;
+  }
+}
+
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);

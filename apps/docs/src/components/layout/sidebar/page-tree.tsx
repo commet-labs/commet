@@ -38,7 +38,7 @@ export function createPageTreeRenderer({
 
     return (
       <SidebarFolder
-        collapsible={true}
+        collapsible={false}
         active={path.includes(item)}
         defaultOpen={item.defaultOpen}
       >
@@ -74,9 +74,9 @@ export function createPageTreeRenderer({
       function renderSidebarList(items: PageTree.Node[]) {
         return items.map((item, i) => {
           if (item.type === "separator") {
-            if (Separator) return <Separator key={item.$id} item={item} />;
+            if (Separator) return <Separator key={i} item={item} />;
             return (
-              <SidebarSeparator key={item.$id}>
+              <SidebarSeparator key={i}>
                 {item.icon}
                 {item.name}
               </SidebarSeparator>
@@ -85,7 +85,7 @@ export function createPageTreeRenderer({
 
           if (item.type === "folder") {
             return (
-              <Folder key={item.$id} item={item}>
+              <Folder key={i} item={item}>
                 {renderSidebarList(item.children)}
               </Folder>
             );
