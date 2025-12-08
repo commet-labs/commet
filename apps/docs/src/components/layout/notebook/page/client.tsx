@@ -1,37 +1,37 @@
 "use client";
 
-import {
-  type ComponentProps,
-  Fragment,
-  useEffect,
-  useEffectEvent,
-  createContext,
-  useMemo,
-  useRef,
-  useState,
-  use,
-} from "react";
-import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
-import Link from "fumadocs-core/link";
-import { cn } from "../../../../lib/cn";
-import { useI18n } from "fumadocs-ui/contexts/i18n";
-import { useTreeContext, useTreePath } from "fumadocs-ui/contexts/tree";
-import type * as PageTree from "fumadocs-core/page-tree";
-import { usePathname } from "fumadocs-core/framework";
+import { useFooterItems } from "@/lib/use-footer-items";
 import {
   type BreadcrumbOptions,
   getBreadcrumbItemsFromPath,
 } from "fumadocs-core/breadcrumb";
+import { usePathname } from "fumadocs-core/framework";
+import Link from "fumadocs-core/link";
+import type * as PageTree from "fumadocs-core/page-tree";
+import { useActiveAnchor } from "fumadocs-core/toc";
+import { useI18n } from "fumadocs-ui/contexts/i18n";
+import { useTreeContext, useTreePath } from "fumadocs-ui/contexts/tree";
+import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  type ComponentProps,
+  Fragment,
+  createContext,
+  use,
+  useEffect,
+  useEffectEvent,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { cn } from "../../../../lib/cn";
 import { isActive } from "../../../../lib/is-active";
+import { useTOCItems } from "../../../toc/index";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "../../../ui/collapsible";
-import { useTOCItems } from "../../../toc/index";
-import { useActiveAnchor } from "fumadocs-core/toc";
 import { LayoutContext } from "../client";
-import { useFooterItems } from "@/lib/use-footer-items";
 
 const TocPopoverContext = createContext<{
   open: boolean;
@@ -192,7 +192,6 @@ function ProgressCircle({
 
   return (
     <svg
-      role="progressbar"
       viewBox={`0 0 ${size} ${size}`}
       aria-valuenow={normalizedValue}
       aria-valuemin={min}

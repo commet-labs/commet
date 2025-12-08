@@ -1,8 +1,8 @@
-import { HeroSection } from "@/components/landing/hero-section";
 import { AnimatedGrid } from "@/components/landing/animated-grid";
 import { AnimatedSection } from "@/components/landing/animated-section";
 import { BottomCTASection } from "@/components/landing/bottom-cta-section";
 import { FeatureCard } from "@/components/landing/feature-card";
+import { HeroSection } from "@/components/landing/hero-section";
 import { InfoSectionBenefit } from "@/components/landing/info-section-benefit";
 
 const FEATURES = [

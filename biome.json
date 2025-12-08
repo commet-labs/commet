@@ -40,6 +40,9 @@
       },
       "correctness": {
         "useExhaustiveDependencies": "off"
+      },
+      "suspicious": {
+        "noArrayIndexKey": "off"
       }
     }
   },

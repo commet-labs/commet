@@ -25,10 +25,7 @@ export function AnimatedGrid({
     <div ref={ref} className={className}>
       {childrenArray.map((child, index) => (
         <div
-          key={`grid-item-${
-            // biome-ignore lint/suspicious/noArrayIndexKey: grid items are static
-            index
-          }`}
+          key={`grid-item-${index}`}
           className={`transition-all duration-700 ease-out ${
             isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
           }`}

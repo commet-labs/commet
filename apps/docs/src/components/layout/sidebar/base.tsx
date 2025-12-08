@@ -1,36 +1,36 @@
 "use client";
+import type {
+  CollapsibleContentProps,
+  CollapsibleTriggerProps,
+} from "@radix-ui/react-collapsible";
+import { Presence } from "@radix-ui/react-presence";
+import type { ScrollAreaProps } from "@radix-ui/react-scroll-area";
+import { usePathname } from "fumadocs-core/framework";
+import Link, { type LinkProps } from "fumadocs-core/link";
+import { useMediaQuery } from "fumadocs-core/utils/use-media-query";
+import { useOnChange } from "fumadocs-core/utils/use-on-change";
 import { ChevronDown, ExternalLink } from "lucide-react";
 import {
   type ComponentProps,
-  createContext,
   type PointerEvent,
   type ReactNode,
   type RefObject,
+  createContext,
   use,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
-import Link, { type LinkProps } from "fumadocs-core/link";
-import { useOnChange } from "fumadocs-core/utils/use-on-change";
+import scrollIntoView from "scroll-into-view-if-needed";
 import { cn } from "../../../lib/cn";
-import { ScrollArea, ScrollViewport } from "../../ui/scroll-area";
 import { isActive } from "../../../lib/is-active";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "../../ui/collapsible";
-import type { ScrollAreaProps } from "@radix-ui/react-scroll-area";
-import type {
-  CollapsibleContentProps,
-  CollapsibleTriggerProps,
-} from "@radix-ui/react-collapsible";
-import { useMediaQuery } from "fumadocs-core/utils/use-media-query";
-import { Presence } from "@radix-ui/react-presence";
-import scrollIntoView from "scroll-into-view-if-needed";
-import { usePathname } from "fumadocs-core/framework";
+import { ScrollArea, ScrollViewport } from "../../ui/scroll-area";
 
 interface SidebarContext {
   open: boolean;

@@ -1,26 +1,26 @@
 "use client";
-import { cn } from "../../../lib/cn";
+import { useIsScrollTop } from "@/lib/use-is-scroll-top";
+import { usePathname } from "fumadocs-core/framework";
+import Link from "fumadocs-core/link";
+import { ChevronDown } from "lucide-react";
 import {
   type ComponentProps,
-  createContext,
   Fragment,
   type HTMLAttributes,
   type PointerEvent,
   type ReactNode,
+  createContext,
   use,
   useMemo,
   useRef,
   useState,
 } from "react";
-import { useSidebar } from "../sidebar/base";
-import { ChevronDown } from "lucide-react";
-import Link from "fumadocs-core/link";
-import { usePathname } from "fumadocs-core/framework";
+import { cn } from "../../../lib/cn";
 import { isTabActive } from "../../../lib/is-active";
-import { LinkItem, type MenuItemType, type LinkItemType } from "../link-item";
 import { Popover, PopoverContent, PopoverTrigger } from "../../ui/popover";
+import { LinkItem, type LinkItemType, type MenuItemType } from "../link-item";
+import { useSidebar } from "../sidebar/base";
 import type { SidebarTabWithProps } from "../sidebar/tabs/dropdown";
-import { useIsScrollTop } from "@/lib/use-is-scroll-top";
 
 export const LayoutContext = createContext<
   | (LayoutInfo & {

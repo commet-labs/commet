@@ -1,14 +1,10 @@
 "use client";
-import { type ComponentProps, Fragment, useMemo, useState } from "react";
+import { useIsScrollTop } from "@/lib/use-is-scroll-top";
 import { cva } from "class-variance-authority";
 import Link from "fumadocs-core/link";
+import { ChevronDown, Languages } from "lucide-react";
+import { type ComponentProps, Fragment, useMemo, useState } from "react";
 import { cn } from "../../../lib/cn";
-import {
-  type NavOptions,
-  resolveLinkItems,
-  type LinkItemType,
-} from "../shared";
-import { LinkItem } from "../link-item";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -19,12 +15,16 @@ import {
   NavigationMenuViewport,
 } from "../../navigation-menu";
 import { buttonVariants } from "../../ui/button";
-import type { HomeLayoutProps } from "./index";
-import { LargeSearchToggle, SearchToggle } from "../search-toggle";
-import { ThemeToggle } from "../theme-toggle";
 import { LanguageToggle, LanguageToggleText } from "../language-toggle";
-import { ChevronDown, Languages } from "lucide-react";
-import { useIsScrollTop } from "@/lib/use-is-scroll-top";
+import { LinkItem } from "../link-item";
+import { LargeSearchToggle, SearchToggle } from "../search-toggle";
+import {
+  type LinkItemType,
+  type NavOptions,
+  resolveLinkItems,
+} from "../shared";
+import { ThemeToggle } from "../theme-toggle";
+import type { HomeLayoutProps } from "./index";
 export const navItemVariants = cva("[&_svg]:size-4", {
   variants: {
     variant: {
@@ -155,7 +155,7 @@ export function Header({
                   className={cn(item.type === "icon" && "-mx-1 first:ms-0")}
                 />
               ))}
-              <div role="separator" className="flex-1" />
+              <div role="separator" className="flex-1" tabIndex={-1} />
               {i18n && (
                 <LanguageToggle>
                   <Languages className="size-5" />

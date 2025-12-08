@@ -1,5 +1,5 @@
-import { useTreeContext } from 'fumadocs-ui/contexts/tree';
-import type * as PageTree from 'fumadocs-core/page-tree';
+import type * as PageTree from "fumadocs-core/page-tree";
+import { useTreeContext } from "fumadocs-ui/contexts/tree";
 
 const footerCache = new Map<string, PageTree.Item[]>();
 
@@ -13,10 +13,10 @@ export function useFooterItems(): PageTree.Item[] {
 
   const list: PageTree.Item[] = [];
   function onNode(node: PageTree.Node) {
-    if (node.type === 'folder') {
+    if (node.type === "folder") {
       if (node.index) onNode(node.index);
       for (const child of node.children) onNode(child);
-    } else if (node.type === 'page' && !node.external) {
+    } else if (node.type === "page" && !node.external) {
       list.push(node);
     }
   }
