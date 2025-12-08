@@ -11,6 +11,7 @@ import {
 } from "react";
 import { cn } from "../../../lib/cn";
 import { buttonVariants } from "../../ui/button";
+import { Header } from "../home/client";
 import { LanguageToggle } from "../language-toggle";
 import { LinkItem, type LinkItemType } from "../link-item";
 import { LargeSearchToggle, SearchToggle } from "../search-toggle";
@@ -284,6 +285,14 @@ export function DocsLayout(props: DocsLayoutProps) {
         tabMode={tabMode}
         navTransparentMode={nav.transparentMode}
       >
+        <Header
+          nav={nav}
+          links={props.links}
+          githubUrl={props.githubUrl}
+          i18n={i18n}
+          themeSwitch={themeSwitch}
+          searchToggle={props.searchToggle}
+        />
         <Sidebar defaultOpenLevel={defaultOpenLevel} prefetch={prefetch}>
           <LayoutBody {...props.containerProps}>
             {sidebar()}
@@ -320,6 +329,7 @@ function DocsNavbar({
         showLayoutTabs && "lg:layout:[--fd-header-height:--spacing(24)]",
       )}
     >
+      {/*
       <div
         data-header-body=""
         className="flex border-b px-4 gap-2 h-14 md:px-6"
@@ -445,6 +455,7 @@ function DocsNavbar({
           </div>
         </div>
       </div>
+      */}
       {showLayoutTabs && (
         <LayoutHeaderTabs
           data-header-tabs=""
