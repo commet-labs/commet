@@ -1,5 +1,7 @@
-import { createMDX as withMDX } from "fumadocs-mdx/next";
+import { createMDX } from "fumadocs-mdx/next";
 import type { NextConfig } from "next";
+
+const withMDX = createMDX();
 
 const config: NextConfig = {
   reactStrictMode: true,
@@ -13,4 +15,4 @@ const config: NextConfig = {
   },
 };
 
-export default withMDX()(config);
+export default withMDX(config);

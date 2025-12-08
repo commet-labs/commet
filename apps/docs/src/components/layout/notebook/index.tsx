@@ -171,6 +171,7 @@ export function DocsLayout(props: DocsLayoutProps) {
     return (
       <>
         <SidebarContent {...rest}>
+          {/*
           <Header>
             {navMode === "auto" && (
               <div className="flex justify-between">
@@ -203,6 +204,7 @@ export function DocsLayout(props: DocsLayoutProps) {
               />
             )}
           </Header>
+          */}
           {viewport}
           <Footer>
             {iconLinks.map((item, i) => (
