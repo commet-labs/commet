@@ -68,7 +68,8 @@ export function baseOptions(locale: string): BaseLayoutProps {
       },
       {
         text: "Documentation",
-        url: "/docs",
+        url: "/docs/platform/overview",
+        active: "nested-url",
       },
     ],
   };

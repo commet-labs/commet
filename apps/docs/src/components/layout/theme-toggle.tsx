@@ -6,7 +6,7 @@ import { type ComponentProps, useEffect, useState } from "react";
 import { cn } from "../../lib/cn";
 
 const itemVariants = cva(
-  "size-6.5 rounded-full p-1.5 text-fd-muted-foreground",
+  "size-6.5 p-1.5 text-fd-muted-foreground",
   {
     variants: {
       active: {
@@ -38,7 +38,7 @@ export function ThemeToggle({
   }, []);
 
   const container = cn(
-    "inline-flex items-center rounded-full border p-1",
+    "inline-flex items-center border p-1",
     className,
   );
 
