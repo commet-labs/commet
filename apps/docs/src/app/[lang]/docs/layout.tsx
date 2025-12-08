@@ -7,15 +7,9 @@ export default async function Layout({
   params,
 }: LayoutProps<"/[lang]/docs">) {
   const { lang } = await params;
-  const { nav, ...base } = baseOptions(lang);
 
   return (
-    <DocsLayout
-      {...base}
-      tree={source.pageTree[lang]}
-      nav={{ ...nav, mode: "top" }}
-      tabMode="navbar"
-    >
+    <DocsLayout {...baseOptions(lang)} tree={source.pageTree[lang]}>
       {children}
     </DocsLayout>
   );

@@ -171,31 +171,7 @@ export function DocsLayout(props: DocsLayoutProps) {
     return (
       <>
         <SidebarContent {...rest}>
-          {/*
           <Header>
-            {navMode === "auto" && (
-              <div className="flex justify-between">
-                <Link
-                  href={nav.url ?? "/"}
-                  className="inline-flex items-center gap-2.5 font-medium"
-                >
-                  {nav.title}
-                </Link>
-                {collapsible && (
-                  <SidebarCollapseTrigger
-                    className={cn(
-                      buttonVariants({
-                        color: "ghost",
-                        size: "icon-sm",
-                        className: "mt-px mb-auto text-fd-muted-foreground",
-                      }),
-                    )}
-                  >
-                    <SidebarIcon />
-                  </SidebarCollapseTrigger>
-                )}
-              </div>
-            )}
             {nav.children}
             {tabs.length > 0 && (
               <SidebarTabsDropdown
@@ -204,7 +180,6 @@ export function DocsLayout(props: DocsLayoutProps) {
               />
             )}
           </Header>
-          */}
           {viewport}
           <Footer>
             {iconLinks.map((item, i) => (
@@ -457,7 +432,6 @@ function DocsNavbar({
           </div>
         </div>
       </div>
-      */}
       {showLayoutTabs && (
         <LayoutHeaderTabs
           data-header-tabs=""
@@ -465,6 +439,7 @@ function DocsNavbar({
           options={tabs}
         />
       )}
+      */}
     </LayoutHeader>
   );
 }
