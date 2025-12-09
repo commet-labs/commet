@@ -183,8 +183,8 @@ The webhook handler at `/api/webhooks/commet` processes:
 
 ## Learn More
 
-- [Commet Documentation](https://docs.commet.co)
-- [Seat-Based Billing Guide](https://docs.commet.co/guides/seats)
+- [Commet Documentation](https://commet.co/docs/platform/overview)
+- [Seat-Based Billing Guide](https://commet.co/docs/platform/features/products/seat-based-pricing)
 - [Better Auth Documentation](https://better-auth.com)
 - [Drizzle ORM Documentation](https://orm.drizzle.team)
 

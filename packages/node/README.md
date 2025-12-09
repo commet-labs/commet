@@ -8,7 +8,7 @@
   <p>TypeScript SDK for Commet billing platform</p>
 
   <a href="https://www.npmjs.com/package/@commet/node"><img alt="NPM version" src="https://img.shields.io/npm/v/@commet/node.svg?style=for-the-badge&labelColor=000000"></a>
-  <a href="https://docs.commet.co/docs/library/quickstart"><img alt="Documentation" src="https://img.shields.io/badge/docs-SDK-blue.svg?style=for-the-badge&labelColor=000000"></a>
+  <a href="https://commet.co/docs/library/quickstart"><img alt="Documentation" src="https://img.shields.io/badge/docs-SDK-blue.svg?style=for-the-badge&labelColor=000000"></a>
 </div>
 
 <br/>
@@ -80,7 +80,7 @@ This generates type-safe autocomplete for your event types, seat types, and prod
 
 ## Documentation
 
-Visit [docs.commet.co/docs/library/quickstart](https://docs.commet.co/docs/library/quickstart) for:
+Visit [commet.co/docs/library/quickstart](https://commet.co/docs/library/quickstart) for:
 
 - Complete API reference
 - Advanced usage examples
@@ -89,8 +89,8 @@ Visit [docs.commet.co/docs/library/quickstart](https://docs.commet.co/docs/libra
 
 ## Resources
 
-- [CLI Documentation](https://docs.commet.co/docs/library/cli/overview)
-- [SDK Reference](https://docs.commet.co/docs/library/quickstart)
+- [CLI Documentation](https://commet.co/docs/library/cli/overview)
+- [SDK Reference](https://commet.co/docs/library/quickstart)
 - [GitHub](https://github.com/commet-labs/commet)
 - [Issues](https://github.com/commet-labs/commet/issues)
 

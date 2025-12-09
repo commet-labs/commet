@@ -23,7 +23,7 @@ const { provider } = defineI18nUI(i18n, {
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL || "https://docs.commet.co",
+    process.env.NEXT_PUBLIC_APP_URL || "https://commet.co/docs",
   ),
 };
 

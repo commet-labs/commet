@@ -8,7 +8,7 @@
   <p>Next.js integration for Commet</p>
 
   <a href="https://www.npmjs.com/package/@commet/next"><img alt="NPM version" src="https://img.shields.io/npm/v/@commet/next.svg?style=for-the-badge&labelColor=000000"></a>
-  <a href="https://docs.commet.co"><img alt="Documentation" src="https://img.shields.io/badge/docs-commet-blue.svg?style=for-the-badge&labelColor=000000"></a>
+  <a href="https://commet.co/docs/platform/overview"><img alt="Documentation" src="https://img.shields.io/badge/docs-commet-blue.svg?style=for-the-badge&labelColor=000000"></a>
 </div>
 
 <br/>
@@ -58,9 +58,9 @@ export const GET = CustomerPortal({
 
 ## Documentation
 
-- [Webhooks](https://docs.commet.co/docs/library/installation/webhooks)
-- [Customer Portal](https://docs.commet.co/docs/library/features/portal-access)
-- [SDK Reference](https://docs.commet.co/docs/library/quickstart)
+- [Webhooks](https://commet.co/docs/library/installation/webhooks)
+- [Customer Portal](https://commet.co/docs/library/features/portal-access)
+- [SDK Reference](https://commet.co/docs/library/quickstart)
 
 ## License
 

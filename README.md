@@ -10,9 +10,9 @@
 </p>
 
 <p align="center">
-  <a href="https://docs.commet.co"><strong>Documentation</strong></a> ·
+  <a href="https://commet.co/docs/platform/overview"><strong>Documentation</strong></a> ·
   <a href="https://commet.co/examples"><strong>Examples</strong></a> ·
-  <a href="https://docs.commet.co/cli"><strong>CLI</strong></a>
+  <a href="https://commet.co/docs/library/cli/overview"><strong>CLI</strong></a>
 </p>
 <br/>
 
@@ -23,10 +23,10 @@ Commet is an all-in-one billing and payments platform. The easiest way to integr
 
 ## Documentation
 
-For details on how to use Commet, check out our [documentation](https://docs.commet.co/docs).
+For details on how to use Commet, check out our [documentation](https://commet.co/docs/platform/overview).
 
 ## Reference
 
 - [Apache 2.0 License](./LICENSE)
-- [CLI Documentation](https://docs.commet.co/docs/library/cli/overview)
-- [SDK Reference](https://docs.commet.co/docs/library/quickstart)
+- [CLI Documentation](https://commet.co/docs/library/cli/overview)
+- [SDK Reference](https://commet.co/docs/library/quickstart)

@@ -8,7 +8,7 @@
   <p>CLI for Commet billing platform</p>
 
   <a href="https://www.npmjs.com/package/commet"><img alt="NPM version" src="https://img.shields.io/npm/v/commet.svg?style=for-the-badge&labelColor=000000"></a>
-  <a href="https://docs.commet.co/docs/library/cli/overview"><img alt="Documentation" src="https://img.shields.io/badge/docs-CLI-blue.svg?style=for-the-badge&labelColor=000000"></a>
+  <a href="https://commet.co/docs/library/cli/overview"><img alt="Documentation" src="https://img.shields.io/badge/docs-CLI-blue.svg?style=for-the-badge&labelColor=000000"></a>
 </div>
 
 <br/>
@@ -67,7 +67,7 @@ commet list seats      # List seat types
 
 ## Documentation
 
-Visit [docs.commet.co/cli](https://docs.commet.co/cli) for:
+Visit [commet.co/docs/library/cli/overview](https://commet.co/docs/library/cli/overview) for:
 
 - Complete command reference
 - Configuration guide
@@ -76,8 +76,8 @@ Visit [docs.commet.co/cli](https://docs.commet.co/cli) for:
 
 ## Resources
 
-- [CLI Documentation](https://docs.commet.co/docs/library/cli/overview)
-- [SDK Reference](https://docs.commet.co/docs/library/quickstart)
+- [CLI Documentation](https://commet.co/docs/library/cli/overview)
+- [SDK Reference](https://commet.co/docs/library/quickstart)
 - [GitHub](https://github.com/commet-labs/commet)
 - [Issues](https://github.com/commet-labs/commet/issues)
 
