@@ -1,5 +1,0 @@
-{
-  "title": "Core",
-  "description": "Fundamentos del SDK",
-  "pages": ["reference", "testing", "error-handling"]
-}
