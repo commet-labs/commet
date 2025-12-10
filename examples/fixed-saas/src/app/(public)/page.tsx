@@ -48,7 +48,7 @@ export default function Home() {
             </Button>
             <Button size="lg" variant="outline" asChild>
               <a
-                href="https://commet.co/docs/platform/overview"
+                href="https://commet.co/docs"
                 target="_blank"
                 rel="noopener noreferrer"
               >
