@@ -126,7 +126,9 @@ export class Webhooks {
    * ```
    */
   verifyAndParse(params: VerifyAndParseParams): WebhookPayload | null {
-    if (!this.verify(params.rawBody, params.signature, params.secret)) {
+    const { rawBody, signature, secret } = params;
+
+    if (!this.verify(rawBody, signature, secret)) {
       return null;
     }
 
