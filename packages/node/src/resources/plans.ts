@@ -96,6 +96,6 @@ export class PlansResource {
    * ```
    */
   async get(planCode: GeneratedPlanCode): Promise<ApiResponse<PlanDetail>> {
-    return this.httpClient.get(`/plans/${planCode}`, undefined);
+    return this.httpClient.get(`/plans/${planCode}`);
   }
 }
