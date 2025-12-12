@@ -34,6 +34,12 @@ export type WebhookEvent =
   | "subscription.canceled"
   | "subscription.updated";
 
+export interface VerifyAndParseParams {
+  rawBody: string;
+  signature: string | null;
+  secret: string;
+}
+
 /**
  * Webhooks resource for signature verification
  */
@@ -101,18 +107,13 @@ export class Webhooks {
   /**
    * Parse and verify webhook payload in one step
    *
-   * @param rawBody - Raw request body as string
-   * @param signature - Value from X-Commet-Signature header
-   * @param secret - Your webhook secret from Commet dashboard
-   * @returns Parsed payload if valid, null if invalid
-   *
    * @example
    * ```typescript
-   * const payload = commet.webhooks.verifyAndParse(
+   * const payload = commet.webhooks.verifyAndParse({
    *   rawBody,
    *   signature,
-   *   process.env.COMMET_WEBHOOK_SECRET
-   * );
+   *   secret: process.env.COMMET_WEBHOOK_SECRET
+   * });
    *
    * if (!payload) {
    *   return new Response('Invalid signature', { status: 401 });
@@ -124,17 +125,13 @@ export class Webhooks {
    * }
    * ```
    */
-  verifyAndParse(
-    rawBody: string,
-    signature: string | null,
-    secret: string,
-  ): WebhookPayload | null {
-    if (!this.verify(rawBody, signature, secret)) {
+  verifyAndParse(params: VerifyAndParseParams): WebhookPayload | null {
+    if (!this.verify(params.rawBody, params.signature, params.secret)) {
       return null;
     }
 
     try {
-      return JSON.parse(rawBody) as WebhookPayload;
+      return JSON.parse(params.rawBody) as WebhookPayload;
     } catch {
       return null;
     }
