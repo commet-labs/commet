@@ -81,9 +81,7 @@ export class PlansResource {
    * const allPlans = await commet.plans.list({ includePrivate: true });
    * ```
    */
-  async list(
-    params?: ListPlansParams,
-  ): Promise<ApiResponse<Plan[]>> {
+  async list(params?: ListPlansParams): Promise<ApiResponse<Plan[]>> {
     return this.httpClient.get("/plans", params);
   }
 
@@ -97,9 +95,7 @@ export class PlansResource {
    * console.log(plan.data.prices); // [{ billingInterval: 'monthly', price: 9900 }]
    * ```
    */
-  async get(
-    planCode: GeneratedPlanCode,
-  ): Promise<ApiResponse<PlanDetail>> {
+  async get(planCode: GeneratedPlanCode): Promise<ApiResponse<PlanDetail>> {
     return this.httpClient.get(`/plans/${planCode}`, undefined);
   }
 }
