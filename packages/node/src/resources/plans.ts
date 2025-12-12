@@ -2,6 +2,7 @@ import type {
   ApiResponse,
   GeneratedPlanCode,
   ListParams,
+  RequestOptions,
 } from "../types/common";
 import type { CommetHTTPClient } from "../utils/http";
 
@@ -81,8 +82,11 @@ export class PlansResource {
    * const allPlans = await commet.plans.list({ includePrivate: true });
    * ```
    */
-  async list(params?: ListPlansParams): Promise<ApiResponse<Plan[]>> {
-    return this.httpClient.get("/plans", params);
+  async list(
+    params?: ListPlansParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<Plan[]>> {
+    return this.httpClient.get("/plans", params, options);
   }
 
   /**
@@ -95,7 +99,10 @@ export class PlansResource {
    * console.log(plan.data.prices); // [{ billingInterval: 'monthly', price: 9900 }]
    * ```
    */
-  async get(planCode: GeneratedPlanCode): Promise<ApiResponse<PlanDetail>> {
-    return this.httpClient.get(`/plans/${planCode}`);
+  async get(
+    planCode: GeneratedPlanCode,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<PlanDetail>> {
+    return this.httpClient.get(`/plans/${planCode}`, undefined, options);
   }
 }

@@ -134,8 +134,11 @@ export class CustomersResource {
   /**
    * Get a customer by ID
    */
-  async get(customerId: CustomerID): Promise<ApiResponse<Customer>> {
-    return this.httpClient.get(`/customers/${customerId}`);
+  async get(
+    customerId: CustomerID,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<Customer>> {
+    return this.httpClient.get(`/customers/${customerId}`, undefined, options);
   }
 
   /**

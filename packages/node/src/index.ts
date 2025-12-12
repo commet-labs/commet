@@ -91,6 +91,10 @@ export type {
   FeatureAccess,
   CanUseResult,
   CheckResult,
+  GetFeatureParams,
+  CheckFeatureParams,
+  CanUseFeatureParams,
+  ListFeaturesParams,
 } from "./resources/features";
 
 // Webhooks

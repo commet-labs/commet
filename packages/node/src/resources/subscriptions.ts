@@ -145,8 +145,9 @@ export class SubscriptionsResource {
    */
   async get(
     params: GetSubscriptionParams,
+    options?: RequestOptions,
   ): Promise<ApiResponse<ActiveSubscription | null>> {
-    return this.httpClient.get("/subscriptions/active", params);
+    return this.httpClient.get("/subscriptions/active", params, options);
   }
 
   /**
