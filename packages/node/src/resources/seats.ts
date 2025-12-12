@@ -156,17 +156,12 @@ export class SeatsResource {
    */
   async getBalance(
     params: GetBalanceParams,
-    options?: RequestOptions,
   ): Promise<ApiResponse<SeatBalance>> {
-    return this.httpClient.get(
-      "/seats/balance",
-      {
+    return this.httpClient.get("/seats/balance", {
         customerId: params.customerId,
         externalId: params.externalId,
         seatType: params.seatType,
-      },
-      options,
-    );
+    });
   }
 
   /**
@@ -181,15 +176,10 @@ export class SeatsResource {
    */
   async getAllBalances(
     params: GetAllBalancesParams,
-    options?: RequestOptions,
   ): Promise<ApiResponse<Record<string, SeatBalance>>> {
-    return this.httpClient.get(
-      "/seats/balances",
-      {
+    return this.httpClient.get("/seats/balances", {
         customerId: params.customerId,
         externalId: params.externalId,
-      },
-      options,
-    );
+    });
   }
 }

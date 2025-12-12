@@ -52,28 +52,16 @@ export class CustomerContext {
    */
   features = {
     get: (code: string, options?: RequestOptions) =>
-      this.featuresResource.get(
-        { code, externalId: this.externalId },
-        options,
-      ),
+      this.featuresResource.get({ code, externalId: this.externalId },options),
 
     check: (code: string, options?: RequestOptions) =>
-      this.featuresResource.check(
-        { code, externalId: this.externalId },
-        options,
-      ),
+      this.featuresResource.check({ code, externalId: this.externalId },options),
 
     canUse: (code: string, options?: RequestOptions) =>
-      this.featuresResource.canUse(
-        { code, externalId: this.externalId },
-        options,
-      ),
+      this.featuresResource.canUse({ code, externalId: this.externalId },options),
 
     list: (options?: RequestOptions) =>
-      this.featuresResource.list(
-        this.externalId ,
-        options,
-      ),
+      this.featuresResource.list(this.externalId , options),
   };
 
   /**
