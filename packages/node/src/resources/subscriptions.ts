@@ -97,10 +97,12 @@ export type CreateSubscriptionParams = CustomerIdentifier &
   };
 
 export type ChangePlanParams = PlanIdentifier & {
+  subscriptionId: string;
   billingInterval?: BillingInterval;
 };
 
 export interface CancelParams {
+  subscriptionId: string;
   reason?: string;
   immediate?: boolean;
 }
@@ -160,12 +162,11 @@ export class SubscriptionsResource {
    * ```
    */
   async changePlan(
-    subscriptionId: string,
     params: ChangePlanParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<Subscription>> {
     return this.httpClient.post(
-      `/subscriptions/${subscriptionId}/change-plan`,
+      `/subscriptions/${params.subscriptionId}/change-plan`,
       params,
       options,
     );
@@ -182,12 +183,11 @@ export class SubscriptionsResource {
    * ```
    */
   async cancel(
-    subscriptionId: string,
-    params?: CancelParams,
+    params: CancelParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<Subscription>> {
     return this.httpClient.post(
-      `/subscriptions/${subscriptionId}/cancel`,
+      `/subscriptions/${params.subscriptionId}/cancel`,
       params || {},
       options,
     );
