@@ -71,7 +71,7 @@ export class CustomerContext {
 
     list: (options?: RequestOptions) =>
       this.featuresResource.list(
-        { externalId: this.externalId },
+        this.externalId ,
         options,
       ),
   };

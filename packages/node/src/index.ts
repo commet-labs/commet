@@ -94,7 +94,6 @@ export type {
   GetFeatureParams,
   CheckFeatureParams,
   CanUseFeatureParams,
-  ListFeaturesParams,
 } from "./resources/features";
 
 // Webhooks
