@@ -63,9 +63,11 @@ export class FeaturesResource {
     params: GetFeatureParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<FeatureAccess>> {
+    const { code, externalId } = params;
+
     return this.httpClient.get(
-      `/features/${params.code}`,
-      { externalId: params.externalId },
+      `/features/${code}`,
+      { externalId: externalId },
       options,
     );
   }
@@ -86,9 +88,11 @@ export class FeaturesResource {
     params: CheckFeatureParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<CheckResult>> {
+    const { code, externalId } = params;
+
     const result = await this.httpClient.get<FeatureAccess>(
-      `/features/${params.code}`,
-      { externalId: params.externalId },
+      `/features/${code}`,
+      { externalId: externalId },
       options,
     );
 
@@ -133,9 +137,11 @@ export class FeaturesResource {
     params: CanUseFeatureParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<CanUseResult>> {
+    const { code, externalId } = params;
+
     return this.httpClient.get(
-      `/features/${params.code}`,
-      { externalId: params.externalId, action: "canUse" },
+      `/features/${code}`,
+      { externalId: externalId, action: "canUse" },
       options,
     );
   }

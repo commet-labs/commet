@@ -157,10 +157,12 @@ export class SeatsResource {
   async getBalance(
     params: GetBalanceParams,
   ): Promise<ApiResponse<SeatBalance>> {
+    const { customerId, externalId, seatType } = params;
+
     return this.httpClient.get("/seats/balance", {
-        customerId: params.customerId,
-        externalId: params.externalId,
-        seatType: params.seatType,
+        customerId: customerId,
+        externalId: externalId,
+        seatType: seatType,
     });
   }
 
@@ -177,9 +179,11 @@ export class SeatsResource {
   async getAllBalances(
     params: GetAllBalancesParams,
   ): Promise<ApiResponse<Record<string, SeatBalance>>> {
+    const { customerId, externalId } = params;
+
     return this.httpClient.get("/seats/balances", {
-        customerId: params.customerId,
-        externalId: params.externalId,
+        customerId: customerId,
+        externalId: externalId,
     });
   }
 }
