@@ -5,24 +5,14 @@ import type {
 } from "../types/common";
 import type { CommetHTTPClient } from "../utils/http";
 
-export interface GetFeatureParams {
+export interface FeatureParams {
   externalId: string;
   code: GeneratedFeatureCode;
 }
 
-export interface CheckFeatureParams {
-  code: GeneratedFeatureCode;
-  externalId: string;
-}
-
-export interface CanUseFeatureParams {
-  code: GeneratedFeatureCode;
-  externalId: string;
-}
-
-export interface ListFeaturesParams {
-  externalId: string;
-}
+export type GetFeatureParams = FeatureParams;
+export type CheckFeatureParams = FeatureParams;
+export type CanUseFeatureParams = FeatureParams;
 
 export interface FeatureAccess {
   code: string;
@@ -162,12 +152,12 @@ export class FeaturesResource {
    * ```
    */
   async list(
-    params: ListFeaturesParams,
+    externalId: string,
     options?: RequestOptions,
   ): Promise<ApiResponse<FeatureAccess[]>> {
     return this.httpClient.get(
       "/features",
-      { externalId: params.externalId },
+      { externalId },
       options,
     );
   }
