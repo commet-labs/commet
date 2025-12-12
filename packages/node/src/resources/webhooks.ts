@@ -77,7 +77,7 @@ export class Webhooks {
     }
 
     try {
-      const expectedSignature = this.generateSignature(payload, secret);
+      const expectedSignature = this.generateSignature({ payload, secret });
 
       // Use timing-safe comparison to prevent timing attacks
       return crypto.timingSafeEqual(
@@ -94,8 +94,8 @@ export class Webhooks {
    * Generate HMAC-SHA256 signature (internal use)
    * @internal
    */
-  private generateSignature(payload: string, secret: string): string {
-    return crypto.createHmac("sha256", secret).update(payload).digest("hex");
+  private generateSignature(params: { payload: string; secret: string }): string {
+    return crypto.createHmac("sha256", params.secret).update(params.payload).digest("hex");
   }
 
   /**
