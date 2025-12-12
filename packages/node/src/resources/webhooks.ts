@@ -34,6 +34,17 @@ export type WebhookEvent =
   | "subscription.canceled"
   | "subscription.updated";
 
+export interface VerifyParams {
+  payload: string;
+  signature: string | null;
+  secret: string;
+}
+
+export interface GenerateSignatureParams {
+  payload: string;
+  secret: string;
+}
+
 export interface VerifyAndParseParams {
   rawBody: string;
   signature: string | null;
@@ -77,7 +88,9 @@ export class Webhooks {
    * }
    * ```
    */
-  verify(payload: string, signature: string | null, secret: string): boolean {
+  verify(params: VerifyParams): boolean {
+    const { payload, signature, secret } = params;
+
     if (!signature || !secret || !payload) {
       return false;
     }
@@ -100,8 +113,9 @@ export class Webhooks {
    * Generate HMAC-SHA256 signature (internal use)
    * @internal
    */
-  private generateSignature(params: { payload: string; secret: string }): string {
-    return crypto.createHmac("sha256", params.secret).update(params.payload).digest("hex");
+  private generateSignature(params: GenerateSignatureParams): string {
+    const { payload, secret } = params;
+    return crypto.createHmac("sha256", secret).update(payload).digest("hex");
   }
 
   /**
@@ -128,7 +142,7 @@ export class Webhooks {
   verifyAndParse(params: VerifyAndParseParams): WebhookPayload | null {
     const { rawBody, signature, secret } = params;
 
-    if (!this.verify(rawBody, signature, secret)) {
+    if (!this.verify({ payload: rawBody, signature, secret })) {
       return null;
     }
 
