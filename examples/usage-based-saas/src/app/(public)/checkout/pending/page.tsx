@@ -22,9 +22,7 @@ export default async function PendingCheckoutPage() {
   }
 
   // Get subscription for this user
-  const result = await commet.subscriptions.get({
-    externalId: session.user.id,
-  });
+  const result = await commet.subscriptions.get(session.user.id);
 
   if (!result.success || !result.data) {
     redirect("/checkout");
