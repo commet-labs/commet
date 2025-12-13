@@ -107,8 +107,6 @@ export interface CancelParams {
   immediate?: boolean;
 }
 
-export type GetSubscriptionParams = CustomerIdentifier;
-
 /**
  * Subscription resource for managing subscriptions (plan-first model)
  *
@@ -142,13 +140,11 @@ export class SubscriptionsResource {
    *
    * @example
    * ```typescript
-   * const sub = await commet.subscriptions.get({ externalId: 'user_123' });
+   * const sub = await commet.subscriptions.get('user_123');
    * ```
    */
-  async get(
-    params: GetSubscriptionParams,
-  ): Promise<ApiResponse<ActiveSubscription | null>> {
-    return this.httpClient.get("/subscriptions/active", params);
+  async get(externalId: string): Promise<ApiResponse<ActiveSubscription | null>> {
+    return this.httpClient.get("/subscriptions/active", { externalId });
   }
 
   /**
@@ -156,7 +152,8 @@ export class SubscriptionsResource {
    *
    * @example
    * ```typescript
-   * await commet.subscriptions.changePlan('sub_xxx', {
+   * await commet.subscriptions.changePlan({
+   *   subscriptionId: 'sub_xxx',
    *   planCode: 'enterprise' // autocomplete works after `commet pull`
    * });
    * ```
@@ -177,7 +174,8 @@ export class SubscriptionsResource {
    *
    * @example
    * ```typescript
-   * await commet.subscriptions.cancel('sub_xxx', {
+   * await commet.subscriptions.cancel({
+   *   subscriptionId: 'sub_xxx',
    *   reason: 'switched_to_competitor'
    * });
    * ```

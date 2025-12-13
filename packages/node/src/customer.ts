@@ -109,7 +109,7 @@ export class CustomerContext {
    * Subscription methods - delegates to SubscriptionsResource
    */
   subscription = {
-    get: () => this.subscriptionsResource.get({ externalId: this.externalId }),
+    get: () => this.subscriptionsResource.get(this.externalId),
   };
 
   /**

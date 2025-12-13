@@ -80,7 +80,6 @@ export type {
   CreateSubscriptionParams,
   ChangePlanParams,
   CancelParams,
-  GetSubscriptionParams,
 } from "./resources/subscriptions";
 
 // Portal
