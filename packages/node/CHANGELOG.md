@@ -1,5 +1,11 @@
 # @commet/node
 
+## 1.2.0
+
+### Minor Changes
+
+- 32b9f13: Normalize SDK method signatures for improved usability
+
 ## 1.1.1
 
 ### Patch Changes
@@ -27,7 +33,7 @@
   // Check if can use one more (metered/seats)
   const { allowed, willBeCharged } = await commet.features.canUse(
     "team_members",
-    userId,
+    userId
   );
 
   // List all features
@@ -184,6 +190,7 @@
   ```
 
   #### Type Exports
+
   - `GeneratedProductId` deprecated in favor of `GeneratedPlanCode`
   - New `GeneratedFeatureCode` type for feature codes
   - Several param types renamed for consistency (e.g., `CreateParams`, `UpdateParams`)
@@ -225,6 +232,7 @@
   Sandbox environment URL changed from `sandbox.commet.co` to `beta.commet.co`.
 
   ### Migration Guide
+
   1. Run `commet pull` to regenerate types with new plan/feature codes
   2. Update any code using `GeneratedProductId` to use `GeneratedPlanCode`
   3. If using sandbox environment, CLI will now connect to `beta.commet.co`
@@ -275,7 +283,7 @@
   const payload = commet.webhooks.verifyAndParse(
     rawBody,
     request.headers.get("x-commet-signature"),
-    process.env.COMMET_WEBHOOK_SECRET,
+    process.env.COMMET_WEBHOOK_SECRET
   );
 
   if (!payload) {
@@ -289,10 +297,12 @@
   ```
 
   **Available methods:**
+
   - `commet.webhooks.verify(payload, signature, secret)` - Returns boolean
   - `commet.webhooks.verifyAndParse(payload, signature, secret)` - Returns parsed payload or null
 
   **Supported events:**
+
   - `subscription.created`
   - `subscription.activated`
   - `subscription.canceled`
@@ -301,6 +311,7 @@
   ### Breaking Changes
 
   **Subscription status enum updated:**
+
   - Added: `pending_payment` (awaiting payment)
   - Status flow: `draft` → `pending_payment` → `active` → `completed`/`canceled`
 
@@ -343,6 +354,7 @@
 ### Minor Changes
 
 - 54840ff: Add product types to CLI and SDK for automatic type inference
+
   - CLI now fetches and generates productId types from the organization's products
   - Added products list to the API endpoint `/api/cli/types` in the backend
   - SDK includes new `GeneratedProductId` helper type for type-safe product IDs
@@ -366,16 +378,19 @@
 - 828c3c3: Add /api prefix to all endpoint URLs
 
   **Changes:**
+
   - SDK now automatically prefixes all endpoints with `/api`
   - CLI commands now include `/api` prefix in URLs
   - Ensures compatibility with Next.js API routes structure
 
   **Impact:**
+
   - SDK endpoints: `/customers` → `/api/customers`
   - CLI endpoints: `/cli/organizations` → `/api/cli/organizations`
   - Auth endpoints already had `/api` prefix (unchanged)
 
   **Examples:**
+
   - Before: `https://commet.co/customers` ❌
   - After: `https://commet.co/api/customers` ✅
 
@@ -386,17 +401,20 @@
 - 4303341: Revert API subdomain migration - consolidate to main domains
 
   **Changes:**
+
   - Production endpoint: `https://api.commet.co` → `https://commet.co`
   - Sandbox endpoint: `https://api.sandbox.commet.co` → `https://sandbox.commet.co`
   - Consolidated `getWebBaseURL()` and `getApiBaseURL()` into single `getBaseURL()` function
   - All API routes remain at `/api/*` path within these domains
 
   **Impact:**
+
   - SDK and CLI now use main domains instead of api subdomains
   - No code changes required for SDK users - only internal URL changes
   - CLI users may need to re-authenticate if experiencing connection issues
 
   **Example:**
+
   - Before: `https://api.commet.co/customers`
   - After: `https://commet.co/api/customers`
 
@@ -407,12 +425,14 @@
 - e128940: API endpoint migration to NestJS infrastructure
 
   **Breaking Changes:**
+
   - Base URLs updated to new API domains:
     - Sandbox: `https://sandbox.commet.co` → `https://api.sandbox.commet.co`
     - Production: `https://billing.commet.co` → `https://api.commet.co`
   - No code changes required on user side - only internal URL changes
 
   **What Changed:**
+
   - HTTP client now points to new API infrastructure
   - All endpoints remain the same, only domain changed
   - Debug logging shows updated URLs
@@ -429,6 +449,7 @@
 - 911a17f: Add externalId support to all resource methods. All customer-related operations now accept either `customerId` or `externalId` as an alternative identifier, allowing users to reference customers using their own internal IDs.
 
   **Changes:**
+
   - Seats: `add()`, `remove()`, `set()`, `bulkUpdate()`, `getBalance()`, `getAllBalances()`, `listEvents()` now accept `externalId`
   - Usage: `create()`, `createBatch()`, `list()` now accept `externalId`
   - Customers: Already supported `externalId` in create, update, and list operations
@@ -457,6 +478,7 @@
 - f207723: **Simplified and RESTful API structure**
 
   ## Usage Events API
+
   - **BREAKING**: Removed `UsageMetricsResource` - metrics are no longer accessible via SDK
   - **BREAKING**: Simplified `UsageResource` - methods now directly on `commet.usage` instead of `commet.usage.events`
     - `commet.usage.events.create()` → `commet.usage.create()`
@@ -466,11 +488,14 @@
     - `commet.usage.events.createBatch()` → `commet.usage.createBatch()`
 
   ## Seats API
+
   - **BREAKING**: Simplified endpoints to follow RESTful conventions
+
     - All operations now use `/api/seats` endpoint with proper HTTP verbs
     - `customerId` and `seatType` now sent in request body instead of URL path
 
   - **Endpoint changes**:
+
     - `POST /customers/{id}/seats/{type}/add` → `POST /seats` with body `{ customerId, seatType, action: "add", count }`
     - `POST /customers/{id}/seats/{type}/remove` → `DELETE /seats` with body `{ customerId, seatType, count }`
     - `POST /customers/{id}/seats/{type}/set` → `PUT /seats` with body `{ customerId, seatType, count }`
@@ -481,6 +506,7 @@
   - **BREAKING**: Removed `getHistory()` method - use `listEvents()` instead
 
   ## HTTP Client
+
   - Enhanced `delete()` method to support request body (valid per HTTP spec)
   - Signature: `delete(endpoint, data?, options?)` instead of `delete(endpoint, options?)`
 
@@ -537,6 +563,7 @@
 - 836b309: Convert to monorepo structure with independent packages
 
   **Breaking Changes:**
+
   - SDK package renamed from `commet` to `@commet/node`
   - CLI remains as `commet` but is now a separate package
 
@@ -552,6 +579,7 @@
   CLI users have no changes - all commands remain the same.
 
   **New Features:**
+
   - Independent versioning for SDK and CLI
   - Smaller SDK package (no CLI dependencies)
   - Turbo-powered parallel builds

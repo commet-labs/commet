@@ -40,9 +40,7 @@ export async function createSubscriptionAction(
     }
 
     // Check if already has active subscription
-    const existing = await commet.subscriptions.get({
-      externalId: user.id,
-    });
+    const existing = await commet.subscriptions.get(user.id);
 
     if (existing.data) {
       if (

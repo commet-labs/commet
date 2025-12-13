@@ -34,6 +34,23 @@ export type WebhookEvent =
   | "subscription.canceled"
   | "subscription.updated";
 
+export interface VerifyParams {
+  payload: string;
+  signature: string | null;
+  secret: string;
+}
+
+export interface GenerateSignatureParams {
+  payload: string;
+  secret: string;
+}
+
+export interface VerifyAndParseParams {
+  rawBody: string;
+  signature: string | null;
+  secret: string;
+}
+
 /**
  * Webhooks resource for signature verification
  */
@@ -71,13 +88,15 @@ export class Webhooks {
    * }
    * ```
    */
-  verify(payload: string, signature: string | null, secret: string): boolean {
+  verify(params: VerifyParams): boolean {
+    const { payload, signature, secret } = params;
+
     if (!signature || !secret || !payload) {
       return false;
     }
 
     try {
-      const expectedSignature = this.generateSignature(payload, secret);
+      const expectedSignature = this.generateSignature({ payload, secret });
 
       // Use timing-safe comparison to prevent timing attacks
       return crypto.timingSafeEqual(
@@ -94,25 +113,21 @@ export class Webhooks {
    * Generate HMAC-SHA256 signature (internal use)
    * @internal
    */
-  private generateSignature(payload: string, secret: string): string {
+  private generateSignature(params: GenerateSignatureParams): string {
+    const { payload, secret } = params;
     return crypto.createHmac("sha256", secret).update(payload).digest("hex");
   }
 
   /**
    * Parse and verify webhook payload in one step
    *
-   * @param rawBody - Raw request body as string
-   * @param signature - Value from X-Commet-Signature header
-   * @param secret - Your webhook secret from Commet dashboard
-   * @returns Parsed payload if valid, null if invalid
-   *
    * @example
    * ```typescript
-   * const payload = commet.webhooks.verifyAndParse(
+   * const payload = commet.webhooks.verifyAndParse({
    *   rawBody,
    *   signature,
-   *   process.env.COMMET_WEBHOOK_SECRET
-   * );
+   *   secret: process.env.COMMET_WEBHOOK_SECRET
+   * });
    *
    * if (!payload) {
    *   return new Response('Invalid signature', { status: 401 });
@@ -124,17 +139,15 @@ export class Webhooks {
    * }
    * ```
    */
-  verifyAndParse(
-    rawBody: string,
-    signature: string | null,
-    secret: string,
-  ): WebhookPayload | null {
-    if (!this.verify(rawBody, signature, secret)) {
+  verifyAndParse(params: VerifyAndParseParams): WebhookPayload | null {
+    const { rawBody, signature, secret } = params;
+
+    if (!this.verify({ payload: rawBody, signature, secret })) {
       return null;
     }
 
     try {
-      return JSON.parse(rawBody) as WebhookPayload;
+      return JSON.parse(params.rawBody) as WebhookPayload;
     } catch {
       return null;
     }

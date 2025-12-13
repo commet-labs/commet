@@ -17,9 +17,7 @@ export default async function CheckoutPage() {
   }
 
   // Check existing subscription
-  const existing = await commet.subscriptions.get({
-    externalId: session.user.id,
-  });
+  const existing = await commet.subscriptions.get(session.user.id);
 
   if (existing.data) {
     if (

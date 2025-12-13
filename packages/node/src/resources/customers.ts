@@ -49,6 +49,7 @@ export interface CreateParams {
 }
 
 export interface UpdateParams {
+  customerId: CustomerID;
   externalId?: string;
   email?: string;
   legalName?: string;
@@ -142,12 +143,11 @@ export class CustomersResource {
    * Update a customer
    */
   async update(
-    customerId: CustomerID,
     params: UpdateParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<Customer>> {
     return this.httpClient.put(
-      `/customers/${customerId}`,
+      `/customers/${params.customerId}`,
       {
         billingEmail: params.email,
         externalId: params.externalId,
