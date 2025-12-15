@@ -97,15 +97,15 @@ export type CreateSubscriptionParams = CustomerIdentifier &
   };
 
 export type ChangePlanParams = PlanIdentifier & {
+  subscriptionId: string;
   billingInterval?: BillingInterval;
 };
 
 export interface CancelParams {
+  subscriptionId: string;
   reason?: string;
   immediate?: boolean;
 }
-
-export type GetSubscriptionParams = CustomerIdentifier;
 
 /**
  * Subscription resource for managing subscriptions (plan-first model)
@@ -140,13 +140,13 @@ export class SubscriptionsResource {
    *
    * @example
    * ```typescript
-   * const sub = await commet.subscriptions.get({ externalId: 'user_123' });
+   * const sub = await commet.subscriptions.get('user_123');
    * ```
    */
   async get(
-    params: GetSubscriptionParams,
+    externalId: string,
   ): Promise<ApiResponse<ActiveSubscription | null>> {
-    return this.httpClient.get("/subscriptions/active", params);
+    return this.httpClient.get("/subscriptions/active", { externalId });
   }
 
   /**
@@ -154,18 +154,18 @@ export class SubscriptionsResource {
    *
    * @example
    * ```typescript
-   * await commet.subscriptions.changePlan('sub_xxx', {
+   * await commet.subscriptions.changePlan({
+   *   subscriptionId: 'sub_xxx',
    *   planCode: 'enterprise' // autocomplete works after `commet pull`
    * });
    * ```
    */
   async changePlan(
-    subscriptionId: string,
     params: ChangePlanParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<Subscription>> {
     return this.httpClient.post(
-      `/subscriptions/${subscriptionId}/change-plan`,
+      `/subscriptions/${params.subscriptionId}/change-plan`,
       params,
       options,
     );
@@ -176,18 +176,18 @@ export class SubscriptionsResource {
    *
    * @example
    * ```typescript
-   * await commet.subscriptions.cancel('sub_xxx', {
+   * await commet.subscriptions.cancel({
+   *   subscriptionId: 'sub_xxx',
    *   reason: 'switched_to_competitor'
    * });
    * ```
    */
   async cancel(
-    subscriptionId: string,
-    params?: CancelParams,
+    params: CancelParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<Subscription>> {
     return this.httpClient.post(
-      `/subscriptions/${subscriptionId}/cancel`,
+      `/subscriptions/${params.subscriptionId}/cancel`,
       params || {},
       options,
     );

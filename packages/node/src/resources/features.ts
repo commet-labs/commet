@@ -5,6 +5,15 @@ import type {
 } from "../types/common";
 import type { CommetHTTPClient } from "../utils/http";
 
+export interface FeatureParams {
+  externalId: string;
+  code: GeneratedFeatureCode;
+}
+
+export type GetFeatureParams = FeatureParams;
+export type CheckFeatureParams = FeatureParams;
+export type CanUseFeatureParams = FeatureParams;
+
 export interface FeatureAccess {
   code: string;
   name: string;
@@ -46,16 +55,21 @@ export class FeaturesResource {
    *
    * @example
    * ```typescript
-   * const seats = await commet.features.get("team_members", "user_123");
+   * const seats = await commet.features.get({ code: "team_members", externalId: "user_123" });
    * console.log(seats.current, seats.included, seats.remaining);
    * ```
    */
   async get(
-    code: GeneratedFeatureCode,
-    externalId: string,
+    params: GetFeatureParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<FeatureAccess>> {
-    return this.httpClient.get(`/features/${code}`, { externalId }, options);
+    const { code, externalId } = params;
+
+    return this.httpClient.get(
+      `/features/${code}`,
+      { externalId: externalId },
+      options,
+    );
   }
 
   /**
@@ -63,18 +77,22 @@ export class FeaturesResource {
    *
    * @example
    * ```typescript
-   * const { allowed } = await commet.features.check("custom_branding", "user_123");
+   * const { allowed } = await commet.features.check({
+   *   code: "custom_branding",
+   *   externalId: "user_123"
+   * });
    * if (!allowed) redirect("/upgrade");
    * ```
    */
   async check(
-    code: GeneratedFeatureCode,
-    externalId: string,
+    params: CheckFeatureParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<CheckResult>> {
+    const { code, externalId } = params;
+
     const result = await this.httpClient.get<FeatureAccess>(
       `/features/${code}`,
-      { externalId },
+      { externalId: externalId },
       options,
     );
 
@@ -101,7 +119,10 @@ export class FeaturesResource {
    *
    * @example
    * ```typescript
-   * const { allowed, willBeCharged } = await commet.features.canUse("team_members", "user_123");
+   * const { allowed, willBeCharged } = await commet.features.canUse({
+   *   code: "team_members",
+   *   externalId: "user_123"
+   * });
    *
    * if (!allowed) {
    *   return { error: "Upgrade to add more members" };
@@ -113,13 +134,14 @@ export class FeaturesResource {
    * ```
    */
   async canUse(
-    code: GeneratedFeatureCode,
-    externalId: string,
+    params: CanUseFeatureParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<CanUseResult>> {
+    const { code, externalId } = params;
+
     return this.httpClient.get(
       `/features/${code}`,
-      { externalId, action: "canUse" },
+      { externalId: externalId, action: "canUse" },
       options,
     );
   }
@@ -129,7 +151,7 @@ export class FeaturesResource {
    *
    * @example
    * ```typescript
-   * const features = await commet.features.list("user_123");
+   * const features = await commet.features.list({ externalId: "user_123" });
    * for (const feature of features) {
    *   console.log(feature.code, feature.allowed);
    * }

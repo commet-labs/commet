@@ -80,7 +80,6 @@ export type {
   CreateSubscriptionParams,
   ChangePlanParams,
   CancelParams,
-  GetSubscriptionParams,
 } from "./resources/subscriptions";
 
 // Portal
@@ -91,6 +90,9 @@ export type {
   FeatureAccess,
   CanUseResult,
   CheckResult,
+  GetFeatureParams,
+  CheckFeatureParams,
+  CanUseFeatureParams,
 } from "./resources/features";
 
 // Webhooks
