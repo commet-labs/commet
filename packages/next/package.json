@@ -1,6 +1,6 @@
 {
   "name": "@commet/next",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Next.js integration for Commet billing platform",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -12,7 +12,10 @@
       "require": "./dist/index.js"
     }
   },
-  "files": ["dist", "README.md"],
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
@@ -22,7 +25,13 @@
     "test": "vitest run",
     "test:watch": "vitest"
   },
-  "keywords": ["commet", "billing", "nextjs", "webhooks", "typescript"],
+  "keywords": [
+    "commet",
+    "billing",
+    "nextjs",
+    "webhooks",
+    "typescript"
+  ],
   "author": "Commet Team",
   "license": "MIT",
   "dependencies": {
