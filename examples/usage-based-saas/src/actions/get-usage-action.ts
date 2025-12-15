@@ -29,7 +29,10 @@ export async function getUsageAction(): Promise<GetUsageResult> {
       return { success: false, error: "Not authenticated" };
     }
 
-    const result = await commet.features.get("storage", session.user.id);
+    const result = await commet.features.get({
+      code: "storage",
+      externalId: session.user.id,
+    });
 
     if (!result.success || !result.data) {
       return {
