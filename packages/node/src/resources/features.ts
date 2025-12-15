@@ -161,10 +161,6 @@ export class FeaturesResource {
     externalId: string,
     options?: RequestOptions,
   ): Promise<ApiResponse<FeatureAccess[]>> {
-    return this.httpClient.get(
-      "/features",
-      { externalId },
-      options,
-    );
+    return this.httpClient.get("/features", { externalId }, options);
   }
 }

@@ -50,7 +50,11 @@ export const Webhooks = (config: WebhooksConfig) => {
       const signature = request.headers.get("x-commet-signature");
 
       // 3. Verify signature
-      const isValid = webhooks.verify({ payload: rawBody, signature, secret: webhookSecret });
+      const isValid = webhooks.verify({
+        payload: rawBody,
+        signature,
+        secret: webhookSecret,
+      });
 
       if (!isValid) {
         console.error("[Commet Webhook] Invalid signature");

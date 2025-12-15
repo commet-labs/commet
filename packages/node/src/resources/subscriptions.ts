@@ -143,7 +143,9 @@ export class SubscriptionsResource {
    * const sub = await commet.subscriptions.get('user_123');
    * ```
    */
-  async get(externalId: string): Promise<ApiResponse<ActiveSubscription | null>> {
+  async get(
+    externalId: string,
+  ): Promise<ApiResponse<ActiveSubscription | null>> {
     return this.httpClient.get("/subscriptions/active", { externalId });
   }
 

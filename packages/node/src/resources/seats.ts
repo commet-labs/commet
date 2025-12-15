@@ -160,9 +160,9 @@ export class SeatsResource {
     const { customerId, externalId, seatType } = params;
 
     return this.httpClient.get("/seats/balance", {
-        customerId: customerId,
-        externalId: externalId,
-        seatType: seatType,
+      customerId: customerId,
+      externalId: externalId,
+      seatType: seatType,
     });
   }
 
@@ -182,8 +182,8 @@ export class SeatsResource {
     const { customerId, externalId } = params;
 
     return this.httpClient.get("/seats/balances", {
-        customerId: customerId,
-        externalId: externalId,
+      customerId: customerId,
+      externalId: externalId,
     });
   }
 }
