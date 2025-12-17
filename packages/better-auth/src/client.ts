@@ -19,7 +19,7 @@ import type { commet } from "./index";
  * // Usage - you can always query state directly (no webhooks needed)
  * const { data: subscription } = await authClient.subscription.get();
  * const { data: features } = await authClient.features.list();
- * const { data: canUse } = await authClient.features.canUse({ code: "api_calls" });
+ * const { data: canUse } = await authClient.features.canUse("api_calls");
  * await authClient.usage.track({ eventType: "api_call" });
  * await authClient.customer.portal(); // Redirect to portal
  * ```
@@ -115,11 +115,8 @@ export const commetClient = () => {
           /**
            * Get a specific feature's access/usage
            */
-          get: async (
-            data: { code: string },
-            fetchOptions?: BetterFetchOption,
-          ) => {
-            return $fetch(`/commet/features/${data.code}`, {
+          get: async (code: string, fetchOptions?: BetterFetchOption) => {
+            return $fetch(`/commet/features/${code}`, {
               method: "GET",
               ...fetchOptions,
             });
@@ -128,11 +125,8 @@ export const commetClient = () => {
           /**
            * Check if a feature is enabled (boolean check)
            */
-          check: async (
-            data: { code: string },
-            fetchOptions?: BetterFetchOption,
-          ) => {
-            return $fetch(`/features/${data.code}/check`, {
+          check: async (code: string, fetchOptions?: BetterFetchOption) => {
+            return $fetch(`/commet/features/${code}/check`, {
               method: "GET",
               ...fetchOptions,
             });
@@ -142,11 +136,8 @@ export const commetClient = () => {
            * Check if user can use one more unit of a feature
            * Returns { allowed: boolean, willBeCharged: boolean }
            */
-          canUse: async (
-            data: { code: string },
-            fetchOptions?: BetterFetchOption,
-          ) => {
-            return $fetch(`/features/${data.code}/can-use`, {
+          canUse: async (code: string, fetchOptions?: BetterFetchOption) => {
+            return $fetch(`/commet/features/${code}/can-use`, {
               method: "GET",
               ...fetchOptions,
             });
@@ -233,12 +224,12 @@ export const commetClient = () => {
            * Set all seat types at once
            */
           setAll: async (
-            data: { seats: Record<string, number> },
+            seats: Record<string, number>,
             fetchOptions?: BetterFetchOption,
           ) => {
             return $fetch("/commet/seats/set-all", {
               method: "POST",
-              body: data,
+              body: { seats },
               ...fetchOptions,
             });
           },
@@ -247,4 +238,3 @@ export const commetClient = () => {
     },
   } satisfies BetterAuthClientPlugin;
 };
-
