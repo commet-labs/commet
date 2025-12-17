@@ -11,9 +11,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
+import { commet } from "@/lib/commet";
 import { Activity, Sparkles, Users, Zap } from "lucide-react";
 import { headers } from "next/headers";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {
   const session = await auth.api.getSession({
@@ -21,6 +23,22 @@ export default async function DashboardPage() {
   });
 
   const user = session?.user;
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  // Check if user has an active subscription
+  // If not, redirect to checkout
+  const subscription = await commet.subscriptions.get(user.id);
+  const hasActiveSubscription =
+    subscription.data &&
+    (subscription.data.status === "active" ||
+      subscription.data.status === "trialing");
+
+  if (!hasActiveSubscription) {
+    redirect("/checkout");
+  }
 
   return (
     <div className="min-h-screen">

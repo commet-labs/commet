@@ -40,7 +40,7 @@ export default function SignUpPage() {
         name,
         email,
         password,
-        callbackURL: "/dashboard",
+        callbackURL: "/checkout",
       });
 
       if (result.error) {
@@ -49,7 +49,8 @@ export default function SignUpPage() {
         return;
       }
 
-      router.push("/dashboard");
+      // Redirect to checkout to create subscription
+      router.push("/checkout");
       router.refresh();
     } catch {
       setError("An error occurred. Please try again.");

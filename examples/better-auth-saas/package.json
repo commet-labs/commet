@@ -14,7 +14,7 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "@commet/better-auth": "1.0.0",
+    "@commet/better-auth": "^1.0.1",
     "@commet/next": "0.2.6",
     "@commet/node": "1.2.0",
     "@radix-ui/react-avatar": "1.1.11",

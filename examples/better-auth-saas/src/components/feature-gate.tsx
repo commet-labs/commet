@@ -19,7 +19,7 @@ interface CanUseResponse {
 }
 
 export function FeatureGate({
-  featureCode,
+  featureCode: initialFeatureCode,
   title,
   description,
   children,
@@ -27,7 +27,17 @@ export function FeatureGate({
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
   const [isPending, startTransition] = useTransition();
 
+  // Ensure featureCode is always a string (handle SSR/hydration issues)
+  const featureCode =
+    typeof initialFeatureCode === "string" ? initialFeatureCode : "";
+
   useEffect(() => {
+    // Don't make request if featureCode is missing
+    if (!featureCode || featureCode.trim() === "") {
+      setHasAccess(false);
+      return;
+    }
+
     startTransition(async () => {
       try {
         // Using authClient.features.canUse from the Commet plugin
@@ -35,6 +45,8 @@ export function FeatureGate({
         const result = await authClient.features.canUse(featureCode);
         if (!result.error && result.data) {
           setHasAccess((result.data as CanUseResponse).canUse);
+        } else {
+          setHasAccess(false);
         }
       } catch (error) {
         console.error("Failed to check feature access:", error);
@@ -78,10 +90,11 @@ export function FeatureGate({
 
         <p className="text-xs text-muted-foreground text-center">
           Uses{" "}
-          <code className="text-xs">authClient.features.canUse("{featureCode}")</code>
+          <code className="text-xs">
+            authClient.features.canUse("{featureCode}")
+          </code>
         </p>
       </CardContent>
     </Card>
   );
 }
-
