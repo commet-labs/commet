@@ -27,15 +27,15 @@ export default async function CheckoutPage() {
       redirect("/dashboard");
     }
 
-    if (existing.data.status === "pending_payment" && existing.data.checkoutUrl) {
+    if (
+      existing.data.status === "pending_payment" &&
+      existing.data.checkoutUrl
+    ) {
       redirect(existing.data.checkoutUrl);
     }
   }
 
-  // Get plan details from Commet
-  // Using "pro" as default - you can make this configurable
-  const planCode = "pro";
-  const planResult = await commet.plans.get(planCode);
+  const planResult = await commet.plans.get("pro_plan");
 
   if (!planResult.success || !planResult.data) {
     return (
@@ -58,11 +58,13 @@ export default async function CheckoutPage() {
                   />
                 </svg>
               </div>
-              <h1 className="text-2xl font-bold mb-2">
-                Plan Not Found
-              </h1>
+              <h1 className="text-2xl font-bold mb-2">Plan Not Found</h1>
               <p className="text-muted-foreground mb-6">
-                The plan <code className="bg-muted px-2 py-1 rounded text-sm">{planCode}</code> does not exist in your Commet dashboard.
+                The plan{" "}
+                <code className="bg-muted px-2 py-1 rounded text-sm">
+                  pro_plan
+                </code>{" "}
+                does not exist in your Commet dashboard.
               </p>
               <Button asChild>
                 <Link href="/">Return to Home</Link>
@@ -166,7 +168,7 @@ export default async function CheckoutPage() {
               )}
             </div>
 
-            <SubscribeButton planCode={planCode} prices={plan.prices} />
+            <SubscribeButton planCode="pro_plan" prices={plan.prices} />
 
             <div className="mt-6 text-center">
               <Button variant="link" asChild>
@@ -179,4 +181,3 @@ export default async function CheckoutPage() {
     </div>
   );
 }
-
