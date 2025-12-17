@@ -1,0 +1,75 @@
+{
+  "name": "@commet/better-auth",
+  "version": "1.0.0",
+  "description": "Better Auth plugin for Commet integration",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./client": {
+      "import": {
+        "types": "./dist/client.d.ts",
+        "default": "./dist/client.js"
+      },
+      "require": {
+        "types": "./dist/client.d.cts",
+        "default": "./dist/client.cjs"
+      }
+    }
+  },
+  "type": "module",
+  "files": ["dist", "README.md"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "biome lint src/",
+    "lint:fix": "biome lint --write src/",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "commet",
+    "better-auth",
+    "billing",
+    "payments",
+    "subscriptions",
+    "authentication"
+  ],
+  "author": "Commet Team",
+  "license": "MIT",
+  "peerDependencies": {
+    "@commet/node": "^1.0.0",
+    "better-auth": "^1.4.6",
+    "zod": "^3.24.2 || ^4"
+  },
+  "devDependencies": {
+    "@commet/node": "workspace:*",
+    "@types/node": "^24.10.1",
+    "better-auth": "^1.4.6",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "zod": "^4.1.12"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "homepage": "https://commet.co",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/commet-labs/commet.git",
+    "directory": "packages/better-auth"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}
