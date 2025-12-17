@@ -20,7 +20,7 @@ export const features =
   (commet: Commet) => {
     return {
       listFeatures: createAuthEndpoint(
-        "/features",
+        "/commet/features",
         {
           method: "GET",
           use: [sessionMiddleware],
@@ -63,7 +63,7 @@ export const features =
       ),
 
       getFeature: createAuthEndpoint(
-        "/features/:code",
+        "/commet/features/:code",
         {
           method: "GET",
           use: [sessionMiddleware],
@@ -116,7 +116,7 @@ export const features =
       ),
 
       checkFeature: createAuthEndpoint(
-        "/features/:code/check",
+        "/commet/features/:code/check",
         {
           method: "GET",
           use: [sessionMiddleware],
@@ -169,7 +169,7 @@ export const features =
       ),
 
       canUseFeature: createAuthEndpoint(
-        "/features/:code/can-use",
+        "/commet/features/:code/can-use",
         {
           method: "GET",
           use: [sessionMiddleware],

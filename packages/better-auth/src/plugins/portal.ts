@@ -20,7 +20,7 @@ export const portal =
   (commet: Commet) => {
     return {
       portal: createAuthEndpoint(
-        "/customer/portal",
+        "/commet/portal",
         {
           method: "GET",
           use: [sessionMiddleware],

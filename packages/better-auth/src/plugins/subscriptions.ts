@@ -34,7 +34,7 @@ export const subscriptions =
   (commet: Commet) => {
     return {
       getSubscription: createAuthEndpoint(
-        "/subscription",
+        "/commet/subscription",
         {
           method: "GET",
           use: [sessionMiddleware],
@@ -78,7 +78,7 @@ export const subscriptions =
       ),
 
       changePlan: createAuthEndpoint(
-        "/subscription/change-plan",
+        "/commet/subscription/change-plan",
         {
           method: "POST",
           body: ChangePlanSchema,
@@ -153,7 +153,7 @@ export const subscriptions =
       ),
 
       cancelSubscription: createAuthEndpoint(
-        "/subscription/cancel",
+        "/commet/subscription/cancel",
         {
           method: "POST",
           body: CancelSchema.optional(),

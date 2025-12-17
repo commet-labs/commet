@@ -31,7 +31,7 @@ export const seats =
   (commet: Commet) => {
     return {
       listSeats: createAuthEndpoint(
-        "/seats",
+        "/commet/seats",
         {
           method: "GET",
           use: [sessionMiddleware],
@@ -76,7 +76,7 @@ export const seats =
       ),
 
       addSeats: createAuthEndpoint(
-        "/seats/add",
+        "/commet/seats/add",
         {
           method: "POST",
           body: SeatOperationSchema,
@@ -125,7 +125,7 @@ export const seats =
       ),
 
       removeSeats: createAuthEndpoint(
-        "/seats/remove",
+        "/commet/seats/remove",
         {
           method: "POST",
           body: SeatOperationSchema,
@@ -176,7 +176,7 @@ export const seats =
       ),
 
       setSeats: createAuthEndpoint(
-        "/seats/set",
+        "/commet/seats/set",
         {
           method: "POST",
           body: SeatOperationSchema,
@@ -225,7 +225,7 @@ export const seats =
       ),
 
       setAllSeats: createAuthEndpoint(
-        "/seats/set-all",
+        "/commet/seats/set-all",
         {
           method: "POST",
           body: SetAllSeatsSchema,

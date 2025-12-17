@@ -36,7 +36,7 @@ export const commetClient = () => {
            * Redirect to the Commet customer portal
            */
           portal: async (fetchOptions?: BetterFetchOption) => {
-            const res = await $fetch("/customer/portal", {
+            const res = await $fetch("/commet/portal", {
               method: "GET",
               ...fetchOptions,
             });
@@ -61,7 +61,7 @@ export const commetClient = () => {
            * Get the current subscription for the authenticated user
            */
           get: async (fetchOptions?: BetterFetchOption) => {
-            return $fetch("/subscription", {
+            return $fetch("/commet/subscription", {
               method: "GET",
               ...fetchOptions,
             });
@@ -78,7 +78,7 @@ export const commetClient = () => {
             },
             fetchOptions?: BetterFetchOption,
           ) => {
-            return $fetch("/subscription/change-plan", {
+            return $fetch("/commet/subscription/change-plan", {
               method: "POST",
               body: data,
               ...fetchOptions,
@@ -92,7 +92,7 @@ export const commetClient = () => {
             data?: { reason?: string; immediate?: boolean },
             fetchOptions?: BetterFetchOption,
           ) => {
-            return $fetch("/subscription/cancel", {
+            return $fetch("/commet/subscription/cancel", {
               method: "POST",
               body: data ?? {},
               ...fetchOptions,
@@ -106,7 +106,7 @@ export const commetClient = () => {
            * List all features for the authenticated user
            */
           list: async (fetchOptions?: BetterFetchOption) => {
-            return $fetch("/features", {
+            return $fetch("/commet/features", {
               method: "GET",
               ...fetchOptions,
             });
@@ -119,7 +119,7 @@ export const commetClient = () => {
             data: { code: string },
             fetchOptions?: BetterFetchOption,
           ) => {
-            return $fetch(`/features/${data.code}`, {
+            return $fetch(`/commet/features/${data.code}`, {
               method: "GET",
               ...fetchOptions,
             });
@@ -167,7 +167,7 @@ export const commetClient = () => {
             },
             fetchOptions?: BetterFetchOption,
           ) => {
-            return $fetch("/usage/track", {
+            return $fetch("/commet/usage/track", {
               method: "POST",
               body: data,
               ...fetchOptions,
@@ -181,7 +181,7 @@ export const commetClient = () => {
            * List all seat balances for the authenticated user
            */
           list: async (fetchOptions?: BetterFetchOption) => {
-            return $fetch("/seats", {
+            return $fetch("/commet/seats", {
               method: "GET",
               ...fetchOptions,
             });
@@ -194,7 +194,7 @@ export const commetClient = () => {
             data: { seatType: string; count: number },
             fetchOptions?: BetterFetchOption,
           ) => {
-            return $fetch("/seats/add", {
+            return $fetch("/commet/seats/add", {
               method: "POST",
               body: data,
               ...fetchOptions,
@@ -208,7 +208,7 @@ export const commetClient = () => {
             data: { seatType: string; count: number },
             fetchOptions?: BetterFetchOption,
           ) => {
-            return $fetch("/seats/remove", {
+            return $fetch("/commet/seats/remove", {
               method: "POST",
               body: data,
               ...fetchOptions,
@@ -222,7 +222,7 @@ export const commetClient = () => {
             data: { seatType: string; count: number },
             fetchOptions?: BetterFetchOption,
           ) => {
-            return $fetch("/seats/set", {
+            return $fetch("/commet/seats/set", {
               method: "POST",
               body: data,
               ...fetchOptions,
@@ -236,7 +236,7 @@ export const commetClient = () => {
             data: { seats: Record<string, number> },
             fetchOptions?: BetterFetchOption,
           ) => {
-            return $fetch("/seats/set-all", {
+            return $fetch("/commet/seats/set-all", {
               method: "POST",
               body: data,
               ...fetchOptions,

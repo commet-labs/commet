@@ -25,7 +25,7 @@ export const usage =
   (commet: Commet) => {
     return {
       trackUsage: createAuthEndpoint(
-        "/usage/track",
+        "/commet/usage/track",
         {
           method: "POST",
           body: TrackEventSchema,

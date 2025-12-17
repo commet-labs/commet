@@ -274,22 +274,24 @@ await authClient.seats.setAll({
 
 ## API Endpoints
 
+All endpoints are prefixed with `/commet/` to avoid collisions with other plugins.
+
 | Plugin | Endpoint | Method | Description |
 |--------|----------|--------|-------------|
-| portal | `/customer/portal` | GET | Generates portal URL and redirects |
-| subscriptions | `/subscription` | GET | Gets active subscription |
-| subscriptions | `/subscription/change-plan` | POST | Changes plan |
-| subscriptions | `/subscription/cancel` | POST | Cancels subscription |
-| features | `/features` | GET | Lists all features |
-| features | `/features/:code` | GET | Gets a specific feature |
-| features | `/features/:code/check` | GET | Checks if feature is enabled |
-| features | `/features/:code/can-use` | GET | Checks if user can use +1 |
-| usage | `/usage/track` | POST | Tracks usage event |
-| seats | `/seats` | GET | Lists seat balances |
-| seats | `/seats/add` | POST | Adds seats |
-| seats | `/seats/remove` | POST | Removes seats |
-| seats | `/seats/set` | POST | Sets seat count |
-| seats | `/seats/set-all` | POST | Sets all seat types |
+| portal | `/commet/portal` | GET | Generates portal URL and redirects |
+| subscriptions | `/commet/subscription` | GET | Gets active subscription |
+| subscriptions | `/commet/subscription/change-plan` | POST | Changes plan |
+| subscriptions | `/commet/subscription/cancel` | POST | Cancels subscription |
+| features | `/commet/features` | GET | Lists all features |
+| features | `/commet/features/:code` | GET | Gets a specific feature |
+| features | `/commet/features/:code/check` | GET | Checks if feature is enabled |
+| features | `/commet/features/:code/can-use` | GET | Checks if user can use +1 |
+| usage | `/commet/usage/track` | POST | Tracks usage event |
+| seats | `/commet/seats` | GET | Lists seat balances |
+| seats | `/commet/seats/add` | POST | Adds seats |
+| seats | `/commet/seats/remove` | POST | Removes seats |
+| seats | `/commet/seats/set` | POST | Sets seat count |
+| seats | `/commet/seats/set-all` | POST | Sets all seat types |
 | webhooks | `/commet/webhooks` | POST | Receives webhooks (optional) |
 
 ## Resources
