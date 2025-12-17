@@ -3,9 +3,7 @@ import { APIError, sessionMiddleware } from "better-auth/api";
 import { createAuthEndpoint } from "better-auth/plugins";
 import { z } from "zod";
 
-export interface UsageConfig {
-  // Reserved for future configuration options
-}
+export type UsageConfig = Record<string, never>;
 
 const TrackEventSchema = z.object({
   eventType: z.string(),

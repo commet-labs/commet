@@ -1,4 +1,4 @@
-import type { Commet, WebhookPayload, WebhookEvent } from "@commet/node";
+import type { Commet, WebhookEvent, WebhookPayload } from "@commet/node";
 import { APIError, createAuthEndpoint } from "better-auth/api";
 
 /**

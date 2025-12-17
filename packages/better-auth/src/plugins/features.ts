@@ -2,9 +2,7 @@ import type { Commet } from "@commet/node";
 import { APIError, sessionMiddleware } from "better-auth/api";
 import { createAuthEndpoint } from "better-auth/plugins";
 
-export interface FeaturesConfig {
-  // Reserved for future configuration options
-}
+export type FeaturesConfig = Record<string, never>;
 
 /**
  * Features plugin - Check feature access and usage

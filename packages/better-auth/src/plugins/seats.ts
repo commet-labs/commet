@@ -3,9 +3,7 @@ import { APIError, sessionMiddleware } from "better-auth/api";
 import { createAuthEndpoint } from "better-auth/plugins";
 import { z } from "zod";
 
-export interface SeatsConfig {
-  // Reserved for future configuration options
-}
+export type SeatsConfig = Record<string, never>;
 
 const SeatOperationSchema = z.object({
   seatType: z.string(),

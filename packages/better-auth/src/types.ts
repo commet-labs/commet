@@ -94,4 +94,3 @@ export interface CommetOptions {
    */
   use: CommetPlugins;
 }
-

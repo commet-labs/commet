@@ -117,4 +117,3 @@ export const commet = <O extends CommetOptions>(options: O) => {
     },
   } satisfies BetterAuthPlugin;
 };
-
