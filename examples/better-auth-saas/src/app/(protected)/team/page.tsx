@@ -100,7 +100,7 @@ export default async function TeamPage() {
           {/* Team Members */}
           <TeamMembers
             initialMembers={members}
-            seatType="member"
+            seatType="team_member"
             maxSeats={5}
           />
 

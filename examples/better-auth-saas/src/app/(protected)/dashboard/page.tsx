@@ -57,12 +57,16 @@ export default async function DashboardPage() {
                 <div className="text-center p-4 rounded-lg bg-background">
                   <Users className="h-6 w-6 mx-auto mb-2 text-primary" />
                   <p className="text-sm font-medium">Seats</p>
-                  <p className="text-xs text-muted-foreground">Team management</p>
+                  <p className="text-xs text-muted-foreground">
+                    Team management
+                  </p>
                 </div>
                 <div className="text-center p-4 rounded-lg bg-background">
                   <Activity className="h-6 w-6 mx-auto mb-2 text-primary" />
                   <p className="text-sm font-medium">Usage</p>
-                  <p className="text-xs text-muted-foreground">Metered billing</p>
+                  <p className="text-xs text-muted-foreground">
+                    Metered billing
+                  </p>
                 </div>
                 <div className="text-center p-4 rounded-lg bg-background">
                   <Zap className="h-6 w-6 mx-auto mb-2 text-primary" />
@@ -93,18 +97,11 @@ export default async function DashboardPage() {
 
             <div className="grid md:grid-cols-2 gap-4">
               <UsageCard
-                eventType="api_calls"
+                eventType="api_call"
                 title="API Calls"
                 description="Track API requests for usage-based billing"
                 currentUsage={127}
                 limit={1000}
-              />
-              <UsageCard
-                eventType="storage"
-                title="Storage Operations"
-                description="Track file uploads and storage usage"
-                currentUsage={45}
-                limit={500}
               />
             </div>
           </div>
@@ -200,4 +197,3 @@ export default async function DashboardPage() {
     </div>
   );
 }
-
