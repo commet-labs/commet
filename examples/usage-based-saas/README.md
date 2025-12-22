@@ -30,7 +30,7 @@ Configure:
 
 ```bash
 # Database
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/usage_based_saas
+DATABASE_URL=postgresql://postgres:postgres@localhost:5435/usage_based_saas
 
 # Better Auth
 BETTER_AUTH_SECRET=$(openssl rand -base64 32)
