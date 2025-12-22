@@ -46,7 +46,7 @@ Create a `.env` file:
 
 ```bash
 # Database
-DATABASE_URL=postgresql://postgres:postgres@localhost:5433/team_saas
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/team_saas
 
 # Better Auth
 BETTER_AUTH_SECRET=your-secret-key-generate-with-openssl-rand-base64-32
