@@ -24,7 +24,7 @@ Create a `.env` file:
 
 ```env
 # Database
-DATABASE_URL=postgresql://postgres:postgres@localhost:5435/better_auth_saas
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/better_auth_saas
 
 # Better Auth
 BETTER_AUTH_SECRET=your-secret-key-min-32-chars-long
