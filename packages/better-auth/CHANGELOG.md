@@ -1,5 +1,16 @@
 # @commet/better-auth
 
+## 1.1.0
+
+### Minor Changes
+
+- 3adc517: Renamed legalName to fullName, removed displayName from Customer schema
+
+### Patch Changes
+
+- Updated dependencies [3adc517]
+  - @commet/node@1.3.0
+
 ## 1.0.1
 
 ### Patch Changes
