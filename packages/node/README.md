@@ -55,7 +55,7 @@ await commet.subscriptions.create({
 
 // Manage customers
 await commet.customers.create({
-  legalName: 'Acme Corp',
+  fullName: 'Acme Corp',
   billingEmail: 'billing@acme.com'
 });
 

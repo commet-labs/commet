@@ -55,7 +55,7 @@ const auth = betterAuth({
       client: commetClient,
       createCustomerOnSignUp: true,
       getCustomerCreateParams: ({ user }) => ({
-        legalName: user.name,
+        fullName: user.name,
         metadata: { source: "signup" }
       }),
       use: [
@@ -121,8 +121,7 @@ commet({
   
   // Optional: Customize customer creation parameters
   getCustomerCreateParams: ({ user }) => ({
-    legalName: user.name,
-    displayName: user.name,
+    fullName: user.name,
     domain: "example.com",
     metadata: { plan: "starter" }
   }),
