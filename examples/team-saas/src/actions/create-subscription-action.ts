@@ -32,7 +32,7 @@ export async function createSubscriptionAction(
     const customerResult = await commet.customers.create({
       email: user.email,
       externalId: user.id,
-      legalName: user.name || undefined,
+      fullName: user.name || undefined,
     });
 
     if (!customerResult.success) {
