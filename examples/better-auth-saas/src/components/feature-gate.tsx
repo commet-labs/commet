@@ -41,7 +41,6 @@ export function FeatureGate({
     startTransition(async () => {
       try {
         // Using authClient.features.canUse from the Commet plugin
-        // @ts-expect-error - Plugin types are inferred at runtime
         const result = await authClient.features.canUse(featureCode);
         if (!result.error && result.data) {
           setHasAccess((result.data as CanUseResponse).canUse);
