@@ -1,5 +1,11 @@
 # @commet/node
 
+## 1.3.0
+
+### Minor Changes
+
+- 3adc517: Renamed legalName to fullName, removed displayName from Customer schema
+
 ## 1.2.0
 
 ### Minor Changes
