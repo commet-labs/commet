@@ -36,7 +36,7 @@ export const auth = betterAuth({
             await commet.customers.create({
               email: user.email,
               externalId: user.id,
-              legalName: user.name || undefined,
+              fullName: user.name || undefined,
             });
 
             // 2. Create workspace for user
