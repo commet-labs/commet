@@ -47,13 +47,9 @@ export type CommetEndpoints = UnionToIntersection<ReturnType<CommetPlugin>>;
  */
 export interface CustomerCreateParams {
   /**
-   * Legal name of the customer/company
+   * Full name of the customer/company
    */
-  legalName?: string;
-  /**
-   * Display name
-   */
-  displayName?: string;
+  fullName?: string;
   /**
    * Company domain
    */
@@ -87,7 +83,7 @@ export interface CommetOptions {
    */
   getCustomerCreateParams?: (
     data: { user: Partial<User> },
-    request?: Request,
+    request?: Request
   ) => Promise<CustomerCreateParams> | CustomerCreateParams;
   /**
    * Array of Commet plugins to use

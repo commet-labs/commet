@@ -61,7 +61,7 @@ export type {
  *       client: commetClient,
  *       createCustomerOnSignUp: true,
  *       getCustomerCreateParams: ({ user }) => ({
- *         legalName: user.name,
+ *         fullName: user.name,
  *         metadata: { source: "signup" }
  *       }),
  *       use: [

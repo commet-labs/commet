@@ -10,8 +10,7 @@ export interface Customer {
   id: CustomerID;
   organizationId: string;
   externalId?: string;
-  legalName?: string;
-  displayName?: string;
+  fullName?: string;
   domain?: string;
   website?: string;
   billingEmail: string;
@@ -37,8 +36,7 @@ export interface CustomerAddress {
 export interface CreateParams {
   email: string; // billingEmail - the only required field
   externalId?: string;
-  legalName?: string;
-  displayName?: string;
+  fullName?: string;
   domain?: string;
   website?: string;
   timezone?: string;
@@ -52,8 +50,7 @@ export interface UpdateParams {
   customerId: CustomerID;
   externalId?: string;
   email?: string;
-  legalName?: string;
-  displayName?: string;
+  fullName?: string;
   domain?: string;
   website?: string;
   timezone?: string;
@@ -88,15 +85,14 @@ export class CustomersResource {
    */
   async create(
     params: CreateParams,
-    options?: RequestOptions,
+    options?: RequestOptions
   ): Promise<ApiResponse<Customer>> {
     return this.httpClient.post(
       "/customers",
       {
         billingEmail: params.email,
         externalId: params.externalId,
-        legalName: params.legalName,
-        displayName: params.displayName,
+        fullName: params.fullName,
         domain: params.domain,
         website: params.website,
         timezone: params.timezone,
@@ -105,7 +101,7 @@ export class CustomersResource {
         metadata: params.metadata,
         address: params.address,
       },
-      options,
+      options
     );
   }
 
@@ -114,13 +110,12 @@ export class CustomersResource {
    */
   async createBatch(
     params: { customers: CreateParams[] },
-    options?: RequestOptions,
+    options?: RequestOptions
   ): Promise<ApiResponse<BatchResult>> {
     const customers = params.customers.map((c) => ({
       billingEmail: c.email,
       externalId: c.externalId,
-      legalName: c.legalName,
-      displayName: c.displayName,
+      fullName: c.fullName,
       domain: c.domain,
       website: c.website,
       timezone: c.timezone,
@@ -144,15 +139,14 @@ export class CustomersResource {
    */
   async update(
     params: UpdateParams,
-    options?: RequestOptions,
+    options?: RequestOptions
   ): Promise<ApiResponse<Customer>> {
     return this.httpClient.put(
       `/customers/${params.customerId}`,
       {
         billingEmail: params.email,
         externalId: params.externalId,
-        legalName: params.legalName,
-        displayName: params.displayName,
+        fullName: params.fullName,
         domain: params.domain,
         website: params.website,
         timezone: params.timezone,
@@ -160,7 +154,7 @@ export class CustomersResource {
         industry: params.industry,
         metadata: params.metadata,
       },
-      options,
+      options
     );
   }
 
@@ -176,12 +170,12 @@ export class CustomersResource {
    */
   async archive(
     customerId: CustomerID,
-    options?: RequestOptions,
+    options?: RequestOptions
   ): Promise<ApiResponse<Customer>> {
     return this.httpClient.put(
       `/customers/${customerId}`,
       { isActive: false },
-      options,
+      options
     );
   }
 }
