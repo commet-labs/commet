@@ -229,7 +229,8 @@ if (canUse?.willBeCharged) {
 ```typescript
 // Track a usage event
 await authClient.usage.track({
-  eventType: "api_call",
+  feature: "api_call",
+  value: 1,
   idempotencyKey: `req_${requestId}`,
   properties: {
     endpoint: "/users",

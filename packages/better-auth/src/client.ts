@@ -20,7 +20,7 @@ import type { commet } from "./index";
  * const { data: subscription } = await authClient.subscription.get();
  * const { data: features } = await authClient.features.list();
  * const { data: canUse } = await authClient.features.canUse("api_calls");
- * await authClient.usage.track({ eventType: "api_call" });
+ * await authClient.usage.track({ feature: "api_call", value: 1 });
  * await authClient.customer.portal(); // Redirect to portal
  * ```
  */

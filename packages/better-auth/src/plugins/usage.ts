@@ -6,7 +6,7 @@ import { z } from "zod";
 export type UsageConfig = Record<string, never>;
 
 const TrackEventSchema = z.object({
-  eventType: z.string(),
+  feature: z.string(),
   value: z.number().optional(),
   idempotencyKey: z.string().optional(),
   properties: z.record(z.string(), z.string()).optional(),
@@ -42,7 +42,8 @@ export const usage =
             const result = await commet.usage.track(
               {
                 externalId: userId,
-                eventType: ctx.body.eventType,
+                feature: ctx.body.feature,
+                value: ctx.body.value,
                 idempotencyKey: ctx.body.idempotencyKey,
                 properties: ctx.body.properties,
               },
