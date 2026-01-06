@@ -3,4 +3,4 @@
 "@commet/node": minor
 ---
 
-Simplificar la integración y el modelo de uso para reporting de usage/metráficas y facturación: reduce el número de endpoints, mejora la DX del SDK, y unifica los conceptos de métricas y créditos. Refactor interno en templates/example apps para adaptarlos al nuevo flujo.
+Simplify integration and usage model for usage/metrics reporting and billing: reduces the number of endpoints, improves SDK DX, and unifies the concepts of metrics and credits. Internal refactor in templates/example apps to adapt them to the new flow.
