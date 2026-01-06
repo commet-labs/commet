@@ -151,7 +151,7 @@ export const commetClient = () => {
            */
           track: async (
             data: {
-              eventType: string;
+              feature: string;
               value?: number;
               idempotencyKey?: string;
               properties?: Record<string, string>;
