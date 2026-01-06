@@ -11,7 +11,7 @@ export interface UsageEvent {
   id: EventID;
   organizationId: string;
   customerId: CustomerID;
-  eventType: GeneratedEventType;
+  feature: string;
   idempotencyKey?: string;
   ts: string;
   properties?: UsageEventProperty[];
@@ -36,7 +36,7 @@ export interface BatchResult<T> {
 }
 
 export interface TrackParams {
-  eventType: GeneratedEventType;
+  feature: string;
   customerId?: CustomerID;
   externalId?: string;
   idempotencyKey?: string;
@@ -58,7 +58,8 @@ export class UsageResource {
    * ```typescript
    * await commet.usage.track({
    *   externalId: 'user_123',
-   *   eventType: 'api_call',
+   *   feature: 'api_call',
+   *   value: 1,
    *   idempotencyKey: `evt_${requestId}`,
    *   properties: { endpoint: '/users', method: 'GET' }
    * });
@@ -69,11 +70,12 @@ export class UsageResource {
     options?: RequestOptions,
   ): Promise<ApiResponse<UsageEvent>> {
     const eventData = {
-      eventType: params.eventType,
+      feature: params.feature,
       customerId: params.customerId,
       externalId: params.externalId,
       idempotencyKey: params.idempotencyKey,
-      ts: params.timestamp || new Date().toISOString(),
+      value: params.value,
+      timestamp: params.timestamp || new Date().toISOString(),
       properties: params.properties
         ? Object.entries(params.properties).map(([property, value]) => ({
             property,
@@ -92,8 +94,8 @@ export class UsageResource {
    * ```typescript
    * await commet.usage.trackBatch({
    *   events: [
-   *     { externalId: 'user_123', eventType: 'api_call', idempotencyKey: 'evt_1' },
-   *     { externalId: 'user_456', eventType: 'api_call', idempotencyKey: 'evt_2' }
+   *     { externalId: 'user_123', feature: 'api_call', value: 1, idempotencyKey: 'evt_1' },
+   *     { externalId: 'user_456', feature: 'api_call', value: 5, idempotencyKey: 'evt_2' }
    *   ]
    * });
    * ```
@@ -103,11 +105,12 @@ export class UsageResource {
     options?: RequestOptions,
   ): Promise<ApiResponse<BatchResult<UsageEvent>>> {
     const events = params.events.map((event) => ({
-      eventType: event.eventType,
+      feature: event.feature,
       customerId: event.customerId,
       externalId: event.externalId,
       idempotencyKey: event.idempotencyKey,
-      ts: event.timestamp || new Date().toISOString(),
+      value: event.value,
+      timestamp: event.timestamp || new Date().toISOString(),
       properties: event.properties
         ? Object.entries(event.properties).map(([property, value]) => ({
             property,

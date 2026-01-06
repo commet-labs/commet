@@ -101,12 +101,13 @@ export class CustomerContext {
    */
   usage = {
     track: (
-      eventType: string,
+      feature: string,
+      value?: number,
       properties?: Record<string, string>,
       options?: RequestOptions,
     ) =>
       this.usageResource.track(
-        { externalId: this.externalId, eventType, properties },
+        { externalId: this.externalId, feature, value, properties },
         options,
       ),
   };
