@@ -35,7 +35,8 @@ const commet = new Commet({
 ```typescript
 // Track usage events
 await commet.usage.create({
-  eventType: 'api_call',
+  feature: 'api_call',
+  value: 1,
   customerId: 'cus_123'
 });
 
@@ -48,9 +49,9 @@ await commet.seats.add({
 
 // Create subscriptions
 await commet.subscriptions.create({
-  productId: 'prod_xxx',
-  customerId: 'cus_123',
-  status: 'active'
+  externalId: 'user_123',
+  planCode: 'pro', // autocomplete works after `commet pull`
+  billingInterval: 'yearly',
 });
 
 // Manage customers
@@ -60,8 +61,8 @@ await commet.customers.create({
 });
 
 // Generate customer portal access
-await commet.portal.requestAccess({
-  externalId: 'my-customer-123'
+await commet.portal.getUrl({
+    externalId: 'my-customer-123'
 });
 ```
 
@@ -76,7 +77,7 @@ commet link
 commet pull
 ```
 
-This generates type-safe autocomplete for your event types, seat types, and products.
+This generates type-safe autocomplete for your plan codes, feature codes, and seat types.
 
 ## Documentation
 
