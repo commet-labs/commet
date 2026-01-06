@@ -4,7 +4,9 @@ import { auth } from "@/lib/auth";
 import { commet } from "@/lib/commet";
 import { headers } from "next/headers";
 
-const EVENT_TYPE = "storage";
+// Feature code - used as event identifier when tracking usage
+// Must match the feature.code configured in Commet
+const FEATURE = "storage";
 
 interface ReportUsageResult {
   success: boolean;
@@ -27,7 +29,7 @@ export async function reportUsageAction(count = 1): Promise<ReportUsageResult> {
     if (eventCount === 1) {
       // Use track() for single event
       const result = await commet.usage.track({
-        eventType: EVENT_TYPE,
+        feature: FEATURE,
         externalId: session.user.id,
       });
 
@@ -44,7 +46,7 @@ export async function reportUsageAction(count = 1): Promise<ReportUsageResult> {
     // Use trackBatch() for multiple events
     const events = Array.from({ length: eventCount }, (_, index) => ({
       externalId: session.user.id,
-      eventType: EVENT_TYPE,
+      feature: FEATURE,
       idempotencyKey: `batch_${Date.now()}_${index}`,
     }));
 

@@ -115,7 +115,7 @@ export default async function DashboardPage() {
 
             <div className="grid md:grid-cols-2 gap-4">
               <UsageCard
-                eventType="api_call"
+                feature="api_call"
                 title="API Calls"
                 description="Track API requests for usage-based billing"
                 currentUsage={127}

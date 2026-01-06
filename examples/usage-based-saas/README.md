@@ -42,18 +42,17 @@ COMMET_API_KEY=ck_sandbox_xxxxx
 COMMET_ENVIRONMENT=sandbox
 COMMET_PLAN_ID=plan_xxxxx
 COMMET_WEBHOOK_SECRET=whsec_xxxxx
-COMMET_EVENT_TYPE=api_call
 ```
 
 **Get Commet credentials:**
 
 1. Sign up at [commet.co](https://commet.co)
-2. Create a **Usage Metric** (e.g., "API Calls" with event type `api_call`)
-3. Create a **Metered Feature** linked to that metric (e.g., 10,000 included, $0.01 per extra call)
-4. Create a **Plan** with that feature and a base price (e.g., $50/month)
-5. Copy API key from Settings → API Keys
-6. Copy Plan ID from Plans page
-7. Copy Event Type code (e.g., `api_call`) from Usage Metrics page
+2. Create a **Metered Feature** (e.g., "Storage" with code `storage`)
+3. Create a **Plan** with that feature configured (e.g., 100 GB included, $0.10/GB extra)
+4. Copy API key from Settings → API Keys
+5. Copy Plan ID from Plans page
+
+**Note:** The feature code (e.g., `storage`) is used directly as the event identifier when tracking usage. No separate event type configuration is needed.
 
 ## Run
 
@@ -80,6 +79,22 @@ Open [http://localhost:3000](http://localhost:3000)
 - `src/app/api/webhooks/commet/route.ts` - Webhook handler
 
 ## Usage-Based Billing
+
+Track usage by sending events with the feature code:
+
+```typescript
+// The feature code "storage" is the event identifier
+await commet.usage.track({
+  feature: "storage",  // Must match feature.code in Commet
+  externalId: userId,
+  value: 1
+});
+```
+
+The platform automatically:
+1. Aggregates events by feature code
+2. Calculates usage against plan limits
+3. Generates overage charges if limits exceeded
 
 Este ejemplo está listo para planes con features metered en Commet, pero la UI se enfoca en el flujo de suscripción y portal. El tracking de uso debe integrarse en tu app/reporting de backend si lo necesitas.
 
