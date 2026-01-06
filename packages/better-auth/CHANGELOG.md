@@ -1,5 +1,13 @@
 # @commet/better-auth
 
+## 1.2.1
+
+### Patch Changes
+
+- 09fe25f: Updated dependencies and minor fixes
+- Updated dependencies [09fe25f]
+  - @commet/node@1.4.1
+
 ## 1.2.0
 
 ### Minor Changes
