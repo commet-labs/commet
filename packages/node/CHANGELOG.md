@@ -1,5 +1,11 @@
 # @commet/node
 
+## 1.4.1
+
+### Patch Changes
+
+- 09fe25f: Updated dependencies and minor fixes
+
 ## 1.4.0
 
 ### Minor Changes
