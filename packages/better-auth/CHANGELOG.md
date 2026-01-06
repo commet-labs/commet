@@ -1,5 +1,16 @@
 # @commet/better-auth
 
+## 2.0.0
+
+### Minor Changes
+
+- 1e0577a: Removed `usage_metric` table. Usage events now use `feature.code` directly as the event identifier. Updated `usage.track()` to accept `feature` parameter instead of `eventType`.
+
+### Patch Changes
+
+- Updated dependencies [1e0577a]
+  - @commet/node@1.4.0
+
 ## 1.1.0
 
 ### Minor Changes
