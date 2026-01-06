@@ -8,7 +8,7 @@ import { Activity } from "lucide-react";
 import { useState, useTransition } from "react";
 
 interface UsageCardProps {
-  eventType: string;
+  feature: string;
   title: string;
   description: string;
   currentUsage?: number;
@@ -16,7 +16,7 @@ interface UsageCardProps {
 }
 
 export function UsageCard({
-  eventType,
+  feature,
   title,
   description,
   currentUsage = 0,
@@ -34,7 +34,7 @@ export function UsageCard({
       try {
         // Using authClient.usage.track from the Commet plugin
         const result = await authClient.usage.track({
-          eventType,
+          feature,
           value: 1,
         });
 

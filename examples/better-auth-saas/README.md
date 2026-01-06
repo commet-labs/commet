@@ -140,7 +140,7 @@ const { data } = await authClient.features.canUse("custom_branding");
 ```typescript
 // Track usage event
 await authClient.usage.track({
-  eventType: "api_calls",
+  feature: "api_calls",
   value: 1,
 });
 ```

@@ -223,7 +223,7 @@ const authClient = createAuthClient({
                     </h3>
                     <pre className="text-sm bg-muted p-4 rounded-lg overflow-x-auto">
                       {`// Track usage
-await authClient.usage.track({ eventType: "api_call", value: 1 });
+await authClient.usage.track({ feature: "api_call", value: 1 });
 
 // Check features
 const { data } = await authClient.features.canUse("advanced_analytics");
