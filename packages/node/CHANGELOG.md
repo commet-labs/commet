@@ -1,5 +1,11 @@
 # @commet/node
 
+## 1.4.0
+
+### Minor Changes
+
+- 1e0577a: Removed `usage_metric` table. Usage events now use `feature.code` directly as the event identifier. Updated `usage.track()` to accept `feature` parameter instead of `eventType`.
+
 ## 1.3.0
 
 ### Minor Changes
