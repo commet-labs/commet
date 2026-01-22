@@ -94,6 +94,7 @@ export type CreateSubscriptionParams = CustomerIdentifier &
     skipTrial?: boolean;
     name?: string;
     startDate?: string;
+    successUrl?: string;
   };
 
 export type ChangePlanParams = PlanIdentifier & {
