@@ -12,7 +12,8 @@ import { signOut, useSession } from "@/lib/auth/auth-client";
 import { CreditCard, Home, LogOut, Zap } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { hasActiveSubscriptionAction } from "@/app/actions/subscription";
 
 function UserMenu() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -81,6 +82,24 @@ function UserMenu() {
 
 function Header() {
   const { data: session, isPending } = useSession();
+  const [hasActiveSubscription, setHasActiveSubscription] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (!isPending && session?.user) {
+      hasActiveSubscriptionAction().then((result) => {
+        if (result.success) {
+          setHasActiveSubscription(result.hasActiveSubscription);
+        }
+      });
+    } else if (!session?.user) {
+      setHasActiveSubscription(false);
+    }
+  }, [session?.user, isPending]);
+
+  // Show Pricing link if:
+  // 1. User is not logged in, OR
+  // 2. User is logged in but doesn't have an active subscription
+  const shouldShowPricing = !isPending && (!session?.user || hasActiveSubscription === false);
 
   return (
     <header className="border-b border-gray-100 bg-white/80 backdrop-blur-md sticky top-0 z-40">
@@ -92,7 +111,7 @@ function Header() {
           <span className="text-xl font-bold text-gray-900">CreditsSaaS</span>
         </Link>
         <div className="flex items-center space-x-6">
-          {!isPending && !session?.user ? (
+          {shouldShowPricing ? (
             <Link
               href="/pricing"
               className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
