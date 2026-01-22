@@ -1,7 +1,7 @@
 "use server";
 
 import { commet } from "@/lib/commet";
-import { getTeamForUser } from "@/lib/db/queries";
+import { getUser } from "@/lib/auth/session";
 
 /**
  * Get portal URL for customer to view billing history
@@ -12,13 +12,13 @@ export async function getPortalUrlAction(): Promise<{
   error?: string;
 }> {
   try {
-    const team = await getTeamForUser();
-    if (!team) {
-      return { success: false, error: "We couldn't find your workspace." };
+    const user = await getUser();
+    if (!user) {
+      return { success: false, error: "Please sign in to continue." };
     }
 
     const result = await commet.portal.getUrl({
-      externalId: team.id.toString(),
+      externalId: user.id,
     });
 
     if (!result.success || !result.data) {

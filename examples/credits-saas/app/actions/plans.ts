@@ -47,9 +47,6 @@ export async function getPlansAction(): Promise<{
           if (feature.type === "boolean" && feature.enabled) {
             return feature.name;
           }
-          if (feature.type === "seats" && feature.includedAmount !== undefined) {
-            return `${feature.includedAmount} ${feature.name} included`;
-          }
           return feature.name;
         });
 

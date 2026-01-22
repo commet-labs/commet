@@ -11,17 +11,15 @@ This example demonstrates how to monetize AI or usage-based products using a "Cr
 - Credits Balance Dashboard with visual overview of plan vs. purchased credits
 - Usage-Based Billing: Track consumption (e.g., AI generations, API calls) in real-time
 - Credit Pack Purchases: Self-service UI to buy additional credits
-- Dashboard pages with CRUD operations on users/teams
-- Basic RBAC with Owner and Member roles
+- Dashboard pages with user settings and credits management
 - Subscription management with Commet Customer Portal
 - Email/password authentication with JWTs stored to cookies
 - Global middleware to protect logged-in routes
 - Activity logging system for any user events
-- Multi-Tenant: Full team management and isolated billing per organization
 
 ## Tech Stack
 
-- **Framework**: [Next.js 15](https://nextjs.org) (App Router)
+- **Framework**: [Next.js 16](https://nextjs.org) (App Router)
 - **Database**: [Postgres](https://www.postgresql.org/) with [Drizzle ORM](https://orm.drizzle.team)
 - **Billing**: [Commet](https://commet.co)
 - **Auth**: [Better Auth](https://better-auth.com)
@@ -39,10 +37,19 @@ bun install
 
 ### 1. Set up Commet
 
+> **Important:** Plans, Features, and Credit Packs are created in the [Commet Dashboard](https://commet.co), not in code. Your application reads these configurations via the API.
+
 Before running the application, you need to configure your Commet account:
 
 1. Sign up at [commet.co](https://commet.co)
 2. Create a **Credits Feature** (e.g., `ai_generation`)
+
+   > **Important:** After creating your feature, you need to update the feature code in the codebase. Replace `ai_generation` with your chosen feature code in the following files:
+   > - `app/actions/credits.ts` - Usage tracking function
+   > - `app/(dashboard)/dashboard/page.tsx` - "Try AI Generation" action
+   > - `app/(dashboard)/dashboard/credits/page.tsx` - Feature list IDs
+   > - The code snippet in the "Tracking Usage" section below
+
 3. Create a **Plan** with the `Credits` consumption model:
    - Select your feature
    - Set "Included Amount" (e.g., 1000 credits)
@@ -143,6 +150,33 @@ const result = await commet.subscriptions.create({
   planCode: "starter",
   // ...
 });
+```
+
+## Architecture
+
+### Auth + Billing Integration
+
+This template integrates [Better Auth](https://better-auth.com) with [Commet](https://commet.co) for seamless authentication and billing:
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   Sign Up   │ ──▶ │ Better Auth │ ──▶ │   Commet    │
+│   (User)    │     │ Creates User│     │Creates Cust.│
+└─────────────┘     └─────────────┘     └─────────────┘
+```
+
+1. **User signs up** → Better Auth creates the user in your database
+2. **Commet plugin** → Automatically creates a matching customer in Commet
+3. **No manual sync needed** → The `externalId` in Commet matches your user ID
+
+This is configured in `lib/auth/auth.ts`:
+
+```typescript
+commet({
+  client: commetClient,
+  createCustomerOnSignUp: true, // Auto-sync enabled
+  use: [portal(), subscriptions(), features(), usage()]
+})
 ```
 
 ## Testing Payments

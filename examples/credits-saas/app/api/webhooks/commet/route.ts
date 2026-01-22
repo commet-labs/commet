@@ -1,14 +1,15 @@
 import { db } from "@/lib/db/drizzle";
-import { teams } from "@/lib/db/schema";
-import { updateTeamSubscription } from "@/lib/db/queries";
+import { user } from "@/lib/db/schema";
+import { updateUserSubscription } from "@/lib/db/queries";
 import { Webhooks } from "@commet/next";
 import type { WebhookPayload } from "@commet/next";
 import { eq } from "drizzle-orm";
 
 /**
- * Get team ID from webhook payload using externalId
+ * Get user ID from webhook payload using externalId
+ * With Better Auth + Commet, the externalId is the user's ID
  */
-function getTeamIdFromPayload(payload: WebhookPayload): string | null {
+function getUserIdFromPayload(payload: WebhookPayload): string | null {
   return payload.data.externalId || null;
 }
 
@@ -26,47 +27,47 @@ export const POST = Webhooks({
 
   // Handle subscription activation (payment successful)
   onSubscriptionActivated: async (payload) => {
-    const teamId = getTeamIdFromPayload(payload);
+    const userId = getUserIdFromPayload(payload);
 
-    if (!teamId) {
+    if (!userId) {
       console.error(
-        "[Webhook] Cannot find team for subscription:",
+        "[Webhook] Cannot find user for subscription:",
         payload.data.subscriptionId,
       );
       return;
     }
 
-    // Update team subscription status
-    await updateTeamSubscription(Number.parseInt(teamId), {
-      subscriptionStatus: "active",
-      planName: (payload.data.planName as string) || null,
+    // Update user subscription status
+    await updateUserSubscription(userId, {
+      subscriptionId: payload.data.subscriptionId as string,
+      isPaid: true,
     });
 
     console.log(
-      `[Webhook] ✅ Team ${teamId} subscription activated: ${payload.data.subscriptionId}`,
+      `[Webhook] ✅ User ${userId} subscription activated: ${payload.data.subscriptionId}`,
     );
   },
 
   // Handle subscription cancellation
   onSubscriptionCanceled: async (payload) => {
-    const teamId = getTeamIdFromPayload(payload);
+    const userId = getUserIdFromPayload(payload);
 
-    if (!teamId) {
+    if (!userId) {
       console.error(
-        "[Webhook] Cannot find team for subscription:",
+        "[Webhook] Cannot find user for subscription:",
         payload.data.subscriptionId,
       );
       return;
     }
 
-    // Update team subscription status
-    await updateTeamSubscription(Number.parseInt(teamId), {
-      subscriptionStatus: "canceled",
-      planName: null,
+    // Update user subscription status
+    await updateUserSubscription(userId, {
+      subscriptionId: null,
+      isPaid: false,
     });
 
     console.log(
-      `[Webhook] ❌ Team ${teamId} subscription canceled: ${payload.data.subscriptionId}`,
+      `[Webhook] ❌ User ${userId} subscription canceled: ${payload.data.subscriptionId}`,
     );
   },
 
@@ -77,12 +78,14 @@ export const POST = Webhooks({
   },
 
   onSubscriptionUpdated: async (payload) => {
-    const teamId = getTeamIdFromPayload(payload);
+    const userId = getUserIdFromPayload(payload);
 
-    if (teamId) {
-      await updateTeamSubscription(Number.parseInt(teamId), {
-        subscriptionStatus: (payload.data.status as string) || "unknown",
-        planName: (payload.data.planName as string) || null,
+    if (userId) {
+      const isPaid =
+        payload.data.status === "active" || payload.data.status === "trialing";
+      await updateUserSubscription(userId, {
+        subscriptionId: payload.data.subscriptionId as string,
+        isPaid,
       });
     }
 

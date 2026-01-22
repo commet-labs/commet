@@ -1,7 +1,7 @@
 "use server";
 
 import { commet } from "@/lib/commet";
-import { getTeamForUser } from "@/lib/db/queries";
+import { getUser } from "@/lib/auth/session";
 
 export interface FeatureUsage {
   code: string;
@@ -27,12 +27,12 @@ export async function getUsageDataAction(): Promise<{
   error?: string;
 }> {
   try {
-    const team = await getTeamForUser();
-    if (!team) {
-      return { success: false, error: "We couldn't find your workspace." };
+    const user = await getUser();
+    if (!user) {
+      return { success: false, error: "Please sign in to continue." };
     }
 
-    const externalId = team.id.toString();
+    const externalId = user.id;
 
     // Check if customer has an active subscription
     const subscriptionResult = await commet.subscriptions.get(externalId);
@@ -75,8 +75,6 @@ export async function getUsageDataAction(): Promise<{
             unit = "images";
           } else if (feature.code.includes("api") || feature.code.includes("request")) {
             unit = "reqs";
-          } else if (feature.type === "seats") {
-            unit = "seats";
           }
 
           features.push({

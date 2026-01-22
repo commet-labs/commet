@@ -3,22 +3,71 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { ActionState } from "@/lib/auth/middleware";
+import { signIn, signUp } from "@/lib/auth/auth-client";
 import { CircleIcon, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { useActionState } from "react";
-import { signIn, signUp } from "./actions";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
 
 export function Login({ mode = "signin" }: { mode?: "signin" | "signup" }) {
   const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect");
+  const router = useRouter();
+  const redirect = searchParams.get("redirect") || "/dashboard";
   const planCode = searchParams.get("planCode");
-  const inviteId = searchParams.get("inviteId");
-  const [state, formAction, pending] = useActionState<ActionState, FormData>(
-    mode === "signin" ? signIn : signUp,
-    { error: "" },
-  );
+
+  const [error, setError] = useState("");
+  const [isPending, setIsPending] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError("");
+    setIsPending(true);
+
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const name = formData.get("name") as string;
+
+    try {
+      if (mode === "signin") {
+        const result = await signIn.email({
+          email,
+          password,
+        });
+
+        if (result.error) {
+          setError(result.error.message || "Invalid email or password");
+          setIsPending(false);
+          return;
+        }
+      } else {
+        // Sign up - Better Auth + Commet plugin handles:
+        // - Create user in database
+        // - Hash password
+        // - Create Commet customer (via plugin)
+        // - Set session cookies
+        const result = await signUp.email({
+          name: name || email.split("@")[0],
+          email,
+          password,
+        });
+
+        if (result.error) {
+          setError(result.error.message || "Failed to create account");
+          setIsPending(false);
+          return;
+        }
+      }
+
+      // Redirect to dashboard or checkout if planCode provided
+      const redirectTo = planCode ? `/checkout?planCode=${planCode}` : redirect;
+      router.push(redirectTo);
+      router.refresh();
+    } catch {
+      setError("An error occurred. Please try again.");
+      setIsPending(false);
+    }
+  }
 
   return (
     <div className="min-h-[100dvh] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
@@ -34,10 +83,28 @@ export function Login({ mode = "signin" }: { mode?: "signin" | "signup" }) {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <form className="space-y-6" action={formAction}>
-          <input type="hidden" name="redirect" value={redirect || ""} />
-          <input type="hidden" name="planCode" value={planCode || ""} />
-          <input type="hidden" name="inviteId" value={inviteId || ""} />
+        <form className="space-y-6" onSubmit={handleSubmit}>
+          {mode === "signup" && (
+            <div>
+              <Label
+                htmlFor="name"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Name
+              </Label>
+              <div className="mt-1">
+                <Input
+                  id="name"
+                  name="name"
+                  type="text"
+                  autoComplete="name"
+                  className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-gray-900 focus:border-gray-900 focus:z-10 sm:text-sm"
+                  placeholder="Enter your name"
+                />
+              </div>
+            </div>
+          )}
+
           <div>
             <Label
               htmlFor="email"
@@ -51,7 +118,6 @@ export function Login({ mode = "signin" }: { mode?: "signin" | "signup" }) {
                 name="email"
                 type="email"
                 autoComplete="email"
-                defaultValue={state.email}
                 required
                 maxLength={50}
                 className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-gray-900 focus:border-gray-900 focus:z-10 sm:text-sm"
@@ -75,7 +141,6 @@ export function Login({ mode = "signin" }: { mode?: "signin" | "signup" }) {
                 autoComplete={
                   mode === "signin" ? "current-password" : "new-password"
                 }
-                defaultValue={state.password}
                 required
                 minLength={8}
                 maxLength={100}
@@ -83,19 +148,20 @@ export function Login({ mode = "signin" }: { mode?: "signin" | "signup" }) {
                 placeholder="Enter your password"
               />
             </div>
+            {mode === "signup" && (
+              <p className="mt-1 text-xs text-gray-500">Minimum 8 characters</p>
+            )}
           </div>
 
-          {state?.error && (
-            <div className="text-red-500 text-sm">{state.error}</div>
-          )}
+          {error && <div className="text-red-500 text-sm">{error}</div>}
 
           <div>
             <Button
               type="submit"
               className="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-full shadow-sm text-sm font-medium text-white bg-gray-900 hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-              disabled={pending}
+              disabled={isPending}
             >
-              {pending ? (
+              {isPending ? (
                 <>
                   <Loader2 className="animate-spin mr-2 h-4 w-4" />
                   Loading...
@@ -126,7 +192,7 @@ export function Login({ mode = "signin" }: { mode?: "signin" | "signup" }) {
           <div className="mt-6">
             <Link
               href={`${mode === "signin" ? "/sign-up" : "/sign-in"}${
-                redirect ? `?redirect=${redirect}` : ""
+                redirect !== "/dashboard" ? `?redirect=${redirect}` : ""
               }${planCode ? `&planCode=${planCode}` : ""}`}
               className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-full shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
             >

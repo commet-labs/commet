@@ -5,13 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { User } from "@/lib/db/schema";
+import { useSession } from "@/lib/auth/auth-client";
 import { Loader2 } from "lucide-react";
 import { useActionState } from "react";
 import { Suspense } from "react";
-import useSWR from "swr";
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 type ActionState = {
   name?: string;
@@ -62,7 +59,9 @@ function AccountForm({
 }
 
 function AccountFormWithData({ state }: { state: ActionState }) {
-  const { data: user } = useSWR<User>("/api/user", fetcher);
+  const { data: session } = useSession();
+  const user = session?.user;
+
   return (
     <AccountForm
       state={state}

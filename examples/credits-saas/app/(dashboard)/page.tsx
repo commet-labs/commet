@@ -92,7 +92,7 @@ export default function HomePage() {
             <FeatureCard
               icon={<ShieldCheck className="w-6 h-6" />}
               title="Secure Auth"
-              description="Built-in authentication and multi-tenant team management."
+              description="Built-in authentication with Better Auth integration."
             />
           </div>
         </div>

@@ -1,6 +1,5 @@
 "use client";
 
-import { signOut } from "@/app/(login)/actions";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,27 +8,28 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { User } from "@/lib/db/schema";
-import { CircleIcon, CreditCard, Home, LogOut, Zap } from "lucide-react";
+import { signOut, useSession } from "@/lib/auth/auth-client";
+import { CreditCard, Home, LogOut, Zap } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Suspense, use, useState } from "react";
-import useSWR, { mutate } from "swr";
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+import { Suspense, useState } from "react";
 
 function UserMenu() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { data: user } = useSWR<User>("/api/user", fetcher);
+  const { data: session, isPending } = useSession();
   const router = useRouter();
 
   async function handleSignOut() {
     await signOut();
-    mutate("/api/user");
     router.push("/");
+    router.refresh();
   }
 
-  if (!user) {
+  if (isPending) {
+    return <div className="h-9 w-9 bg-gray-100 rounded-full animate-pulse" />;
+  }
+
+  if (!session?.user) {
     return (
       <>
         <Link
@@ -45,16 +45,20 @@ function UserMenu() {
     );
   }
 
+  const user = session.user;
+
   return (
     <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
       <DropdownMenuTrigger>
         <Avatar className="cursor-pointer size-9">
-          <AvatarImage alt={user.name || ""} />
+          <AvatarImage alt={user.name || ""} src={user.image || undefined} />
           <AvatarFallback>
-            {user.email
+            {(user.name || user.email)
               .split(" ")
               .map((n) => n[0])
-              .join("")}
+              .join("")
+              .toUpperCase()
+              .slice(0, 2)}
           </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
@@ -80,14 +84,13 @@ function UserMenu() {
             <span>Credits</span>
           </Link>
         </DropdownMenuItem>
-        <form action={handleSignOut} className="w-full">
-          <button type="submit" className="flex w-full">
-            <DropdownMenuItem className="w-full flex-1 cursor-pointer">
-              <LogOut className="mr-2 h-4 w-4" />
-              <span>Sign out</span>
-            </DropdownMenuItem>
-          </button>
-        </form>
+        <DropdownMenuItem
+          className="w-full cursor-pointer"
+          onClick={handleSignOut}
+        >
+          <LogOut className="mr-2 h-4 w-4" />
+          <span>Sign out</span>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

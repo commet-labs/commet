@@ -1,12 +1,10 @@
 import "./globals.css";
-import { getTeamForUser, getUser } from "@/lib/db/queries";
 import type { Metadata, Viewport } from "next";
 import { Manrope } from "next/font/google";
-import { SWRConfig } from "swr";
 
 export const metadata: Metadata = {
-  title: "Next.js SaaS Starter",
-  description: "Get started quickly with Next.js, Postgres, and Commet.",
+  title: "Credits SaaS - Better Auth Demo",
+  description: "Get started quickly with Next.js, Better Auth, and Commet.",
 };
 
 export const viewport: Viewport = {
@@ -25,20 +23,7 @@ export default function RootLayout({
       lang="en"
       className={`bg-white dark:bg-gray-950 text-black dark:text-white ${manrope.className}`}
     >
-      <body className="min-h-[100dvh] bg-gray-50">
-        <SWRConfig
-          value={{
-            fallback: {
-              // We do NOT await here
-              // Only components that read this data will suspend
-              "/api/user": getUser(),
-              "/api/team": getTeamForUser(),
-            },
-          }}
-        >
-          {children}
-        </SWRConfig>
-      </body>
+      <body className="min-h-[100dvh] bg-gray-50">{children}</body>
     </html>
   );
 }
