@@ -2,7 +2,6 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowUpRight } from "lucide-react";
 
 interface UsageMeterProps {
   title: string;
@@ -11,7 +10,12 @@ interface UsageMeterProps {
   unit: string;
 }
 
-export function UsageMeter({ title, used, total, unit }: UsageMeterProps) {
+export function UsageMeter({
+  title,
+  used,
+  total,
+  unit,
+}: UsageMeterProps) {
   const percentage = total > 0 ? (used / total) * 100 : 0;
   const isHigh = percentage > 80;
   const isCritical = percentage > 95;
@@ -57,10 +61,6 @@ export function UsageMeter({ title, used, total, unit }: UsageMeterProps) {
           />
         </div>
 
-        <div className="mt-4 flex items-center text-xs text-gray-900 font-medium cursor-pointer hover:underline">
-          View detailed breakdown
-          <ArrowUpRight className="w-3 h-3 ml-1" />
-        </div>
       </CardContent>
     </Card>
   );

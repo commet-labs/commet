@@ -129,10 +129,11 @@ export default async function DashboardPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-gray-900 mb-1">
-                          View Full Billing History
+                          Customer Portal
                         </p>
                         <p className="text-xs text-gray-500">
-                          Access invoices and payment history in the billing portal
+                          Manage your subscription, view credits and usage, update payment
+                          methods, and access invoices in the Commet portal.
                         </p>
                       </div>
                       <Button
