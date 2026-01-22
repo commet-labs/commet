@@ -57,7 +57,7 @@ export async function getPlansAction(): Promise<{
           price: defaultPrice?.price || 0,
           billingInterval: (defaultPrice?.billingInterval || "monthly") as "monthly" | "yearly",
           features,
-          planCode: 'starter',
+          planCode: plan.code,
           isDefault: plan.isDefault,
         };
       })
