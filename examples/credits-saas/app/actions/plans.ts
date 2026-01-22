@@ -24,7 +24,6 @@ export async function getPlansAction(): Promise<{
   try {
     // Get public plans from Commet
     const result = await commet.plans.list({ includePrivate: false });
-
     if (!result.success || !result.data) {
       return { success: false, error: "Unable to load plans. Please try again." };
     }
@@ -50,9 +49,6 @@ export async function getPlansAction(): Promise<{
           return feature.name;
         });
 
-        // Use plan ID as planCode for checkout (the SDK accepts planId)
-        // The planCode will be used as planId in the checkout session
-        const planCode = plan.id;
 
         return {
           id: plan.id,
@@ -61,7 +57,7 @@ export async function getPlansAction(): Promise<{
           price: defaultPrice?.price || 0,
           billingInterval: (defaultPrice?.billingInterval || "monthly") as "monthly" | "yearly",
           features,
-          planCode,
+          planCode: 'starter',
           isDefault: plan.isDefault,
         };
       })

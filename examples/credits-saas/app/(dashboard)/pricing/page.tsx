@@ -10,7 +10,6 @@ function formatBillingInterval(interval: "monthly" | "yearly"): string {
 export default async function PricingPage() {
   const plansResult = await getPlansAction();
   const plans = plansResult.data || [];
-
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 bg-gray-50/30 min-h-screen">
       <div className="max-w-3xl mx-auto text-center mb-16">
@@ -68,10 +67,9 @@ export default async function PricingPage() {
             How do credits work?
           </h3>
           <p className="text-gray-700 leading-relaxed">
-            Credits are used to power AI features. For example, 1 image
-            generation costs 50 credits. Your monthly plan credits reset every
-            period, but any <strong>purchased credit packs</strong> never
-            expire.
+            Credits are used to power AI features. Each feature consumes credits
+            based on usage. Your monthly plan credits reset every period, but
+            any <strong>purchased credit packs</strong> never expire.
           </p>
         </div>
       </div>

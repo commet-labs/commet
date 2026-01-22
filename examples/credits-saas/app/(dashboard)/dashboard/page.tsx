@@ -16,6 +16,9 @@ export default async function DashboardPage() {
   const usageData = usageResult.success ? usageResult.data : null;
   const portalUrl = portalResult.success ? portalResult.portalUrl : null;
 
+  // Get first credits feature for the "Try" card
+  const firstCreditsFeature = usageData?.features?.[0];
+
   // For now, show empty transactions array since invoices are not available via SDK
   // Users can view billing history in the Commet portal
   const transactions: {
@@ -81,32 +84,35 @@ export default async function DashboardPage() {
               )}
             </div>
 
-            <Card className="shadow-sm border-gray-200 bg-gray-50">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium flex items-center gap-2 text-gray-900">
-                  <Zap className="w-4 h-4 text-gray-700" />
-                  Try AI Generation
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-gray-600 mb-4">
-                  Generate an image using 50 credits. This will deduct from your balance.
-                </p>
-                <form
-                  action={async () => {
-                    "use server";
-                    await trackUsageAction("ai_generation", 50);
-                  }}
-                >
-                  <Button
-                    type="submit"
-                    className="w-full bg-white text-gray-900 border border-gray-300 hover:bg-gray-100 shadow-sm"
+            {firstCreditsFeature && (
+              <Card className="shadow-sm border-gray-200 bg-gray-50">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2 text-gray-900">
+                    <Zap className="w-4 h-4 text-gray-700" />
+                    Try {firstCreditsFeature.name}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Send a usage event to Commet for <span className="font-medium">{firstCreditsFeature.name}</span>.
+                    Your usage will update based on your plan configuration.
+                  </p>
+                  <form
+                    action={async () => {
+                      "use server";
+                      await trackUsageAction(firstCreditsFeature.code, 1);
+                    }}
                   >
-                    Generate Image (50 Credits)
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
+                    <Button
+                      type="submit"
+                      className="w-full bg-white text-gray-900 border border-gray-300 hover:bg-gray-100 shadow-sm"
+                    >
+                      Use {firstCreditsFeature.name}
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Billing Info */}

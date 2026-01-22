@@ -31,17 +31,9 @@ function UserMenu() {
 
   if (!session?.user) {
     return (
-      <>
-        <Link
-          href="/pricing"
-          className="text-sm font-medium text-gray-700 hover:text-gray-900"
-        >
-          Pricing
-        </Link>
-        <Button asChild className="rounded-full">
-          <Link href="/sign-up">Sign Up</Link>
-        </Button>
-      </>
+      <Button asChild className="rounded-full">
+        <Link href="/sign-up">Sign Up</Link>
+      </Button>
     );
   }
 
