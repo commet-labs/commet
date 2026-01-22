@@ -27,7 +27,7 @@ export async function getBillingDataAction(): Promise<{
   try {
     const team = await getTeamForUser();
     if (!team) {
-      return { success: false, error: "Team not found" };
+      return { success: false, error: "We couldn't find your workspace." };
     }
 
     // Get subscription from Commet
@@ -56,6 +56,6 @@ export async function getBillingDataAction(): Promise<{
     };
   } catch (error) {
     console.error("Error fetching billing data:", error);
-    return { success: false, error: "Failed to fetch billing data" };
+    return { success: false, error: "Unable to load billing information. Please try again." };
   }
 }

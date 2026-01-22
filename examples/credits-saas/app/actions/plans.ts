@@ -26,7 +26,7 @@ export async function getPlansAction(): Promise<{
     const result = await commet.plans.list({ includePrivate: false });
 
     if (!result.success || !result.data) {
-      return { success: false, error: "Failed to fetch plans" };
+      return { success: false, error: "Unable to load plans. Please try again." };
     }
 
     // Transform Commet plans to our format
@@ -81,6 +81,6 @@ export async function getPlansAction(): Promise<{
     };
   } catch (error) {
     console.error("Error fetching plans:", error);
-    return { success: false, error: "Failed to fetch plans" };
+    return { success: false, error: "Unable to load plans. Please try again." };
   }
 }

@@ -1,15 +1,23 @@
-# Credits-Based SaaS Starter (Commet + BillUI Style)
+# Credits-Based SaaS Starter
 
-A modern, production-ready SaaS starter focused on **Credits-based consumption** and usage-based billing. Built with Next.js, Drizzle ORM, Better Auth, and Commet.
+This is a starter template for building a SaaS application with **credits-based consumption** and usage-based billing. Built with Next.js, Drizzle ORM, Better Auth, and Commet.
 
 This example demonstrates how to monetize AI or usage-based products using a "Credits" model where users have a monthly allowance (Plan Credits) and can purchase top-ups (Purchased Credits) that never expire.
 
 ## Features
 
-- **Credits Balance Dashboard**: Visual overview of plan vs. purchased credits.
-- **Usage-Based Billing**: Track consumption (e.g., AI generations, API calls) in real-time.
-- **Credit Pack Purchases**: Self-service UI to buy additional credits.
-- **Multi-Tenant**: Full team management and isolated billing per organization.
+- Marketing landing page (`/`) with animated Terminal element
+- Pricing page (`/pricing`) which connects to Commet Checkout
+- Credits Balance Dashboard with visual overview of plan vs. purchased credits
+- Usage-Based Billing: Track consumption (e.g., AI generations, API calls) in real-time
+- Credit Pack Purchases: Self-service UI to buy additional credits
+- Dashboard pages with CRUD operations on users/teams
+- Basic RBAC with Owner and Member roles
+- Subscription management with Commet Customer Portal
+- Email/password authentication with JWTs stored to cookies
+- Global middleware to protect logged-in routes
+- Activity logging system for any user events
+- Multi-Tenant: Full team management and isolated billing per organization
 
 ## Tech Stack
 
@@ -21,25 +29,48 @@ This example demonstrates how to monetize AI or usage-based products using a "Cr
 
 ## Getting Started
 
-### 1. Setup Commet
+```bash
+git clone <repository-url>
+cd credits-saas
+bun install
+```
 
-1. Sign up at [commet.co](https://commet.co).
-2. Create a **Credits Feature** (e.g., `ai_generation`).
+## Running Locally
+
+### 1. Set up Commet
+
+Before running the application, you need to configure your Commet account:
+
+1. Sign up at [commet.co](https://commet.co)
+2. Create a **Credits Feature** (e.g., `ai_generation`)
 3. Create a **Plan** with the `Credits` consumption model:
-   - Select your feature.
-   - Set "Included Amount" (e.g., 1000).
-   - Set "Price" (e.g., $20/mo).
-   - Set "Plan Code" (e.g., `starter`).
-4. Create **Credit Packs** (e.g., 500 credits for $10).
-5. Copy your **API Key** from Settings.
+   - Select your feature
+   - Set "Included Amount" (e.g., 1000 credits)
+   - Set "Price" (e.g., $20/mo)
+   - Set "Plan Code" (e.g., `starter`)
+4. Create **Credit Packs** (e.g., 500 credits for $10)
+5. Copy your **API Key** from Settings → API Keys
 
 ### 2. Configure Environment
 
-Copy `.env.example` to `.env` and fill in the values:
+Use the included setup script to create your `.env` file:
+
+```bash
+bun db:setup
+```
+
+This will guide you through:
+- Setting up Postgres (local Docker or remote)
+- Entering your Commet API Key
+- Selecting Commet environment (sandbox or production)
+- Configuring webhook secret
+- Generating AUTH_SECRET
+
+Alternatively, manually create a `.env` file with:
 
 ```bash
 # Database
-POSTGRES_URL=postgresql://...
+POSTGRES_URL=postgresql://postgres:postgres@localhost:5439/credits-saas
 
 # Auth
 AUTH_SECRET=...
@@ -53,31 +84,40 @@ COMMET_WEBHOOK_SECRET=whsec_...
 BASE_URL=http://localhost:3000
 ```
 
-### 3. Install & Run
+### 3. Set up Database
+
+Run the database migrations and seed the database with a default user and team:
 
 ```bash
-bun install
-docker compose up -d
 bun db:push
+bun db:seed
+```
+
+This will create the following user and team:
+
+- User: `test@test.com`
+- Password: `admin123`
+
+You can also create new users through the `/sign-up` route.
+
+### 4. Start Development Server
+
+Finally, run the Next.js development server:
+
+```bash
 bun dev
 ```
 
-Alternatively, you can use the setup script for guided configuration:
-
-```bash
-bun db:setup
-bun db:push
-bun db:seed  # Optional: creates a test user
-bun dev
-```
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the app in action.
 
 ## How it Works
 
 ### Credits Logic
 
 This example uses a **FIFO (First-In, First-Out)** deduction strategy:
-1. **Plan Credits** are used first (they expire at the end of the month).
-2. **Purchased Credits** are used only when plan credits are exhausted (they never expire).
+
+1. **Plan Credits** are used first (they expire at the end of the billing period)
+2. **Purchased Credits** are used only when plan credits are exhausted (they never expire)
 
 ### Tracking Usage
 
@@ -104,6 +144,14 @@ const result = await commet.subscriptions.create({
   // ...
 });
 ```
+
+## Testing Payments
+
+To test Commet payments in sandbox mode, use the following test card details:
+
+- Card Number: `4242 4242 4242 4242`
+- Expiration: Any future date
+- CVC: Any 3-digit number
 
 ## Webhooks
 
@@ -142,43 +190,36 @@ https://yourdomain.com/api/webhooks/commet
 
 When you're ready to deploy your SaaS application to production:
 
-### 1. Set up Production Environment
+### Set up a production Commet webhook
 
-1. **Update Commet Environment:**
-   - Change `COMMET_ENVIRONMENT=production` in your `.env`
-   - Use your production Commet API key
+1. Go to the Commet Dashboard and create a new webhook for your production environment
+2. Set the endpoint URL to your production API route (e.g., `https://yourdomain.com/api/webhooks/commet`)
+3. Select the events you want to listen for (e.g., `subscription.activated`, `subscription.canceled`, `subscription.updated`)
 
-2. **Configure Production Database:**
-   - Set up a production PostgreSQL database (e.g., Vercel Postgres, Supabase, Neon)
-   - Update `POSTGRES_URL` with your production connection string
+### Deploy to Vercel
 
-3. **Set Environment Variables:**
-   - `BASE_URL`: Your production domain (e.g., `https://yourdomain.com`)
-   - `AUTH_SECRET`: Generate a secure random string (`openssl rand -base64 32`)
-   - `COMMET_WEBHOOK_SECRET`: Copy from Commet dashboard webhook settings
+1. Push your code to a GitHub repository
+2. Connect your repository to [Vercel](https://vercel.com/) and deploy it
+3. Follow the Vercel deployment process, which will guide you through setting up your project
 
-### 2. Deploy to Vercel
+### Add environment variables
 
-1. **Push your code to GitHub**
+In your Vercel project settings (or during deployment), add all the necessary environment variables. Make sure to update the values for the production environment, including:
 
-2. **Connect to Vercel:**
-   - Import your repository in [Vercel](https://vercel.com/)
-   - Configure environment variables in project settings
-   - Deploy
+1. `BASE_URL`: Set this to your production domain
+2. `COMMET_API_KEY`: Use your Commet API key for the production environment
+3. `COMMET_ENVIRONMENT`: Set to `production`
+4. `COMMET_WEBHOOK_SECRET`: Use the webhook secret from the production webhook you created
+5. `POSTGRES_URL`: Set this to your production database URL
+6. `AUTH_SECRET`: Set this to a random string. `openssl rand -base64 32` will generate one
 
-3. **Set up database:**
-   ```bash
-   bun db:push
-   ```
-   
-   Note: For production, you may want to use migrations instead. Generate them with `bun db:generate` and run with `bun db:migrate`.
+### Set up database
 
-### 3. Configure Production Webhook
+```bash
+bun db:push
+```
 
-1. Go to Commet dashboard → Settings → Webhooks → Endpoints
-2. Add production webhook endpoint: `https://yourdomain.com/api/webhooks/commet`
-3. Select events: `subscription.activated`, `subscription.canceled`, `subscription.updated`
-4. Copy webhook secret to your production environment variables
+Note: For production, you may want to use migrations instead. Generate them with `bun db:generate` and run with `bun db:migrate`.
 
 ## Credits
 

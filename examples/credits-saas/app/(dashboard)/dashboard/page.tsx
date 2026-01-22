@@ -45,7 +45,7 @@ export default async function DashboardPage() {
               Active Features
             </h2>
             <div className="grid gap-6">
-              {usageData && usageData.hasSubscription && usageData.features.length > 0 ? (
+              {usageData?.hasSubscription && usageData.features.length > 0 ? (
                 usageData.features.map((feature) => (
                   <UsageMeter
                     key={feature.code}
@@ -81,7 +81,6 @@ export default async function DashboardPage() {
               )}
             </div>
 
-            {/* Simulated Action Card */}
             <Card className="shadow-sm border-gray-200 bg-gray-50">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium flex items-center gap-2 text-gray-900">
@@ -91,8 +90,7 @@ export default async function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-gray-600 mb-4">
-                  Simulate using 50 credits to generate an image. This will
-                  deduct from your balance.
+                  Generate an image using 50 credits. This will deduct from your balance.
                 </p>
                 <form
                   action={async () => {
@@ -128,7 +126,7 @@ export default async function DashboardPage() {
                           View Full Billing History
                         </p>
                         <p className="text-xs text-gray-500">
-                          Access invoices and payment history in the Commet portal
+                          Access invoices and payment history in the billing portal
                         </p>
                       </div>
                       <Button

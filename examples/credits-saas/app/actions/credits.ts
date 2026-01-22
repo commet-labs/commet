@@ -29,7 +29,7 @@ export async function trackUsageAction(
   try {
     const team = await getTeamForUser();
     if (!team) {
-      return { success: false, error: "Team not found" };
+      return { success: false, error: "We couldn't find your workspace." };
     }
 
     // Track credit consumption in Commet
@@ -40,13 +40,13 @@ export async function trackUsageAction(
     });
 
     if (!result.success) {
-      return { success: false, error: result.error || "Failed to track usage" };
+      return { success: false, error: result.error || "Unable to process usage. Please try again." };
     }
 
     revalidatePath("/dashboard");
     return { success: true };
   } catch (error) {
     console.error("Error tracking usage:", error);
-    return { success: false, error: "An error occurred while tracking usage" };
+    return { success: false, error: "Something went wrong. Please try again." };
   }
 }

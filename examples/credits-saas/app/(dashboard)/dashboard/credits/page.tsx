@@ -55,7 +55,7 @@ export default async function CreditsPage() {
               Credit Management
             </h1>
             <p className="text-gray-500">
-              Test credit consumption features using Commet SDK
+              Track and manage your credit usage
             </p>
           </div>
         </div>
@@ -65,7 +65,7 @@ export default async function CreditsPage() {
           <div className="lg:col-span-2 space-y-6">
             <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-gray-700" />
-              Simulate Credit Consumption
+              Use Credits
             </h2>
 
             <div className="grid gap-4 sm:grid-cols-2">
@@ -151,12 +151,7 @@ export default async function CreditsPage() {
               <CardContent className="p-6">
                 <h3 className="font-bold text-lg mb-2">Usage Tracking</h3>
                 <p className="text-gray-300 text-sm mb-6 opacity-80 leading-relaxed">
-                  All usage events are tracked via Commet SDK using the{" "}
-                  <code className="text-xs bg-gray-800 px-1 py-0.5 rounded">
-                    commet.usage.track()
-                  </code>{" "}
-                  method. Credits and balance management will be available when
-                  the SDK adds support for these features.
+                  All usage is tracked automatically. Credits are deducted when you use features, and your balance updates in real-time.
                 </p>
               </CardContent>
             </Card>

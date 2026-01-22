@@ -117,7 +117,7 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
 
   if (existingUser.length > 0) {
     return {
-      error: "Failed to create user. Please try again.",
+      error: "This email is already registered. Please sign in instead.",
       email,
       password,
     };
@@ -135,7 +135,7 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
 
   if (!createdUser) {
     return {
-      error: "Failed to create user. Please try again.",
+      error: "This email is already registered. Please sign in instead.",
       email,
       password,
     };
@@ -188,7 +188,7 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
 
     if (!createdTeam) {
       return {
-        error: "Failed to create team. Please try again.",
+        error: "Unable to create workspace. Please try again.",
         email,
         password,
       };
@@ -369,7 +369,7 @@ export const removeTeamMember = validatedActionWithUser(
     const userWithTeam = await getUserWithTeam(user.id);
 
     if (!userWithTeam?.teamId) {
-      return { error: "User is not part of a team" };
+      return { error: "You're not part of a workspace." };
     }
 
     await db
@@ -419,7 +419,7 @@ export const inviteTeamMember = validatedActionWithUser(
       .limit(1);
 
     if (existingMember.length > 0) {
-      return { error: "User is already a member of this team" };
+      return { error: "This user is already part of your workspace." };
     }
 
     // Check if there's an existing invitation
@@ -436,7 +436,7 @@ export const inviteTeamMember = validatedActionWithUser(
       .limit(1);
 
     if (existingInvitation.length > 0) {
-      return { error: "An invitation has already been sent to this email" };
+      return { error: "An invitation has already been sent to this email." };
     }
 
     // Create a new invitation

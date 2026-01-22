@@ -29,7 +29,7 @@ export async function getUsageDataAction(): Promise<{
   try {
     const team = await getTeamForUser();
     if (!team) {
-      return { success: false, error: "Team not found" };
+      return { success: false, error: "We couldn't find your workspace." };
     }
 
     const externalId = team.id.toString();
@@ -103,7 +103,7 @@ export async function getUsageDataAction(): Promise<{
     return {
       success: false,
       error:
-        error instanceof Error ? error.message : "Failed to fetch usage data",
+        error instanceof Error ? error.message : "Unable to load usage data. Please try again.",
     };
   }
 }

@@ -14,7 +14,7 @@ export async function getPortalUrlAction(): Promise<{
   try {
     const team = await getTeamForUser();
     if (!team) {
-      return { success: false, error: "Team not found" };
+      return { success: false, error: "We couldn't find your workspace." };
     }
 
     const result = await commet.portal.getUrl({
@@ -24,7 +24,7 @@ export async function getPortalUrlAction(): Promise<{
     if (!result.success || !result.data) {
       return {
         success: false,
-        error: result.error || "Failed to get portal URL",
+        error: result.error || "Unable to access billing portal. Please try again.",
       };
     }
 
@@ -37,7 +37,7 @@ export async function getPortalUrlAction(): Promise<{
     return {
       success: false,
       error:
-        error instanceof Error ? error.message : "Failed to get portal URL",
+        error instanceof Error ? error.message : "Unable to access billing portal. Please try again.",
     };
   }
 }

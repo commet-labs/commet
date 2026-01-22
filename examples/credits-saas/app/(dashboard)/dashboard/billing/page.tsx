@@ -132,7 +132,7 @@ export default async function BillingPage() {
         <div className="flex justify-center">
           <p className="text-xs text-gray-400 flex items-center gap-1">
             <CreditCard className="w-3 h-3" />
-            Billing is handled securely via Commet
+            Billing is handled securely
           </p>
         </div>
       </div>

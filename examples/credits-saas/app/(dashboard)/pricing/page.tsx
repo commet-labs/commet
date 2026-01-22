@@ -44,7 +44,7 @@ export default async function PricingPage() {
             <div className="mb-8">
               <h2 className="text-2xl font-bold text-gray-400 mb-2">No plans available</h2>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Plans will appear here once configured in Commet.
+                Plans will appear here once available.
               </p>
             </div>
           </div>
@@ -52,7 +52,7 @@ export default async function PricingPage() {
             <div className="mb-8">
               <h2 className="text-2xl font-bold text-gray-400 mb-2">No plans available</h2>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Plans will appear here once configured in Commet.
+                Plans will appear here once available.
               </p>
             </div>
           </div>
