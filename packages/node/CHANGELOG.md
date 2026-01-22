@@ -1,5 +1,11 @@
 # @commet/node
 
+## 1.4.2
+
+### Patch Changes
+
+- 4452a24: Expose plan code field in Plan and PlanDetail types
+
 ## 1.4.1
 
 ### Patch Changes
