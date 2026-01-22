@@ -26,14 +26,16 @@ export function UsageMeter({
         <CardTitle className="text-sm font-medium text-gray-500">
           {title}
         </CardTitle>
-        <Badge
-          variant={
-            isCritical ? "destructive" : isHigh ? "secondary" : "outline"
-          }
-          className="text-[10px] h-5"
-        >
-          {Math.round(percentage)}%
-        </Badge>
+        {total > 0 ? (
+          <Badge
+            variant={
+              isCritical ? "destructive" : isHigh ? "secondary" : "outline"
+            }
+            className="text-[10px] h-5"
+          >
+            {Math.round(percentage)}%
+          </Badge>
+        ) : null}
       </CardHeader>
       <CardContent>
         <div className="flex justify-between items-baseline mb-2">
@@ -43,9 +45,11 @@ export function UsageMeter({
               {unit}
             </span>
           </div>
-          <div className="text-sm text-gray-400">
-            of {total.toLocaleString()}
-          </div>
+          {total > 0 ? (
+            <div className="text-sm text-gray-400">
+              of {total.toLocaleString()}
+            </div>
+          ) : null}
         </div>
 
         <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">

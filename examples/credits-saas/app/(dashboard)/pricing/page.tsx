@@ -1,13 +1,37 @@
 import { getPlansAction } from "@/app/actions/plans";
+import { getPortalUrlAction } from "@/app/actions/portal";
+import { commet } from "@/lib/commet";
+import { getUser } from "@/lib/auth/session";
 import { Button } from "@/components/ui/button";
 import { checkoutAction } from "@/lib/payments/actions";
 import { Check, Zap } from "lucide-react";
+import { redirect } from "next/navigation";
 
 function formatBillingInterval(interval: "monthly" | "yearly"): string {
   return interval === "monthly" ? "month" : "year";
 }
 
 export default async function PricingPage() {
+  const user = await getUser();
+  if (user) {
+    const subscriptionResult = await commet.subscriptions.get(user.id);
+    if (subscriptionResult.success && subscriptionResult.data) {
+      const subscription = subscriptionResult.data;
+      if (subscription.status === "pending_payment" && subscription.checkoutUrl) {
+        redirect(subscription.checkoutUrl);
+      }
+
+      if (subscription.status === "active" || subscription.status === "trialing") {
+        const portalResult = await getPortalUrlAction();
+        if (portalResult.success && portalResult.portalUrl) {
+          redirect(portalResult.portalUrl);
+        }
+
+        redirect("/dashboard");
+      }
+    }
+  }
+
   const plansResult = await getPlansAction();
   const plans = plansResult.data || [];
   return (
