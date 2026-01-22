@@ -28,6 +28,7 @@ export interface PlanFeature {
 
 export interface Plan {
   id: PlanID;
+  code: string;
   name: string;
   description?: string;
   isPublic: boolean;
