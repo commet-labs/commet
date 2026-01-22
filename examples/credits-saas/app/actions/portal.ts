@@ -17,6 +17,16 @@ export async function getPortalUrlAction(): Promise<{
       return { success: false, error: "Please sign in to continue." };
     }
 
+    const subscriptionResult = await commet.subscriptions.get(user.id);
+    if (!subscriptionResult.success || !subscriptionResult.data) {
+      return { success: false, error: "No active subscription." };
+    }
+
+    const subscription = subscriptionResult.data;
+    if (subscription.status !== "active" && subscription.status !== "trialing") {
+      return { success: false, error: "No active subscription." };
+    }
+
     const result = await commet.portal.getUrl({
       externalId: user.id,
     });

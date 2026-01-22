@@ -49,6 +49,15 @@ export async function getUsageDataAction(): Promise<{
 
     // Get all features from the subscription
     const subscription = subscriptionResult.data;
+    if (subscription.status !== "active" && subscription.status !== "trialing") {
+      return {
+        success: true,
+        data: {
+          features: [],
+          hasSubscription: false,
+        },
+      };
+    }
     const features: FeatureUsage[] = [];
 
     // Fetch usage data for each feature in the subscription
