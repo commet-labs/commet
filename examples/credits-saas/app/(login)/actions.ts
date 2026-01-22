@@ -1,5 +1,6 @@
 "use server";
 
+import { auth } from "@/lib/auth/auth";
 import { getUser } from "@/lib/auth/session";
 import { db } from "@/lib/db/drizzle";
 import {
@@ -9,6 +10,7 @@ import {
   user,
 } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 type ActionState = {
@@ -89,13 +91,25 @@ export async function updatePassword(
     return { error: "Password must be at least 8 characters" };
   }
 
-  // Note: With Better Auth, password changes should be done through the auth client
-  // This is a placeholder that shows the intent
-  // In production, use authClient.changePassword() on the client side
+  try {
+    await auth.api.changePassword({
+      body: {
+        currentPassword,
+        newPassword,
+        revokeOtherSessions: false,
+      },
+      headers: await headers(),
+    });
 
-  await logActivity(currentUser.id, ActivityType.UPDATE_PASSWORD);
+    await logActivity(currentUser.id, ActivityType.UPDATE_PASSWORD);
 
-  return { success: "Password updated successfully." };
+    return { success: "Password updated successfully." };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return { error: error.message || "Failed to update password" };
+    }
+    return { error: "Failed to update password" };
+  }
 }
 
 export async function deleteAccount(

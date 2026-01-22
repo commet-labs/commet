@@ -67,15 +67,6 @@ function UserMenu() {
             <span>Billing</span>
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem className="cursor-pointer">
-          <Link
-            href="/dashboard/credits"
-            className="flex w-full items-center text-gray-900 font-semibold"
-          >
-            <Zap className="mr-2 h-4 w-4" />
-            <span>Credits</span>
-          </Link>
-        </DropdownMenuItem>
         <DropdownMenuItem
           className="w-full cursor-pointer"
           onClick={handleSignOut}
@@ -89,6 +80,8 @@ function UserMenu() {
 }
 
 function Header() {
+  const { data: session, isPending } = useSession();
+
   return (
     <header className="border-b border-gray-100 bg-white/80 backdrop-blur-md sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
@@ -99,12 +92,14 @@ function Header() {
           <span className="text-xl font-bold text-gray-900">CreditsSaaS</span>
         </Link>
         <div className="flex items-center space-x-6">
-          <Link
-            href="/pricing"
-            className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
-          >
-            Pricing
-          </Link>
+          {!isPending && !session?.user ? (
+            <Link
+              href="/pricing"
+              className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              Pricing
+            </Link>
+          ) : null}
           <Suspense
             fallback={
               <div className="h-9 w-9 bg-gray-100 rounded-full animate-pulse" />
