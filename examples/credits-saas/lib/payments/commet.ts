@@ -4,8 +4,10 @@ import { redirect } from "next/navigation";
 
 export async function createCheckoutSession({
   planCode,
+  successUrl,
 }: {
   planCode: string;
+  successUrl?: string;
 }) {
   const user = await getUser();
 
@@ -39,6 +41,7 @@ export async function createCheckoutSession({
     const result = await commet.subscriptions.create({
       externalId: user.id,
       planCode: planCode,
+      successUrl,
     });
 
     if (!result.success || !result.data?.checkoutUrl) {

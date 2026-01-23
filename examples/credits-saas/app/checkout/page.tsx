@@ -25,5 +25,9 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
     redirect("/pricing?error=missing_plan");
   }
 
-  await createCheckoutSession({ planCode });
+  // Build success URL for post-checkout redirect
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
+  const successUrl = `${baseUrl}/checkout/success`;
+
+  await createCheckoutSession({ planCode, successUrl });
 }
