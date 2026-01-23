@@ -1,5 +1,11 @@
 # @commet/node
 
+## 1.4.3
+
+### Patch Changes
+
+- 1a5a14c: Add optional successUrl parameter to subscriptions.create() for custom checkout redirect
+
 ## 1.4.2
 
 ### Patch Changes
