@@ -33,6 +33,3 @@ export const deleteAccountSchema = z.object({
 
 export type SignInInput = z.infer<typeof signInSchema>;
 export type SignUpInput = z.infer<typeof signUpSchema>;
-export type UpdateAccountInput = z.infer<typeof updateAccountSchema>;
-export type UpdatePasswordInput = z.infer<typeof updatePasswordSchema>;
-export type DeleteAccountInput = z.infer<typeof deleteAccountSchema>;
