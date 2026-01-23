@@ -1,11 +1,11 @@
 "use client";
 
 import { deleteAccount, updatePassword } from "@/actions/auth";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Loader2, Lock, Trash2 } from "lucide-react";
+import { FormField } from "@/components/ui/form-field";
+import { SubmitButton } from "@/components/ui/submit-button";
+import { useFormToast } from "@/hooks/use-form-toast";
+import { Lock, Trash2 } from "lucide-react";
 import { useActionState } from "react";
 
 type PasswordState = {
@@ -14,12 +14,14 @@ type PasswordState = {
   confirmPassword?: string;
   error?: string;
   success?: string;
+  fieldErrors?: Record<string, string[] | undefined>;
 };
 
 type DeleteState = {
   password?: string;
   error?: string;
   success?: string;
+  fieldErrors?: Record<string, string[] | undefined>;
 };
 
 export default function SecurityPage() {
@@ -33,6 +35,9 @@ export default function SecurityPage() {
     FormData
   >(deleteAccount, {});
 
+  useFormToast(passwordState);
+  useFormToast(deleteState);
+
   return (
     <section className="flex-1 p-4 lg:p-8">
       <h1 className="text-lg lg:text-2xl font-bold text-gray-900 mb-6">
@@ -44,73 +49,49 @@ export default function SecurityPage() {
         </CardHeader>
         <CardContent>
           <form className="space-y-4" action={passwordAction}>
-            <div>
-              <Label htmlFor="current-password" className="mb-2">
-                Current Password
-              </Label>
-              <Input
-                id="current-password"
-                name="currentPassword"
-                type="password"
-                autoComplete="current-password"
-                required
-                minLength={8}
-                maxLength={100}
-                defaultValue={passwordState.currentPassword}
-              />
-            </div>
-            <div>
-              <Label htmlFor="new-password" className="mb-2">
-                New Password
-              </Label>
-              <Input
-                id="new-password"
-                name="newPassword"
-                type="password"
-                autoComplete="new-password"
-                required
-                minLength={8}
-                maxLength={100}
-                defaultValue={passwordState.newPassword}
-              />
-            </div>
-            <div>
-              <Label htmlFor="confirm-password" className="mb-2">
-                Confirm New Password
-              </Label>
-              <Input
-                id="confirm-password"
-                name="confirmPassword"
-                type="password"
-                required
-                minLength={8}
-                maxLength={100}
-                defaultValue={passwordState.confirmPassword}
-              />
-            </div>
-            {passwordState.error && (
-              <p className="text-red-500 text-sm">{passwordState.error}</p>
-            )}
-            {passwordState.success && (
-              <p className="text-green-500 text-sm">{passwordState.success}</p>
-            )}
-            <Button
-              type="submit"
+            <FormField
+              id="current-password"
+              name="currentPassword"
+              type="password"
+              label="Current Password"
+              autoComplete="current-password"
+              required
+              minLength={8}
+              maxLength={100}
+              defaultValue={passwordState.currentPassword}
+              error={passwordState.fieldErrors?.currentPassword?.[0]}
+            />
+            <FormField
+              id="new-password"
+              name="newPassword"
+              type="password"
+              label="New Password"
+              autoComplete="new-password"
+              required
+              minLength={8}
+              maxLength={100}
+              defaultValue={passwordState.newPassword}
+              error={passwordState.fieldErrors?.newPassword?.[0]}
+            />
+            <FormField
+              id="confirm-password"
+              name="confirmPassword"
+              type="password"
+              label="Confirm New Password"
+              required
+              minLength={8}
+              maxLength={100}
+              defaultValue={passwordState.confirmPassword}
+              error={passwordState.fieldErrors?.confirmPassword?.[0]}
+            />
+            <SubmitButton
+              isPending={isPasswordPending}
+              pendingText="Updating..."
               className="bg-gray-900 hover:bg-black text-white"
-              disabled={isPasswordPending}
+              icon={<Lock className="h-4 w-4" />}
             >
-              {isPasswordPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Updating...
-                </>
-              ) : (
-                <>
-                  <Lock className="mr-2 h-4 w-4" />
-                  Update Password
-                </>
-              )}
-            </Button>
+              Update Password
+            </SubmitButton>
           </form>
         </CardContent>
       </Card>
@@ -124,41 +105,26 @@ export default function SecurityPage() {
             Account deletion is irreversible. Please proceed with caution.
           </p>
           <form action={deleteAction} className="space-y-4">
-            <div>
-              <Label htmlFor="delete-password" className="mb-2">
-                Confirm Password
-              </Label>
-              <Input
-                id="delete-password"
-                name="password"
-                type="password"
-                required
-                minLength={8}
-                maxLength={100}
-                defaultValue={deleteState.password}
-              />
-            </div>
-            {deleteState.error && (
-              <p className="text-red-500 text-sm">{deleteState.error}</p>
-            )}
-            <Button
-              type="submit"
+            <FormField
+              id="delete-password"
+              name="password"
+              type="password"
+              label="Confirm Password"
+              required
+              minLength={8}
+              maxLength={100}
+              defaultValue={deleteState.password}
+              error={deleteState.fieldErrors?.password?.[0]}
+            />
+            <SubmitButton
+              isPending={isDeletePending}
+              pendingText="Deleting..."
               variant="destructive"
               className="bg-red-600 hover:bg-red-700"
-              disabled={isDeletePending}
+              icon={<Trash2 className="h-4 w-4" />}
             >
-              {isDeletePending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Deleting...
-                </>
-              ) : (
-                <>
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Delete Account
-                </>
-              )}
-            </Button>
+              Delete Account
+            </SubmitButton>
           </form>
         </CardContent>
       </Card>

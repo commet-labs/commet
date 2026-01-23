@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import { Manrope } from "next/font/google";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "Credits SaaS - Better Auth Demo",
@@ -23,7 +24,10 @@ export default function RootLayout({
       lang="en"
       className={`bg-white dark:bg-gray-950 text-black dark:text-white ${manrope.className}`}
     >
-      <body className="min-h-[100dvh] bg-gray-50">{children}</body>
+      <body className="min-h-[100dvh] bg-gray-50">
+        {children}
+        <Toaster position="top-right" richColors />
+      </body>
     </html>
   );
 }

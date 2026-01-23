@@ -58,45 +58,44 @@ export async function getUsageDataAction(): Promise<{
         },
       };
     }
-    const features: FeatureUsage[] = [];
-
-    // Fetch usage data for each feature in the subscription
+    // Fetch usage data for each feature in the subscription in parallel
     // Only include metered or credits features that have usage data
-    for (const featureSummary of subscription.features) {
-      // Skip boolean features as they don't have usage meters
-      if (featureSummary.type === "boolean") {
-        continue;
-      }
+    const featurePromises = subscription.features
+      .filter((featureSummary) => featureSummary.type !== "boolean")
+      .map(async (featureSummary) => {
+        const featureResult = await commet.features.get({
+          code: featureSummary.code,
+          externalId,
+        });
 
-      const featureResult = await commet.features.get({
-        code: featureSummary.code,
-        externalId,
+        if (featureResult.success && featureResult.data) {
+          const feature = featureResult.data;
+
+          // Only include features that have usage data (metered or credits)
+          if (feature.current !== undefined && feature.included !== undefined) {
+            // Determine unit based on feature name/code
+            let unit = "units";
+            if (feature.code.includes("generation") || feature.code.includes("image")) {
+              unit = "images";
+            } else if (feature.code.includes("api") || feature.code.includes("request")) {
+              unit = "reqs";
+            }
+
+            return {
+              code: feature.code,
+              name: feature.name,
+              current: feature.current ?? 0,
+              included: feature.included ?? 0,
+              remaining: feature.remaining ?? 0,
+              unit,
+            } as FeatureUsage;
+          }
+        }
+        return null;
       });
 
-      if (featureResult.success && featureResult.data) {
-        const feature = featureResult.data;
-
-        // Only include features that have usage data (metered or credits)
-        if (feature.current !== undefined && feature.included !== undefined) {
-          // Determine unit based on feature name/code
-          let unit = "units";
-          if (feature.code.includes("generation") || feature.code.includes("image")) {
-            unit = "images";
-          } else if (feature.code.includes("api") || feature.code.includes("request")) {
-            unit = "reqs";
-          }
-
-          features.push({
-            code: feature.code,
-            name: feature.name,
-            current: feature.current ?? 0,
-            included: feature.included ?? 0,
-            remaining: feature.remaining ?? 0,
-            unit,
-          });
-        }
-      }
-    }
+    const featureResults = await Promise.all(featurePromises);
+    const features = featureResults.filter((f): f is FeatureUsage => f !== null);
 
     return {
       success: true,

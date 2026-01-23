@@ -4,10 +4,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signIn, signUp } from "@/lib/auth/auth-client";
+import { signInSchema, signUpSchema } from "@/lib/validations/auth";
 import { CircleIcon, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
+
+type FieldErrors = {
+  email?: string[];
+  password?: string[];
+  name?: string[];
+};
 
 export function Login({ mode = "signin" }: { mode?: "signin" | "signup" }) {
   const searchParams = useSearchParams();
@@ -15,18 +23,28 @@ export function Login({ mode = "signin" }: { mode?: "signin" | "signup" }) {
   const redirect = searchParams.get("redirect") || "/dashboard";
   const planCode = searchParams.get("planCode");
 
-  const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [isPending, setIsPending] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setError("");
+    setFieldErrors({});
     setIsPending(true);
 
     const formData = new FormData(e.currentTarget);
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const name = formData.get("name") as string;
+
+    // Validate with Zod
+    const schema = mode === "signin" ? signInSchema : signUpSchema;
+    const validation = schema.safeParse({ email, password, name });
+
+    if (!validation.success) {
+      setFieldErrors(validation.error.flatten().fieldErrors as FieldErrors);
+      setIsPending(false);
+      return;
+    }
 
     try {
       if (mode === "signin") {
@@ -36,7 +54,7 @@ export function Login({ mode = "signin" }: { mode?: "signin" | "signup" }) {
         });
 
         if (result.error) {
-          setError(result.error.message || "Invalid email or password");
+          toast.error(result.error.message || "Invalid email or password");
           setIsPending(false);
           return;
         }
@@ -53,7 +71,7 @@ export function Login({ mode = "signin" }: { mode?: "signin" | "signup" }) {
         });
 
         if (result.error) {
-          setError(result.error.message || "Failed to create account");
+          toast.error(result.error.message || "Failed to create account");
           setIsPending(false);
           return;
         }
@@ -64,7 +82,7 @@ export function Login({ mode = "signin" }: { mode?: "signin" | "signup" }) {
       router.push(redirectTo);
       router.refresh();
     } catch {
-      setError("An error occurred. Please try again.");
+      toast.error("An error occurred. Please try again.");
       setIsPending(false);
     }
   }
@@ -120,9 +138,12 @@ export function Login({ mode = "signin" }: { mode?: "signin" | "signup" }) {
                 autoComplete="email"
                 required
                 maxLength={50}
-                className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-gray-900 focus:border-gray-900 focus:z-10 sm:text-sm"
+                className={`appearance-none rounded-full relative block w-full px-3 py-2 border placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-gray-900 focus:border-gray-900 focus:z-10 sm:text-sm ${fieldErrors.email ? "border-red-500" : "border-gray-300"}`}
                 placeholder="Enter your email"
               />
+              {fieldErrors.email && (
+                <p className="mt-1 text-sm text-red-500">{fieldErrors.email[0]}</p>
+              )}
             </div>
           </div>
 
@@ -144,16 +165,16 @@ export function Login({ mode = "signin" }: { mode?: "signin" | "signup" }) {
                 required
                 minLength={8}
                 maxLength={100}
-                className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-gray-900 focus:border-gray-900 focus:z-10 sm:text-sm"
+                className={`appearance-none rounded-full relative block w-full px-3 py-2 border placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-gray-900 focus:border-gray-900 focus:z-10 sm:text-sm ${fieldErrors.password ? "border-red-500" : "border-gray-300"}`}
                 placeholder="Enter your password"
               />
+              {fieldErrors.password ? (
+                <p className="mt-1 text-sm text-red-500">{fieldErrors.password[0]}</p>
+              ) : mode === "signup" ? (
+                <p className="mt-1 text-xs text-gray-500">Minimum 8 characters</p>
+              ) : null}
             </div>
-            {mode === "signup" && (
-              <p className="mt-1 text-xs text-gray-500">Minimum 8 characters</p>
-            )}
           </div>
-
-          {error && <div className="text-red-500 text-sm">{error}</div>}
 
           <div>
             <Button
