@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
+import { Terminal } from "@/components/terminal";
 import { ArrowRight, BarChart3, Coins, ShieldCheck, Zap } from "lucide-react";
 import Link from "next/link";
-import { Terminal } from "./terminal";
 
 export default function HomePage() {
   return (
