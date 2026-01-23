@@ -70,7 +70,6 @@ This will guide you through:
 - Setting up Postgres (local Docker or remote)
 - Entering your Commet API Key
 - Selecting Commet environment (sandbox or production)
-- Configuring webhook secret
 - Generating AUTH_SECRET
 
 Alternatively, manually create a `.env` file with:
@@ -85,7 +84,6 @@ AUTH_SECRET=...
 # Commet
 COMMET_API_KEY=ck_...
 COMMET_ENVIRONMENT=sandbox
-COMMET_WEBHOOK_SECRET=whsec_...
 
 # App
 BASE_URL=http://localhost:3000
@@ -187,48 +185,9 @@ To test Commet payments in sandbox mode, use the following test card details:
 - Expiration: Any future date
 - CVC: Any 3-digit number
 
-## Webhooks
-
-Commet webhooks allow your application to react immediately to subscription changes (activation, cancellation, updates) without polling.
-
-### Local Development
-
-For local development, use [ngrok](https://ngrok.com/) to expose your local server:
-
-1. **Start ngrok:**
-   ```bash
-   ngrok http 3000
-   ```
-
-2. **Configure webhook in Commet dashboard:**
-   - Go to Settings → Webhooks → Endpoints in your Commet dashboard
-   - Add a new webhook endpoint
-   - URL: `https://your-ngrok-url.ngrok.io/api/webhooks/commet`
-   - Events: Select `subscription.activated`, `subscription.canceled`, `subscription.updated`
-   - Copy the webhook secret to your `.env` file as `COMMET_WEBHOOK_SECRET`
-
-3. **Test webhooks:**
-   - Create a subscription in your app
-   - Check your terminal logs for webhook events
-   - Verify that team subscription status updates automatically
-
-### Production
-
-In production, configure your webhook endpoint URL in the Commet dashboard to point to your production domain:
-
-```
-https://yourdomain.com/api/webhooks/commet
-```
-
 ## Going to Production
 
 When you're ready to deploy your SaaS application to production:
-
-### Set up a production Commet webhook
-
-1. Go to the Commet Dashboard and create a new webhook for your production environment
-2. Set the endpoint URL to your production API route (e.g., `https://yourdomain.com/api/webhooks/commet`)
-3. Select the events you want to listen for (e.g., `subscription.activated`, `subscription.canceled`, `subscription.updated`)
 
 ### Deploy to Vercel
 
@@ -243,9 +202,8 @@ In your Vercel project settings (or during deployment), add all the necessary en
 1. `BASE_URL`: Set this to your production domain
 2. `COMMET_API_KEY`: Use your Commet API key for the production environment
 3. `COMMET_ENVIRONMENT`: Set to `production`
-4. `COMMET_WEBHOOK_SECRET`: Use the webhook secret from the production webhook you created
-5. `POSTGRES_URL`: Set this to your production database URL
-6. `AUTH_SECRET`: Set this to a random string. `openssl rand -base64 32` will generate one
+4. `POSTGRES_URL`: Set this to your production database URL
+5. `AUTH_SECRET`: Set this to a random string. `openssl rand -base64 32` will generate one
 
 ### Set up database
 

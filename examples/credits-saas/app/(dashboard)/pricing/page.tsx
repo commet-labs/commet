@@ -6,9 +6,25 @@ import { Button } from "@/components/ui/button";
 import { checkoutAction } from "@/lib/payments/actions";
 import { Check, Zap } from "lucide-react";
 import { redirect } from "next/navigation";
+import type { PlanFeature } from "@commet/node";
 
-function formatBillingInterval(interval: "monthly" | "yearly"): string {
-  return interval === "monthly" ? "month" : "year";
+function formatBillingInterval(interval: "monthly" | "yearly" | "quarterly"): string {
+  if (interval === "monthly") return "month";
+  if (interval === "yearly") return "year";
+  return "quarter";
+}
+
+function formatFeature(feature: PlanFeature): string {
+  if (feature.type === "metered" && feature.includedAmount !== undefined) {
+    return `${feature.includedAmount.toLocaleString()} ${feature.name} included`;
+  }
+  if (feature.type === "boolean" && feature.enabled) {
+    return feature.name;
+  }
+  if (feature.type === "seats" && feature.includedAmount !== undefined) {
+    return `${feature.includedAmount} ${feature.name}`;
+  }
+  return feature.name;
 }
 
 export default async function PricingPage() {
@@ -48,18 +64,24 @@ export default async function PricingPage() {
 
       {plans.length > 0 ? (
         <div className={`grid gap-8 max-w-4xl mx-auto ${plans.length === 1 ? "md:grid-cols-1" : plans.length === 2 ? "md:grid-cols-2" : "md:grid-cols-3"}`}>
-          {plans.map((plan, index) => (
-            <PricingCard
-              key={plan.id}
-              name={plan.name}
-              price={plan.price}
-              interval={formatBillingInterval(plan.billingInterval)}
-              description={plan.description || `Perfect for ${plan.name.toLowerCase()} users.`}
-              features={plan.features}
-              planCode={plan.planCode}
-              highlight={plan.isDefault || index === Math.floor(plans.length / 2)}
-            />
-          ))}
+          {plans.map((plan, index) => {
+            // Get the default price or first price
+            const defaultPrice =
+              plan.prices.find((p) => p.isDefault) || plan.prices[0];
+            
+            return (
+              <PricingCard
+                key={plan.id}
+                name={plan.name}
+                price={defaultPrice?.price || 0}
+                interval={formatBillingInterval(defaultPrice?.billingInterval || "monthly")}
+                description={plan.description || `Perfect for ${plan.name.toLowerCase()} users.`}
+                features={plan.features.map(formatFeature)}
+                planCode={plan.code}
+                highlight={plan.isDefault || index === Math.floor(plans.length / 2)}
+              />
+            );
+          })}
         </div>
       ) : (
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">

@@ -27,19 +27,3 @@ export async function getActivityLogs() {
     .orderBy(desc(activityLogs.timestamp))
     .limit(10);
 }
-
-export async function updateUserSubscription(
-  userId: string,
-  subscriptionData: {
-    subscriptionId?: string | null;
-    isPaid?: boolean;
-  },
-) {
-  await db
-    .update(user)
-    .set({
-      ...subscriptionData,
-      updatedAt: new Date(),
-    })
-    .where(eq(user.id, userId));
-}

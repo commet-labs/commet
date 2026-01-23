@@ -111,24 +111,13 @@ async function getCommetEnvironment(): Promise<string> {
   return "sandbox";
 }
 
-async function getCommetWebhookSecret(): Promise<string> {
-  console.log("Step 4: Getting Commet Webhook Secret");
-  console.log(
-    "You can find your Commet Webhook Secret at: https://app.commet.co/settings/webhooks",
-  );
-  console.log(
-    "For local development, you can use any string (e.g., 'dev-secret')",
-  );
-  return await question("Enter your Commet Webhook Secret: ");
-}
-
 function generateAuthSecret(): string {
-  console.log("Step 5: Generating AUTH_SECRET...");
+  console.log("Step 4: Generating AUTH_SECRET...");
   return crypto.randomBytes(32).toString("hex");
 }
 
 async function writeEnvFile(envVars: Record<string, string>) {
-  console.log("Step 6: Writing environment variables to .env");
+  console.log("Step 5: Writing environment variables to .env");
   const envContent = Object.entries(envVars)
     .map(([key, value]) => `${key}=${value}`)
     .join("\n");
@@ -141,7 +130,6 @@ async function main() {
   const POSTGRES_URL = await getPostgresURL();
   const COMMET_API_KEY = await getCommetApiKey();
   const COMMET_ENVIRONMENT = await getCommetEnvironment();
-  const COMMET_WEBHOOK_SECRET = await getCommetWebhookSecret();
   const BASE_URL = "http://localhost:3000";
   const AUTH_SECRET = generateAuthSecret();
 
@@ -149,7 +137,6 @@ async function main() {
     POSTGRES_URL,
     COMMET_API_KEY,
     COMMET_ENVIRONMENT,
-    COMMET_WEBHOOK_SECRET,
     BASE_URL,
     AUTH_SECRET,
   });
