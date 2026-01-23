@@ -4,12 +4,12 @@ import { getUser } from "@/lib/auth/session";
 import { redirect } from "next/navigation";
 
 export async function checkoutAction(formData: FormData) {
+  const planCode = formData.get("planCode") as string;
   const user = await getUser();
   if (!user) {
-    redirect("/sign-in");
+    redirect(`/sign-up?planCode=${planCode}`);
   }
 
-  const planCode = formData.get("planCode") as string;
   redirect(`/checkout?planCode=${planCode}`);
 }
 
