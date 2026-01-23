@@ -13,9 +13,9 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "@commet/better-auth": "^1.2.2",
-    "@commet/next": "0.2.8",
-    "@commet/node": "1.4.2",
+    "@commet/better-auth": "^1.2.3",
+    "@commet/next": "0.2.11",
+    "@commet/node": "1.4.3",
     "@tailwindcss/postcss": "4.1.7",
     "@types/node": "^22.15.18",
     "@types/react": "19.1.4",
