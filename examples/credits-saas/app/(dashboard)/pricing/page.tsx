@@ -1,5 +1,5 @@
-import { getPlansAction } from "@/app/actions/plans";
-import { getPortalUrlAction } from "@/app/actions/portal";
+import { getPlansAction } from "@/actions/plans";
+import { getPortalUrlAction } from "@/actions/portal";
 import { commet } from "@/lib/commet";
 import { getUser } from "@/lib/auth/session";
 import { Button } from "@/components/ui/button";

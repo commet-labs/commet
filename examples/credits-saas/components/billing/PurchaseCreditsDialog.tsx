@@ -1,8 +1,8 @@
 "use client";
 
 // NOTE: This component is kept for future use when Commet SDK adds credit pack support
-// import { purchaseCreditsAction } from "@/app/actions/credits";
-import type { CreditPack } from "@/app/actions/credits";
+// import { purchaseCreditsAction } from "@/actions/credits";
+import type { CreditPack } from "@/actions/credits";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Check, Coins, Loader2, Zap } from "lucide-react";

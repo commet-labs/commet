@@ -1,6 +1,6 @@
-import { trackUsageAction } from "@/app/actions/credits";
-import { getUsageDataAction } from "@/app/actions/usage";
-import { getPortalUrlAction } from "@/app/actions/portal";
+import { trackUsageAction } from "@/actions/credits";
+import { getUsageDataAction } from "@/actions/usage";
+import { getPortalUrlAction } from "@/actions/portal";
 import { TransactionHistory } from "@/components/billing/TransactionHistory";
 import { UsageMeter } from "@/components/billing/UsageMeter";
 import { Button } from "@/components/ui/button";

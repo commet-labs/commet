@@ -1,4 +1,4 @@
-import { getBillingDataAction } from "@/app/actions/billing";
+import { getBillingDataAction } from "@/actions/billing";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { customerPortalAction } from "@/lib/payments/actions";

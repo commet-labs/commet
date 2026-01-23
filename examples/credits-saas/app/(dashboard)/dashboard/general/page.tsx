@@ -1,6 +1,6 @@
 "use client";
 
-import { updateAccount } from "@/app/actions/auth";
+import { updateAccount } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";

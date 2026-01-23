@@ -13,7 +13,7 @@ import { CreditCard, Home, LogOut, Zap } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
-import { hasActiveSubscriptionAction } from "@/app/actions/subscription";
+import { hasActiveSubscriptionAction } from "@/actions/subscription";
 
 function UserMenu() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

@@ -1,6 +1,6 @@
 "use client";
 
-import type { CreditsBalance } from "@/app/actions/credits";
+import type { CreditsBalance } from "@/actions/credits";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, Coins, RefreshCw, Zap } from "lucide-react";
 
