@@ -38,6 +38,14 @@ export async function createCheckoutSession({
   let checkoutUrl: string;
   
   try {
+    // Log the successUrl being sent for debugging
+    console.log("Creating checkout session with:", {
+      externalId: user.id,
+      planCode,
+      successUrl,
+      successUrlType: typeof successUrl,
+    });
+    
     const result = await commet.subscriptions.create({
       externalId: user.id,
       planCode: planCode,
@@ -56,8 +64,16 @@ export async function createCheckoutSession({
 
     checkoutUrl = result.data.checkoutUrl;
   } catch (error: unknown) {
+    // Log error completo primero para debugging
+    console.error("Raw error:", error);
+    console.error("Error type:", typeof error);
+    if (error && typeof error === "object") {
+      console.error("Error constructor:", error.constructor?.name);
+      console.error("Error keys:", Object.keys(error));
+    }
+    
     const errorObj = error instanceof Error ? error : new Error(String(error));
-    const errorWithDetails = error as { statusCode?: number; details?: unknown; code?: string };
+    const errorWithDetails = error as { statusCode?: number; details?: unknown; code?: string; message?: string };
     
     // Handle 409 Conflict: Customer already has active subscription
     if (errorWithDetails.statusCode === 409) {
@@ -65,12 +81,13 @@ export async function createCheckoutSession({
     }
     
     console.error("Exception creating checkout session:", {
-      message: errorObj.message,
+      message: errorObj.message || errorWithDetails.message || String(error),
       statusCode: errorWithDetails.statusCode,
       details: errorWithDetails.details,
       code: errorWithDetails.code,
       externalId: user.id,
       planId: planCode,
+      fullError: error,
     });
     throw error;
   }

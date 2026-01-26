@@ -26,8 +26,8 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
   }
 
   // Build success URL for post-checkout redirect
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
-  const successUrl = `${baseUrl}/checkout/success`;
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.BASE_URL || "http://localhost:3000";
+  const successUrl = `${baseUrl}/dashboard`;
 
   await createCheckoutSession({ planCode, successUrl });
 }
