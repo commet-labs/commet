@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16.4-alpine
+    container_name: credits_saas_postgres
+    environment:
+      POSTGRES_DB: credits-saas
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5439:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
