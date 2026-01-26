@@ -1,8 +1,8 @@
 import { trackUsageAction } from "@/actions/credits";
 import { getUsageDataAction } from "@/actions/usage";
 import { getPortalUrlAction } from "@/actions/portal";
-import { TransactionHistory } from "@/components/billing/TransactionHistory";
-import { UsageMeter } from "@/components/billing/UsageMeter";
+import { TransactionHistory } from "@/components/billing/transaction-history";
+import { UsageMeter } from "@/components/billing/usage-meter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity, Info, Zap, ExternalLink } from "lucide-react";

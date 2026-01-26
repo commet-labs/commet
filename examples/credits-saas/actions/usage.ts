@@ -19,7 +19,7 @@ export interface UsageData {
 
 /**
  * Get usage data from Commet SDK for all features
- * Returns usage information formatted for UsageMeter components
+ * Returns usage information formatted for usage-meter components
  */
 export async function getUsageDataAction(): Promise<{
   success: boolean;
