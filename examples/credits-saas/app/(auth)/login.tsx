@@ -116,7 +116,7 @@ export function Login({ mode = "signin" }: { mode?: "signin" | "signup" }) {
                   name="name"
                   type="text"
                   autoComplete="name"
-                  className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-gray-900 focus:border-gray-900 focus:z-10 sm:text-sm"
+                  className="border-gray-300"
                   placeholder="Enter your name"
                 />
               </div>
@@ -138,7 +138,7 @@ export function Login({ mode = "signin" }: { mode?: "signin" | "signup" }) {
                 autoComplete="email"
                 required
                 maxLength={50}
-                className={`appearance-none rounded-full relative block w-full px-3 py-2 border placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-gray-900 focus:border-gray-900 focus:z-10 sm:text-sm ${fieldErrors.email ? "border-red-500" : "border-gray-300"}`}
+                className={fieldErrors.email ? "border-red-500" : "border-gray-300"}
                 placeholder="Enter your email"
               />
               {fieldErrors.email && (
@@ -165,7 +165,7 @@ export function Login({ mode = "signin" }: { mode?: "signin" | "signup" }) {
                 required
                 minLength={8}
                 maxLength={100}
-                className={`appearance-none rounded-full relative block w-full px-3 py-2 border placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-gray-900 focus:border-gray-900 focus:z-10 sm:text-sm ${fieldErrors.password ? "border-red-500" : "border-gray-300"}`}
+                className={fieldErrors.password ? "border-red-500" : "border-gray-300"}
                 placeholder="Enter your password"
               />
               {fieldErrors.password ? (
@@ -179,7 +179,7 @@ export function Login({ mode = "signin" }: { mode?: "signin" | "signup" }) {
           <div>
             <Button
               type="submit"
-              className="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-full shadow-sm text-sm font-medium text-white bg-gray-900 hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+              className="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-900 hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
               disabled={isPending}
             >
               {isPending ? (
@@ -215,7 +215,7 @@ export function Login({ mode = "signin" }: { mode?: "signin" | "signup" }) {
               href={`${mode === "signin" ? "/sign-up" : "/sign-in"}${
                 redirect !== "/dashboard" ? `?redirect=${redirect}` : ""
               }${planCode ? `&planCode=${planCode}` : ""}`}
-              className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-full shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+              className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
             >
               {mode === "signin"
                 ? "Create an account"
