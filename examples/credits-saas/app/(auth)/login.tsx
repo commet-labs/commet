@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signIn, signUp } from "@/lib/auth/auth-client";
 import { signInSchema, signUpSchema } from "@/lib/validations/auth";
+import { handlePostSignupCheckout } from "@/lib/payments/actions";
 import { CircleIcon, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -77,9 +78,20 @@ export function Login({ mode = "signin" }: { mode?: "signin" | "signup" }) {
         }
       }
 
-      // Redirect to dashboard or checkout if planCode provided
-      const redirectTo = planCode ? `/checkout?planCode=${planCode}` : redirect;
-      router.push(redirectTo);
+      // Handle checkout redirect after authentication if planCode is provided
+      if (planCode) {
+        try {
+          await handlePostSignupCheckout(planCode);
+        } catch (error) {
+          toast.error(error instanceof Error ? error.message : "Failed to create checkout session");
+          setIsPending(false);
+          return;
+        }
+        return;
+      }
+
+      // Regular redirect for sign-in or signup without planCode
+      router.push(redirect);
       router.refresh();
     } catch {
       toast.error("An error occurred. Please try again.");
