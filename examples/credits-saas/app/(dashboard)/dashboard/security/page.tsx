@@ -3,7 +3,7 @@
 import { deleteAccount, updatePassword } from "@/actions/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FormField } from "@/components/ui/form-field";
-import { SubmitButton } from "@/components/ui/submit-button";
+import { SubmitButton } from "@/components/shared/submit-button";
 import { useFormToast } from "@/hooks/use-form-toast";
 import { Lock, Trash2 } from "lucide-react";
 import { useActionState } from "react";
@@ -40,7 +40,7 @@ export default function SecurityPage() {
 
   return (
     <section className="flex-1 p-4 lg:p-8">
-      <h1 className="text-lg lg:text-2xl font-bold text-gray-900 mb-6">
+      <h1 className="text-lg lg:text-2xl font-bold text-foreground mb-6">
         Security Settings
       </h1>
       <Card className="mb-8">
@@ -87,7 +87,7 @@ export default function SecurityPage() {
             <SubmitButton
               isPending={isPasswordPending}
               pendingText="Updating..."
-              className="bg-gray-900 hover:bg-black text-white"
+              className="bg-foreground text-background hover:bg-foreground/90 border border-border/60"
               icon={<Lock className="h-4 w-4" />}
             >
               Update Password
@@ -101,7 +101,7 @@ export default function SecurityPage() {
           <CardTitle>Delete Account</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-gray-500 mb-4">
+          <p className="text-sm text-muted-foreground mb-4">
             Account deletion is irreversible. Please proceed with caution.
           </p>
           <form action={deleteAction} className="space-y-4">

@@ -15,9 +15,7 @@ export default async function DashboardPage() {
 
   const usageData = usageResult.success ? usageResult.data : null;
   const portalUrl = portalResult.success ? portalResult.portalUrl : null;
-
-  // Get first credits feature for the "Try" card
-  const firstCreditsFeature = usageData?.features?.[0];
+  const tryFeatures = usageData?.features ?? [];
 
   // For now, show empty transactions array since invoices are not available via SDK
   // Users can view billing history in the Commet portal
@@ -31,20 +29,20 @@ export default async function DashboardPage() {
   }[] = [];
 
   return (
-    <section className="flex-1 p-4 lg:p-8 bg-gray-50/50 min-h-screen">
+    <section className="flex-1 p-4 lg:p-8 bg-background min-h-screen">
       <div className="max-w-6xl mx-auto space-y-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-            <p className="text-gray-500">Overview of your usage and activity</p>
+            <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+            <p className="text-muted-foreground">Overview of your usage and activity</p>
           </div>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
           {/* Usage Meters */}
           <div className="space-y-6">
-            <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-              <Activity className="w-5 h-5 text-gray-700" />
+            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+              <Activity className="w-5 h-5 text-foreground" />
               Active Features
             </h2>
             <div className="grid gap-6">
@@ -59,13 +57,13 @@ export default async function DashboardPage() {
                   />
                 ))
               ) : usageData && !usageData.hasSubscription ? (
-                <Card className="shadow-sm border-gray-100">
+                <Card className="shadow-sm border-border">
                   <CardContent className="p-6">
-                    <p className="text-sm text-gray-600 text-center">
+                    <p className="text-sm text-muted-foreground text-center">
                       No active subscription.{" "}
                       <Link
                         href="/pricing"
-                        className="text-gray-900 font-medium hover:underline"
+                        className="text-foreground font-medium hover:underline"
                       >
                         Subscribe to a plan
                       </Link>{" "}
@@ -74,9 +72,9 @@ export default async function DashboardPage() {
                   </CardContent>
                 </Card>
               ) : (
-                <Card className="shadow-sm border-gray-100">
+                <Card className="shadow-sm border-border">
                   <CardContent className="p-6">
-                    <p className="text-sm text-gray-600 text-center">
+                    <p className="text-sm text-muted-foreground text-center">
                       Unable to load usage data. Please try again later.
                     </p>
                   </CardContent>
@@ -84,54 +82,63 @@ export default async function DashboardPage() {
               )}
             </div>
 
-            {firstCreditsFeature && (
-              <Card className="shadow-sm border-gray-200 bg-gray-50">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2 text-gray-900">
-                    <Zap className="w-4 h-4 text-gray-700" />
-                    Try {firstCreditsFeature.name}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Send a usage event to Commet for <span className="font-medium">{firstCreditsFeature.name}</span>.
-                    Your usage will update based on your plan configuration.
-                  </p>
-                  <form
-                    action={async () => {
-                      "use server";
-                      await trackUsageAction(firstCreditsFeature.code, 1);
-                    }}
-                  >
-                    <Button
-                      type="submit"
-                      className="w-full bg-white text-gray-900 border border-gray-300 hover:bg-gray-100 shadow-sm"
-                    >
-                      Use {firstCreditsFeature.name}
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
+            {usageData?.hasSubscription && tryFeatures.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-2">
+                  <Zap className="w-4 h-4" />
+                  Try Features
+                </h3>
+                <div className="grid gap-4">
+                  {tryFeatures.map((feature) => (
+                    <Card key={feature.code} className="shadow-sm border-border bg-secondary">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm font-medium flex items-center gap-2 text-foreground">
+                          Try {feature.name}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          Send a usage event to Commet for{" "}
+                          <span className="font-medium">{feature.name}</span>. Your usage will update
+                          based on your plan configuration.
+                        </p>
+                        <form
+                          action={async () => {
+                            "use server";
+                            await trackUsageAction(feature.code, 1);
+                          }}
+                        >
+                          <Button
+                            type="submit"
+                            className="w-full bg-card text-foreground border border-border hover:bg-accent shadow-sm"
+                          >
+                            Use {feature.name}
+                          </Button>
+                        </form>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
 
           {/* Billing Info */}
           <div className="space-y-6">
-            <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-              <Info className="w-5 h-5 text-gray-400" />
-              Recent Activity
+            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+              <Info className="w-5 h-5 text-muted-foreground" />
+              Manage Billing
             </h2>
             {portalUrl ? (
               <>
-                <TransactionHistory transactions={transactions} />
-                <Card className="shadow-sm border-gray-100 bg-gray-50">
+                <Card className="shadow-sm border-border bg-secondary">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-gray-900 mb-1">
+                        <p className="text-sm font-medium text-foreground mb-1">
                           Customer Portal
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-muted-foreground">
                           Manage your subscription, view credits and usage, update payment
                           methods, and access invoices in the Commet portal.
                         </p>
@@ -149,6 +156,8 @@ export default async function DashboardPage() {
                     </div>
                   </CardContent>
                 </Card>
+                <TransactionHistory transactions={transactions} />
+
               </>
             ) : (
               <TransactionHistory transactions={transactions} />

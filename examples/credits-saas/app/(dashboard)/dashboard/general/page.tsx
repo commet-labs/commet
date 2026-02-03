@@ -3,7 +3,7 @@
 import { updateAccount } from "@/actions/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FormField } from "@/components/ui/form-field";
-import { SubmitButton } from "@/components/ui/submit-button";
+import { SubmitButton } from "@/components/shared/submit-button";
 import { useFormToast } from "@/hooks/use-form-toast";
 import { useSession } from "@/lib/auth/auth-client";
 import { useActionState } from "react";
@@ -75,7 +75,7 @@ export default function GeneralPage() {
 
   return (
     <section className="flex-1 p-4 lg:p-8">
-      <h1 className="text-lg lg:text-2xl font-medium text-gray-900 mb-6">
+      <h1 className="text-lg lg:text-2xl font-medium text-foreground mb-6">
         General Settings
       </h1>
 
@@ -91,7 +91,7 @@ export default function GeneralPage() {
             <SubmitButton
               isPending={isPending}
               pendingText="Saving..."
-              className="bg-gray-900 hover:bg-black text-white"
+              className="bg-foreground text-background hover:bg-foreground/90 border border-border/60"
             >
               Save Changes
             </SubmitButton>

@@ -30,7 +30,7 @@ export function FormField({
         {...props}
       />
       {description && !error && (
-        <p className="text-xs text-gray-500">{description}</p>
+        <p className="text-xs text-muted-foreground">{description}</p>
       )}
       {error && <p className="text-red-500 text-sm">{error}</p>}
     </div>

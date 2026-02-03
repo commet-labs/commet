@@ -1,10 +1,10 @@
 import { Suspense } from "react";
-import { Login } from "../login";
+import { FormAuth } from "@/components/auth/form-auth";
 
 export default function SignInPage() {
   return (
     <Suspense>
-      <Login mode="signin" />
+      <FormAuth mode="signin" />
     </Suspense>
   );
 }
