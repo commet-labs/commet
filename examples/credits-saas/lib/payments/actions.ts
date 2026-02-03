@@ -24,15 +24,25 @@ export async function handlePostSignupCheckout(planCode: string) {
   const user = await getUser();
   
   if (!user) {
-    throw new Error("User not authenticated");
+    return { success: false, error: "User not authenticated" } as const;
   }
   
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.BASE_URL || "http://localhost:3000";
   const successUrl = `${baseUrl}/dashboard`;
   
-  const checkoutUrl = await getCheckoutUrl({ planCode, successUrl });
-  
-  redirect(checkoutUrl);
+  try {
+    const checkoutUrl = await getCheckoutUrl({ planCode, successUrl });
+    return { success: true, checkoutUrl } as const;
+  } catch (error) {
+    console.error("Failed to get checkout URL:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Unable to start checkout. Please try again.",
+    } as const;
+  }
 }
 
 export async function customerPortalAction() {

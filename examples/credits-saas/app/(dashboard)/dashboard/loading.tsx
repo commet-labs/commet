@@ -4,25 +4,25 @@ import { Activity, Info } from "lucide-react";
 
 export default function DashboardLoading() {
   return (
-    <section className="flex-1 p-4 lg:p-8 bg-gray-50/50 min-h-screen">
+    <section className="flex-1 p-4 lg:p-8 bg-secondary/50 min-h-screen">
       <div className="max-w-6xl mx-auto space-y-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <Skeleton className="h-8 w-36 mb-2" />
-            <Skeleton className="h-5 w-64" />
+            <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+            <p className="text-muted-foreground">Overview of your usage and activity</p>
           </div>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
           {/* Usage Meters Skeleton */}
           <div className="space-y-6">
-            <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-              <Activity className="w-5 h-5 text-gray-700" />
+            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+              <Activity className="w-5 h-5 text-foreground" />
               Active Features
             </h2>
             <div className="grid gap-6">
               {[1, 2].map((i) => (
-                <Card key={i} className="shadow-sm border-gray-100">
+                <Card key={i} className="shadow-sm border-border">
                   <CardHeader className="pb-2">
                     <Skeleton className="h-5 w-32" />
                   </CardHeader>
@@ -38,7 +38,7 @@ export default function DashboardLoading() {
             </div>
 
             {/* Try Feature Card Skeleton */}
-            <Card className="shadow-sm border-gray-200 bg-gray-50">
+            <Card className="shadow-sm border-border bg-secondary">
               <CardHeader className="pb-2">
                 <Skeleton className="h-5 w-40" />
               </CardHeader>
@@ -52,11 +52,11 @@ export default function DashboardLoading() {
 
           {/* Billing Info Skeleton */}
           <div className="space-y-6">
-            <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-              <Info className="w-5 h-5 text-gray-400" />
+            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+              <Info className="w-5 h-5 text-muted-foreground" />
               Recent Activity
             </h2>
-            <Card className="shadow-sm border-gray-100">
+            <Card className="shadow-sm border-border">
               <CardHeader className="pb-2">
                 <Skeleton className="h-5 w-40" />
               </CardHeader>
@@ -72,7 +72,7 @@ export default function DashboardLoading() {
                 ))}
               </CardContent>
             </Card>
-            <Card className="shadow-sm border-gray-100 bg-gray-50">
+            <Card className="shadow-sm border-border bg-secondary">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="space-y-2">

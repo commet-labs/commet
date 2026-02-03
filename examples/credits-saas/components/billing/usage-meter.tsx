@@ -21,9 +21,9 @@ export function UsageMeter({
   const isCritical = percentage > 95;
 
   return (
-    <Card className="shadow-sm border-gray-100">
+    <Card className="shadow-sm border-border">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium text-gray-500">
+        <CardTitle className="text-sm font-medium text-muted-foreground">
           {title}
         </CardTitle>
         {total > 0 ? (
@@ -39,20 +39,20 @@ export function UsageMeter({
       </CardHeader>
       <CardContent>
         <div className="flex justify-between items-baseline mb-2">
-          <div className="text-2xl font-bold text-gray-900">
+          <div className="text-2xl font-bold text-foreground">
             {used.toLocaleString()}
-            <span className="text-sm font-normal text-gray-400 ml-1">
+            <span className="text-sm font-normal text-muted-foreground ml-1">
               {unit}
             </span>
           </div>
           {total > 0 ? (
-            <div className="text-sm text-gray-400">
+            <div className="text-sm text-muted-foreground">
               of {total.toLocaleString()}
             </div>
           ) : null}
         </div>
 
-        <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+        <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
           <div
             className={`h-full rounded-full transition-all duration-500 ${
               isCritical

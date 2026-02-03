@@ -20,17 +20,17 @@ interface TransactionHistoryProps {
 export function TransactionHistory({ transactions }: TransactionHistoryProps) {
   if (transactions.length === 0) {
     return (
-      <Card className="shadow-sm border-gray-100 overflow-hidden">
-        <CardHeader className="bg-gray-50/50 border-b border-gray-100">
-          <CardTitle className="text-lg font-semibold text-gray-900">
+      <Card className="shadow-sm border-border overflow-hidden">
+        <CardHeader className="bg-secondary/50 border-b border-border">
+          <CardTitle className="text-lg font-semibold text-foreground">
             Billing History
           </CardTitle>
         </CardHeader>
         <CardContent className="p-12">
-          <div className="text-center text-gray-500">
-            <CreditCard className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+          <div className="text-center text-muted-foreground">
+            <CreditCard className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
             <p className="text-sm">No billing history available</p>
-            <p className="text-xs text-gray-400 mt-2">
+            <p className="text-xs text-muted-foreground mt-2">
               Your invoices will appear here once you make a payment
             </p>
           </div>
@@ -40,9 +40,9 @@ export function TransactionHistory({ transactions }: TransactionHistoryProps) {
   }
 
   return (
-    <Card className="shadow-sm border-gray-100 overflow-hidden">
-      <CardHeader className="bg-gray-50/50 border-b border-gray-100">
-        <CardTitle className="text-lg font-semibold text-gray-900">
+    <Card className="shadow-sm border-border overflow-hidden">
+      <CardHeader className="bg-secondary/50 border-b border-border">
+        <CardTitle className="text-lg font-semibold text-foreground">
           Billing History
         </CardTitle>
       </CardHeader>
@@ -50,7 +50,7 @@ export function TransactionHistory({ transactions }: TransactionHistoryProps) {
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="border-b border-gray-100 text-xs font-medium text-gray-400 uppercase tracking-wider">
+              <tr className="border-b border-border text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 <th className="px-6 py-4">Transaction</th>
                 <th className="px-6 py-4">Type</th>
                 <th className="px-6 py-4">Date</th>
@@ -59,34 +59,34 @@ export function TransactionHistory({ transactions }: TransactionHistoryProps) {
                 <th className="px-6 py-4 text-right">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-border">
               {transactions.map((t) => (
                 <tr
                   key={t.id}
-                  className="hover:bg-gray-50/50 transition-colors"
+                  className="hover:bg-accent transition-colors"
                 >
                   <td className="px-6 py-4">
-                    <div className="font-medium text-gray-900">
+                    <div className="font-medium text-foreground">
                       {t.description}
                     </div>
-                    <div className="text-xs text-gray-400 font-mono">
+                    <div className="text-xs text-muted-foreground font-mono">
                       {t.id}
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       {t.type === "Subscription" ? (
-                        <RefreshCw className="w-3 h-3 text-gray-700" />
+                        <RefreshCw className="w-3 h-3 text-foreground" />
                       ) : t.type === "Credit Pack" ? (
                         <Zap className="w-3 h-3 text-amber-500" />
                       ) : (
-                        <CreditCard className="w-3 h-3 text-gray-400" />
+                        <CreditCard className="w-3 h-3 text-muted-foreground" />
                       )}
                       {t.type}
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{t.date}</td>
-                  <td className="px-6 py-4 text-sm font-semibold text-gray-900">
+                  <td className="px-6 py-4 text-sm text-muted-foreground">{t.date}</td>
+                  <td className="px-6 py-4 text-sm font-semibold text-foreground">
                     {t.amount}
                   </td>
                   <td className="px-6 py-4">
@@ -95,7 +95,7 @@ export function TransactionHistory({ transactions }: TransactionHistoryProps) {
                   <td className="px-6 py-4 text-right">
                     <button
                       type="button"
-                      className="text-gray-400 hover:text-gray-900 transition-colors"
+                      className="text-muted-foreground hover:text-foreground transition-colors"
                     >
                       <Download className="w-4 h-4" />
                     </button>

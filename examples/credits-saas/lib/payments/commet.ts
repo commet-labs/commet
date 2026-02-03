@@ -2,6 +2,37 @@ import { commet } from "@/lib/commet";
 import { getUser } from "@/lib/auth/session";
 import { redirect } from "next/navigation";
 
+type AuthUser = NonNullable<Awaited<ReturnType<typeof getUser>>>;
+
+async function ensureCommetCustomer(user: AuthUser) {
+  const existing = await commet.customers.list({
+    externalId: user.id,
+    limit: 1,
+  });
+
+  if (existing.success && existing.data && existing.data.length > 0) {
+    return existing.data[0];
+  }
+
+  if (!user.email) {
+    throw new Error("User email is required to create Commet customer");
+  }
+
+  const created = await commet.customers.create({
+    externalId: user.id,
+    email: user.email,
+    fullName: user.name ?? undefined,
+  });
+
+  if (!created.success || !created.data) {
+    throw new Error(
+      created.error || "Failed to create Commet customer for checkout",
+    );
+  }
+
+  return created.data;
+}
+
 export async function createCheckoutSession({
   planCode,
   successUrl,
@@ -14,6 +45,8 @@ export async function createCheckoutSession({
   if (!user) {
     redirect(`/sign-up?redirect=checkout&planCode=${planCode}`);
   }
+
+  await ensureCommetCustomer(user);
 
   // Check if already has active subscription
   const existing = await commet.subscriptions.get(user.id);
@@ -98,6 +131,8 @@ export async function getCheckoutUrl({
   if (!user) {
     throw new Error("User not authenticated");
   }
+
+  await ensureCommetCustomer(user);
 
   // Check if already has active subscription
   const existing = await commet.subscriptions.get(user.id);

@@ -19,7 +19,7 @@ export function CreditBalance({ balance }: CreditBalanceProps) {
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       {/* Total Balance Card */}
-      <Card className="overflow-hidden border-none shadow-md bg-gray-900 text-white">
+      <Card className="overflow-hidden border-none shadow-md bg-primary text-primary-foreground">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium flex items-center gap-2 opacity-90">
             <Coins className="w-4 h-4" />
@@ -37,30 +37,30 @@ export function CreditBalance({ balance }: CreditBalanceProps) {
       </Card>
 
       {/* Plan Credits Card */}
-      <Card className="shadow-sm border-gray-100">
+      <Card className="shadow-sm border-border">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium flex items-center gap-2 text-gray-500">
-            <RefreshCw className="w-4 h-4 text-gray-700" />
+          <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground">
+            <RefreshCw className="w-4 h-4 text-foreground" />
             Plan Credits
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex justify-between items-end">
             <div>
-              <div className="text-2xl font-bold text-gray-900">
+              <div className="text-2xl font-bold text-foreground">
                 {balance.planCredits.toLocaleString()}
               </div>
-              <p className="text-xs text-gray-500 mt-1">Resets every month</p>
+              <p className="text-xs text-muted-foreground mt-1">Resets every month</p>
             </div>
             <div className="text-right">
-              <span className="text-xs font-medium text-gray-400">
+              <span className="text-xs font-medium text-muted-foreground">
                 {Math.round(100 - planUsage)}% remaining
               </span>
             </div>
           </div>
-          <div className="mt-4 h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+          <div className="mt-4 h-2 w-full bg-muted rounded-full overflow-hidden">
             <div
-              className="h-full bg-gray-800 rounded-full transition-all duration-500"
+              className="h-full bg-foreground rounded-full transition-all duration-500"
               style={{ width: `${Math.max(0, 100 - planUsage)}%` }}
             />
           </div>
@@ -68,18 +68,18 @@ export function CreditBalance({ balance }: CreditBalanceProps) {
       </Card>
 
       {/* Purchased Credits Card */}
-      <Card className="shadow-sm border-gray-100">
+      <Card className="shadow-sm border-border">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium flex items-center gap-2 text-gray-500">
+          <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground">
             <Zap className="w-4 h-4 text-amber-500" />
             Purchased Credits
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-gray-900">
+          <div className="text-2xl font-bold text-foreground">
             {balance.purchasedCredits.toLocaleString()}
           </div>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             Never expire, used after plan credits
           </p>
           <div className="mt-4 flex items-center gap-1 text-amber-600 text-xs font-medium">
