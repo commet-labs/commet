@@ -31,94 +31,88 @@ export default async function DashboardPage() {
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
+          <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+            <Zap className="w-5 h-5 text-foreground" />
+            Subscription
+          </h2>
+          <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+            <Info className="w-5 h-5 text-muted-foreground" />
+            Manage Billing
+          </h2>
+
           {/* Subscription Status */}
-          <div className="space-y-6">
-            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-              <Zap className="w-5 h-5 text-foreground" />
-              Subscription
-            </h2>
-            {subscription ? (
-              <Card className="shadow-sm border-border">
-                <CardHeader>
-                  <CardTitle className="text-lg">{subscription.planName}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Status</span>
-                      <span className="text-sm font-medium text-foreground capitalize">
-                        {subscription.status}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Price</span>
-                      <span className="text-sm font-medium text-foreground">
-                        ${(subscription.planPrice / 100).toFixed(2)} / {subscription.billingInterval === "monthly" ? "month" : subscription.billingInterval === "quarterly" ? "quarter" : "year"}
-                      </span>
-                    </div>
+          {subscription ? (
+            <Card className="shadow-sm border-border">
+              <CardHeader>
+                <CardTitle className="text-lg">{subscription.planName}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Status</span>
+                    <span className="text-sm font-medium text-foreground capitalize">
+                      {subscription.status}
+                    </span>
                   </div>
-                </CardContent>
-              </Card>
-            ) : (
-              <Card className="shadow-sm border-border">
-                <CardContent className="p-6">
-                  <p className="text-sm text-muted-foreground text-center">
-                    No active subscription.{" "}
-                    <Link
-                      href="/pricing"
-                      className="text-foreground font-medium hover:underline"
-                    >
-                      Subscribe to a plan
-                    </Link>{" "}
-                    to get started.
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-          </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Price</span>
+                    <span className="text-sm font-medium text-foreground">
+                      ${(subscription.planPrice / 100).toFixed(2)} / {subscription.billingInterval === "monthly" ? "month" : subscription.billingInterval === "quarterly" ? "quarter" : "year"}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="shadow-sm border-border">
+              <CardContent className="p-6">
+                <p className="text-sm text-muted-foreground text-center">
+                  No active subscription.{" "}
+                  <Link
+                    href="/pricing"
+                    className="text-foreground font-medium hover:underline"
+                  >
+                    Subscribe to a plan
+                  </Link>{" "}
+                  to get started.
+                </p>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Manage Billing */}
-          <div className="space-y-6">
-            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-              <Info className="w-5 h-5 text-muted-foreground" />
-              Manage Billing
-            </h2>
-            {portalUrl ? (
-              <Card className="shadow-sm border-border bg-secondary">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-foreground mb-1">
-                        Customer Portal
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Manage your subscription, update payment
-                        methods, and access invoices in the Commet portal.
-                      </p>
-                    </div>
-                    <Button
-                      variant="outline"
-                      className="gap-2"
-                      asChild
-                    >
-                      <Link href={portalUrl} target="_blank" rel="noopener noreferrer">
-                        Open Portal
-                        <ExternalLink className="w-3 h-3" />
-                      </Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ) : (
-              <Card className="shadow-sm border-border">
-                <CardContent className="p-6">
-                  <p className="text-sm text-muted-foreground text-center">
-                    Billing portal will be available once you have an active subscription.
+          {portalUrl ? (
+            <Card className="shadow-sm border-border bg-secondary">
+              <CardHeader>
+                <CardTitle className="text-lg">Customer Portal</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <p className="text-sm text-muted-foreground">
+                    Manage your subscription, update payment methods, and access invoices in the Commet portal.
                   </p>
-                </CardContent>
-              </Card>
-            )}
-          </div>
+                  <Button
+                    variant="outline"
+                    className="gap-2"
+                    asChild
+                  >
+                    <Link href={portalUrl} target="_blank" rel="noopener noreferrer">
+                      Open Portal
+                      <ExternalLink className="w-3 h-3" />
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="shadow-sm border-border">
+              <CardContent className="p-6">
+                <p className="text-sm text-muted-foreground text-center">
+                  Billing portal will be available once you have an active subscription.
+                </p>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </section>
