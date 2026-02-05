@@ -1,87 +1,174 @@
-# Fixed SaaS Example
+# Fixed-Pricing SaaS Starter
 
-Billing integration for a fixed-price SaaS using Commet's plan-first model.
+This is a starter template for building a SaaS application with **fixed-price subscriptions**. Built with Next.js, Drizzle ORM, Better Auth, and Commet.
 
-**Stack:** Next.js 16, Better Auth, Drizzle ORM, PostgreSQL, Commet SDK
+This example demonstrates how to implement a traditional subscription model where users choose a plan and pay a fixed recurring fee.
 
-## Quick Start
+## Features
+
+- Pricing page (`/pricing`) which connects to Commet Checkout
+- Dashboard with subscription overview and billing management
+- Full sidebar dashboard (Overview, General, Billing, Activity, Security)
+- Subscription management with Commet Customer Portal
+- Email/password authentication with JWTs stored to cookies
+- Activity logging system for user events
+- Account settings (update name, email, password, delete account)
+
+## Tech Stack
+
+- **Framework**: [Next.js 16](https://nextjs.org) (App Router)
+- **Database**: [Postgres](https://www.postgresql.org/) with [Drizzle ORM](https://orm.drizzle.team)
+- **Billing**: [Commet](https://commet.co)
+- **Auth**: [Better Auth](https://better-auth.com)
+- **UI**: [Tailwind CSS](https://tailwindcss.com) + Lucide Icons
+
+## Getting Started
 
 ```bash
-# Clone this example
-npx degit commet-labs/commet-node/examples/fixed-saas my-saas
-cd my-saas
-
-# Install dependencies
+git clone <repository-url>
+cd fixed-saas
 pnpm install
-
-# Start database
-docker-compose up -d
-
-# Configure environment
-cp .env.example .env
-# Edit .env with your credentials
-
-# Setup database
-pnpm db:push
-
-# Run
-pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+## Running Locally
 
-## Configuration
+### 1. Set up Commet
 
-Edit `.env` with your credentials:
+> **Important:** Plans and Features are created in the [Commet Dashboard](https://commet.co), not in code. Your application reads these configurations via the API.
+
+Before running the application, you need to configure your Commet account:
+
+1. Sign up at [commet.co](https://commet.co)
+2. Create a **Plan** with fixed pricing:
+   - Set a "Plan Code" (e.g., `pro`)
+   - Set "Price" (e.g., $20/mo)
+   - Add features (boolean flags for access control)
+3. Copy your **API Key** from Settings
+
+### 2. Configure Environment
+
+Create a `.env` file based on `.env.example`:
+
+```bash
+cp .env.example .env
+```
+
+Fill in the values:
 
 ```bash
 # Database
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/fixed_saas
+POSTGRES_URL=postgresql://postgres:postgres@localhost:54322/postgres
 
-# Better Auth
-BETTER_AUTH_SECRET=$(openssl rand -base64 32)
+# Auth
+BETTER_AUTH_SECRET=your-secret-key-min-32-chars-long
 BETTER_AUTH_URL=http://localhost:3000
 NEXT_PUBLIC_BETTER_AUTH_URL=http://localhost:3000
 
 # Commet
 COMMET_API_KEY=ck_sandbox_xxxxx
 COMMET_ENVIRONMENT=sandbox
-COMMET_WEBHOOK_SECRET=whsec_xxxxx
+
+# App
+BASE_URL=http://localhost:3000
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-**Get Commet credentials:**
+### 3. Set up Database
 
-1. Sign up at [commet.co](https://commet.co)
-2. Create a **Plan** with code `pro` and a price (e.g., $50/month)
-3. Copy API key from Settings → API Keys
+Run the database migrations:
 
-## Run
+```bash
+pnpm db:push
+```
+
+You can create new users through the `/sign-up` route.
+
+### 4. Start Development Server
 
 ```bash
 pnpm dev
 ```
 
-## Flow
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-1. **Signup** - Creates Better Auth user
-2. **Checkout** - Creates customer + subscription with plan
-3. **Payment** - Commet handles checkout via Stripe
-4. **Dashboard** - Shows subscription status with `subscriptions.get()`
+## How it Works
 
-## Key Files
+### Subscription Flow
 
-- `src/lib/commet.ts` - SDK initialization with `COMMET_PLAN_ID`
-- `src/actions/create-subscription-action.ts` - Creates subscription with `planId`
-- `src/actions/check-subscription-action.ts` - Uses `subscriptions.get()` for status
-- `src/actions/get-portal-url-action.ts` - Uses `portal.getUrl()` for billing portal
-- `src/app/api/webhooks/commet/route.ts` - Webhook handler
-
-## Webhooks (for local testing)
-
-```bash
-ngrok http 3000
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   Sign Up   │ ──▶ │ Better Auth │ ──▶ │   Commet    │
+│   (User)    │     │ Creates User│     │Creates Cust.│
+└─────────────┘     └─────────────┘     └─────────────┘
+        │
+        ▼
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│  Pricing    │ ──▶ │  Checkout   │ ──▶ │  Dashboard  │
+│  (Select)   │     │  (Stripe)   │     │  (Active)   │
+└─────────────┘     └─────────────┘     └─────────────┘
 ```
 
-Add webhook in Commet dashboard:
-- URL: `https://your-ngrok-url.ngrok.io/api/webhooks/commet`
-- Events: `subscription.activated`, `subscription.canceled`
+1. **User signs up** - Better Auth creates the user in your database
+2. **Commet plugin** - Automatically creates a matching customer in Commet
+3. **User selects plan** - Redirected to Commet Checkout (Stripe)
+4. **Subscription active** - User accesses dashboard features
+
+This is configured in `lib/auth/auth.ts`:
+
+```typescript
+commet({
+  client: commetClient,
+  createCustomerOnSignUp: true,
+  use: [portal(), subscriptions(), features()]
+})
+```
+
+### Key Files
+
+- `lib/commet.ts` - SDK initialization
+- `lib/auth/auth.ts` - Better Auth + Commet plugin configuration
+- `lib/payments/commet.ts` - Checkout session and portal management
+- `actions/plans.ts` - Cached plan fetching from Commet
+- `actions/subscription.ts` - Subscription status checks
+- `actions/billing.ts` - Billing data retrieval
+
+## Testing Payments
+
+To test Commet payments in sandbox mode, use the following test card details:
+
+- Card Number: `4242 4242 4242 4242`
+- Expiration: Any future date
+- CVC: Any 3-digit number
+
+## Going to Production
+
+### Deploy to Vercel
+
+1. Push your code to a GitHub repository
+2. Connect your repository to [Vercel](https://vercel.com/) and deploy it
+
+### Add environment variables
+
+In your Vercel project settings, add all the necessary environment variables:
+
+1. `POSTGRES_URL`: Your production database URL
+2. `BETTER_AUTH_SECRET`: A random string (`openssl rand -base64 32`)
+3. `BETTER_AUTH_URL`: Your production domain
+4. `NEXT_PUBLIC_BETTER_AUTH_URL`: Your production domain
+5. `COMMET_API_KEY`: Your Commet production API key
+6. `COMMET_ENVIRONMENT`: Set to `production`
+7. `BASE_URL`: Your production domain
+8. `NEXT_PUBLIC_APP_URL`: Your production domain
+
+### Set up database
+
+```bash
+pnpm db:push
+```
+
+Note: For production, you may want to use migrations instead. Generate them with `pnpm db:generate` and run with `pnpm db:migrate`.
+
+## Credits
+
+- Based on [Next.js SaaS Starter](https://github.com/vercel/nextjs-saas-starter)
+- Powered by [Commet](https://commet.co)
