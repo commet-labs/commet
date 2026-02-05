@@ -6,6 +6,7 @@ This example demonstrates how to implement a traditional subscription model wher
 
 ## Features
 
+- Fixed-price subscription tiers with predictable billing
 - Pricing page (`/pricing`) which connects to Commet Checkout
 - Dashboard with subscription overview and billing management
 - Full sidebar dashboard (Overview, General, Billing, Activity, Security)

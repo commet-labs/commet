@@ -33,9 +33,9 @@ export default function HomePage() {
             </div>
             <div className="space-y-6 max-w-4xl">
               <h1 className="text-5xl font-extrabold text-foreground tracking-tight sm:text-6xl md:text-7xl">
-                The modern way to{" "}
+                Launch your SaaS with{" "}
                 <span className="underline decoration-4 underline-offset-4">
-                  monetize AI.
+                  predictable pricing.
                 </span>
               </h1>
               <p className="text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
@@ -91,7 +91,7 @@ export default function HomePage() {
               Features
             </h2>
             <p className="text-3xl font-bold text-foreground sm:text-4xl">
-              Everything you need for subscription billing.
+              Everything you need for fixed-price subscriptions.
             </p>
           </div>
 
@@ -127,11 +127,11 @@ export default function HomePage() {
             <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 bg-card/10 rounded-full blur-3xl" />
             <div className="relative z-10">
               <h2 className="text-3xl font-bold sm:text-4xl mb-6">
-                Ready to launch your AI SaaS?
+                Ready to launch your subscription business?
               </h2>
               <p className="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto">
-                Stop building billing from scratch. Use our template to monetize
-                your product with subscriptions in just 2 minutes.
+                Stop building billing from scratch. Use our template to launch
+                fixed-price plans and start earning predictable revenue in minutes.
               </p>
               <Button
                 size="lg"
