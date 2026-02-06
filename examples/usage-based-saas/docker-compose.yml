@@ -6,11 +6,11 @@ services:
     container_name: usage-based-saas-postgres
     restart: unless-stopped
     ports:
-      - "5432:5432"
+      - "5450:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: usage_based_saas
+      POSTGRES_DB: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
