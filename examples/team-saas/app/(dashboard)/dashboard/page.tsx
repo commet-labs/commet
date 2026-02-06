@@ -12,7 +12,7 @@ export default async function DashboardPage() {
   let portalUrl: string | null = null;
   if (status.isPaid) {
     const portalResult = await getPortalUrlAction();
-    portalUrl = portalResult.success ? portalResult.portalUrl : null;
+    portalUrl = portalResult.success && portalResult.portalUrl ? portalResult.portalUrl : null;
   }
 
   return (
