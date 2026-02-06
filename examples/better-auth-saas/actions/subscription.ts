@@ -3,9 +3,6 @@
 import { commet } from "@/lib/commet";
 import { getUser } from "@/lib/auth/session";
 
-/**
- * Check if user has an active subscription
- */
 export async function hasActiveSubscriptionAction(): Promise<{
   success: boolean;
   hasActiveSubscription: boolean;

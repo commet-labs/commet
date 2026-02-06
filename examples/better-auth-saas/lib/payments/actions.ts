@@ -14,9 +14,6 @@ export async function checkoutAction(formData: FormData) {
   redirect(`/checkout?planCode=${planCode}`);
 }
 
-/**
- * Server action to handle checkout after signup
- */
 export async function handlePostSignupCheckout(planCode: string) {
   "use server";
 

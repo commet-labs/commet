@@ -17,9 +17,6 @@ export interface UsageData {
   hasSubscription: boolean;
 }
 
-/**
- * Get usage data from Commet SDK for all features
- */
 export async function getUsageDataAction(): Promise<{
   success: boolean;
   data?: UsageData;
@@ -33,7 +30,6 @@ export async function getUsageDataAction(): Promise<{
 
     const externalId = user.id;
 
-    // Check if customer has an active subscription
     const subscriptionResult = await commet.subscriptions.get(externalId);
 
     if (!subscriptionResult.success || !subscriptionResult.data) {
@@ -46,7 +42,6 @@ export async function getUsageDataAction(): Promise<{
       };
     }
 
-    // Get all features from the subscription
     const subscription = subscriptionResult.data;
     if (subscription.status !== "active" && subscription.status !== "trialing") {
       return {
@@ -57,7 +52,7 @@ export async function getUsageDataAction(): Promise<{
         },
       };
     }
-    // Fetch usage data for each feature in the subscription in parallel
+
     const featurePromises = subscription.features
       .filter((featureSummary) => featureSummary.type !== "boolean")
       .map(async (featureSummary) => {

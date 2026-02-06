@@ -9,10 +9,6 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-// =============================================================================
-// Better Auth Core Tables
-// =============================================================================
-
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
@@ -63,10 +59,6 @@ export const verification = pgTable("verification", {
   updatedAt: timestamp("updatedAt").defaultNow(),
 });
 
-// =============================================================================
-// Team Members (for seats management)
-// =============================================================================
-
 export const member = pgTable("member", {
   id: uuid("id").primaryKey().defaultRandom(),
   email: varchar("email", { length: 255 }).notNull(),
@@ -81,10 +73,6 @@ export const member = pgTable("member", {
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 });
 
-// =============================================================================
-// Activity Logs
-// =============================================================================
-
 export const activityLogs = pgTable("activity_logs", {
   id: serial("id").primaryKey(),
   userId: text("user_id").references(() => user.id),
@@ -92,10 +80,6 @@ export const activityLogs = pgTable("activity_logs", {
   timestamp: timestamp("timestamp").notNull().defaultNow(),
   ipAddress: varchar("ip_address", { length: 45 }),
 });
-
-// =============================================================================
-// Relations
-// =============================================================================
 
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
@@ -132,10 +116,6 @@ export const memberRelations = relations(member, ({ one }) => ({
     relationName: "ownedMembers",
   }),
 }));
-
-// =============================================================================
-// Type Exports
-// =============================================================================
 
 export type User = typeof user.$inferSelect;
 export type NewUser = typeof user.$inferInsert;

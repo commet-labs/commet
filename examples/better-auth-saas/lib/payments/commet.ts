@@ -48,7 +48,6 @@ export async function createCheckoutSession({
 
   await ensureCommetCustomer(user);
 
-  // Check if already has active subscription
   const existing = await commet.subscriptions.get(user.id);
 
   if (existing.success && existing.data) {
@@ -63,7 +62,6 @@ export async function createCheckoutSession({
     }
   }
 
-  // Create subscription via Commet
   let checkoutUrl: string;
 
   try {
@@ -88,7 +86,6 @@ export async function createCheckoutSession({
     const errorObj = error instanceof Error ? error : new Error(String(error));
     const errorWithDetails = error as { statusCode?: number; details?: unknown; code?: string; message?: string };
 
-    // Handle 409 Conflict: Customer already has active subscription
     if (errorWithDetails.statusCode === 409) {
       const recheck = await commet.subscriptions.get(user.id);
       if (recheck.success && recheck.data) {
@@ -114,9 +111,6 @@ export async function createCheckoutSession({
   redirect(checkoutUrl);
 }
 
-/**
- * Get checkout URL without redirecting (for use in server actions called from client)
- */
 export async function getCheckoutUrl({
   planCode,
   successUrl,
@@ -132,7 +126,6 @@ export async function getCheckoutUrl({
 
   await ensureCommetCustomer(user);
 
-  // Check if already has active subscription
   const existing = await commet.subscriptions.get(user.id);
 
   if (existing.success && existing.data) {
@@ -147,7 +140,6 @@ export async function getCheckoutUrl({
     }
   }
 
-  // Create subscription via Commet
   const result = await commet.subscriptions.create({
     externalId: user.id,
     planCode: planCode,

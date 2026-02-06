@@ -15,9 +15,6 @@ export interface BillingData {
   subscription: BillingSubscription | null;
 }
 
-/**
- * Get billing data from Commet (subscription only)
- */
 export async function getBillingDataAction(): Promise<{
   success: boolean;
   data?: BillingData;
@@ -29,7 +26,6 @@ export async function getBillingDataAction(): Promise<{
       return { success: false, error: "Please sign in to view billing." };
     }
 
-    // Get subscription from Commet
     const subscriptionResult = await commet.subscriptions.get(user.id);
 
     let subscription: BillingSubscription | null = null;
