@@ -46,17 +46,20 @@ Create a `.env` file:
 
 ```bash
 # Database
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/team_saas
+POSTGRES_URL=postgresql://postgres:postgres@localhost:54324/postgres
 
 # Better Auth
-BETTER_AUTH_SECRET=your-secret-key-generate-with-openssl-rand-base64-32
-BETTER_AUTH_URL=http://localhost:3001
-NEXT_PUBLIC_BETTER_AUTH_URL=http://localhost:3001
+BETTER_AUTH_SECRET=your-secret-key-min-32-chars-long
+BETTER_AUTH_URL=http://localhost:3002
+NEXT_PUBLIC_BETTER_AUTH_URL=http://localhost:3002
 
 # Commet
 COMMET_API_KEY=ck_sandbox_xxxxx
 COMMET_ENVIRONMENT=sandbox
-COMMET_WEBHOOK_SECRET=whsec_xxxxx
+
+# App
+BASE_URL=http://localhost:3002
+NEXT_PUBLIC_APP_URL=http://localhost:3002
 ```
 
 ### 3. Start Database
@@ -85,7 +88,7 @@ Create the following in your Commet dashboard:
 1. Go to **Features**
 2. Create a feature:
    - **Name**: Team Members
-   - **Code**: `team_members`
+   - **Code**: `member`
    - **Type**: Seats
    - **Seat Type**: member
 
@@ -96,7 +99,7 @@ Create the following in your Commet dashboard:
    - **Name**: Team
    - **Code**: `team`
    - **Base Price**: $50/month
-3. Add the `team_members` feature:
+3. Add the `member` feature:
    - **Included Amount**: 3
    - **Overage Enabled**: Yes
    - **Overage Unit Price**: $10 (1000 cents)
@@ -107,34 +110,47 @@ Create the following in your Commet dashboard:
 pnpm dev
 ```
 
-Visit [http://localhost:3001](http://localhost:3001)
+Visit [http://localhost:3002](http://localhost:3002)
 
 ## Project Structure
 
 ```
-src/
 ├── actions/
-│   ├── invite-member-action.ts    # Add member + seats.add()
-│   ├── remove-member-action.ts    # Remove member + seats.remove()
-│   ├── check-subscription-action.ts # Get subscription + seat balance
-│   └── get-workspace-members.ts   # Fetch team members
+│   ├── auth.ts                    # Auth actions (sign-in, sign-up, sign-out)
+│   ├── plans.ts                   # Fetch available plans
+│   ├── portal.ts                  # Billing portal URL
+│   ├── subscription.ts            # Check subscription + seat balance
+│   └── team.ts                    # Invite/remove members + seats.add/remove
 ├── app/
-│   ├── (auth)/                    # Login/signup pages
-│   ├── (protected)/
-│   │   ├── dashboard/page.tsx     # Workspace overview
-│   │   └── team/page.tsx          # Member management
-│   ├── (public)/
-│   │   └── checkout/              # Subscription checkout
-│   └── api/
-│       └── webhooks/commet/       # Webhook handler
+│   ├── (auth)/                    # Sign-in/sign-up pages
+│   ├── (dashboard)/
+│   │   ├── dashboard/
+│   │   │   ├── billing/           # Billing management
+│   │   │   ├── general/           # General settings
+│   │   │   ├── security/          # Security settings
+│   │   │   └── team/              # Member management
+│   │   └── pricing/               # Pricing page
+│   ├── checkout/                  # Subscription checkout
+│   └── api/auth/[...all]/         # Better Auth API route
 ├── components/
-│   ├── seat-usage-card.tsx        # Seat usage visualization
-│   ├── member-list.tsx            # Team member list
-│   └── invite-member-form.tsx     # Invite form
+│   ├── auth/form-auth.tsx         # Auth form component
+│   ├── billing/
+│   │   ├── invite-member-form.tsx # Invite form
+│   │   ├── manage-billing-button.tsx # Portal redirect
+│   │   ├── member-list.tsx        # Team member list
+│   │   └── seat-usage-card.tsx    # Seat usage visualization
+│   ├── shared/submit-button.tsx   # Reusable submit button
+│   ├── header.tsx                 # App header
+│   └── ui/                        # UI primitives
+├── hooks/
+│   └── use-form-toast.ts         # Form toast notifications
 └── lib/
-    ├── auth.ts                    # Better Auth + workspace hooks
+    ├── auth/                      # Better Auth config + session helpers
     ├── commet.ts                  # Commet SDK instance
-    └── db/schema.ts               # Drizzle schema
+    ├── db/                        # Drizzle schema + connection + queries
+    ├── payments/                  # Payment actions + Commet helpers
+    ├── utils.ts                   # Utility functions
+    └── validations/               # Zod schemas
 ```
 
 ## Key Flows
@@ -176,10 +192,7 @@ At billing time, Commet:
 
 ## Webhook Events
 
-The webhook handler at `/api/webhooks/commet` processes:
-
-- `subscription.activated`: Grants access to user
-- `subscription.canceled`: Revokes access
+Webhooks are handled automatically by the `@commet/better-auth` plugin through the `/api/auth/[...all]` route. The plugin processes subscription lifecycle events like activation and cancellation.
 
 ## Learn More
 
