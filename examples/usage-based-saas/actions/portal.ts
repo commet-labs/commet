@@ -33,14 +33,20 @@ export async function getPortalUrlAction(): Promise<{
 
     const getCachedPortalUrl = unstable_cache(
       async (userId: string) => {
-        const result = await commet.portal.getUrl({
-          externalId: userId,
-        });
-        return result;
+        try {
+          const result = await commet.portal.getUrl({
+            externalId: userId,
+          });
+          return result;
+        } catch (error) {
+          // If rate limited or any error, return graceful failure
+          console.warn("Portal URL fetch failed (will retry after cache expires):", error);
+          return { success: false, error: "Rate limited", data: null };
+        }
       },
       [`portal-url-${user.id}`],
       {
-        revalidate: 300,
+        revalidate: 300, // Cache for 5 minutes
         tags: [`portal-${user.id}`],
       }
     );
