@@ -1,7 +1,7 @@
 // Environment variable validation
 export function validateEnv() {
   const required = [
-    "DATABASE_URL",
+    "POSTGRES_URL",
     "BETTER_AUTH_SECRET",
     "BETTER_AUTH_URL",
     "COMMET_API_KEY",
