@@ -29,19 +29,17 @@ export default function HomePage() {
           <div className="flex flex-col items-center text-center gap-10">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-muted border border-border text-foreground text-sm font-medium">
               <Zap className="w-4 h-4" />
-              <span>Powered by @commet/better-auth</span>
+              <span>@commet/better-auth Plugin Showcase</span>
             </div>
             <div className="space-y-6 max-w-4xl">
               <h1 className="text-5xl font-extrabold text-foreground tracking-tight sm:text-6xl md:text-7xl">
-                Billing via{" "}
-                <span className="underline decoration-4 underline-offset-4">
-                  authClient.
-                </span>
+                <span className="block">Better Auth + Commet</span>
+                <span className="block">Billing Integration</span>
               </h1>
               <p className="text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-                Seats, subscriptions, feature flags, usage tracking, and
-                customer portal — all through your Better Auth client. No
-                separate SDK needed.
+                This example demonstrates the @commet/better-auth plugin —
+                seamless billing integration with seats, usage tracking, and
+                feature flags.
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center w-full max-w-2xl">

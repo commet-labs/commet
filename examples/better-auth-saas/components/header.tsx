@@ -17,8 +17,18 @@ import { hasActiveSubscriptionAction } from "@/actions/subscription";
 
 function UserMenu() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
   const { data: session, isPending } = useSession();
   const router = useRouter();
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return <div className="h-9 w-9 bg-muted rounded-full animate-pulse" />;
+  }
 
   async function handleSignOut() {
     await signOut();
@@ -102,6 +112,7 @@ function BackButton() {
 
   return (
     <button
+      type="button"
       onClick={() => router.back()}
       className="flex items-center text-muted-foreground hover:text-foreground transition-colors"
     >
@@ -117,6 +128,11 @@ interface HeaderProps {
 export function Header({ variant = "default" }: HeaderProps) {
   const { data: session, isPending } = useSession();
   const [hasActiveSubscription, setHasActiveSubscription] = useState<boolean | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     if (variant === "auth") return;
@@ -132,7 +148,11 @@ export function Header({ variant = "default" }: HeaderProps) {
     }
   }, [session?.user, isPending, variant]);
 
-  const shouldShowPricing = variant === "default" && !isPending && (!session?.user || hasActiveSubscription === false);
+  const shouldShowPricing =
+    isMounted &&
+    variant === "default" &&
+    !isPending &&
+    (!session?.user || hasActiveSubscription === false);
 
   if (variant === "auth") {
     return (

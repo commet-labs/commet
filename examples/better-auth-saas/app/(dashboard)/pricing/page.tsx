@@ -62,12 +62,44 @@ export default async function PricingPage() {
         </p>
       </div>
 
-      {plans.length > 0 ? (
-        <div className={`grid gap-8 max-w-4xl mx-auto ${plans.length === 1 ? "md:grid-cols-1" : plans.length === 2 ? "md:grid-cols-2" : "md:grid-cols-3"}`}>
+      {plans.length === 0 ? (
+        <div className="flex justify-center max-w-4xl mx-auto">
+          <div className="w-full max-w-md p-8 bg-card border border-border shadow-sm">
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-muted-foreground mb-2">No plans available</h2>
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                Plans will appear here once available.
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : plans.length === 1 ? (
+        <div className="flex justify-center max-w-4xl mx-auto">
+          <div className="w-full max-w-md">
+            <PricingCard
+              key={plans[0].id}
+              name={plans[0].name}
+              price={plans[0].prices.find((p) => p.isDefault)?.price || plans[0].prices[0]?.price || 0}
+              interval={formatBillingInterval(
+                plans[0].prices.find((p) => p.isDefault)?.billingInterval ||
+                plans[0].prices[0]?.billingInterval ||
+                "monthly"
+              )}
+              description={plans[0].description || `Perfect for ${plans[0].name.toLowerCase()} teams.`}
+              features={plans[0].features.map(formatFeature)}
+              planCode={plans[0].code}
+              highlight={plans[0].isDefault}
+            />
+          </div>
+        </div>
+      ) : (
+        <div className={`grid gap-8 mx-auto ${
+          plans.length === 2 ? "md:grid-cols-2 max-w-4xl" :
+          plans.length === 3 ? "md:grid-cols-3 max-w-4xl" :
+          "md:grid-cols-3 max-w-6xl"
+        }`}>
           {plans.map((plan, index) => {
-            const defaultPrice =
-              plan.prices.find((p) => p.isDefault) || plan.prices[0];
-
+            const defaultPrice = plan.prices.find((p) => p.isDefault) || plan.prices[0];
             return (
               <PricingCard
                 key={plan.id}
@@ -81,25 +113,6 @@ export default async function PricingPage() {
               />
             );
           })}
-        </div>
-      ) : (
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          <div className="p-8 rounded-[2rem] bg-card border border-border shadow-sm">
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold text-muted-foreground mb-2">No plans available</h2>
-              <p className="text-muted-foreground text-sm leading-relaxed">
-                Plans will appear here once available.
-              </p>
-            </div>
-          </div>
-          <div className="p-8 rounded-[2rem] bg-card border border-border shadow-sm">
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold text-muted-foreground mb-2">No plans available</h2>
-              <p className="text-muted-foreground text-sm leading-relaxed">
-                Plans will appear here once available.
-              </p>
-            </div>
-          </div>
         </div>
       )}
 
