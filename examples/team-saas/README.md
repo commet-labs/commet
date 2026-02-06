@@ -1,17 +1,17 @@
-# Team SaaS Example - Seat-Based Billing with Commet
+# Team SaaS Example - License-Based Billing with Commet
 
-This example demonstrates how to implement **seat-based billing** using [Commet](https://commet.co) with Next.js, Better Auth, and Drizzle ORM.
+This example demonstrates how to implement **license-based billing** using [Commet](https://commet.co) with Next.js, Better Auth, and Drizzle ORM.
 
 ## Features
 
-- **Seat-Based Billing**: Users pay for team members (seats)
+- **License-Based Billing**: Users pay for team members (licenses)
 - **Workspace Management**: Each user gets a workspace to manage team members
 - **Real-Time Seat Tracking**: Add/remove members and see billing impact instantly
 - **Overage Pricing**: Included seats in plan, extra seats charged per-seat
 - **Better Auth**: Complete authentication with email/password
 - **Drizzle ORM**: Type-safe database operations
 
-## How Seat Billing Works
+## How License Billing Works
 
 ```
 Plan: Team ($50/month)
@@ -197,7 +197,7 @@ Webhooks are handled automatically by the `@commet/better-auth` plugin through t
 ## Learn More
 
 - [Commet Documentation](https://commet.co/docs/platform/overview)
-- [Seat-Based Billing Guide](https://commet.co/docs/platform/features/products/seat-based-pricing)
+- [License-Based Billing Guide](https://commet.co/docs/platform/features/products/seat-based-pricing)
 - [Better Auth Documentation](https://better-auth.com)
 - [Drizzle ORM Documentation](https://orm.drizzle.team)
 

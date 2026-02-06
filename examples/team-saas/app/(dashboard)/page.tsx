@@ -34,7 +34,7 @@ export default function HomePage() {
               <h1 className="text-5xl font-extrabold text-foreground tracking-tight sm:text-6xl md:text-7xl">
                 Team collaboration,{" "}
                 <span className="underline decoration-4 underline-offset-4">
-                  seat-based billing.
+                  license-based billing.
                 </span>
               </h1>
               <p className="text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
@@ -88,15 +88,15 @@ export default function HomePage() {
               Features
             </h2>
             <p className="text-3xl font-bold text-foreground sm:text-4xl">
-              Everything you need for seat-based billing.
+              Everything you need for license-based billing.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <FeatureCard
               icon={<Users className="w-6 h-6" />}
-              title="Seat-Based Billing"
-              description="Only pay for active team members. Add and remove seats as your team grows."
+              title="License-Based Billing"
+              description="Only pay for active team members. Add and remove licenses as your team grows."
             />
             <FeatureCard
               icon={<Zap className="w-6 h-6" />}
@@ -127,7 +127,7 @@ export default function HomePage() {
               </h2>
               <p className="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto">
                 Stop building billing from scratch. Use our template to monetize
-                your product with seat-based billing in just 2 minutes.
+                your product with license-based billing in just 2 minutes.
               </p>
               <Button
                 size="lg"
