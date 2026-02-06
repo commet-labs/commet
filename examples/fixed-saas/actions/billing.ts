@@ -15,10 +15,6 @@ export interface BillingData {
   subscription: BillingSubscription | null;
 }
 
-/**
- * Get billing data from Commet (subscription only)
- * Note: Invoices are not available via the Commet SDK yet
- */
 export async function getBillingDataAction(): Promise<{
   success: boolean;
   data?: BillingData;

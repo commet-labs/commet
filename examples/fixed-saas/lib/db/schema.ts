@@ -8,10 +8,6 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-// =============================================================================
-// Better Auth Core Tables
-// =============================================================================
-
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
@@ -62,10 +58,6 @@ export const verification = pgTable("verification", {
   updatedAt: timestamp("updatedAt").defaultNow(),
 });
 
-// =============================================================================
-// Activity Logs (keeping for audit trail)
-// =============================================================================
-
 export const activityLogs = pgTable("activity_logs", {
   id: serial("id").primaryKey(),
   userId: text("user_id").references(() => user.id),
@@ -73,10 +65,6 @@ export const activityLogs = pgTable("activity_logs", {
   timestamp: timestamp("timestamp").notNull().defaultNow(),
   ipAddress: varchar("ip_address", { length: 45 }),
 });
-
-// =============================================================================
-// Relations
-// =============================================================================
 
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
@@ -104,10 +92,6 @@ export const activityLogsRelations = relations(activityLogs, ({ one }) => ({
     references: [user.id],
   }),
 }));
-
-// =============================================================================
-// Type Exports
-// =============================================================================
 
 export type User = typeof user.$inferSelect;
 export type NewUser = typeof user.$inferInsert;

@@ -3,9 +3,6 @@
 import { commet } from "@/lib/commet";
 import { getUser } from "@/lib/auth/session";
 
-/**
- * Get portal URL for customer to manage billing
- */
 export async function getPortalUrlAction(): Promise<{
   success: boolean;
   portalUrl?: string;

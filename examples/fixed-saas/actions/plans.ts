@@ -4,10 +4,6 @@ import { commet } from "@/lib/commet";
 import type { Plan } from "@commet/node";
 import { unstable_cache } from "next/cache";
 
-/**
- * Cached function to fetch plans from Commet
- * Revalidates every hour or on-demand with the "plans" tag
- */
 const getCachedPlans = unstable_cache(
   async () => {
     const result = await commet.plans.list();
@@ -20,9 +16,6 @@ const getCachedPlans = unstable_cache(
   { revalidate: 3600, tags: ["plans"] }
 );
 
-/**
- * Get all public plans from Commet
- */
 export async function getPlansAction(): Promise<{
   success: boolean;
   data?: Plan[];

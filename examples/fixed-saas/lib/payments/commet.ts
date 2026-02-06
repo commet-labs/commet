@@ -114,10 +114,6 @@ export async function createCheckoutSession({
   redirect(checkoutUrl);
 }
 
-/**
- * Get checkout URL without redirecting (for use in server actions called from client)
- * Returns the checkout URL or throws an error
- */
 export async function getCheckoutUrl({
   planCode,
   successUrl,

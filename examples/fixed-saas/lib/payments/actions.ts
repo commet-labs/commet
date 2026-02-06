@@ -14,10 +14,6 @@ export async function checkoutAction(formData: FormData) {
   redirect(`/checkout?planCode=${planCode}`);
 }
 
-/**
- * Server action to handle checkout after signup
- * Redirects directly to Stripe checkout (ensures session cookies are available)
- */
 export async function handlePostSignupCheckout(planCode: string) {
   "use server";
 
