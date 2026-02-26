@@ -59,6 +59,9 @@ export type {
   GetAllBalancesParams,
 } from "./resources/seats";
 
+// Credit Packs
+export type { CreditPack } from "./resources/credit-packs";
+
 // Plans
 export type {
   Plan,
