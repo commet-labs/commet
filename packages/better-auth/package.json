@@ -50,8 +50,8 @@
   "author": "Commet Team",
   "license": "MIT",
   "peerDependencies": {
-    "@commet/node": "^1.4.3",
-    "better-auth": "^1.4.6",
+    "@commet/node": "1.4.3",
+    "better-auth": "1.4.6",
     "zod": "3.24.2 || 4"
   },
   "devDependencies": {
