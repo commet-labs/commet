@@ -1,5 +1,11 @@
 # @commet/node
 
+## 1.5.0
+
+### Minor Changes
+
+- 6ddf08e: Add creditPacks.list() resource for retrieving active credit packs
+
 ## 1.4.3
 
 ### Patch Changes
