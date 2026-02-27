@@ -1,5 +1,11 @@
 # @commet/next
 
+## 0.2.13
+
+### Patch Changes
+
+- 25481d9: Update next devDependency to 16.1.6 to fix security vulnerabilities (HTTP request deserialization DoS, PPR memory consumption, Image Optimizer DoS)
+
 ## 0.2.12
 
 ### Patch Changes
