@@ -52,7 +52,11 @@ export interface ActiveSubscription {
   endDate?: string;
   billingDayOfMonth: number;
   nextBillingDate: string;
-  checkoutUrl?: string;
+  /**
+   * Checkout URL for completing payment.
+   * Present for subscriptions in pending_payment when checkout is required.
+   */
+  checkoutUrl?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -72,7 +76,17 @@ export interface Subscription {
   currentPeriodStart?: string;
   currentPeriodEnd?: string;
   billingDayOfMonth: number;
-  checkoutUrl?: string;
+  /**
+   * Checkout URL for completing payment.
+   * Present for subscriptions in pending_payment when checkout is required.
+   * May be null/undefined for free plans that activate immediately.
+   */
+  checkoutUrl?: string | null;
+  /**
+   * Indicates whether the subscription was created from a free plan.
+   * Optional because it may not be present in all subscription responses.
+   */
+  isFreePlan?: boolean;
   createdAt: string;
   updatedAt: string;
 }
