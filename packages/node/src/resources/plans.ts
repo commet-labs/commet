@@ -31,6 +31,7 @@ export interface Plan {
   code: string;
   name: string;
   description?: string;
+  isFree: boolean;
   isPublic: boolean;
   isDefault: boolean;
   trialDays: number;

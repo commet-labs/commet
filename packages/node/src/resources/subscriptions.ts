@@ -36,7 +36,7 @@ export interface ActiveSubscription {
     id: string;
     name: string;
     basePrice: number;
-    billingInterval: BillingInterval;
+    billingInterval: BillingInterval | null;
   };
   name: string;
   description?: string;
@@ -65,7 +65,7 @@ export interface Subscription {
   name: string;
   description?: string;
   status: SubscriptionStatus;
-  billingInterval: BillingInterval;
+  billingInterval: BillingInterval | null;
   trialEndsAt?: string;
   startDate: string;
   endDate?: string;
