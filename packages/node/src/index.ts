@@ -76,12 +76,12 @@ export type {
 
 // Subscriptions
 export type {
+  CreatedSubscription,
   Subscription,
   ActiveSubscription,
   SubscriptionStatus,
   FeatureSummary,
   CreateSubscriptionParams,
-  ChangePlanParams,
   CancelParams,
 } from "./resources/subscriptions";
 

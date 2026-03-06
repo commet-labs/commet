@@ -10,12 +10,6 @@ export interface SubscriptionsConfig {
   plans?: Array<{ planId: string; slug: string }>;
 }
 
-const ChangePlanSchema = z.object({
-  planId: z.string().optional(),
-  slug: z.string().optional(),
-  billingInterval: z.enum(["monthly", "quarterly", "yearly"]).optional(),
-});
-
 const CancelSchema = z.object({
   reason: z.string().optional(),
   immediate: z.boolean().optional(),
@@ -26,12 +20,12 @@ const CancelSchema = z.object({
  *
  * Endpoints:
  * - GET /subscription - Get active subscription for the authenticated user
- * - POST /subscription/change-plan - Change subscription plan (upgrade/downgrade)
  * - POST /subscription/cancel - Cancel the subscription
  */
 export const subscriptions =
   (config: SubscriptionsConfig = {}) =>
   (commet: Commet) => {
+
     return {
       getSubscription: createAuthEndpoint(
         "/commet/subscription",
@@ -72,81 +66,6 @@ export const subscriptions =
 
             throw new APIError("INTERNAL_SERVER_ERROR", {
               message: "Failed to retrieve subscription",
-            });
-          }
-        },
-      ),
-
-      changePlan: createAuthEndpoint(
-        "/commet/subscription/change-plan",
-        {
-          method: "POST",
-          body: ChangePlanSchema,
-          use: [sessionMiddleware],
-        },
-        async (ctx) => {
-          const userId = ctx.context.session?.user.id;
-
-          if (!userId) {
-            throw new APIError("UNAUTHORIZED", {
-              message: "You must be logged in to change plan",
-            });
-          }
-
-          // Resolve plan ID from slug if provided
-          let planId = ctx.body.planId;
-          if (ctx.body.slug && !planId) {
-            const plan = config.plans?.find((p) => p.slug === ctx.body.slug);
-            if (!plan) {
-              throw new APIError("BAD_REQUEST", {
-                message: `Plan with slug "${ctx.body.slug}" not found`,
-              });
-            }
-            planId = plan.planId;
-          }
-
-          if (!planId) {
-            throw new APIError("BAD_REQUEST", {
-              message: "Either planId or slug must be provided",
-            });
-          }
-
-          try {
-            // First get the current subscription
-            const currentSub = await commet.subscriptions.get(userId);
-
-            if (!currentSub.success || !currentSub.data) {
-              throw new APIError("BAD_REQUEST", {
-                message: "No active subscription found",
-              });
-            }
-
-            const result = await commet.subscriptions.changePlan({
-              subscriptionId: currentSub.data.id,
-              planId,
-              billingInterval: ctx.body.billingInterval,
-            });
-
-            if (!result.success) {
-              throw new APIError("INTERNAL_SERVER_ERROR", {
-                message: result.message || "Failed to change plan",
-              });
-            }
-
-            return ctx.json(result.data ?? null);
-          } catch (e: unknown) {
-            if (e instanceof APIError) {
-              throw e;
-            }
-
-            if (e instanceof Error) {
-              ctx.context.logger.error(
-                `Commet plan change failed: ${e.message}`,
-              );
-            }
-
-            throw new APIError("INTERNAL_SERVER_ERROR", {
-              message: "Failed to change plan",
             });
           }
         },

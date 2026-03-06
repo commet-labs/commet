@@ -68,24 +68,6 @@ export const commetClient = () => {
           },
 
           /**
-           * Change the subscription plan (upgrade/downgrade)
-           */
-          changePlan: async (
-            data: {
-              planId?: string;
-              slug?: string;
-              billingInterval?: "monthly" | "quarterly" | "yearly";
-            },
-            fetchOptions?: BetterFetchOption,
-          ) => {
-            return $fetch("/commet/subscription/change-plan", {
-              method: "POST",
-              body: data,
-              ...fetchOptions,
-            });
-          },
-
-          /**
            * Cancel the subscription
            */
           cancel: async (

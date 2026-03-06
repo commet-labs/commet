@@ -36,12 +36,12 @@ export interface ActiveSubscription {
     id: string;
     name: string;
     basePrice: number;
-    billingInterval: BillingInterval;
+    billingInterval: BillingInterval | null;
   };
   name: string;
-  description?: string;
+  description: string | null;
   status: SubscriptionStatus;
-  trialEndsAt?: string;
+  trialEndsAt: string | null;
   currentPeriod: {
     start: string;
     end: string;
@@ -49,12 +49,35 @@ export interface ActiveSubscription {
   };
   features: FeatureSummary[];
   startDate: string;
-  endDate?: string;
+  endDate: string | null;
   billingDayOfMonth: number;
   nextBillingDate: string;
-  checkoutUrl?: string;
+  checkoutUrl: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface CreatedSubscription {
+  id: string;
+  customerId: string;
+  externalId: string;
+  planId: string;
+  planName: string;
+  name: string;
+  status: SubscriptionStatus;
+  billingInterval: BillingInterval | null;
+  trialEndsAt: string | null;
+  startDate: string;
+  endDate: string | null;
+  currentPeriodStart: string | null;
+  currentPeriodEnd: string | null;
+  billingDayOfMonth: number;
+  checkoutUrl: string | null;
+  createdAt: string;
+  updatedAt: string;
+  introOfferEndsAt: string | null;
+  introOfferDiscountType: "percentage" | "amount" | null;
+  introOfferDiscountValue: number | null;
 }
 
 export interface Subscription {
@@ -97,11 +120,6 @@ export type CreateSubscriptionParams = CustomerIdentifier &
     successUrl?: string;
   };
 
-export type ChangePlanParams = PlanIdentifier & {
-  subscriptionId: string;
-  billingInterval?: BillingInterval;
-};
-
 export interface CancelParams {
   subscriptionId: string;
   reason?: string;
@@ -132,7 +150,7 @@ export class SubscriptionsResource {
   async create(
     params: CreateSubscriptionParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<Subscription>> {
+  ): Promise<ApiResponse<CreatedSubscription>> {
     return this.httpClient.post("/subscriptions", params, options);
   }
 
@@ -148,28 +166,6 @@ export class SubscriptionsResource {
     externalId: string,
   ): Promise<ApiResponse<ActiveSubscription | null>> {
     return this.httpClient.get("/subscriptions/active", { externalId });
-  }
-
-  /**
-   * Change the plan of a subscription (upgrade/downgrade)
-   *
-   * @example
-   * ```typescript
-   * await commet.subscriptions.changePlan({
-   *   subscriptionId: 'sub_xxx',
-   *   planCode: 'enterprise' // autocomplete works after `commet pull`
-   * });
-   * ```
-   */
-  async changePlan(
-    params: ChangePlanParams,
-    options?: RequestOptions,
-  ): Promise<ApiResponse<Subscription>> {
-    return this.httpClient.post(
-      `/subscriptions/${params.subscriptionId}/change-plan`,
-      params,
-      options,
-    );
   }
 
   /**

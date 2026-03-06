@@ -13,6 +13,7 @@ export interface PlanPrice {
   billingInterval: BillingInterval;
   price: number; // in cents
   isDefault: boolean;
+  trialDays: number;
 }
 
 export interface PlanFeature {
@@ -30,33 +31,49 @@ export interface Plan {
   id: PlanID;
   code: string;
   name: string;
-  description?: string;
+  description: string | null;
   isPublic: boolean;
+  isFree: boolean;
   isDefault: boolean;
-  trialDays: number;
   sortOrder: number;
   prices: PlanPrice[];
   features: PlanFeature[];
   createdAt: string;
 }
 
-export interface PlanDetail extends Plan {
-  features: Array<
-    PlanFeature & {
-      unitName?: string;
-      overage?: {
-        enabled: boolean;
-        model: "per_unit" | "tiered";
-        unitPrice: number;
-        tiers?: Array<{
-          order: number;
-          upTo: number | null;
-          unitAmount: number;
-          flatFee: number;
-        }>;
-      } | null;
-    }
-  >;
+export interface PlanDetailPrice {
+  billingInterval: BillingInterval;
+  price: number;
+  isDefault: boolean;
+  trialDays: number;
+  introOffer: {
+    enabled: boolean;
+    discountType: "percentage" | "amount" | null;
+    discountValue: number | null;
+    durationCycles: number | null;
+  } | null;
+}
+
+export interface PlanDetailFeature extends PlanFeature {
+  unitName: string | null;
+  overage: {
+    enabled: boolean;
+    model: "per_unit" | "tiered" | null;
+    unitPrice: number | null;
+  } | null;
+}
+
+export interface PlanDetail {
+  id: PlanID;
+  code: string;
+  name: string;
+  description: string | null;
+  isPublic: boolean;
+  isDefault: boolean;
+  sortOrder: number;
+  prices: PlanDetailPrice[];
+  features: PlanDetailFeature[];
+  createdAt: string;
   updatedAt: string;
 }
 
