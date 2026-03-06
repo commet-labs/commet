@@ -34,7 +34,7 @@ Sandbox: `https://sandbox.commet.co`. Production: `https://commet.co`.
 1. **Setup**: `commet login` -> `commet link` -> `commet pull` (generates `.commet/types.d.ts` for autocomplete)
 2. **Create customer**: On user signup, create Commet customer with `externalId` = your user ID
 3. **Create subscription**: Call `subscriptions.create()` -> redirect to `checkoutUrl`
-4. **Handle activation**: Webhook `subscription.activated` or poll `subscriptions.get()`
+4. **Check state**: Query `subscriptions.get()` to check subscription status (preferred over webhooks)
 5. **Track usage**: `usage.track()` for metered features, `seats.add/remove/set()` for seats
 6. **Feature gating**: `features.check()`, `features.canUse()`, `features.get()`
 7. **Customer portal**: `portal.getUrl()` -> redirect for self-service billing management
@@ -56,6 +56,20 @@ See [references/better-auth.md](references/better-auth.md) for the `@commet/bett
 See [references/billing-concepts.md](references/billing-concepts.md) for plan structure, feature types, consumption models, and charging behavior.
 
 ## Key Patterns
+
+### Query-first, webhooks optional
+
+Always query subscription/feature state directly with the SDK instead of relying on webhooks to sync state. The recommended pattern is to call `subscriptions.get()`, `features.check()`, or `features.list()` when you need to know a customer's status. Webhooks are useful for background tasks (sending emails, provisioning resources) but should never be the source of truth for access control.
+
+```typescript
+// Recommended: query state directly
+const { data: sub } = await commet.subscriptions.get("user_123");
+if (sub?.status === "active") { /* grant access */ }
+
+// Recommended: feature gating
+const { data } = await commet.features.check({ code: "advanced_analytics", externalId: "user_123" });
+if (!data?.allowed) { /* show upgrade prompt */ }
+```
 
 ### Customer identification
 
@@ -106,5 +120,5 @@ try {
 ```env
 COMMET_API_KEY=ck_xxx           # API key from dashboard
 COMMET_ENVIRONMENT=sandbox      # sandbox | production
-COMMET_WEBHOOK_SECRET=whsec_xxx # Webhook secret for signature verification
+COMMET_WEBHOOK_SECRET=whsec_xxx # Optional - webhook secret for signature verification
 ```

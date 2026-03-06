@@ -1,6 +1,24 @@
 # @commet/next - Next.js Integration
 
-## Webhooks Route Handler
+## Recommended: Query State Directly
+
+Instead of syncing state via webhooks, query the SDK directly when you need to know a customer's subscription or feature status. This is simpler, more reliable, and avoids state synchronization bugs.
+
+```typescript
+// Check subscription status on any page/action
+const { data: sub } = await commet.subscriptions.get(user.id);
+if (sub?.status === "active" || sub?.status === "trialing") { /* has access */ }
+
+// Check feature access
+const { data } = await commet.features.check({ code: "api_calls", externalId: user.id });
+
+// List all features
+const { data: features } = await commet.features.list(user.id);
+```
+
+## Webhooks Route Handler (Optional)
+
+Webhooks are useful for background tasks like sending emails, provisioning external resources, or logging — but should not be the primary mechanism for access control. Always prefer querying state directly.
 
 Create a route that auto-verifies signatures and routes events to handlers.
 
@@ -11,15 +29,15 @@ import { Webhooks } from "@commet/next";
 export const POST = Webhooks({
   webhookSecret: process.env.COMMET_WEBHOOK_SECRET!,
 
-  // Specific event handlers
+  // Use for background tasks, not access control (query SDK directly for that)
   onSubscriptionActivated: async (payload) => {
-    // Grant access: payload.data.externalId, payload.data.subscriptionId
-    await db.update(users).set({ hasAccess: true }).where(eq(users.id, payload.data.externalId));
+    await sendWelcomeEmail(payload.data.externalId);
+    await provisionResources(payload.data.externalId);
   },
 
   onSubscriptionCanceled: async (payload) => {
-    // Revoke access
-    await db.update(users).set({ hasAccess: false }).where(eq(users.id, payload.data.externalId));
+    await sendCancellationEmail(payload.data.externalId);
+    await scheduleResourceCleanup(payload.data.externalId);
   },
 
   onSubscriptionCreated: async (payload) => { /* ... */ },

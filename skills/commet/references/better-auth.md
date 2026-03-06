@@ -30,10 +30,12 @@ export const auth = betterAuth({
         features(),
         usage(),
         seats(),
+        // Webhooks are OPTIONAL - prefer querying state directly via SDK
+        // Use only for background tasks like sending emails or provisioning
         webhooks({
           secret: process.env.COMMET_WEBHOOK_SECRET!,
-          onSubscriptionActivated: async (payload) => { /* grant access */ },
-          onSubscriptionCanceled: async (payload) => { /* revoke access */ },
+          onSubscriptionActivated: async (payload) => { /* send welcome email */ },
+          onSubscriptionCanceled: async (payload) => { /* send cancellation email */ },
         }),
       ],
     }),
