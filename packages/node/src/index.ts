@@ -76,6 +76,7 @@ export type {
 
 // Subscriptions
 export type {
+  CreatedSubscription,
   Subscription,
   ActiveSubscription,
   SubscriptionStatus,
