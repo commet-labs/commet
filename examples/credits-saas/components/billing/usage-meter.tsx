@@ -10,12 +10,7 @@ interface UsageMeterProps {
   unit: string;
 }
 
-export function UsageMeter({
-  title,
-  used,
-  total,
-  unit,
-}: UsageMeterProps) {
+export function UsageMeter({ title, used, total, unit }: UsageMeterProps) {
   const percentage = total > 0 ? (used / total) * 100 : 0;
   const isHigh = percentage > 80;
   const isCritical = percentage > 95;
@@ -64,7 +59,6 @@ export function UsageMeter({
             style={{ width: `${Math.min(100, percentage)}%` }}
           />
         </div>
-
       </CardContent>
     </Card>
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import { hasActiveSubscriptionAction } from "@/actions/subscription";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,7 +14,6 @@ import { ArrowLeft, CreditCard, Home, LogOut, Zap } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
-import { hasActiveSubscriptionAction } from "@/actions/subscription";
 
 function UserMenu() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -96,6 +96,7 @@ function BackButton() {
 
   return (
     <button
+      type="button"
       onClick={() => router.back()}
       className="flex items-center text-muted-foreground hover:text-foreground transition-colors"
     >
@@ -110,7 +111,9 @@ interface HeaderProps {
 
 export function Header({ variant = "default" }: HeaderProps) {
   const { data: session, isPending } = useSession();
-  const [hasActiveSubscription, setHasActiveSubscription] = useState<boolean | null>(null);
+  const [hasActiveSubscription, setHasActiveSubscription] = useState<
+    boolean | null
+  >(null);
 
   useEffect(() => {
     if (variant === "auth") return;
@@ -129,7 +132,10 @@ export function Header({ variant = "default" }: HeaderProps) {
   // Show Pricing link if:
   // 1. User is not logged in, OR
   // 2. User is logged in but doesn't have an active subscription
-  const shouldShowPricing = variant === "default" && !isPending && (!session?.user || hasActiveSubscription === false);
+  const shouldShowPricing =
+    variant === "default" &&
+    !isPending &&
+    (!session?.user || hasActiveSubscription === false);
 
   if (variant === "auth") {
     return (

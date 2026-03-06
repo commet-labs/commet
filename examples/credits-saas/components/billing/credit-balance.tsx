@@ -50,7 +50,9 @@ export function CreditBalance({ balance }: CreditBalanceProps) {
               <div className="text-2xl font-bold text-foreground">
                 {balance.planCredits.toLocaleString()}
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Resets every month</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Resets every month
+              </p>
             </div>
             <div className="text-right">
               <span className="text-xs font-medium text-muted-foreground">

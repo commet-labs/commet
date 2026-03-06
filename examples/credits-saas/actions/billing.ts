@@ -1,7 +1,7 @@
 "use server";
 
-import { commet } from "@/lib/commet";
 import { getUser } from "@/lib/auth/session";
+import { commet } from "@/lib/commet";
 
 export interface BillingSubscription {
   id: string;
@@ -54,6 +54,9 @@ export async function getBillingDataAction(): Promise<{
     };
   } catch (error) {
     console.error("Error fetching billing data:", error);
-    return { success: false, error: "Unable to load billing information. Please try again." };
+    return {
+      success: false,
+      error: "Unable to load billing information. Please try again.",
+    };
   }
 }

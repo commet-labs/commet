@@ -10,9 +10,9 @@ import {
   user,
 } from "@/lib/db/schema";
 import {
+  deleteAccountSchema,
   updateAccountSchema,
   updatePasswordSchema,
-  deleteAccountSchema,
 } from "@/lib/validations/auth";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
@@ -22,7 +22,11 @@ type ActionState = {
   error?: string;
   success?: string;
   fieldErrors?: Record<string, string[] | undefined>;
-  [key: string]: string | string[] | Record<string, string[] | undefined> | undefined;
+  [key: string]:
+    | string
+    | string[]
+    | Record<string, string[] | undefined>
+    | undefined;
 };
 
 async function logActivity(

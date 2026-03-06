@@ -1,5 +1,5 @@
 import { db } from "./drizzle";
-import { user, account } from "./schema";
+import { account, user } from "./schema";
 
 async function seed() {
   const email = "test@test.com";

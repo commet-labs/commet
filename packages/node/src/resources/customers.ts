@@ -85,7 +85,7 @@ export class CustomersResource {
    */
   async create(
     params: CreateParams,
-    options?: RequestOptions
+    options?: RequestOptions,
   ): Promise<ApiResponse<Customer>> {
     return this.httpClient.post(
       "/customers",
@@ -101,7 +101,7 @@ export class CustomersResource {
         metadata: params.metadata,
         address: params.address,
       },
-      options
+      options,
     );
   }
 
@@ -110,7 +110,7 @@ export class CustomersResource {
    */
   async createBatch(
     params: { customers: CreateParams[] },
-    options?: RequestOptions
+    options?: RequestOptions,
   ): Promise<ApiResponse<BatchResult>> {
     const customers = params.customers.map((c) => ({
       billingEmail: c.email,
@@ -139,7 +139,7 @@ export class CustomersResource {
    */
   async update(
     params: UpdateParams,
-    options?: RequestOptions
+    options?: RequestOptions,
   ): Promise<ApiResponse<Customer>> {
     return this.httpClient.put(
       `/customers/${params.customerId}`,
@@ -154,7 +154,7 @@ export class CustomersResource {
         industry: params.industry,
         metadata: params.metadata,
       },
-      options
+      options,
     );
   }
 
@@ -170,12 +170,12 @@ export class CustomersResource {
    */
   async archive(
     customerId: CustomerID,
-    options?: RequestOptions
+    options?: RequestOptions,
   ): Promise<ApiResponse<Customer>> {
     return this.httpClient.put(
       `/customers/${customerId}`,
       { isActive: false },
-      options
+      options,
     );
   }
 }

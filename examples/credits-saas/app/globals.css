@@ -74,8 +74,6 @@
   }
 }
 
-
-
 @layer base {
   * {
     @apply border-border;
@@ -116,7 +114,6 @@
   --chart-4: #f472b6;
   --chart-5: #38bdf8;
 }
-
 
 /*
   ---break---

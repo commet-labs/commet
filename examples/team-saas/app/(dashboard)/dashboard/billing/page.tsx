@@ -28,7 +28,8 @@ export default async function BillingPage() {
                       {status.planName} Plan
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      Status: {status.status} &middot; {status.daysRemaining} days remaining
+                      Status: {status.status} &middot; {status.daysRemaining}{" "}
+                      days remaining
                     </p>
                   </div>
                   <ManageBillingButton />
@@ -36,14 +37,28 @@ export default async function BillingPage() {
                 <div className="pt-4 border-t space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Seats used</span>
-                    <span>{status.seatsUsed} of {status.seatsIncluded} included</span>
+                    <span>
+                      {status.seatsUsed} of {status.seatsIncluded} included
+                    </span>
                   </div>
-                  {status.seatOveragePrice && status.seatsUsed > status.seatsIncluded && (
-                    <div className="flex justify-between text-yellow-500">
-                      <span>Overage ({status.seatsUsed - status.seatsIncluded} extra seats)</span>
-                      <span>+${(((status.seatsUsed - status.seatsIncluded) * status.seatOveragePrice) / 100).toFixed(0)}/mo</span>
-                    </div>
-                  )}
+                  {status.seatOveragePrice &&
+                    status.seatsUsed > status.seatsIncluded && (
+                      <div className="flex justify-between text-yellow-500">
+                        <span>
+                          Overage ({status.seatsUsed - status.seatsIncluded}{" "}
+                          extra seats)
+                        </span>
+                        <span>
+                          +$
+                          {(
+                            ((status.seatsUsed - status.seatsIncluded) *
+                              status.seatOveragePrice) /
+                            100
+                          ).toFixed(0)}
+                          /mo
+                        </span>
+                      </div>
+                    )}
                 </div>
               </div>
             ) : (
@@ -53,8 +68,12 @@ export default async function BillingPage() {
                     <CreditCard className="w-5 h-5 text-muted-foreground" />
                   </div>
                   <div>
-                    <p className="font-medium text-muted-foreground">No active plan</p>
-                    <p className="text-sm text-muted-foreground">Subscribe to a plan to get started</p>
+                    <p className="font-medium text-muted-foreground">
+                      No active plan
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Subscribe to a plan to get started
+                    </p>
                   </div>
                 </div>
                 <Button variant="outline" asChild>

@@ -83,7 +83,7 @@ export interface CommetOptions {
    */
   getCustomerCreateParams?: (
     data: { user: Partial<User> },
-    request?: Request
+    request?: Request,
   ) => Promise<CustomerCreateParams> | CustomerCreateParams;
   /**
    * Array of Commet plugins to use

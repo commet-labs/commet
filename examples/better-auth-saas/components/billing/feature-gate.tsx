@@ -52,7 +52,9 @@ export function FeatureGate({
   }, [featureCode]);
 
   return (
-    <Card className={`shadow-sm border-border ${!hasAccess ? "opacity-75" : ""}`}>
+    <Card
+      className={`shadow-sm border-border ${!hasAccess ? "opacity-75" : ""}`}
+    >
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
         <div className="flex items-center gap-2">

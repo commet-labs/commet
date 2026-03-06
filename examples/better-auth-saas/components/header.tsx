@@ -1,5 +1,6 @@
 "use client";
 
+import { hasActiveSubscriptionAction } from "@/actions/subscription";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,7 +14,6 @@ import { ArrowLeft, CreditCard, Home, LogOut, Users, Zap } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
-import { hasActiveSubscriptionAction } from "@/actions/subscription";
 
 function UserMenu() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -127,7 +127,9 @@ interface HeaderProps {
 
 export function Header({ variant = "default" }: HeaderProps) {
   const { data: session, isPending } = useSession();
-  const [hasActiveSubscription, setHasActiveSubscription] = useState<boolean | null>(null);
+  const [hasActiveSubscription, setHasActiveSubscription] = useState<
+    boolean | null
+  >(null);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {

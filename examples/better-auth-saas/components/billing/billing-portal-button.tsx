@@ -25,14 +25,16 @@ export function BillingPortalButton() {
 
   return (
     <div className="space-y-2">
-      <Button onClick={handleOpenPortal} disabled={isPending} className="w-full">
+      <Button
+        onClick={handleOpenPortal}
+        disabled={isPending}
+        className="w-full"
+      >
         <ExternalLink className="h-4 w-4 mr-2" />
         {isPending ? "Opening Portal..." : "Manage Billing"}
       </Button>
 
-      {error && (
-        <p className="text-xs text-destructive text-center">{error}</p>
-      )}
+      {error && <p className="text-xs text-destructive text-center">{error}</p>}
 
       <p className="text-xs text-muted-foreground text-center">
         Uses <code className="text-xs">authClient.customer.portal()</code>

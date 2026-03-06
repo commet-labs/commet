@@ -30,7 +30,7 @@ export const onBeforeUserCreate =
       });
 
       const existingCustomer = existingCustomers.data?.find(
-        (c) => c.billingEmail === user.email
+        (c) => c.billingEmail === user.email,
       );
 
       // Skip creation if customer already exists
@@ -77,7 +77,7 @@ export const onAfterUserCreate =
       });
 
       const existingCustomer = existingCustomers.data?.find(
-        (c) => c.billingEmail === user.email
+        (c) => c.billingEmail === user.email,
       );
 
       if (existingCustomer && existingCustomer.externalId !== user.id) {
@@ -129,7 +129,7 @@ export const onUserUpdate =
       // Log but don't throw - update failures shouldn't break the auth flow
       if (e instanceof Error) {
         context.context.logger.error(
-          `Commet customer update failed: ${e.message}`
+          `Commet customer update failed: ${e.message}`,
         );
       } else {
         context.context.logger.error("Commet customer update failed");
@@ -163,7 +163,7 @@ export const onUserDelete =
       // Log but don't throw - archive failures shouldn't break the auth flow
       if (e instanceof Error) {
         context?.context.logger.error(
-          `Commet customer archive failed: ${e.message}`
+          `Commet customer archive failed: ${e.message}`,
         );
       } else {
         context?.context.logger.error("Commet customer archive failed");

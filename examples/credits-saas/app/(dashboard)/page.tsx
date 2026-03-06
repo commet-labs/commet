@@ -1,11 +1,5 @@
 import { Button } from "@/components/ui/button";
-import {
-  ArrowRight,
-  BarChart3,
-  Coins,
-  ShieldCheck,
-  Zap,
-} from "lucide-react";
+import { ArrowRight, BarChart3, Coins, ShieldCheck, Zap } from "lucide-react";
 import Link from "next/link";
 
 export default function HomePage() {

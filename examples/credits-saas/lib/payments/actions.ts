@@ -1,8 +1,8 @@
 "use server";
 
 import { getUser } from "@/lib/auth/session";
-import { redirect } from "next/navigation";
 import { getCheckoutUrl } from "@/lib/payments/commet";
+import { redirect } from "next/navigation";
 
 export async function checkoutAction(formData: FormData) {
   const planCode = formData.get("planCode") as string;
@@ -20,16 +20,19 @@ export async function checkoutAction(formData: FormData) {
  */
 export async function handlePostSignupCheckout(planCode: string) {
   "use server";
-  
+
   const user = await getUser();
-  
+
   if (!user) {
     return { success: false, error: "User not authenticated" } as const;
   }
-  
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.BASE_URL || "http://localhost:3000";
+
+  const baseUrl =
+    process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.BASE_URL ||
+    "http://localhost:3000";
   const successUrl = `${baseUrl}/dashboard`;
-  
+
   try {
     const checkoutUrl = await getCheckoutUrl({ planCode, successUrl });
     return { success: true, checkoutUrl } as const;

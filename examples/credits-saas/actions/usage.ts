@@ -1,7 +1,7 @@
 "use server";
 
-import { commet } from "@/lib/commet";
 import { getUser } from "@/lib/auth/session";
+import { commet } from "@/lib/commet";
 
 export interface FeatureUsage {
   code: string;
@@ -49,7 +49,10 @@ export async function getUsageDataAction(): Promise<{
 
     // Get all features from the subscription
     const subscription = subscriptionResult.data;
-    if (subscription.status !== "active" && subscription.status !== "trialing") {
+    if (
+      subscription.status !== "active" &&
+      subscription.status !== "trialing"
+    ) {
       return {
         success: true,
         data: {
@@ -75,9 +78,15 @@ export async function getUsageDataAction(): Promise<{
           if (feature.current !== undefined && feature.included !== undefined) {
             // Determine unit based on feature name/code
             let unit = "units";
-            if (feature.code.includes("generation") || feature.code.includes("image")) {
+            if (
+              feature.code.includes("generation") ||
+              feature.code.includes("image")
+            ) {
               unit = "images";
-            } else if (feature.code.includes("api") || feature.code.includes("request")) {
+            } else if (
+              feature.code.includes("api") ||
+              feature.code.includes("request")
+            ) {
               unit = "reqs";
             }
 
@@ -95,7 +104,9 @@ export async function getUsageDataAction(): Promise<{
       });
 
     const featureResults = await Promise.all(featurePromises);
-    const features = featureResults.filter((f): f is FeatureUsage => f !== null);
+    const features = featureResults.filter(
+      (f): f is FeatureUsage => f !== null,
+    );
 
     return {
       success: true,
@@ -109,7 +120,9 @@ export async function getUsageDataAction(): Promise<{
     return {
       success: false,
       error:
-        error instanceof Error ? error.message : "Unable to load usage data. Please try again.",
+        error instanceof Error
+          ? error.message
+          : "Unable to load usage data. Please try again.",
     };
   }
 }

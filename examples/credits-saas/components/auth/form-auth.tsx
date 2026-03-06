@@ -1,11 +1,11 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useMemo, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { signIn, signUp } from "@/lib/auth/auth-client";
 import { handlePostSignupCheckout } from "@/lib/payments/actions";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { type FormEvent, useMemo, useState } from "react";
 
 type Mode = "signin" | "signup";
 
@@ -28,9 +28,7 @@ export function FormAuth({ mode = "signin" }: { mode?: Mode }) {
       : "Enter your information to get started";
   const primaryCta = mode === "signin" ? "Sign in" : "Create account";
   const footerCopy =
-    mode === "signin"
-      ? "Don't have an account?"
-      : "Already have an account?";
+    mode === "signin" ? "Don't have an account?" : "Already have an account?";
   const footerLinkLabel = mode === "signin" ? "Create an account" : "Sign in";
 
   const secondaryHref = useMemo(() => {
@@ -87,7 +85,8 @@ export function FormAuth({ mode = "signin" }: { mode?: Mode }) {
         }
 
         setError(
-          result.error || "We couldn't continue with checkout. Please try again.",
+          result.error ||
+            "We couldn't continue with checkout. Please try again.",
         );
         setLoading(false);
         return;
@@ -177,7 +176,9 @@ export function FormAuth({ mode = "signin" }: { mode?: Mode }) {
                 placeholder="••••••••"
                 required
                 minLength={8}
-                autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                autoComplete={
+                  mode === "signin" ? "current-password" : "new-password"
+                }
                 className="h-11 w-full rounded-lg border border-input bg-background px-4 text-sm transition-colors placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
               />
               {mode === "signup" ? (

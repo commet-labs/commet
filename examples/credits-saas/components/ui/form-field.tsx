@@ -26,7 +26,10 @@ export function FormField({
       </Label>
       <Input
         id={id}
-        className={cn(error && "border-red-500 focus-visible:ring-red-500", className)}
+        className={cn(
+          error && "border-red-500 focus-visible:ring-red-500",
+          className,
+        )}
         {...props}
       />
       {description && !error && (

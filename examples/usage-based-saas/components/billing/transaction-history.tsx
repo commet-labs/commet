@@ -61,10 +61,7 @@ export function TransactionHistory({ transactions }: TransactionHistoryProps) {
             </thead>
             <tbody className="divide-y divide-border">
               {transactions.map((t) => (
-                <tr
-                  key={t.id}
-                  className="hover:bg-accent transition-colors"
-                >
+                <tr key={t.id} className="hover:bg-accent transition-colors">
                   <td className="px-6 py-4">
                     <div className="font-medium text-foreground">
                       {t.description}
@@ -85,7 +82,9 @@ export function TransactionHistory({ transactions }: TransactionHistoryProps) {
                       {t.type}
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-muted-foreground">{t.date}</td>
+                  <td className="px-6 py-4 text-sm text-muted-foreground">
+                    {t.date}
+                  </td>
                   <td className="px-6 py-4 text-sm font-semibold text-foreground">
                     {t.amount}
                   </td>

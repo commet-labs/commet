@@ -1,11 +1,5 @@
 import { Button } from "@/components/ui/button";
-import {
-  ArrowRight,
-  Shield,
-  ShieldCheck,
-  Users,
-  Zap,
-} from "lucide-react";
+import { ArrowRight, Shield, ShieldCheck, Users, Zap } from "lucide-react";
 import Link from "next/link";
 
 export default function HomePage() {
@@ -38,8 +32,9 @@ export default function HomePage() {
                 </span>
               </h1>
               <p className="text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-                Invite team members, manage seats, and only pay for what you use.
-                Build your team SaaS in record time with our ready-to-use starter.
+                Invite team members, manage seats, and only pay for what you
+                use. Build your team SaaS in record time with our ready-to-use
+                starter.
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center w-full max-w-2xl">

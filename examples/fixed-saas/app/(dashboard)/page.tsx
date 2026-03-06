@@ -131,7 +131,8 @@ export default function HomePage() {
               </h2>
               <p className="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto">
                 Stop building billing from scratch. Use our template to launch
-                fixed-price plans and start earning predictable revenue in minutes.
+                fixed-price plans and start earning predictable revenue in
+                minutes.
               </p>
               <Button
                 size="lg"

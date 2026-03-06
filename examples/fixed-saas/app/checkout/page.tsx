@@ -17,7 +17,9 @@ function normalizePlanCode(
   return planCode.trim() || null;
 }
 
-export default async function CheckoutPage({ searchParams }: CheckoutPageProps) {
+export default async function CheckoutPage({
+  searchParams,
+}: CheckoutPageProps) {
   const params = await searchParams;
   const planCode = normalizePlanCode(params?.planCode);
 
@@ -26,7 +28,10 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
   }
 
   // Build success URL for post-checkout redirect
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.BASE_URL || "http://localhost:3000";
+  const baseUrl =
+    process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.BASE_URL ||
+    "http://localhost:3000";
   const successUrl = `${baseUrl}/dashboard`;
 
   await createCheckoutSession({ planCode, successUrl });

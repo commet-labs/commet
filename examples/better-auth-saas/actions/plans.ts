@@ -13,7 +13,7 @@ const getCachedPlans = unstable_cache(
     return result.data;
   },
   ["plans"],
-  { revalidate: 3600, tags: ["plans"] }
+  { revalidate: 3600, tags: ["plans"] },
 );
 
 export async function getPlansAction(): Promise<{

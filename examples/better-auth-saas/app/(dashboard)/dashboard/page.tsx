@@ -1,12 +1,12 @@
 import { trackUsageAction } from "@/actions/credits";
 import { getUsageDataAction } from "@/actions/usage";
-import { commet } from "@/lib/commet";
-import { getUser } from "@/lib/auth/session";
 import { TransactionHistory } from "@/components/billing/transaction-history";
 import { UsageMeter } from "@/components/billing/usage-meter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Activity, Info, Zap, ExternalLink } from "lucide-react";
+import { getUser } from "@/lib/auth/session";
+import { commet } from "@/lib/commet";
+import { Activity, ExternalLink, Info, Zap } from "lucide-react";
 import Link from "next/link";
 
 export default async function DashboardPage() {
@@ -39,7 +39,9 @@ export default async function DashboardPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-            <p className="text-muted-foreground">Overview of your usage and activity</p>
+            <p className="text-muted-foreground">
+              Overview of your usage and activity
+            </p>
           </div>
         </div>
 
@@ -95,7 +97,10 @@ export default async function DashboardPage() {
                 </h3>
                 <div className="grid gap-4">
                   {tryFeatures.map((feature) => (
-                    <Card key={feature.code} className="shadow-sm border-border bg-secondary">
+                    <Card
+                      key={feature.code}
+                      className="shadow-sm border-border bg-secondary"
+                    >
                       <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium flex items-center gap-2 text-foreground">
                           Try {feature.name}
@@ -104,8 +109,9 @@ export default async function DashboardPage() {
                       <CardContent>
                         <p className="text-sm text-muted-foreground mb-4">
                           Send a usage event to Commet for{" "}
-                          <span className="font-medium">{feature.name}</span>. Your usage will update
-                          based on your plan configuration.
+                          <span className="font-medium">{feature.name}</span>.
+                          Your usage will update based on your plan
+                          configuration.
                         </p>
                         <form
                           action={async () => {
@@ -148,12 +154,12 @@ export default async function DashboardPage() {
                           methods, and access invoices in the Commet portal.
                         </p>
                       </div>
-                      <Button
-                        variant="outline"
-                        className="gap-2"
-                        asChild
-                      >
-                        <Link href={portalUrl} target="_blank" rel="noopener noreferrer">
+                      <Button variant="outline" className="gap-2" asChild>
+                        <Link
+                          href={portalUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
                           Open Portal
                           <ExternalLink className="w-3 h-3" />
                         </Link>

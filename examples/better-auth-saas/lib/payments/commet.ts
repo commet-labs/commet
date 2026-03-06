@@ -1,5 +1,5 @@
-import { commet } from "@/lib/commet";
 import { getUser } from "@/lib/auth/session";
+import { commet } from "@/lib/commet";
 import { redirect } from "next/navigation";
 
 type AuthUser = NonNullable<Awaited<ReturnType<typeof getUser>>>;
@@ -84,7 +84,12 @@ export async function createCheckoutSession({
     checkoutUrl = result.data.checkoutUrl;
   } catch (error: unknown) {
     const errorObj = error instanceof Error ? error : new Error(String(error));
-    const errorWithDetails = error as { statusCode?: number; details?: unknown; code?: string; message?: string };
+    const errorWithDetails = error as {
+      statusCode?: number;
+      details?: unknown;
+      code?: string;
+      message?: string;
+    };
 
     if (errorWithDetails.statusCode === 409) {
       const recheck = await commet.subscriptions.get(user.id);

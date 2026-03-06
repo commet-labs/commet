@@ -1,5 +1,5 @@
-import { commet } from "@/lib/commet";
 import { getUser } from "@/lib/auth/session";
+import { commet } from "@/lib/commet";
 import { redirect } from "next/navigation";
 
 type AuthUser = NonNullable<Awaited<ReturnType<typeof getUser>>>;
@@ -53,7 +53,7 @@ export async function createCheckoutSession({
 
   if (existing.success && existing.data) {
     const status = existing.data.status;
-    
+
     if (status === "active" || status === "trialing") {
       redirect("/dashboard/billing?error=already_subscribed");
     }
@@ -66,7 +66,7 @@ export async function createCheckoutSession({
   // With Better Auth + Commet plugin, customer is created automatically on signup
   // Create subscription via Commet
   let checkoutUrl: string;
-  
+
   try {
     const result = await commet.subscriptions.create({
       externalId: user.id,
@@ -87,8 +87,13 @@ export async function createCheckoutSession({
     checkoutUrl = result.data.checkoutUrl;
   } catch (error: unknown) {
     const errorObj = error instanceof Error ? error : new Error(String(error));
-    const errorWithDetails = error as { statusCode?: number; details?: unknown; code?: string; message?: string };
-    
+    const errorWithDetails = error as {
+      statusCode?: number;
+      details?: unknown;
+      code?: string;
+      message?: string;
+    };
+
     // Handle 409 Conflict: Customer already has active subscription
     if (errorWithDetails.statusCode === 409) {
       const recheck = await commet.subscriptions.get(user.id);
@@ -100,7 +105,7 @@ export async function createCheckoutSession({
       }
       redirect("/dashboard/billing?error=subscription_conflict");
     }
-    
+
     console.error("Failed to create checkout session:", {
       message: errorObj.message || errorWithDetails.message || String(error),
       statusCode: errorWithDetails.statusCode,
@@ -139,7 +144,7 @@ export async function getCheckoutUrl({
 
   if (existing.success && existing.data) {
     const status = existing.data.status;
-    
+
     if (status === "active" || status === "trialing") {
       throw new Error("User already has active subscription");
     }

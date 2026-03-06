@@ -1,7 +1,7 @@
 "use client";
 
-import { TeamMembers } from "@/components/billing/team-members";
 import { FeatureGate } from "@/components/billing/feature-gate";
+import { TeamMembers } from "@/components/billing/team-members";
 import { useSession } from "@/lib/auth/auth-client";
 
 export default function TeamPage() {
@@ -40,7 +40,8 @@ export default function TeamPage() {
           description="View detailed analytics about your team's activity and usage patterns."
         >
           <div className="p-4 rounded-lg bg-muted/50 text-sm text-foreground">
-            Team analytics content would appear here when the feature is enabled.
+            Team analytics content would appear here when the feature is
+            enabled.
           </div>
         </FeatureGate>
       </div>

@@ -1,7 +1,7 @@
 import { CustomerContext } from "./customer";
+import { CreditPacksResource } from "./resources/credit-packs";
 import { CustomersResource } from "./resources/customers";
 import { FeaturesResource } from "./resources/features";
-import { CreditPacksResource } from "./resources/credit-packs";
 import { PlansResource } from "./resources/plans";
 import { PortalResource } from "./resources/portal";
 import { SeatsResource } from "./resources/seats";

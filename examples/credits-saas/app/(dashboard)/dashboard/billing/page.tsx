@@ -108,7 +108,11 @@ export default async function BillingPage() {
                     {formatPrice(subscription.planPrice)} /{" "}
                     {formatBillingInterval(subscription.billingInterval)}
                   </div>
-                  <Button variant="outline" className="w-full text-xs h-8" asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full text-xs h-8"
+                    asChild
+                  >
                     <Link href="/pricing">Change Plan</Link>
                   </Button>
                 </>
@@ -120,7 +124,11 @@ export default async function BillingPage() {
                   <div className="text-sm text-muted-foreground mb-4">
                     Subscribe to a plan to get started
                   </div>
-                  <Button variant="outline" className="w-full text-xs h-8" asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full text-xs h-8"
+                    asChild
+                  >
                     <Link href="/pricing">View Plans</Link>
                   </Button>
                 </>

@@ -1,7 +1,7 @@
 "use server";
 
-import { commet } from "@/lib/commet";
 import { getUser } from "@/lib/auth/session";
+import { commet } from "@/lib/commet";
 import { db } from "@/lib/db/drizzle";
 import { member, workspace } from "@/lib/db/schema";
 import type { Member } from "@/lib/db/schema";
@@ -232,8 +232,15 @@ export async function checkSubscriptionStatusAction(): Promise<SubscriptionStatu
       seatOveragePrice: seatResult.data?.overageUnitPrice,
     };
   } catch (error) {
-    if (error && typeof error === "object" && "statusCode" in error && error.statusCode === 429) {
-      console.warn("Rate limit reached - this is expected in sandbox with frequent refreshes");
+    if (
+      error &&
+      typeof error === "object" &&
+      "statusCode" in error &&
+      error.statusCode === 429
+    ) {
+      console.warn(
+        "Rate limit reached - this is expected in sandbox with frequent refreshes",
+      );
       return defaultStatus;
     }
     console.error("Error checking subscription status:", error);

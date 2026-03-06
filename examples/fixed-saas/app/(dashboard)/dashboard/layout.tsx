@@ -1,7 +1,14 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Activity, CreditCard, Home, Menu, Settings, Shield } from "lucide-react";
+import {
+  Activity,
+  CreditCard,
+  Home,
+  Menu,
+  Settings,
+  Shield,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";

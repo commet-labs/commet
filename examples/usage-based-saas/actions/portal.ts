@@ -1,8 +1,8 @@
 "use server";
 
-import { unstable_cache } from "next/cache";
-import { commet } from "@/lib/commet";
 import { getUser } from "@/lib/auth/session";
+import { commet } from "@/lib/commet";
+import { unstable_cache } from "next/cache";
 
 /**
  * Get portal URL for customer to view billing history
@@ -27,7 +27,10 @@ export async function getPortalUrlAction(): Promise<{
     }
 
     const subscription = subscriptionResult.data;
-    if (subscription.status !== "active" && subscription.status !== "trialing") {
+    if (
+      subscription.status !== "active" &&
+      subscription.status !== "trialing"
+    ) {
       return { success: false, error: "No active subscription." };
     }
 
@@ -40,7 +43,10 @@ export async function getPortalUrlAction(): Promise<{
           return result;
         } catch (error) {
           // If rate limited or any error, return graceful failure
-          console.warn("Portal URL fetch failed (will retry after cache expires):", error);
+          console.warn(
+            "Portal URL fetch failed (will retry after cache expires):",
+            error,
+          );
           return { success: false, error: "Rate limited", data: null };
         }
       },
@@ -48,7 +54,7 @@ export async function getPortalUrlAction(): Promise<{
       {
         revalidate: 300, // Cache for 5 minutes
         tags: [`portal-${user.id}`],
-      }
+      },
     );
 
     const result = await getCachedPortalUrl(user.id);
@@ -56,7 +62,8 @@ export async function getPortalUrlAction(): Promise<{
     if (!result.success || !result.data) {
       return {
         success: false,
-        error: result.error || "Unable to access billing portal. Please try again.",
+        error:
+          result.error || "Unable to access billing portal. Please try again.",
       };
     }
 
@@ -69,7 +76,9 @@ export async function getPortalUrlAction(): Promise<{
     return {
       success: false,
       error:
-        error instanceof Error ? error.message : "Unable to access billing portal. Please try again.",
+        error instanceof Error
+          ? error.message
+          : "Unable to access billing portal. Please try again.",
     };
   }
 }

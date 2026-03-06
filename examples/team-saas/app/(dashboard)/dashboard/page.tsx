@@ -1,5 +1,5 @@
-import { checkSubscriptionStatusAction } from "@/actions/team";
 import { getPortalUrlAction } from "@/actions/portal";
+import { checkSubscriptionStatusAction } from "@/actions/team";
 import { SeatUsageCard } from "@/components/billing/seat-usage-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,7 +12,10 @@ export default async function DashboardPage() {
   let portalUrl: string | null = null;
   if (status.isPaid) {
     const portalResult = await getPortalUrlAction();
-    portalUrl = portalResult.success && portalResult.portalUrl ? portalResult.portalUrl : null;
+    portalUrl =
+      portalResult.success && portalResult.portalUrl
+        ? portalResult.portalUrl
+        : null;
   }
 
   return (
@@ -20,7 +23,9 @@ export default async function DashboardPage() {
       <div className="max-w-6xl mx-auto space-y-8">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-          <p className="text-muted-foreground">Overview of your team and subscription</p>
+          <p className="text-muted-foreground">
+            Overview of your team and subscription
+          </p>
         </div>
 
         {status.isPaid ? (
@@ -54,17 +59,31 @@ export default async function DashboardPage() {
             <div className="space-y-6">
               <Card>
                 <CardContent className="p-6 space-y-4">
-                  <h3 className="font-semibold text-foreground">Quick Actions</h3>
+                  <h3 className="font-semibold text-foreground">
+                    Quick Actions
+                  </h3>
                   <div className="grid gap-3">
-                    <Button variant="outline" className="justify-start gap-2" asChild>
+                    <Button
+                      variant="outline"
+                      className="justify-start gap-2"
+                      asChild
+                    >
                       <Link href="/dashboard/team">
                         <Users className="h-4 w-4" />
                         Manage Team Members
                       </Link>
                     </Button>
                     {portalUrl && (
-                      <Button variant="outline" className="justify-start gap-2" asChild>
-                        <Link href={portalUrl} target="_blank" rel="noopener noreferrer">
+                      <Button
+                        variant="outline"
+                        className="justify-start gap-2"
+                        asChild
+                      >
+                        <Link
+                          href={portalUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
                           <ExternalLink className="h-4 w-4" />
                           Open Billing Portal
                         </Link>
@@ -83,7 +102,8 @@ export default async function DashboardPage() {
                 No Active Subscription
               </h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Subscribe to a plan to start inviting team members and managing seats.
+                Subscribe to a plan to start inviting team members and managing
+                seats.
               </p>
               <Button asChild>
                 <Link href="/pricing">View Plans</Link>

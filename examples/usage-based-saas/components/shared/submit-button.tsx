@@ -18,7 +18,12 @@ export function SubmitButton({
   ...props
 }: SubmitButtonProps) {
   return (
-    <Button type="submit" className="bg-primary" disabled={isPending} {...props}>
+    <Button
+      type="submit"
+      className="bg-primary"
+      disabled={isPending}
+      {...props}
+    >
       {isPending ? (
         <>
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -1,9 +1,4 @@
-import {
-  commet,
-  features,
-  portal,
-  subscriptions,
-} from "@commet/better-auth";
+import { commet, features, portal, subscriptions } from "@commet/better-auth";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { commet as commetClient } from "../commet";

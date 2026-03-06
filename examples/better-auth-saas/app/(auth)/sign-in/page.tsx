@@ -1,5 +1,5 @@
-import { Suspense } from "react";
 import { FormAuth } from "@/components/auth/form-auth";
+import { Suspense } from "react";
 
 export default function SignInPage() {
   return (

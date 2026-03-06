@@ -1,11 +1,5 @@
 import { Button } from "@/components/ui/button";
-import {
-  ArrowRight,
-  ShieldCheck,
-  Users,
-  Zap,
-  ToggleRight,
-} from "lucide-react";
+import { ArrowRight, ShieldCheck, ToggleRight, Users, Zap } from "lucide-react";
 import Link from "next/link";
 
 export default function HomePage() {

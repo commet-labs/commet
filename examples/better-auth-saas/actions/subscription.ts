@@ -1,7 +1,7 @@
 "use server";
 
-import { commet } from "@/lib/commet";
 import { getUser } from "@/lib/auth/session";
+import { commet } from "@/lib/commet";
 
 export async function hasActiveSubscriptionAction(): Promise<{
   success: boolean;

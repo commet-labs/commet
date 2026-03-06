@@ -9,7 +9,9 @@ export default function DashboardLoading() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-            <p className="text-muted-foreground">Overview of your usage and activity</p>
+            <p className="text-muted-foreground">
+              Overview of your usage and activity
+            </p>
           </div>
         </div>
 
@@ -62,7 +64,10 @@ export default function DashboardLoading() {
               </CardHeader>
               <CardContent className="space-y-3">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="flex items-center justify-between py-2">
+                  <div
+                    key={i}
+                    className="flex items-center justify-between py-2"
+                  >
                     <div className="space-y-1">
                       <Skeleton className="h-4 w-32" />
                       <Skeleton className="h-3 w-24" />

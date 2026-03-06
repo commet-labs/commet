@@ -1,7 +1,10 @@
-import { checkSubscriptionStatusAction, getWorkspaceMembersAction } from "@/actions/team";
-import { SeatUsageCard } from "@/components/billing/seat-usage-card";
+import {
+  checkSubscriptionStatusAction,
+  getWorkspaceMembersAction,
+} from "@/actions/team";
 import { InviteMemberForm } from "@/components/billing/invite-member-form";
 import { MemberList } from "@/components/billing/member-list";
+import { SeatUsageCard } from "@/components/billing/seat-usage-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users } from "lucide-react";

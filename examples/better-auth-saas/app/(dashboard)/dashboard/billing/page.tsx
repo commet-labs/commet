@@ -1,7 +1,7 @@
 "use client";
 
-import { SubscriptionCard } from "@/components/billing/subscription-card";
 import { BillingPortalButton } from "@/components/billing/billing-portal-button";
+import { SubscriptionCard } from "@/components/billing/subscription-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CreditCard } from "lucide-react";
 
@@ -32,8 +32,8 @@ export default function BillingPage() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground mb-4">
-                Access the Commet customer portal to manage your payment methods,
-                view invoices, and update your subscription.
+                Access the Commet customer portal to manage your payment
+                methods, view invoices, and update your subscription.
               </p>
               <BillingPortalButton />
             </CardContent>

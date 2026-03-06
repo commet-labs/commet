@@ -1,7 +1,7 @@
 "use server";
 
-import { commet } from "@/lib/commet";
 import { getUser } from "@/lib/auth/session";
+import { commet } from "@/lib/commet";
 import { revalidatePath } from "next/cache";
 
 export interface CreditsBalance {
@@ -40,7 +40,10 @@ export async function trackUsageAction(
     });
 
     if (!result.success) {
-      return { success: false, error: result.error || "Unable to process usage. Please try again." };
+      return {
+        success: false,
+        error: result.error || "Unable to process usage. Please try again.",
+      };
     }
 
     revalidatePath("/dashboard");

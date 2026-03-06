@@ -1,14 +1,16 @@
 import { getPlansAction } from "@/actions/plans";
 
-import { commet } from "@/lib/commet";
-import { getUser } from "@/lib/auth/session";
 import { Button } from "@/components/ui/button";
+import { getUser } from "@/lib/auth/session";
+import { commet } from "@/lib/commet";
 import { checkoutAction } from "@/lib/payments/actions";
+import type { PlanFeature } from "@commet/node";
 import { Check, Zap } from "lucide-react";
 import { redirect } from "next/navigation";
-import type { PlanFeature } from "@commet/node";
 
-function formatBillingInterval(interval: "monthly" | "yearly" | "quarterly"): string {
+function formatBillingInterval(
+  interval: "monthly" | "yearly" | "quarterly",
+): string {
   if (interval === "monthly") return "month";
   if (interval === "yearly") return "year";
   return "quarter";
@@ -33,12 +35,20 @@ export default async function PricingPage() {
     const subscriptionResult = await commet.subscriptions.get(user.id);
     if (subscriptionResult.success && subscriptionResult.data) {
       const subscription = subscriptionResult.data;
-      if (subscription.status === "pending_payment" && subscription.checkoutUrl) {
+      if (
+        subscription.status === "pending_payment" &&
+        subscription.checkoutUrl
+      ) {
         redirect(subscription.checkoutUrl);
       }
 
-      if (subscription.status === "active" || subscription.status === "trialing") {
-        const portalResult = await commet.portal.getUrl({ externalId: user.id });
+      if (
+        subscription.status === "active" ||
+        subscription.status === "trialing"
+      ) {
+        const portalResult = await commet.portal.getUrl({
+          externalId: user.id,
+        });
         if (portalResult.success && portalResult.data?.portalUrl) {
           redirect(portalResult.data.portalUrl);
         }
@@ -57,8 +67,8 @@ export default async function PricingPage() {
           Simple, Transparent Pricing
         </h1>
         <p className="text-xl text-muted-foreground">
-          Choose a plan that fits your team. Includes seats, usage tracking,
-          and feature flags out of the box.
+          Choose a plan that fits your team. Includes seats, usage tracking, and
+          feature flags out of the box.
         </p>
       </div>
 
@@ -66,7 +76,9 @@ export default async function PricingPage() {
         <div className="flex justify-center max-w-4xl mx-auto">
           <div className="w-full max-w-md p-8 bg-card border border-border shadow-sm">
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-muted-foreground mb-2">No plans available</h2>
+              <h2 className="text-2xl font-bold text-muted-foreground mb-2">
+                No plans available
+              </h2>
               <p className="text-muted-foreground text-sm leading-relaxed">
                 Plans will appear here once available.
               </p>
@@ -79,13 +91,20 @@ export default async function PricingPage() {
             <PricingCard
               key={plans[0].id}
               name={plans[0].name}
-              price={plans[0].prices.find((p) => p.isDefault)?.price || plans[0].prices[0]?.price || 0}
+              price={
+                plans[0].prices.find((p) => p.isDefault)?.price ||
+                plans[0].prices[0]?.price ||
+                0
+              }
               interval={formatBillingInterval(
                 plans[0].prices.find((p) => p.isDefault)?.billingInterval ||
-                plans[0].prices[0]?.billingInterval ||
-                "monthly"
+                  plans[0].prices[0]?.billingInterval ||
+                  "monthly",
               )}
-              description={plans[0].description || `Perfect for ${plans[0].name.toLowerCase()} teams.`}
+              description={
+                plans[0].description ||
+                `Perfect for ${plans[0].name.toLowerCase()} teams.`
+              }
               features={plans[0].features.map(formatFeature)}
               planCode={plans[0].code}
               highlight={plans[0].isDefault}
@@ -93,23 +112,35 @@ export default async function PricingPage() {
           </div>
         </div>
       ) : (
-        <div className={`grid gap-8 mx-auto ${
-          plans.length === 2 ? "md:grid-cols-2 max-w-4xl" :
-          plans.length === 3 ? "md:grid-cols-3 max-w-4xl" :
-          "md:grid-cols-3 max-w-6xl"
-        }`}>
+        <div
+          className={`grid gap-8 mx-auto ${
+            plans.length === 2
+              ? "md:grid-cols-2 max-w-4xl"
+              : plans.length === 3
+                ? "md:grid-cols-3 max-w-4xl"
+                : "md:grid-cols-3 max-w-6xl"
+          }`}
+        >
           {plans.map((plan, index) => {
-            const defaultPrice = plan.prices.find((p) => p.isDefault) || plan.prices[0];
+            const defaultPrice =
+              plan.prices.find((p) => p.isDefault) || plan.prices[0];
             return (
               <PricingCard
                 key={plan.id}
                 name={plan.name}
                 price={defaultPrice?.price || 0}
-                interval={formatBillingInterval(defaultPrice?.billingInterval || "monthly")}
-                description={plan.description || `Perfect for ${plan.name.toLowerCase()} teams.`}
+                interval={formatBillingInterval(
+                  defaultPrice?.billingInterval || "monthly",
+                )}
+                description={
+                  plan.description ||
+                  `Perfect for ${plan.name.toLowerCase()} teams.`
+                }
                 features={plan.features.map(formatFeature)}
                 planCode={plan.code}
-                highlight={plan.isDefault || index === Math.floor(plans.length / 2)}
+                highlight={
+                  plan.isDefault || index === Math.floor(plans.length / 2)
+                }
               />
             );
           })}
@@ -169,14 +200,18 @@ function PricingCard({
 
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-foreground mb-2">{name}</h2>
-        <p className="text-muted-foreground text-sm leading-relaxed">{description}</p>
+        <p className="text-muted-foreground text-sm leading-relaxed">
+          {description}
+        </p>
       </div>
 
       <div className="flex items-baseline mb-8">
         <span className="text-5xl font-extrabold text-foreground">
           ${price / 100}
         </span>
-        <span className="text-muted-foreground ml-2 font-medium">/{interval}</span>
+        <span className="text-muted-foreground ml-2 font-medium">
+          /{interval}
+        </span>
       </div>
 
       <ul className="space-y-4 mb-10 flex-grow">
@@ -187,7 +222,9 @@ function PricingCard({
             >
               <Check className="h-3.5 w-3.5" />
             </div>
-            <span className="text-muted-foreground text-sm font-medium">{feature}</span>
+            <span className="text-muted-foreground text-sm font-medium">
+              {feature}
+            </span>
           </li>
         ))}
       </ul>

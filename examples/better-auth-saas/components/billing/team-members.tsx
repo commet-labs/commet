@@ -154,12 +154,17 @@ export function TeamMembers({
               <div className="flex items-center gap-3">
                 <Avatar>
                   <AvatarFallback>
-                    {member.name?.[0]?.toUpperCase() || member.email[0].toUpperCase()}
+                    {member.name?.[0]?.toUpperCase() ||
+                      member.email[0].toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-medium text-sm">{member.name || member.email}</p>
-                  <p className="text-xs text-muted-foreground">{member.email}</p>
+                  <p className="font-medium text-sm">
+                    {member.name || member.email}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {member.email}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-2">

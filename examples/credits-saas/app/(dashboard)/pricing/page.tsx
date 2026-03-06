@@ -1,14 +1,16 @@
 import { getPlansAction } from "@/actions/plans";
 import { getPortalUrlAction } from "@/actions/portal";
-import { commet } from "@/lib/commet";
-import { getUser } from "@/lib/auth/session";
 import { Button } from "@/components/ui/button";
+import { getUser } from "@/lib/auth/session";
+import { commet } from "@/lib/commet";
 import { checkoutAction } from "@/lib/payments/actions";
+import type { PlanFeature } from "@commet/node";
 import { Check, Zap } from "lucide-react";
 import { redirect } from "next/navigation";
-import type { PlanFeature } from "@commet/node";
 
-function formatBillingInterval(interval: "monthly" | "yearly" | "quarterly"): string {
+function formatBillingInterval(
+  interval: "monthly" | "yearly" | "quarterly",
+): string {
   if (interval === "monthly") return "month";
   if (interval === "yearly") return "year";
   return "quarter";
@@ -33,11 +35,17 @@ export default async function PricingPage() {
     const subscriptionResult = await commet.subscriptions.get(user.id);
     if (subscriptionResult.success && subscriptionResult.data) {
       const subscription = subscriptionResult.data;
-      if (subscription.status === "pending_payment" && subscription.checkoutUrl) {
+      if (
+        subscription.status === "pending_payment" &&
+        subscription.checkoutUrl
+      ) {
         redirect(subscription.checkoutUrl);
       }
 
-      if (subscription.status === "active" || subscription.status === "trialing") {
+      if (
+        subscription.status === "active" ||
+        subscription.status === "trialing"
+      ) {
         const portalResult = await getPortalUrlAction();
         if (portalResult.success && portalResult.portalUrl) {
           redirect(portalResult.portalUrl);
@@ -63,22 +71,31 @@ export default async function PricingPage() {
       </div>
 
       {plans.length > 0 ? (
-        <div className={`grid gap-8 max-w-4xl mx-auto ${plans.length === 1 ? "md:grid-cols-1" : plans.length === 2 ? "md:grid-cols-2" : "md:grid-cols-3"}`}>
+        <div
+          className={`grid gap-8 max-w-4xl mx-auto ${plans.length === 1 ? "md:grid-cols-1" : plans.length === 2 ? "md:grid-cols-2" : "md:grid-cols-3"}`}
+        >
           {plans.map((plan, index) => {
             // Get the default price or first price
             const defaultPrice =
               plan.prices.find((p) => p.isDefault) || plan.prices[0];
-            
+
             return (
               <PricingCard
                 key={plan.id}
                 name={plan.name}
                 price={defaultPrice?.price || 0}
-                interval={formatBillingInterval(defaultPrice?.billingInterval || "monthly")}
-                description={plan.description || `Perfect for ${plan.name.toLowerCase()} users.`}
+                interval={formatBillingInterval(
+                  defaultPrice?.billingInterval || "monthly",
+                )}
+                description={
+                  plan.description ||
+                  `Perfect for ${plan.name.toLowerCase()} users.`
+                }
                 features={plan.features.map(formatFeature)}
                 planCode={plan.code}
-                highlight={plan.isDefault || index === Math.floor(plans.length / 2)}
+                highlight={
+                  plan.isDefault || index === Math.floor(plans.length / 2)
+                }
               />
             );
           })}
@@ -87,7 +104,9 @@ export default async function PricingPage() {
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           <div className="p-8 rounded-[2rem] bg-card border border-border shadow-sm">
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-muted-foreground mb-2">No plans available</h2>
+              <h2 className="text-2xl font-bold text-muted-foreground mb-2">
+                No plans available
+              </h2>
               <p className="text-muted-foreground text-sm leading-relaxed">
                 Plans will appear here once available.
               </p>
@@ -95,7 +114,9 @@ export default async function PricingPage() {
           </div>
           <div className="p-8 rounded-[2rem] bg-card border border-border shadow-sm">
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-muted-foreground mb-2">No plans available</h2>
+              <h2 className="text-2xl font-bold text-muted-foreground mb-2">
+                No plans available
+              </h2>
               <p className="text-muted-foreground text-sm leading-relaxed">
                 Plans will appear here once available.
               </p>
@@ -156,14 +177,18 @@ function PricingCard({
 
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-foreground mb-2">{name}</h2>
-        <p className="text-muted-foreground text-sm leading-relaxed">{description}</p>
+        <p className="text-muted-foreground text-sm leading-relaxed">
+          {description}
+        </p>
       </div>
 
       <div className="flex items-baseline mb-8">
         <span className="text-5xl font-extrabold text-foreground">
           ${price / 100}
         </span>
-        <span className="text-muted-foreground ml-2 font-medium">/{interval}</span>
+        <span className="text-muted-foreground ml-2 font-medium">
+          /{interval}
+        </span>
       </div>
 
       <ul className="space-y-4 mb-10 flex-grow">
@@ -174,7 +199,9 @@ function PricingCard({
             >
               <Check className="h-3.5 w-3.5" />
             </div>
-            <span className="text-muted-foreground text-sm font-medium">{feature}</span>
+            <span className="text-muted-foreground text-sm font-medium">
+              {feature}
+            </span>
           </li>
         ))}
       </ul>
