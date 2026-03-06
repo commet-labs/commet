@@ -5,7 +5,7 @@ import { z } from "zod";
 
 export interface SubscriptionsConfig {
   /**
-   * Optional plan mappings for easu slug-based plan changes
+   * Optional plan mappings for easy slug-based plan changes
    */
   plans?: Array<{ planId: string; slug: string }>;
 }
