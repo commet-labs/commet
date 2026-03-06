@@ -1,5 +1,11 @@
 # @commet/node
 
+## 1.6.0
+
+### Minor Changes
+
+- 9ab31e6: Remove changePlan from @commet/node and @commet/better-auth, and align free-plan SDK types with current Commet Billing responses.
+
 ## 1.5.0
 
 ### Minor Changes
