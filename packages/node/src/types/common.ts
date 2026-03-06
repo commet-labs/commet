@@ -110,60 +110,32 @@ export interface RequestOptions {
  * Generated types interface - augmented by CLI after 'commet pull'
  *
  * This interface gets filled by module augmentation when you run `commet pull`.
- * The CLI generates a .commet.d.ts file that augments this interface with your
- * organization's specific event and seat types.
+ * The CLI generates a .commet/types.d.ts file that augments this interface with your
+ * organization's specific feature codes, seat types, and plan codes.
  *
  * @example
  * // After running `commet pull`, TypeScript will automatically know your types:
- * await commet.usage.events.create({
- *   eventType: 'api_call', // Autocomplete works!
- *   customerId: 'cus_123'
+ * await commet.usage.track({
+ *   feature: 'api_calls', // Autocomplete works!
+ *   externalId: 'user_123'
  * });
  */
 
-// biome-ignore lint/suspicious/noEmptyInterface: <explanation>
+// biome-ignore lint/suspicious/noEmptyInterface: augmented by CLI-generated .commet/types.d.ts
 export interface CommetGeneratedTypes {}
 
-/**
- * Helper type that provides fallback to string if types are not generated
- */
-export type GeneratedEventType = CommetGeneratedTypes extends {
-  eventType: infer T;
-}
-  ? T
-  : string;
-
-/**
- * Helper type that provides fallback to string if types are not generated
- */
 export type GeneratedSeatType = CommetGeneratedTypes extends {
   seatType: infer T;
 }
   ? T
   : string;
 
-/**
- * Helper type that provides fallback to string if types are not generated
- * @deprecated Use GeneratedPlanCode instead
- */
-export type GeneratedProductId = CommetGeneratedTypes extends {
-  productId: infer T;
-}
-  ? T
-  : string;
-
-/**
- * Helper type that provides fallback to string if types are not generated
- */
 export type GeneratedPlanCode = CommetGeneratedTypes extends {
   planCode: infer T;
 }
   ? T
   : string;
 
-/**
- * Helper type that provides fallback to string if types are not generated
- */
 export type GeneratedFeatureCode = CommetGeneratedTypes extends {
   featureCode: infer T;
 }

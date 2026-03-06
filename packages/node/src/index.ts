@@ -8,7 +8,6 @@ export { CustomerContext } from "./customer";
 export type {
   CommetConfig,
   CommetGeneratedTypes,
-  GeneratedEventType,
   GeneratedSeatType,
   GeneratedPlanCode,
   GeneratedFeatureCode,

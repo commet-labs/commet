@@ -14,13 +14,6 @@ import { generateTypes } from "../utils/generator";
 import { updateGitignore } from "../utils/gitignore-updater";
 import { updateTsConfig } from "../utils/tsconfig-updater";
 
-interface EventType {
-  id: string;
-  code: string;
-  name: string;
-  description?: string;
-}
-
 interface SeatType {
   id: string;
   code: string;
@@ -48,7 +41,6 @@ interface Plan {
 
 interface TypesResponse {
   success: boolean;
-  eventTypes: EventType[];
   seatTypes: SeatType[];
   features: Feature[];
   plans: Plan[];
@@ -96,15 +88,9 @@ export const pullCommand = new Command("pull")
       return;
     }
 
-    const { eventTypes, seatTypes, features, plans } = result.data;
+    const { seatTypes, features, plans } = result.data;
 
-    // Generate TypeScript definitions
-    const typeDefinitions = generateTypes(
-      eventTypes,
-      seatTypes,
-      features,
-      plans,
-    );
+    const typeDefinitions = generateTypes(seatTypes, features, plans);
 
     // Write to .commet/types.d.ts
     const commetDir = path.resolve(process.cwd(), ".commet");
@@ -153,7 +139,7 @@ export const pullCommand = new Command("pull")
     console.log(chalk.dim("\nGenerated types:"));
     console.log(
       chalk.dim(
-        `  Event types: ${eventTypes.length > 0 ? eventTypes.map((e) => e.code).join(", ") : "none"}`,
+        `  Features: ${features.length > 0 ? features.map((f) => f.code).join(", ") : "none"}`,
       ),
     );
     console.log(
@@ -166,22 +152,16 @@ export const pullCommand = new Command("pull")
         `  Plans: ${plans.length > 0 ? plans.map((p) => p.code).join(", ") : "none"}`,
       ),
     );
-    console.log(
-      chalk.dim(
-        `  Features: ${features.length > 0 ? features.map((f) => f.code).join(", ") : "none"}`,
-      ),
-    );
     console.log(chalk.dim(`\nOutput: ${outputPath}`));
 
     if (
-      eventTypes.length === 0 &&
       seatTypes.length === 0 &&
       plans.length === 0 &&
       features.length === 0
     ) {
       console.log(
         chalk.yellow(
-          "\n⚠ No types found. Create event types, seat types, plans, and features in your Commet dashboard.",
+          "\n⚠ No types found. Create features, seat types, and plans in your Commet dashboard.",
         ),
       );
     }

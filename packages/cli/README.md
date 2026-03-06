@@ -42,14 +42,14 @@ import { Commet } from '@commet/node';
 
 const commet = new Commet({ apiKey: '...' });
 
-await commet.usage.create({
-  eventType: 'api_call', // Autocomplete works!
-  customerId: 'cus_123'
+await commet.usage.track({
+  feature: 'api_calls', // Autocomplete works!
+  externalId: 'user_123'
 });
 
 await commet.subscriptions.create({
-  productId: 'prod_xxx', // Autocomplete with your products!
-  customerId: 'cus_123'
+  planCode: 'pro', // Autocomplete with your plans!
+  externalId: 'user_123'
 });
 ```
 
@@ -61,8 +61,9 @@ commet logout          # Remove credentials
 commet link            # Link project to organization
 commet pull            # Generate TypeScript types
 commet info            # Show project status
-commet list events     # List event types
+commet list features   # List features
 commet list seats      # List seat types
+commet list plans      # List plans
 ```
 
 ## Documentation

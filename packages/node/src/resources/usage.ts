@@ -2,7 +2,7 @@ import type {
   ApiResponse,
   CustomerID,
   EventID,
-  GeneratedEventType,
+  GeneratedFeatureCode,
   RequestOptions,
 } from "../types/common";
 import type { CommetHTTPClient } from "../utils/http";
@@ -36,7 +36,7 @@ export interface BatchResult<T> {
 }
 
 export interface TrackParams {
-  feature: string;
+  feature: GeneratedFeatureCode;
   customerId?: CustomerID;
   externalId?: string;
   idempotencyKey?: string;

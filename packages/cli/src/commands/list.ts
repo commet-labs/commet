@@ -8,13 +8,6 @@ import {
   projectConfigExists,
 } from "../utils/config";
 
-interface EventType {
-  id: string;
-  code: string;
-  name: string;
-  description?: string;
-}
-
 interface SeatType {
   id: string;
   code: string;
@@ -23,33 +16,54 @@ interface SeatType {
   isFree: boolean;
 }
 
-interface TypesResponse {
-  success: boolean;
-  eventTypes: EventType[];
-  seatTypes: SeatType[];
+interface Feature {
+  id: string;
+  publicId: string;
+  code: string;
+  name: string;
+  description?: string;
+  type: string;
 }
 
+interface Plan {
+  id: string;
+  publicId: string;
+  code: string;
+  name: string;
+  description?: string;
+}
+
+interface TypesResponse {
+  success: boolean;
+  seatTypes: SeatType[];
+  features: Feature[];
+  plans: Plan[];
+}
+
+const validTypes = ["features", "seats", "plans"] as const;
+type ListType = (typeof validTypes)[number];
+
 export const listCommand = new Command("list")
-  .description("List event types or seat types")
-  .argument("<type>", "Type to list (events or seats)")
+  .description("List features, seat types, or plans")
+  .argument("<type>", "Type to list (features, seats, or plans)")
   .action(async (type: string) => {
-    // Validate type argument
-    if (type !== "events" && type !== "seats") {
-      console.log(chalk.red('✗ Invalid type. Use "events" or "seats"'));
+    if (!validTypes.includes(type as ListType)) {
+      console.log(
+        chalk.red('✗ Invalid type. Use "features", "seats", or "plans"'),
+      );
       console.log(chalk.dim("\nExamples:"));
-      console.log(chalk.dim("  commet list events"));
+      console.log(chalk.dim("  commet list features"));
       console.log(chalk.dim("  commet list seats"));
+      console.log(chalk.dim("  commet list plans"));
       return;
     }
 
-    // Check auth
     if (!authExists()) {
       console.log(chalk.red("✗ Not authenticated"));
       console.log(chalk.dim("Run `commet login` first"));
       return;
     }
 
-    // Check project config
     if (!projectConfigExists()) {
       console.log(chalk.red("✗ Project not linked"));
       console.log(
@@ -66,7 +80,6 @@ export const listCommand = new Command("list")
 
     const spinner = ora(`Fetching ${type}...`).start();
 
-    // Fetch types from API
     const baseURL = getBaseURL(projectConfig.environment);
     const result = await apiRequest<TypesResponse>(
       `${baseURL}/api/cli/types?orgId=${projectConfig.orgId}`,
@@ -80,28 +93,27 @@ export const listCommand = new Command("list")
 
     spinner.stop();
 
-    // Display results
-    if (type === "events") {
-      const { eventTypes } = result.data;
+    if (type === "features") {
+      const { features } = result.data;
 
-      if (eventTypes.length === 0) {
-        console.log(chalk.yellow("⚠ No event types found"));
+      if (features.length === 0) {
+        console.log(chalk.yellow("⚠ No features found"));
         console.log(
-          chalk.dim("Create event types in your Commet dashboard first"),
+          chalk.dim("Create features in your Commet dashboard first"),
         );
         return;
       }
 
-      console.log(chalk.bold(`\n📊 Event Types (${eventTypes.length})\n`));
-      for (const eventType of eventTypes) {
-        console.log(chalk.green(`• ${eventType.code}`));
-        console.log(chalk.dim(`  ${eventType.name}`));
-        if (eventType.description) {
-          console.log(chalk.dim(`  ${eventType.description}`));
+      console.log(chalk.bold(`\n📊 Features (${features.length})\n`));
+      for (const feature of features) {
+        console.log(chalk.green(`• ${feature.code} (${feature.type})`));
+        console.log(chalk.dim(`  ${feature.name}`));
+        if (feature.description) {
+          console.log(chalk.dim(`  ${feature.description}`));
         }
         console.log("");
       }
-    } else {
+    } else if (type === "seats") {
       const { seatTypes } = result.data;
 
       if (seatTypes.length === 0) {
@@ -120,6 +132,26 @@ export const listCommand = new Command("list")
         console.log(chalk.dim(`  ${seatType.name}`));
         if (seatType.description) {
           console.log(chalk.dim(`  ${seatType.description}`));
+        }
+        console.log("");
+      }
+    } else {
+      const { plans } = result.data;
+
+      if (plans.length === 0) {
+        console.log(chalk.yellow("⚠ No plans found"));
+        console.log(
+          chalk.dim("Create plans in your Commet dashboard first"),
+        );
+        return;
+      }
+
+      console.log(chalk.bold(`\n📋 Plans (${plans.length})\n`));
+      for (const plan of plans) {
+        console.log(chalk.green(`• ${plan.code}`));
+        console.log(chalk.dim(`  ${plan.name}`));
+        if (plan.description) {
+          console.log(chalk.dim(`  ${plan.description}`));
         }
         console.log("");
       }
