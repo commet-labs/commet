@@ -81,7 +81,6 @@ export type {
   SubscriptionStatus,
   FeatureSummary,
   CreateSubscriptionParams,
-  ChangePlanParams,
   CancelParams,
 } from "./resources/subscriptions";
 

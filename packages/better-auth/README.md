@@ -185,12 +185,6 @@ await authClient.customer.portal();
 const { data: subscription } = await authClient.subscription.get();
 console.log(subscription?.status); // "active", "trialing", etc.
 
-// Change plan (upgrade/downgrade)
-await authClient.subscription.changePlan({
-  planId: "plan_456", // or use slug if configured
-  billingInterval: "yearly"
-});
-
 // Cancel subscription
 await authClient.subscription.cancel({
   reason: "switching_to_competitor",
@@ -280,7 +274,6 @@ All endpoints are prefixed with `/commet/` to avoid collisions with other plugin
 |--------|----------|--------|-------------|
 | portal | `/commet/portal` | GET | Generates portal URL and redirects |
 | subscriptions | `/commet/subscription` | GET | Gets active subscription |
-| subscriptions | `/commet/subscription/change-plan` | POST | Changes plan |
 | subscriptions | `/commet/subscription/cancel` | POST | Cancels subscription |
 | features | `/commet/features` | GET | Lists all features |
 | features | `/commet/features/:code` | GET | Gets a specific feature |
@@ -303,4 +296,3 @@ All endpoints are prefixed with `/commet/` to avoid collisions with other plugin
 ## License
 
 MIT
-

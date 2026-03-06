@@ -97,11 +97,6 @@ export type CreateSubscriptionParams = CustomerIdentifier &
     successUrl?: string;
   };
 
-export type ChangePlanParams = PlanIdentifier & {
-  subscriptionId: string;
-  billingInterval?: BillingInterval;
-};
-
 export interface CancelParams {
   subscriptionId: string;
   reason?: string;
@@ -148,28 +143,6 @@ export class SubscriptionsResource {
     externalId: string,
   ): Promise<ApiResponse<ActiveSubscription | null>> {
     return this.httpClient.get("/subscriptions/active", { externalId });
-  }
-
-  /**
-   * Change the plan of a subscription (upgrade/downgrade)
-   *
-   * @example
-   * ```typescript
-   * await commet.subscriptions.changePlan({
-   *   subscriptionId: 'sub_xxx',
-   *   planCode: 'enterprise' // autocomplete works after `commet pull`
-   * });
-   * ```
-   */
-  async changePlan(
-    params: ChangePlanParams,
-    options?: RequestOptions,
-  ): Promise<ApiResponse<Subscription>> {
-    return this.httpClient.post(
-      `/subscriptions/${params.subscriptionId}/change-plan`,
-      params,
-      options,
-    );
   }
 
   /**
