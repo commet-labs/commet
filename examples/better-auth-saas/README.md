@@ -118,9 +118,6 @@ await authClient.customer.portal();
 // Get current subscription
 const { data } = await authClient.subscription.get();
 
-// Change plan
-await authClient.subscription.changePlan({ planId: "pro" });
-
 // Cancel
 await authClient.subscription.cancel();
 ```
