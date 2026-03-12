@@ -132,13 +132,13 @@ export function TeamMembers({
         </form>
 
         {error && (
-          <div className="p-3 rounded-lg text-sm bg-destructive/10 text-destructive border border-destructive/20">
+          <div className="p-3 text-sm bg-destructive/10 text-destructive border border-destructive/20">
             {error}
           </div>
         )}
 
         {!canAddMore && (
-          <div className="p-3 rounded-lg text-sm bg-yellow-500/10 text-yellow-600 border border-yellow-500/20">
+          <div className="p-3 text-sm bg-yellow-500/10 text-yellow-600 border border-yellow-500/20">
             You've reached your seat limit. Upgrade your plan to add more team
             members.
           </div>
@@ -149,7 +149,7 @@ export function TeamMembers({
           {members.map((member) => (
             <div
               key={member.id}
-              className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
+              className="flex items-center justify-between p-3 bg-muted/50"
             >
               <div className="flex items-center gap-3">
                 <Avatar>

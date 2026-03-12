@@ -39,7 +39,7 @@ export default function TeamPage() {
           title="Team Analytics"
           description="View detailed analytics about your team's activity and usage patterns."
         >
-          <div className="p-4 rounded-lg bg-muted/50 text-sm text-foreground">
+          <div className="p-4 bg-muted/50 text-sm text-foreground">
             Team analytics content would appear here when the feature is
             enabled.
           </div>

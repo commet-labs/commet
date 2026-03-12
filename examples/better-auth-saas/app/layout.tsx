@@ -1,21 +1,21 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
-import { IBM_Plex_Mono } from "next/font/google";
+import { IBM_Plex_Sans } from "next/font/google";
 import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
-  title: "BetterAuth SaaS - Commet Plugin Demo",
+  title: "Commet + Better Auth Starter",
   description:
-    "Showcase of the @commet/better-auth plugin with seats, usage, features, and portal.",
+    "SaaS starter with authentication, billing, seats, and usage tracking built in.",
 };
 
 export const viewport: Viewport = {
   maximumScale: 1,
 };
 
-const ibmPlexMono = IBM_Plex_Mono({
+const ibmPlexSans = IBM_Plex_Sans({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["300", "400", "500", "600"],
 });
 
 export default function RootLayout({
@@ -24,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`dark ${ibmPlexMono.className}`}>
+    <html lang="en" className={`dark ${ibmPlexSans.className}`}>
       <body className="min-h-[100dvh] antialiased">
         {children}
         <Toaster position="top-right" richColors />

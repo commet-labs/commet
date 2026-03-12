@@ -111,14 +111,14 @@ export function TransactionHistory({ transactions }: TransactionHistoryProps) {
 
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    Paid: "bg-green-100 text-green-700",
-    Pending: "bg-amber-100 text-amber-700",
-    Failed: "bg-red-100 text-red-700",
+    Paid: "bg-green-500/10 text-green-600 dark:text-green-400",
+    Pending: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+    Failed: "bg-red-500/10 text-red-600 dark:text-red-400",
   };
 
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${styles[status]}`}
+      className={`inline-flex items-center px-2.5 py-0.5 text-xs font-medium ${styles[status]}`}
     >
       <span
         className={`w-1.5 h-1.5 rounded-full mr-1.5 ${

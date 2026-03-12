@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { signOut, useSession } from "@/lib/auth/auth-client";
-import { ArrowLeft, CreditCard, Home, LogOut, Users, Zap } from "lucide-react";
+import { ArrowLeft, CreditCard, Home, LogOut, Users } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
@@ -27,7 +27,7 @@ function UserMenu() {
   }, []);
 
   if (!isMounted) {
-    return <div className="h-9 w-9 bg-muted rounded-full animate-pulse" />;
+    return <div className="h-8 w-8 bg-muted animate-pulse" />;
   }
 
   async function handleSignOut() {
@@ -37,12 +37,12 @@ function UserMenu() {
   }
 
   if (isPending) {
-    return <div className="h-9 w-9 bg-muted rounded-full animate-pulse" />;
+    return <div className="h-8 w-8 bg-muted animate-pulse" />;
   }
 
   if (!session?.user) {
     return (
-      <Button asChild className="rounded-xl">
+      <Button asChild size="sm">
         <Link href="/sign-up">Sign Up</Link>
       </Button>
     );
@@ -53,7 +53,7 @@ function UserMenu() {
   return (
     <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
       <DropdownMenuTrigger>
-        <Avatar className="cursor-pointer size-9">
+        <Avatar className="cursor-pointer size-8">
           <AvatarImage alt={user.name || ""} src={user.image || undefined} />
           <AvatarFallback>
             {(user.name || user.email)
@@ -98,11 +98,8 @@ function UserMenu() {
 
 function Logo() {
   return (
-    <Link href="/" className="flex items-center">
-      <div className="bg-primary rounded-lg p-1 mr-2">
-        <Zap className="h-5 w-5 text-primary-foreground" />
-      </div>
-      <span className="text-xl font-bold text-foreground">BetterAuthSaaS</span>
+    <Link href="/" className="flex items-center gap-2">
+      <span className="text-sm font-medium text-foreground">ACME</span>
     </Link>
   );
 }
@@ -158,8 +155,8 @@ export function Header({ variant = "default" }: HeaderProps) {
 
   if (variant === "auth") {
     return (
-      <header className="border-b border-border bg-card/80 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+      <header className="border-b border-border sticky top-0 z-40 bg-background">
+        <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-4 flex justify-between items-center">
           <BackButton />
           <div />
         </div>
@@ -168,22 +165,20 @@ export function Header({ variant = "default" }: HeaderProps) {
   }
 
   return (
-    <header className="border-b border-border bg-card/80 backdrop-blur-md sticky top-0 z-40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+    <header className="border-b border-border sticky top-0 z-40 bg-background">
+      <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-4 flex justify-between items-center">
         <Logo />
-        <div className="flex items-center space-x-6">
+        <div className="flex items-center gap-6">
           {shouldShowPricing ? (
             <Link
               href="/pricing"
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               Pricing
             </Link>
           ) : null}
           <Suspense
-            fallback={
-              <div className="h-9 w-9 bg-muted rounded-full animate-pulse" />
-            }
+            fallback={<div className="h-8 w-8 bg-muted animate-pulse" />}
           >
             <UserMenu />
           </Suspense>

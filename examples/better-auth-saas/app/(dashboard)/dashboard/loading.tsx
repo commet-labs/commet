@@ -5,7 +5,7 @@ import { Activity, Info } from "lucide-react";
 export default function DashboardLoading() {
   return (
     <section className="flex-1 p-4 lg:p-8 bg-secondary/50 min-h-screen">
-      <div className="max-w-6xl mx-auto space-y-8">
+      <div className="max-w-screen-2xl mx-auto space-y-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
@@ -29,7 +29,7 @@ export default function DashboardLoading() {
                     <Skeleton className="h-5 w-32" />
                   </CardHeader>
                   <CardContent>
-                    <Skeleton className="h-2 w-full rounded-full mb-2" />
+                    <Skeleton className="h-1.5 w-full mb-2" />
                     <div className="flex justify-between">
                       <Skeleton className="h-4 w-20" />
                       <Skeleton className="h-4 w-16" />

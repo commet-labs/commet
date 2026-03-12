@@ -77,7 +77,7 @@ export default async function ActivityPage() {
 
                 return (
                   <li key={log.id} className="flex items-center space-x-4">
-                    <div className="bg-muted rounded-full p-2">
+                    <div className="bg-muted p-2">
                       <Icon className="w-5 h-5 text-foreground" />
                     </div>
                     <div className="flex-1">

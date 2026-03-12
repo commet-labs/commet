@@ -85,12 +85,12 @@ export function SubscriptionCard() {
             Loading subscription...
           </div>
         ) : error ? (
-          <div className="p-3 rounded-lg text-sm bg-destructive/10 text-destructive border border-destructive/20">
+          <div className="p-3 text-sm bg-destructive/10 text-destructive border border-destructive/20">
             {error}
           </div>
         ) : subscription ? (
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
+            <div className="flex items-center justify-between p-4 bg-muted/50">
               <div>
                 <p className="font-medium">
                   {subscription.planName || "Current Plan"}

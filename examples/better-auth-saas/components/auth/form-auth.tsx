@@ -45,7 +45,7 @@ export function FormAuth({ mode = "signin" }: { mode?: Mode }) {
   }, [mode, redirect, planCode]);
 
   const planBanner = planCode ? (
-    <div className="flex flex-col rounded-xl border border-primary/20 bg-primary/10 px-4 py-3 text-sm text-primary">
+    <div className="flex flex-col border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-foreground">
       <span className="font-medium">Selected plan</span>
       <span>Complete your signup to continue with {planCode}.</span>
     </div>
@@ -113,7 +113,7 @@ export function FormAuth({ mode = "signin" }: { mode?: Mode }) {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
-            <div className="flex items-center gap-2 rounded-lg border border-red-900/50 bg-red-950/30 px-3 py-2 text-sm text-red-400">
+            <div className="flex items-center gap-2 border border-destructive/20 bg-destructive/5 px-3 py-2 text-sm text-destructive">
               <svg
                 className="h-4 w-4 shrink-0"
                 viewBox="0 0 24 24"
@@ -143,7 +143,7 @@ export function FormAuth({ mode = "signin" }: { mode?: Mode }) {
                   placeholder="John Doe"
                   required
                   autoComplete="name"
-                  className="h-11 w-full rounded-lg border border-input bg-background px-4 text-sm transition-colors placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+                  className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm transition-colors placeholder:text-muted-foreground focus:outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
                 />
               </div>
             )}
@@ -160,7 +160,7 @@ export function FormAuth({ mode = "signin" }: { mode?: Mode }) {
                 placeholder="name@example.com"
                 required
                 autoComplete="email"
-                className="h-11 w-full rounded-lg border border-input bg-background px-4 text-sm transition-colors placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+                className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm transition-colors placeholder:text-muted-foreground focus:outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
               />
             </div>
 
@@ -179,7 +179,7 @@ export function FormAuth({ mode = "signin" }: { mode?: Mode }) {
                 autoComplete={
                   mode === "signin" ? "current-password" : "new-password"
                 }
-                className="h-11 w-full rounded-lg border border-input bg-background px-4 text-sm transition-colors placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+                className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm transition-colors placeholder:text-muted-foreground focus:outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
               />
               {mode === "signup" ? (
                 <p className="text-xs text-muted-foreground">

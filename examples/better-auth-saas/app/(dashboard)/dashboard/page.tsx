@@ -35,7 +35,7 @@ export default async function DashboardPage() {
 
   return (
     <section className="flex-1 p-4 lg:p-8 bg-background min-h-screen">
-      <div className="max-w-6xl mx-auto space-y-8">
+      <div className="max-w-screen-2xl mx-auto space-y-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>

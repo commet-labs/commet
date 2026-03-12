@@ -47,9 +47,9 @@ export function UsageMeter({ title, used, total, unit }: UsageMeterProps) {
           ) : null}
         </div>
 
-        <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+        <div className="h-1.5 w-full bg-muted overflow-hidden">
           <div
-            className={`h-full rounded-full transition-all duration-500 ${
+            className={`h-full transition-all duration-500 ${
               isCritical
                 ? "bg-red-500"
                 : isHigh

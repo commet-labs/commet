@@ -8,7 +8,7 @@ import { CreditCard } from "lucide-react";
 export default function BillingPage() {
   return (
     <section className="flex-1 p-4 lg:p-8 bg-secondary/50 min-h-screen">
-      <div className="max-w-5xl mx-auto space-y-8">
+      <div className="max-w-screen-2xl mx-auto space-y-8">
         <div>
           <h1 className="text-2xl font-bold text-foreground">
             Billing & Subscription
