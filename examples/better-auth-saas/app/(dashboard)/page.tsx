@@ -25,10 +25,13 @@ export default function HomePage() {
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" className="h-11 px-6" asChild>
-                  <Link href="/sign-up">
-                    Try the demo
-                  </Link>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="h-11 px-6"
+                  asChild
+                >
+                  <Link href="/sign-up">Try the demo</Link>
                 </Button>
               </div>
             </div>

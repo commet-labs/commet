@@ -111,9 +111,7 @@ export default async function PricingPage() {
       ) : (
         <div
           className={`grid gap-6 ${
-            plans.length === 2
-              ? "md:grid-cols-2"
-              : "md:grid-cols-3"
+            plans.length === 2 ? "md:grid-cols-2" : "md:grid-cols-3"
           }`}
         >
           {plans.map((plan, index) => {
@@ -128,8 +126,7 @@ export default async function PricingPage() {
                   defaultPrice?.billingInterval || "monthly",
                 )}
                 description={
-                  plan.description ||
-                  `For ${plan.name.toLowerCase()} teams.`
+                  plan.description || `For ${plan.name.toLowerCase()} teams.`
                 }
                 features={plan.features.map(formatFeature)}
                 planCode={plan.code}
@@ -165,9 +162,7 @@ function PricingCard({
   return (
     <div
       className={`relative p-8 flex flex-col h-full border ${
-        highlight
-          ? "border-primary shadow-sm"
-          : "border-border"
+        highlight ? "border-primary shadow-sm" : "border-border"
       }`}
     >
       {highlight && (
@@ -182,9 +177,7 @@ function PricingCard({
       </div>
 
       <div className="flex items-baseline mb-8">
-        <span className="text-4xl font-light tabular-nums">
-          ${price / 100}
-        </span>
+        <span className="text-4xl font-light tabular-nums">${price / 100}</span>
         <span className="text-muted-foreground ml-2 text-sm">/{interval}</span>
       </div>
 
