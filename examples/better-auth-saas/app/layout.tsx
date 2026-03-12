@@ -4,9 +4,9 @@ import { IBM_Plex_Sans } from "next/font/google";
 import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
-  title: "Commet + Better Auth Starter",
+  title: "SaaS Starter",
   description:
-    "SaaS starter with authentication, billing, seats, and usage tracking built in.",
+    "Launch your SaaS with auth, billing, and team management built in.",
 };
 
 export const viewport: Viewport = {

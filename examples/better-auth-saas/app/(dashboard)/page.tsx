@@ -18,11 +18,16 @@ export default function HomePage() {
                 Launch with auth, billing, and team management built in. Clone,
                 configure, ship.
               </p>
-              <div className="mt-8">
+              <div className="mt-8 flex flex-col sm:flex-row gap-3">
                 <Button size="lg" className="h-11 px-6" asChild>
-                  <Link href="/sign-up">
-                    Deploy your own
+                  <Link href="https://sandbox.commet.co/create?template=better-auth-saas">
+                    Create your plans
                     <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+                <Button size="lg" variant="outline" className="h-11 px-6" asChild>
+                  <Link href="/sign-up">
+                    Try the demo
                   </Link>
                 </Button>
               </div>
