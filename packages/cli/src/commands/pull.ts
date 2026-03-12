@@ -154,11 +154,7 @@ export const pullCommand = new Command("pull")
     );
     console.log(chalk.dim(`\nOutput: ${outputPath}`));
 
-    if (
-      seatTypes.length === 0 &&
-      plans.length === 0 &&
-      features.length === 0
-    ) {
+    if (seatTypes.length === 0 && plans.length === 0 && features.length === 0) {
       console.log(
         chalk.yellow(
           "\n⚠ No types found. Create features, seat types, and plans in your Commet dashboard.",

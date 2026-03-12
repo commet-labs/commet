@@ -140,9 +140,7 @@ export const listCommand = new Command("list")
 
       if (plans.length === 0) {
         console.log(chalk.yellow("⚠ No plans found"));
-        console.log(
-          chalk.dim("Create plans in your Commet dashboard first"),
-        );
+        console.log(chalk.dim("Create plans in your Commet dashboard first"));
         return;
       }
 
