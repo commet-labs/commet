@@ -10,8 +10,9 @@ function formatPrice(cents: number): string {
 }
 
 function formatBillingInterval(
-  interval: "monthly" | "quarterly" | "yearly",
+  interval: "monthly" | "quarterly" | "yearly" | null,
 ): string {
+  if (interval === null) return "free";
   if (interval === "monthly") return "month";
   if (interval === "quarterly") return "quarter";
   return "year";

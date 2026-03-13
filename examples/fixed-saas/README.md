@@ -124,6 +124,12 @@ commet({
 })
 ```
 
+The template is pinned to:
+
+- `@commet/node` `1.6.0`
+- `@commet/next` `0.2.14`
+- `@commet/better-auth` `1.3.0`
+
 ### Key Files
 
 - `lib/commet.ts` - SDK initialization

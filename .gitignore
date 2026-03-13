@@ -5,6 +5,13 @@ node_modules
 .pnp
 .pnp.js
 
+# Example app lockfiles
+examples/**/pnpm-lock.yaml
+examples/**/bun.lock
+examples/**/yarn.lock
+examples/**/package-lock.json
+examples/**/bun.lockb
+
 # Local env files
 .env
 .env.local

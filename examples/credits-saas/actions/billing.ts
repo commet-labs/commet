@@ -7,7 +7,7 @@ export interface BillingSubscription {
   id: string;
   planName: string;
   planPrice: number;
-  billingInterval: "monthly" | "quarterly" | "yearly";
+  billingInterval: "monthly" | "quarterly" | "yearly" | null;
   status: string;
 }
 

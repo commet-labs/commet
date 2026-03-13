@@ -38,7 +38,7 @@ export const auth = betterAuth({
       use: [
         // Customer portal for self-service billing management
         portal({ returnUrl: "/settings" }),
-        // Subscription management (get, change plan, cancel)
+        // Subscription management (get and cancel)
         subscriptions(),
         // Feature flags and access checks
         features(),

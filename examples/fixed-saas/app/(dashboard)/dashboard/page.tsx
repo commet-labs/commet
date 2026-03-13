@@ -72,7 +72,9 @@ export default async function DashboardPage() {
                         ? "month"
                         : subscription.billingInterval === "quarterly"
                           ? "quarter"
-                          : "year"}
+                          : subscription.billingInterval === null
+                            ? "free"
+                            : "year"}
                     </span>
                   </div>
                 </div>
