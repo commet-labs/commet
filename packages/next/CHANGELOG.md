@@ -1,5 +1,13 @@
 # @commet/next
 
+## 0.2.15
+
+### Patch Changes
+
+- 8231f94: Update SDK to handle normalized API response shapes. Error responses now use `code` instead of `error` field. Validation errors use `details` array instead of `errors` object. Success responses no longer include `message` field.
+- Updated dependencies [8231f94]
+  - @commet/node@1.6.1
+
 ## 0.2.14
 
 ### Patch Changes
