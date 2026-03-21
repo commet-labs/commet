@@ -67,7 +67,7 @@ export const CustomerPortal = ({
       });
 
       if (!result.success || !result.data) {
-        throw new Error(result.error || "Failed to create portal session");
+        throw new Error(result.message || "Failed to create portal session");
       }
 
       // Redirect to customer portal
