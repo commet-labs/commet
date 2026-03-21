@@ -154,7 +154,8 @@ export class CommetHTTPClient {
         if (response.status === 404) {
           return {
             success: false,
-            error: "Resource not found",
+            code: "not_found",
+            message: "Resource not found",
           } as ApiResponse<T>;
         }
 
@@ -200,7 +201,6 @@ export class CommetHTTPClient {
           data: unknown,
         ): data is {
           message?: string;
-          errors?: Record<string, string[]>;
           code?: string;
           details?: unknown;
         } => {
@@ -209,11 +209,22 @@ export class CommetHTTPClient {
 
         const errorData = isErrorResponse(responseData) ? responseData : {};
 
-        // Handle different error types
-        if (response.status === 400 && errorData.errors) {
+        // Handle validation errors (new normalized shape)
+        if (
+          errorData.code === "validation_error" &&
+          Array.isArray(errorData.details)
+        ) {
+          const errors: Record<string, string[]> = {};
+          for (const detail of errorData.details as Array<{
+            field: string;
+            message: string;
+          }>) {
+            if (!errors[detail.field]) errors[detail.field] = [];
+            errors[detail.field].push(detail.message);
+          }
           throw new CommetValidationError(
             errorData.message || "Validation failed",
-            errorData.errors,
+            errors,
           );
         }
 

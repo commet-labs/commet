@@ -12,8 +12,9 @@ export type CommetConfig = {
 export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
-  error?: string;
+  code?: string;
   message?: string;
+  details?: unknown;
   // Pagination fields (optional, included for list endpoints)
   hasMore?: boolean;
   nextCursor?: string;
