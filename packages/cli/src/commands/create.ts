@@ -1,4 +1,3 @@
-import { execSync } from "node:child_process";
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
@@ -35,15 +34,6 @@ const TEMPLATES = [
 ] as const;
 
 type TemplateName = (typeof TEMPLATES)[number]["name"];
-
-function detectPackageManager(): string {
-  const agent = process.env.npm_config_user_agent;
-  if (!agent) return "npm";
-  if (agent.startsWith("pnpm")) return "pnpm";
-  if (agent.startsWith("yarn")) return "yarn";
-  if (agent.startsWith("bun")) return "bun";
-  return "npm";
-}
 
 async function downloadTemplate(
   templateDir: string,
@@ -189,22 +179,12 @@ export const createCommand = new Command("create")
     updatePackageJson(dest, projectName);
     copyEnvExample(dest);
 
-    const pm = detectPackageManager();
-    const installSpinner = ora(`Installing dependencies with ${pm}...`).start();
-
-    try {
-      execSync(`${pm} install`, { cwd: dest, stdio: "ignore" });
-      installSpinner.succeed("Dependencies installed");
-    } catch {
-      installSpinner.warn("Could not install dependencies");
-      console.log(chalk.dim(`  Run \`${pm} install\` manually`));
-    }
-
     console.log(chalk.green(`\n✓ Created ${projectName}`));
     console.log(chalk.dim(`  Template: ${template.name}`));
     console.log();
     console.log(`  ${chalk.cyan("cd")} ${projectName}`);
     console.log(`  ${chalk.dim("Update .env with your keys")}`);
-    console.log(`  ${chalk.cyan(`${pm} dev`)}`);
+    console.log(`  ${chalk.cyan("npm install")}`);
+    console.log(`  ${chalk.cyan("npm run dev")}`);
     console.log();
   });
