@@ -29,14 +29,7 @@ export {
 } from "./types/common";
 
 // Addons
-export type {
-  Addon,
-  ActiveAddon,
-  AddonActivationResult,
-  AddonDeactivationResult,
-  ActivateAddonParams,
-  DeactivateAddonParams,
-} from "./resources/addons";
+export type { ActiveAddon } from "./resources/addons";
 
 // Customers
 export type {

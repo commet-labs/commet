@@ -52,20 +52,11 @@ export class CustomerContext {
   }
 
   addons = {
-    activate: (slug: string, options?: RequestOptions) =>
-      this.addonsResource.activate(
-        { externalId: this.externalId, slug },
-        options,
-      ),
-
-    deactivate: (slug: string, options?: RequestOptions) =>
-      this.addonsResource.deactivate(
-        { externalId: this.externalId, slug },
-        options,
-      ),
-
     list: (options?: RequestOptions) =>
-      this.addonsResource.listActive(this.externalId, options),
+      this.addonsResource.listActive(
+        { externalId: this.externalId },
+        options,
+      ),
   };
 
   /**
