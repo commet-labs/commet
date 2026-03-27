@@ -3,6 +3,7 @@
 import chalk from "chalk";
 import { Command } from "commander";
 import packageJson from "../package.json" with { type: "json" };
+import { createCommand } from "./commands/create";
 import { infoCommand } from "./commands/info";
 import { linkCommand } from "./commands/link";
 import { listCommand } from "./commands/list";
@@ -21,6 +22,9 @@ program
     "Commet CLI - Manage your billing platform from the command line",
   )
   .version(packageJson.version);
+
+// Scaffolding commands
+program.addCommand(createCommand);
 
 // Authentication commands
 program.addCommand(loginCommand);
