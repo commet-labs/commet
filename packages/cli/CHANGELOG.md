@@ -1,5 +1,13 @@
 # commet
 
+## 1.1.0
+
+### Minor Changes
+
+- 2bd6f3d: feat: add `commet create` command to scaffold new projects from templates
+
+  Scaffold a new Commet app from the existing example templates (fixed, seats, credits, usage-based) by downloading them directly from GitHub. Supports interactive prompts and flags for quick setup (`commet create my-app -t usage-based`).
+
 ## 1.0.0
 
 ### Major Changes
@@ -123,6 +131,7 @@
   ```
 
   #### Type Exports
+
   - `GeneratedProductId` deprecated in favor of `GeneratedPlanCode`
   - New `GeneratedFeatureCode` type for feature codes
   - Several param types renamed for consistency (e.g., `CreateParams`, `UpdateParams`)
@@ -164,6 +173,7 @@
   Sandbox environment URL changed from `sandbox.commet.co` to `beta.commet.co`.
 
   ### Migration Guide
+
   1. Run `commet pull` to regenerate types with new plan/feature codes
   2. Update any code using `GeneratedProductId` to use `GeneratedPlanCode`
   3. If using sandbox environment, CLI will now connect to `beta.commet.co`
@@ -180,6 +190,7 @@
 ### Minor Changes
 
 - 54840ff: Add product types to CLI and SDK for automatic type inference
+
   - CLI now fetches and generates productId types from the organization's products
   - Added products list to the API endpoint `/api/cli/types` in the backend
   - SDK includes new `GeneratedProductId` helper type for type-safe product IDs
@@ -209,16 +220,19 @@
 - 828c3c3: Add /api prefix to all endpoint URLs
 
   **Changes:**
+
   - SDK now automatically prefixes all endpoints with `/api`
   - CLI commands now include `/api` prefix in URLs
   - Ensures compatibility with Next.js API routes structure
 
   **Impact:**
+
   - SDK endpoints: `/customers` → `/api/customers`
   - CLI endpoints: `/cli/organizations` → `/api/cli/organizations`
   - Auth endpoints already had `/api` prefix (unchanged)
 
   **Examples:**
+
   - Before: `https://commet.co/customers` ❌
   - After: `https://commet.co/api/customers` ✅
 
@@ -232,6 +246,7 @@
 - 737ad93: Fix CLI version display and error handling
 
   **Changes:**
+
   - Version now reads from package.json instead of hardcoded value
   - Fixed `--version` command showing error message after displaying version
   - Improved error handling for Commander.js exitOverride mode
@@ -258,17 +273,20 @@
 - 4303341: Revert API subdomain migration - consolidate to main domains
 
   **Changes:**
+
   - Production endpoint: `https://api.commet.co` → `https://commet.co`
   - Sandbox endpoint: `https://api.sandbox.commet.co` → `https://sandbox.commet.co`
   - Consolidated `getWebBaseURL()` and `getApiBaseURL()` into single `getBaseURL()` function
   - All API routes remain at `/api/*` path within these domains
 
   **Impact:**
+
   - SDK and CLI now use main domains instead of api subdomains
   - No code changes required for SDK users - only internal URL changes
   - CLI users may need to re-authenticate if experiencing connection issues
 
   **Example:**
+
   - Before: `https://api.commet.co/customers`
   - After: `https://commet.co/api/customers`
 
@@ -282,12 +300,14 @@
 - 58a1b3a: CLI endpoints migration to NestJS infrastructure
 
   **Breaking Changes:**
+
   - CLI endpoints migrated from Next.js to NestJS:
     - Auth flow stays in web app: `commet.co/api/auth/device/*`
     - Organization and types endpoints now at: `api.commet.co/cli/*`
     - Uses Bearer token authentication with Better Auth
 
   **What Changed:**
+
   - Device auth flow remains on web app (unchanged user experience)
   - Organization and types endpoints migrated to NestJS API
   - New URL functions: `getWebBaseURL()` for auth, `getApiBaseURL()` for data
@@ -304,12 +324,14 @@
 - e128940: API endpoint migration to NestJS infrastructure
 
   **Breaking Changes:**
+
   - Base URLs updated to new API domains:
     - Sandbox: `https://sandbox.commet.co` → `https://api.sandbox.commet.co`
     - Production: `https://billing.commet.co` → `https://api.commet.co`
   - No code changes required on user side - only internal URL changes
 
   **What Changed:**
+
   - HTTP client now points to new API infrastructure
   - All endpoints remain the same, only domain changed
   - Debug logging shows updated URLs
@@ -345,10 +367,12 @@
 - 54590c9: Refactor CLI structure and improve developer experience
 
   **Breaking Changes:**
+
   - File structure changed from `.commet` and `.commet.d.ts` to `.commet/config.json` and `.commet/types.d.ts`
   - Users need to delete old files and run `commet link` and `commet pull` again
 
   **New Features:**
+
   - Automatic `tsconfig.json` update when running `commet pull` (adds `.commet/types.d.ts` to include array)
   - Automatic `.gitignore` update in both `commet link` and `commet pull` (adds `.commet/` directory)
   - Works without `tsconfig.json` or `.gitignore` - shows warnings with instructions instead of failing
@@ -356,6 +380,7 @@
   - Uses `jsonc-parser` to preserve comments and formatting in `tsconfig.json`
 
   **Improvements:**
+
   - Cleaner directory structure with `.commet/` folder containing all generated files
   - `commet unlink` now removes entire `.commet/` directory
   - Better error messages that are simple and actionable
@@ -387,11 +412,13 @@
 - af8c080: Improved CLI authentication flow and user experience
 
   **Breaking behavior change:**
+
   - Environment (sandbox/production) is now selected during `commet login` instead of `commet link`
   - The access token is tied to the selected environment, making it more secure and straightforward
   - `commet link` and `commet switch` now only prompt for organization selection
 
   **UI improvements:**
+
   - Migrated from `inquirer` to `@inquirer/prompts` for better theming support
   - Added custom Commet brand color (#A0DED4) with mint highlighting for selected options
   - Added graceful Ctrl+C handling with clean exit messages instead of stack traces
@@ -402,6 +429,7 @@
 ### Patch Changes
 
 - dfc4cca: Add environment selection during login to support isolated sandbox and production platforms
+
   - Login now prompts user to select between Sandbox (sandbox.commet.co) and Production (billing.commet.co)
   - Authentication tokens are now environment-specific
   - Updated URLs: sandbox uses sandbox.commet.co, production uses billing.commet.co
@@ -417,6 +445,7 @@
 - 836b309: Convert to monorepo structure with independent packages
 
   **Breaking Changes:**
+
   - SDK package renamed from `commet` to `@commet/node`
   - CLI remains as `commet` but is now a separate package
 
@@ -432,6 +461,7 @@
   CLI users have no changes - all commands remain the same.
 
   **New Features:**
+
   - Independent versioning for SDK and CLI
   - Smaller SDK package (no CLI dependencies)
   - Turbo-powered parallel builds
