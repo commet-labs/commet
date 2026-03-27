@@ -28,6 +28,16 @@ export {
   CommetValidationError,
 } from "./types/common";
 
+// Addons
+export type {
+  Addon,
+  ActiveAddon,
+  AddonActivationResult,
+  AddonDeactivationResult,
+  ActivateAddonParams,
+  DeactivateAddonParams,
+} from "./resources/addons";
+
 // Customers
 export type {
   Customer,

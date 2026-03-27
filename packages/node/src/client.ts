@@ -1,4 +1,5 @@
 import { CustomerContext } from "./customer";
+import { AddonsResource } from "./resources/addons";
 import { CreditPacksResource } from "./resources/credit-packs";
 import { CustomersResource } from "./resources/customers";
 import { FeaturesResource } from "./resources/features";
@@ -18,6 +19,7 @@ export class Commet {
   private httpClient: CommetHTTPClient;
   private environment: Environment;
 
+  public readonly addons: AddonsResource;
   public readonly customers: CustomersResource;
   public readonly creditPacks: CreditPacksResource;
   public readonly plans: PlansResource;
@@ -43,6 +45,7 @@ export class Commet {
     this.environment = config.environment || "sandbox";
 
     this.httpClient = new CommetHTTPClient(config, this.environment);
+    this.addons = new AddonsResource(this.httpClient);
     this.customers = new CustomersResource(this.httpClient);
     this.creditPacks = new CreditPacksResource(this.httpClient);
     this.plans = new PlansResource(this.httpClient);
@@ -79,6 +82,7 @@ export class Commet {
    */
   customer(externalId: string): CustomerContext {
     return new CustomerContext(externalId, {
+      addons: this.addons,
       features: this.features,
       seats: this.seats,
       usage: this.usage,

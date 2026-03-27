@@ -1,3 +1,4 @@
+import type { AddonsResource } from "./resources/addons";
 import type { FeaturesResource } from "./resources/features";
 import type { PortalResource } from "./resources/portal";
 import type { SeatsResource } from "./resources/seats";
@@ -23,6 +24,7 @@ import type { RequestOptions } from "./types/common";
  */
 export class CustomerContext {
   private readonly externalId: string;
+  private readonly addonsResource: AddonsResource;
   private readonly featuresResource: FeaturesResource;
   private readonly seatsResource: SeatsResource;
   private readonly usageResource: UsageResource;
@@ -32,6 +34,7 @@ export class CustomerContext {
   constructor(
     externalId: string,
     resources: {
+      addons: AddonsResource;
       features: FeaturesResource;
       seats: SeatsResource;
       usage: UsageResource;
@@ -40,12 +43,30 @@ export class CustomerContext {
     },
   ) {
     this.externalId = externalId;
+    this.addonsResource = resources.addons;
     this.featuresResource = resources.features;
     this.seatsResource = resources.seats;
     this.usageResource = resources.usage;
     this.subscriptionsResource = resources.subscriptions;
     this.portalResource = resources.portal;
   }
+
+  addons = {
+    activate: (slug: string, options?: RequestOptions) =>
+      this.addonsResource.activate(
+        { externalId: this.externalId, slug },
+        options,
+      ),
+
+    deactivate: (slug: string, options?: RequestOptions) =>
+      this.addonsResource.deactivate(
+        { externalId: this.externalId, slug },
+        options,
+      ),
+
+    list: (options?: RequestOptions) =>
+      this.addonsResource.listActive(this.externalId, options),
+  };
 
   /**
    * Feature access methods - delegates to FeaturesResource
