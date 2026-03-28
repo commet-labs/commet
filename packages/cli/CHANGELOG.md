@@ -1,5 +1,11 @@
 # commet
 
+## 1.2.0
+
+### Minor Changes
+
+- b50fd40: Integrated create flow: login, org selection, and plan creation in a single command. Removed auto-install of dependencies.
+
 ## 1.1.0
 
 ### Minor Changes
