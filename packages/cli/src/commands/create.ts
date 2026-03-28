@@ -6,6 +6,9 @@ import chalk from "chalk";
 import { Command } from "commander";
 import ora from "ora";
 import { extract as tarExtract } from "tar";
+import { apiRequest, getBaseURL } from "../utils/api";
+import { authExists, loadAuth } from "../utils/config";
+import { performLogin } from "../utils/login-flow";
 import { commetColor, promptTheme } from "../utils/prompt-theme";
 
 const GITHUB_REPO = "commet-labs/commet";
@@ -14,21 +17,25 @@ const TEMPLATES = [
   {
     name: "fixed",
     dir: "fixed-saas",
+    templateId: "fixed-saas",
     description: "Fixed subscriptions (monthly/yearly plans)",
   },
   {
     name: "seats",
     dir: "team-saas",
+    templateId: "seat-based-saas",
     description: "Seat-based billing (per team member)",
   },
   {
     name: "credits",
     dir: "credits-saas",
+    templateId: "credits-saas",
     description: "Credit-based billing (prepaid usage blocks)",
   },
   {
     name: "usage-based",
     dir: "usage-based-saas",
+    templateId: "usage-based-saas",
     description: "Usage-based billing (metered, pay for what you use)",
   },
 ] as const;
@@ -93,6 +100,21 @@ function copyEnvExample(dest: string) {
   }
 }
 
+function linkProject(
+  dest: string,
+  orgId: string,
+  orgName: string,
+  environment: "sandbox" | "production",
+) {
+  const commetDir = path.join(dest, ".commet");
+  fs.mkdirSync(commetDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(commetDir, "config.json"),
+    JSON.stringify({ orgId, orgName, environment }, null, 2),
+    "utf8",
+  );
+}
+
 export const createCommand = new Command("create")
   .description("Create a new Commet app from a template")
   .argument("[name]", "Project name")
@@ -114,6 +136,7 @@ export const createCommand = new Command("create")
       return;
     }
 
+    // 1. Project name
     let projectName = argName;
     try {
       if (!projectName) {
@@ -123,20 +146,97 @@ export const createCommand = new Command("create")
         });
       }
     } catch {
-      console.log(chalk.yellow("\n⚠ Cancelled"));
+      console.log(chalk.yellow("\n\u26A0 Cancelled"));
       return;
     }
 
     const dest = path.resolve(projectName);
     if (fs.existsSync(dest)) {
-      console.log(chalk.red(`✗ Directory "${projectName}" already exists`));
+      console.log(
+        chalk.red(`\u2717 Directory "${projectName}" already exists`),
+      );
       return;
     }
 
+    // 2. Login (if not authenticated)
+    if (!authExists()) {
+      let environment: "sandbox" | "production";
+      try {
+        environment = await select<"sandbox" | "production">({
+          message: "Environment:",
+          choices: [
+            {
+              name: `Sandbox ${chalk.dim("(Development)")}`,
+              value: "sandbox",
+            },
+            { name: "Production", value: "production" },
+          ],
+          default: "sandbox",
+          theme: promptTheme,
+        });
+      } catch {
+        console.log(chalk.yellow("\n\u26A0 Cancelled"));
+        return;
+      }
+
+      const loggedIn = await performLogin(environment);
+      if (!loggedIn) {
+        return;
+      }
+    }
+
+    const auth = loadAuth()!;
+    const baseURL = getBaseURL(auth.environment);
+
+    // 3. Select organization
+    const orgsSpinner = ora("Fetching organizations...").start();
+    const orgsResult = await apiRequest<{
+      organizations: Array<{ id: string; name: string; slug: string }>;
+    }>(`${baseURL}/api/cli/organizations`);
+
+    if (orgsResult.error || !orgsResult.data) {
+      orgsSpinner.fail("Failed to fetch organizations");
+      console.log(chalk.dim(orgsResult.error));
+      return;
+    }
+
+    const { organizations } = orgsResult.data;
+    orgsSpinner.stop();
+
+    if (organizations.length === 0) {
+      console.log(chalk.yellow("\u26A0 No organizations found"));
+      console.log(
+        chalk.dim("Create an organization at https://commet.co first"),
+      );
+      return;
+    }
+
+    let selectedOrg: (typeof organizations)[0];
+
+    if (organizations.length === 1) {
+      selectedOrg = organizations[0]!;
+    } else {
+      try {
+        const orgId = await select({
+          message: "Organization:",
+          choices: organizations.map((org) => ({
+            name: `${org.name} ${chalk.dim(`(${org.slug})`)}`,
+            value: org.id,
+          })),
+          theme: promptTheme,
+        });
+        selectedOrg = organizations.find((org) => org.id === orgId)!;
+      } catch {
+        console.log(chalk.yellow("\n\u26A0 Cancelled"));
+        return;
+      }
+    }
+
+    // 4. Select template
     let template = TEMPLATES.find((t) => t.name === opts.template);
 
     if (opts.template && !template) {
-      console.log(chalk.red(`✗ Unknown template "${opts.template}"`));
+      console.log(chalk.red(`\u2717 Unknown template "${opts.template}"`));
       console.log(
         chalk.dim("Run `commet create --list` to see available templates"),
       );
@@ -156,17 +256,18 @@ export const createCommand = new Command("create")
         template = TEMPLATES.find((t) => t.name === selected)!;
       }
     } catch {
-      console.log(chalk.yellow("\n⚠ Cancelled"));
+      console.log(chalk.yellow("\n\u26A0 Cancelled"));
       return;
     }
 
-    const spinner = ora("Downloading template...").start();
+    // 5. Download template
+    const downloadSpinner = ora("Downloading template...").start();
 
     try {
       await downloadTemplate(template.dir, dest, opts.ref);
-      spinner.succeed("Template downloaded");
+      downloadSpinner.succeed("Template downloaded");
     } catch (error) {
-      spinner.fail("Failed to download template");
+      downloadSpinner.fail("Failed to download template");
       if (error instanceof Error) {
         console.error(chalk.red(error.message));
       }
@@ -179,8 +280,35 @@ export const createCommand = new Command("create")
     updatePackageJson(dest, projectName);
     copyEnvExample(dest);
 
-    console.log(chalk.green(`\n✓ Created ${projectName}`));
+    // 6. Create plans in platform
+    const planSpinner = ora("Creating plans...").start();
+    const templateResult = await apiRequest<{
+      plansCreated: number;
+      featuresCreated: number;
+    }>(`${baseURL}/api/cli/templates`, {
+      method: "POST",
+      body: JSON.stringify({
+        templateId: template.templateId,
+        organizationId: selectedOrg.id,
+      }),
+    });
+
+    if (templateResult.error || !templateResult.data) {
+      planSpinner.fail("Failed to create plans");
+      console.log(chalk.dim(templateResult.error));
+    } else {
+      planSpinner.succeed(
+        `Created ${templateResult.data.plansCreated} plans and ${templateResult.data.featuresCreated} features`,
+      );
+    }
+
+    // 7. Link project
+    linkProject(dest, selectedOrg.id, selectedOrg.name, auth.environment);
+
+    // 8. Done
+    console.log(chalk.green(`\n\u2713 Created ${projectName}`));
     console.log(chalk.dim(`  Template: ${template.name}`));
+    console.log(chalk.dim(`  Organization: ${selectedOrg.name}`));
     console.log();
     console.log(`  ${chalk.cyan("cd")} ${projectName}`);
     console.log(`  ${chalk.dim("Update .env with your keys")}`);
