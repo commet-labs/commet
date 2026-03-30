@@ -280,7 +280,8 @@ function collectUsageFeatures(plans: Plan[]): UsageFeatureColumn[] {
     for (const feature of plan.features) {
       if (
         (feature.type === "metered" || feature.type === "seats") &&
-        !seen.has(feature.code)
+        !seen.has(feature.code) &&
+        hasUsageData(feature)
       ) {
         seen.set(feature.code, {
           code: feature.code,
@@ -291,6 +292,14 @@ function collectUsageFeatures(plans: Plan[]): UsageFeatureColumn[] {
     }
   }
   return Array.from(seen.values());
+}
+
+function hasUsageData(feature: PlanFeature): boolean {
+  return (
+    feature.unlimited === true ||
+    (feature.includedAmount !== undefined && feature.includedAmount > 0) ||
+    (feature.overageEnabled === true && feature.overageUnitPrice !== undefined)
+  );
 }
 
 function formatSettlementPrice(cents: number): string {
