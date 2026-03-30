@@ -1,11 +1,18 @@
 {
-  "name": "commet",
-  "version": "1.2.0",
-  "description": "Commet CLI - Manage your billing platform from the command line",
-  "bin": {
-    "commet": "./bin/commet"
+  "name": "@commet/ai",
+  "version": "0.1.0",
+  "description": "Commet AI billing middleware for Vercel AI SDK",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
   },
-  "files": ["dist", "bin", "README.md"],
+  "files": ["dist", "README.md"],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
@@ -13,20 +20,22 @@
     "lint:fix": "biome lint --write src/",
     "typecheck": "tsc --noEmit"
   },
-  "keywords": ["billing", "cli", "typescript", "commet"],
+  "keywords": [
+    "billing",
+    "ai",
+    "tokens",
+    "usage-based-billing",
+    "ai-sdk",
+    "middleware"
+  ],
   "author": "Commet Team",
   "license": "MIT",
-  "dependencies": {
-    "@inquirer/prompts": "8.0.1",
-    "chalk": "5.6.2",
-    "commander": "14.0.2",
-    "jsonc-parser": "3.3.1",
-    "open": "11.0.0",
-    "ora": "9.0.0",
-    "tar": "^7.5.13"
+  "peerDependencies": {
+    "ai": ">=4.0.0"
   },
   "devDependencies": {
     "@types/node": "24.10.1",
+    "ai": "^4.0.0",
     "tsup": "8.5.1",
     "typescript": "5.9.3"
   },
@@ -37,7 +46,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/commet-labs/commet.git",
-    "directory": "packages/cli"
+    "directory": "packages/ai"
   },
   "publishConfig": {
     "access": "public",
