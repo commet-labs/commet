@@ -14,8 +14,8 @@
   },
   "dependencies": {
     "@commet/better-auth": "1.3.0",
-    "@commet/next": "0.2.14",
-    "@commet/node": "1.6.0",
+    "@commet/next": "0.3.0",
+    "@commet/node": "1.6.2",
     "@radix-ui/react-slot": "1.2.4",
     "@tailwindcss/postcss": "4.1.18",
     "@types/node": "25.0.10",
