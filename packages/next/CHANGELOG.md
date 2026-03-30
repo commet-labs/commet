@@ -1,5 +1,11 @@
 # @commet/next
 
+## 0.3.1
+
+### Patch Changes
+
+- a6feeef: fix: skip empty usage columns in PricingMarkdown when no plan has data for a feature
+
 ## 0.3.0
 
 ### Minor Changes
