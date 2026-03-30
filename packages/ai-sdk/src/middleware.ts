@@ -1,5 +1,5 @@
+import type { LanguageModelV3 } from "@ai-sdk/provider";
 import { type LanguageModelMiddleware, wrapLanguageModel } from "ai";
-import type { LanguageModelV2, LanguageModelV3, LanguageModelV4 } from "ai";
 import type { AIUsageTrackResponse, CommetAIOptions } from "./types";
 
 function getBaseUrl(
@@ -46,7 +46,6 @@ async function reportTokenUsage(
       body: JSON.stringify({
         feature: options.feature,
         customerId: options.customerId,
-        externalId: options.externalId,
         model: modelId,
         inputTokens,
         outputTokens,
@@ -65,7 +64,7 @@ async function reportTokenUsage(
       options.onTrackingError(trackingError);
     } else {
       console.warn(
-        "[commet/ai] Failed to track AI usage:",
+        "[commet/ai-sdk] Failed to report token usage:",
         trackingError.message,
       );
     }
@@ -74,20 +73,21 @@ async function reportTokenUsage(
 }
 
 export function commetAI(
-  model: LanguageModelV2 | LanguageModelV3 | LanguageModelV4,
+  model: LanguageModelV3,
   options: CommetAIOptions,
-): LanguageModelV4 {
+): LanguageModelV3 {
   if (!options.apiKey) {
-    throw new Error("@commet/ai: apiKey is required");
+    throw new Error("@commet/ai-sdk: apiKey is required");
   }
   if (!options.feature) {
-    throw new Error("@commet/ai: feature is required");
+    throw new Error("@commet/ai-sdk: feature is required");
   }
-  if (!options.customerId && !options.externalId) {
-    throw new Error("@commet/ai: either customerId or externalId is required");
+  if (!options.customerId) {
+    throw new Error("@commet/ai-sdk: customerId is required");
   }
 
   const middleware: LanguageModelMiddleware = {
+    specificationVersion: "v3",
     wrapGenerate: async ({ doGenerate, model: wrappedModel }) => {
       const result = await doGenerate();
 

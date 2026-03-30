@@ -26,6 +26,9 @@ importers:
 
   packages/ai-sdk:
     devDependencies:
+      '@ai-sdk/provider':
+        specifier: ^3.0.0
+        version: 3.0.8
       '@types/node':
         specifier: 24.10.1
         version: 24.10.1

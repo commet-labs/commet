@@ -10,5 +10,5 @@ export default defineConfig({
   minify: false,
   target: "es2020",
   outDir: "dist",
-  external: ["ai"],
+  external: ["ai", "@ai-sdk/provider"],
 });
