@@ -26,12 +26,14 @@ function reportTokenUsage(
   const cacheReadTokens = usage.inputTokens?.cacheRead ?? 0;
   const cacheWriteTokens = usage.inputTokens?.cacheWrite ?? 0;
 
+  const isCommetId = options.customerId.startsWith("cus_");
+
   options.commet.usage
     .track({
-      feature: options.feature as Parameters<
-        typeof options.commet.usage.track
-      >[0]["feature"],
-      customerId: options.customerId,
+      feature: options.feature,
+      ...(isCommetId
+        ? { customerId: options.customerId as `cus_${string}` }
+        : { externalId: options.customerId }),
       model: modelId,
       inputTokens,
       outputTokens,
