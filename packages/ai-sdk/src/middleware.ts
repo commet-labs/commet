@@ -1,14 +1,6 @@
 import type { LanguageModelV3 } from "@ai-sdk/provider";
 import { type LanguageModelMiddleware, wrapLanguageModel } from "ai";
-import type { AIUsageTrackResponse, CommetAIOptions } from "./types";
-
-function getBaseUrl(
-  environment: "production" | "sandbox" = "production",
-): string {
-  return environment === "production"
-    ? "https://commet.co"
-    : "https://sandbox.commet.co";
-}
+import type { CommetAIOptions } from "./types";
 
 interface TokenUsage {
   inputTokens: {
@@ -21,63 +13,53 @@ interface TokenUsage {
   };
 }
 
-async function reportTokenUsage(
+function reportTokenUsage(
   options: CommetAIOptions,
   modelId: string,
   usage: TokenUsage,
-): Promise<AIUsageTrackResponse | null> {
+): void {
   const inputTokens = usage.inputTokens?.total ?? 0;
   const outputTokens = usage.outputTokens?.total ?? 0;
 
-  if (inputTokens === 0 && outputTokens === 0) return null;
+  if (inputTokens === 0 && outputTokens === 0) return;
 
   const cacheReadTokens = usage.inputTokens?.cacheRead ?? 0;
   const cacheWriteTokens = usage.inputTokens?.cacheWrite ?? 0;
 
-  const baseUrl = getBaseUrl(options.environment);
+  options.commet.usage
+    .track({
+      feature: options.feature as Parameters<
+        typeof options.commet.usage.track
+      >[0]["feature"],
+      customerId: options.customerId,
+      model: modelId,
+      inputTokens,
+      outputTokens,
+      ...(cacheReadTokens > 0 && { cacheReadTokens }),
+      ...(cacheWriteTokens > 0 && { cacheWriteTokens }),
+      idempotencyKey: options.idempotencyKey,
+    })
+    .catch((error) => {
+      const trackingError =
+        error instanceof Error ? error : new Error("Unknown tracking error");
 
-  try {
-    const response = await fetch(`${baseUrl}/api/usage/events`, {
-      method: "POST",
-      headers: {
-        "x-api-key": options.apiKey,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        feature: options.feature,
-        customerId: options.customerId,
-        model: modelId,
-        inputTokens,
-        outputTokens,
-        ...(cacheReadTokens > 0 && { cacheReadTokens }),
-        ...(cacheWriteTokens > 0 && { cacheWriteTokens }),
-        idempotencyKey: options.idempotencyKey,
-      }),
+      if (options.onTrackingError) {
+        options.onTrackingError(trackingError);
+      } else {
+        console.warn(
+          "[commet/ai-sdk] Failed to report token usage:",
+          trackingError.message,
+        );
+      }
     });
-
-    return (await response.json()) as AIUsageTrackResponse;
-  } catch (error) {
-    const trackingError =
-      error instanceof Error ? error : new Error("Unknown tracking error");
-
-    if (options.onTrackingError) {
-      options.onTrackingError(trackingError);
-    } else {
-      console.warn(
-        "[commet/ai-sdk] Failed to report token usage:",
-        trackingError.message,
-      );
-    }
-    return null;
-  }
 }
 
 export function commetAI(
   model: LanguageModelV3,
   options: CommetAIOptions,
 ): LanguageModelV3 {
-  if (!options.apiKey) {
-    throw new Error("@commet/ai-sdk: apiKey is required");
+  if (!options.commet) {
+    throw new Error("@commet/ai-sdk: commet instance is required");
   }
   if (!options.feature) {
     throw new Error("@commet/ai-sdk: feature is required");
@@ -91,9 +73,7 @@ export function commetAI(
     wrapGenerate: async ({ doGenerate, model: wrappedModel }) => {
       const result = await doGenerate();
 
-      reportTokenUsage(options, wrappedModel.modelId, result.usage).catch(
-        () => {},
-      );
+      reportTokenUsage(options, wrappedModel.modelId, result.usage);
 
       return result;
     },
@@ -105,11 +85,7 @@ export function commetAI(
         new TransformStream({
           transform(chunk, controller) {
             if (chunk.type === "finish") {
-              reportTokenUsage(
-                options,
-                wrappedModel.modelId,
-                chunk.usage,
-              ).catch(() => {});
+              reportTokenUsage(options, wrappedModel.modelId, chunk.usage);
             }
 
             controller.enqueue(chunk);

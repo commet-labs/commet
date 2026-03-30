@@ -1,2 +1,2 @@
 export { commetAI } from "./middleware";
-export type { CommetAIOptions, AIUsageTrackResponse } from "./types";
+export type { CommetAIOptions } from "./types";

@@ -31,10 +31,12 @@
   "author": "Commet Team",
   "license": "MIT",
   "peerDependencies": {
+    "@commet/node": ">=1.6.0",
     "ai": ">=6.0.0"
   },
   "devDependencies": {
     "@ai-sdk/provider": "^3.0.0",
+    "@commet/node": "workspace:*",
     "@types/node": "24.10.1",
     "ai": "^6.0.0",
     "tsup": "8.5.1",
