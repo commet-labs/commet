@@ -31,11 +31,11 @@
   "author": "Commet Team",
   "license": "MIT",
   "peerDependencies": {
-    "ai": ">=4.0.0"
+    "ai": ">=6.0.0"
   },
   "devDependencies": {
     "@types/node": "24.10.1",
-    "ai": "^4.0.0",
+    "ai": "^6.0.0",
     "tsup": "8.5.1",
     "typescript": "5.9.3"
   },
