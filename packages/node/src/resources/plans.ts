@@ -20,6 +20,7 @@ export interface PlanFeature {
   code: string;
   name: string;
   type: FeatureType;
+  unitName: string | null;
   enabled?: boolean;
   includedAmount?: number;
   unlimited?: boolean;
@@ -55,7 +56,6 @@ export interface PlanDetailPrice {
 }
 
 export interface PlanDetailFeature extends PlanFeature {
-  unitName: string | null;
   overage: {
     enabled: boolean;
     model: "per_unit" | "tiered" | null;

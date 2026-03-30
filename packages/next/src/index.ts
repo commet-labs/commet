@@ -41,3 +41,6 @@ export type {
 
 export { CustomerPortal } from "./portal";
 export type { CustomerPortalConfig } from "./portal";
+
+export { PricingMarkdown } from "./pricing-markdown";
+export type { PricingMarkdownConfig } from "./pricing-markdown";
