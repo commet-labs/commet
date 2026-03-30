@@ -21,7 +21,7 @@ interface TokenUsage {
   };
 }
 
-async function trackAIUsage(
+async function reportTokenUsage(
   options: CommetAIOptions,
   modelId: string,
   usage: TokenUsage,
@@ -91,7 +91,9 @@ export function commetAI(
     wrapGenerate: async ({ doGenerate, model: wrappedModel }) => {
       const result = await doGenerate();
 
-      trackAIUsage(options, wrappedModel.modelId, result.usage).catch(() => {});
+      reportTokenUsage(options, wrappedModel.modelId, result.usage).catch(
+        () => {},
+      );
 
       return result;
     },
@@ -103,9 +105,11 @@ export function commetAI(
         new TransformStream({
           transform(chunk, controller) {
             if (chunk.type === "finish") {
-              trackAIUsage(options, wrappedModel.modelId, chunk.usage).catch(
-                () => {},
-              );
+              reportTokenUsage(
+                options,
+                wrappedModel.modelId,
+                chunk.usage,
+              ).catch(() => {});
             }
 
             controller.enqueue(chunk);

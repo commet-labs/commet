@@ -49,7 +49,7 @@ export interface TrackUsageParams extends TrackBaseParams {
   model?: never;
 }
 
-export interface TrackAIParams extends TrackBaseParams {
+export interface TrackModelTokensParams extends TrackBaseParams {
   model: string;
   inputTokens: number;
   outputTokens: number;
@@ -58,7 +58,7 @@ export interface TrackAIParams extends TrackBaseParams {
   value?: never;
 }
 
-export type TrackParams = TrackUsageParams | TrackAIParams;
+export type TrackParams = TrackUsageParams | TrackModelTokensParams;
 
 export class UsageResource {
   constructor(private httpClient: CommetHTTPClient) {}

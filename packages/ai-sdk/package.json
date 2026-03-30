@@ -1,7 +1,7 @@
 {
-  "name": "@commet/ai",
+  "name": "@commet/ai-sdk",
   "version": "0.1.0",
-  "description": "Commet AI billing middleware for Vercel AI SDK",
+  "description": "Commet billing middleware for Vercel AI SDK",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -46,7 +46,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/commet-labs/commet.git",
-    "directory": "packages/ai"
+    "directory": "packages/ai-sdk"
   },
   "publishConfig": {
     "access": "public",

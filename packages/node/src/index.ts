@@ -44,7 +44,7 @@ export type {
   UsageEventProperty,
   TrackParams,
   TrackUsageParams,
-  TrackAIParams,
+  TrackModelTokensParams,
   BatchResult as UsageBatchResult,
 } from "./resources/usage";
 
