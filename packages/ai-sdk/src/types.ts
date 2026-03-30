@@ -1,15 +1,7 @@
 export interface CommetAIOptions {
-  /** Commet API key (ck_...) */
   apiKey: string;
-
-  /** Feature code to track usage against */
   feature: string;
-
-  /** Commet customer ID (cus_...) */
-  customerId?: string;
-
-  /** External user ID (your system's user identifier) */
-  externalId?: string;
+  customerId: string;
 
   /** Environment: "production" or "sandbox" */
   environment?: "production" | "sandbox";
