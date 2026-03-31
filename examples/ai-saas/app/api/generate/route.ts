@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/auth/auth";
 import { commet } from "@/lib/commet";
 
-export async function POST(request: Request) {
+export async function POST() {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -13,20 +13,16 @@ export async function POST(request: Request) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const { messages } = await request.json();
-
   const model = commetAI(gateway("anthropic/claude-sonnet-4-20250514"), {
     commet,
-    feature: "ai_chat" as never,
+    feature: "ai_chat",
     customerId: session.user.id,
   });
 
   const result = streamText({
     model,
-    system:
-      "You are a helpful AI assistant. Be concise and direct in your responses.",
-    messages,
+    prompt: "Write a short, interesting fun fact about technology in 2-3 sentences.",
   });
 
-  return result.toDataStreamResponse();
+  return result.toTextStreamResponse();
 }

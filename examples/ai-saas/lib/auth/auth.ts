@@ -4,7 +4,6 @@ import {
   portal,
   subscriptions,
   usage,
-  webhooks,
 } from "@commet/better-auth";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
@@ -38,9 +37,6 @@ export const auth = betterAuth({
         subscriptions(),
         features(),
         usage(),
-        webhooks({
-          secret: process.env.COMMET_WEBHOOK_SECRET || "",
-        }),
       ],
     }),
   ],
