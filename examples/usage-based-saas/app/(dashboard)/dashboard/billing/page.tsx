@@ -1,9 +1,9 @@
+import { CreditCard, ExternalLink } from "lucide-react";
+import Link from "next/link";
 import { getBillingDataAction } from "@/actions/billing";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { customerPortalAction } from "@/lib/payments/actions";
-import { CreditCard, ExternalLink } from "lucide-react";
-import Link from "next/link";
 
 function formatPrice(cents: number): string {
   return `$${(cents / 100).toFixed(2)}`;

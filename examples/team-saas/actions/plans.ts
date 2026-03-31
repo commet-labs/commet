@@ -1,8 +1,8 @@
 "use server";
 
-import { commet } from "@/lib/commet";
 import type { Plan } from "@commet/node";
 import { unstable_cache } from "next/cache";
+import { commet } from "@/lib/commet";
 
 const getCachedPlans = unstable_cache(
   async () => {

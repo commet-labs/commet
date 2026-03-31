@@ -1,5 +1,9 @@
 "use client";
 
+import { ArrowLeft, CreditCard, Home, LogOut, Users } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 import { hasActiveSubscriptionAction } from "@/actions/subscription";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -10,10 +14,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { signOut, useSession } from "@/lib/auth/auth-client";
-import { ArrowLeft, CreditCard, Home, LogOut, Users } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
 
 function UserMenu() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

@@ -1,9 +1,9 @@
+import { CreditCard } from "lucide-react";
+import Link from "next/link";
 import { checkSubscriptionStatusAction } from "@/actions/team";
 import { ManageBillingButton } from "@/components/billing/manage-billing-button";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CreditCard } from "lucide-react";
-import Link from "next/link";
 
 export default async function BillingPage() {
   const status = await checkSubscriptionStatusAction();

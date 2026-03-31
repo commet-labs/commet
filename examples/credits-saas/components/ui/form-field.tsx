@@ -1,9 +1,9 @@
 "use client";
 
+import type { ComponentProps } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import type { ComponentProps } from "react";
 
 interface FormFieldProps extends ComponentProps<typeof Input> {
   label: string;

@@ -1,5 +1,5 @@
-import { Skeleton } from "@/components/ui/skeleton";
 import { Zap } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function PricingLoading() {
   return (

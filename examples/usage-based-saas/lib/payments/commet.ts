@@ -1,6 +1,6 @@
+import { redirect } from "next/navigation";
 import { getUser } from "@/lib/auth/session";
 import { commet } from "@/lib/commet";
-import { redirect } from "next/navigation";
 
 type AuthUser = NonNullable<Awaited<ReturnType<typeof getUser>>>;
 

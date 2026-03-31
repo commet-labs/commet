@@ -1,12 +1,12 @@
 "use client";
 
+import { Lock, Trash2 } from "lucide-react";
+import { useActionState } from "react";
 import { deleteAccount, updatePassword } from "@/actions/auth";
 import { SubmitButton } from "@/components/shared/submit-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FormField } from "@/components/ui/form-field";
 import { useFormToast } from "@/hooks/use-form-toast";
-import { Lock, Trash2 } from "lucide-react";
-import { useActionState } from "react";
 
 type PasswordState = {
   currentPassword?: string;

@@ -1,5 +1,5 @@
-import { getUser as getAuthUser } from "@/lib/auth/session";
 import { and, eq } from "drizzle-orm";
+import { getUser as getAuthUser } from "@/lib/auth/session";
 import { db } from "./drizzle";
 import { member, workspace } from "./schema";
 

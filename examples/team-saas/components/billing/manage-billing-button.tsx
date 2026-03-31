@@ -1,10 +1,10 @@
 "use client";
 
-import { getPortalUrlAction } from "@/actions/portal";
-import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { getPortalUrlAction } from "@/actions/portal";
+import { Button } from "@/components/ui/button";
 
 export function ManageBillingButton() {
   const [isLoading, setIsLoading] = useState(false);

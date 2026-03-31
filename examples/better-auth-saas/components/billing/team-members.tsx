@@ -1,5 +1,7 @@
 "use client";
 
+import { Trash2, UserPlus } from "lucide-react";
+import { useState, useTransition } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,8 +14,6 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth/auth-client";
-import { Trash2, UserPlus } from "lucide-react";
-import { useState, useTransition } from "react";
 
 interface Member {
   id: string;

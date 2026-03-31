@@ -1,8 +1,8 @@
 "use server";
 
-import { commet } from "@/lib/commet";
 import type { Plan } from "@commet/node";
 import { unstable_cache } from "next/cache";
+import { commet } from "@/lib/commet";
 
 /**
  * Cached function to fetch plans from Commet

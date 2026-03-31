@@ -1,12 +1,11 @@
+import type { PlanFeature } from "@commet/node";
+import { Check, Zap } from "lucide-react";
+import { redirect } from "next/navigation";
 import { getPlansAction } from "@/actions/plans";
-
 import { Button } from "@/components/ui/button";
 import { getUser } from "@/lib/auth/session";
 import { commet } from "@/lib/commet";
 import { checkoutAction } from "@/lib/payments/actions";
-import type { PlanFeature } from "@commet/node";
-import { Check, Zap } from "lucide-react";
-import { redirect } from "next/navigation";
 
 function formatBillingInterval(
   interval: "monthly" | "yearly" | "quarterly",

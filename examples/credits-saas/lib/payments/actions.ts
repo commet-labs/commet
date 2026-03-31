@@ -1,8 +1,8 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import { getUser } from "@/lib/auth/session";
 import { getCheckoutUrl } from "@/lib/payments/commet";
-import { redirect } from "next/navigation";
 
 export async function checkoutAction(formData: FormData) {
   const planCode = formData.get("planCode") as string;

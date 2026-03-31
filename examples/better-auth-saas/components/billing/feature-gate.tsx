@@ -1,10 +1,10 @@
 "use client";
 
+import { Lock, Unlock } from "lucide-react";
+import { useEffect, useState, useTransition } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { authClient } from "@/lib/auth/auth-client";
-import { Lock, Unlock } from "lucide-react";
-import { useEffect, useState, useTransition } from "react";
 
 interface FeatureGateProps {
   featureCode: string;

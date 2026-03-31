@@ -1,9 +1,9 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { authClient } from "@/lib/auth/auth-client";
 import { ExternalLink } from "lucide-react";
 import { useState, useTransition } from "react";
+import { Button } from "@/components/ui/button";
+import { authClient } from "@/lib/auth/auth-client";
 
 export function BillingPortalButton() {
   const [isPending, startTransition] = useTransition();

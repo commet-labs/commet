@@ -1,13 +1,12 @@
 "use client";
 
+import { Suspense, useActionState } from "react";
 import { updateAccount } from "@/actions/auth";
 import { SubmitButton } from "@/components/shared/submit-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FormField } from "@/components/ui/form-field";
 import { useFormToast } from "@/hooks/use-form-toast";
 import { useSession } from "@/lib/auth/auth-client";
-import { useActionState } from "react";
-import { Suspense } from "react";
 
 type ActionState = {
   name?: string;

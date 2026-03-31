@@ -1,13 +1,13 @@
 "use client";
 
+import { Crown, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 import { removeMemberAction } from "@/actions/team";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Member } from "@/lib/db/schema";
-import { Crown, Trash2 } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
 
 interface MemberListProps {
   members: Member[];

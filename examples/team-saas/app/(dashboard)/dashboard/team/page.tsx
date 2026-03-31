@@ -1,3 +1,5 @@
+import { Users } from "lucide-react";
+import Link from "next/link";
 import {
   checkSubscriptionStatusAction,
   getWorkspaceMembersAction,
@@ -7,8 +9,6 @@ import { MemberList } from "@/components/billing/member-list";
 import { SeatUsageCard } from "@/components/billing/seat-usage-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users } from "lucide-react";
-import Link from "next/link";
 
 export default async function TeamPage() {
   const status = await checkSubscriptionStatusAction();

@@ -1,5 +1,5 @@
-import { FormAuth } from "@/components/auth/form-auth";
 import { Suspense } from "react";
+import { FormAuth } from "@/components/auth/form-auth";
 
 export default function SignUpPage() {
   return (

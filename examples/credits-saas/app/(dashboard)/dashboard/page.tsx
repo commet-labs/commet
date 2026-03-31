@@ -1,3 +1,5 @@
+import { Activity, ExternalLink, Info, Zap } from "lucide-react";
+import Link from "next/link";
 import { trackUsageAction } from "@/actions/credits";
 import { getPortalUrlAction } from "@/actions/portal";
 import { getUsageDataAction } from "@/actions/usage";
@@ -5,8 +7,6 @@ import { TransactionHistory } from "@/components/billing/transaction-history";
 import { UsageMeter } from "@/components/billing/usage-meter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Activity, ExternalLink, Info, Zap } from "lucide-react";
-import Link from "next/link";
 
 export default async function DashboardPage() {
   // Get real usage data from Commet SDK

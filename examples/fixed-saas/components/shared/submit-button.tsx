@@ -1,8 +1,8 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import type { ComponentProps, ReactNode } from "react";
+import { Button } from "@/components/ui/button";
 
 interface SubmitButtonProps extends ComponentProps<typeof Button> {
   isPending: boolean;

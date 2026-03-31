@@ -1,10 +1,10 @@
+import { ExternalLink, Users } from "lucide-react";
+import Link from "next/link";
 import { getPortalUrlAction } from "@/actions/portal";
 import { checkSubscriptionStatusAction } from "@/actions/team";
 import { SeatUsageCard } from "@/components/billing/seat-usage-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ExternalLink, Users } from "lucide-react";
-import Link from "next/link";
 
 export default async function DashboardPage() {
   const status = await checkSubscriptionStatusAction();

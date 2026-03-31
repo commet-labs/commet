@@ -1,6 +1,3 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getActivityLogs } from "@/lib/db/queries";
-import { ActivityType } from "@/lib/db/schema";
 import {
   AlertCircle,
   Lock,
@@ -11,6 +8,9 @@ import {
   UserMinus,
   UserPlus,
 } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getActivityLogs } from "@/lib/db/queries";
+import { ActivityType } from "@/lib/db/schema";
 
 const iconMap: Record<ActivityType, LucideIcon> = {
   [ActivityType.SIGN_UP]: UserPlus,

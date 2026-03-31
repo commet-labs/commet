@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import {
   ArrowRight,
   CreditCard,
@@ -7,6 +6,7 @@ import {
   Zap,
 } from "lucide-react";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function HomePage() {
   const stackList = [
@@ -153,7 +153,11 @@ function FeatureCard({
   icon,
   title,
   description,
-}: { icon: React.ReactNode; title: string; description: string }) {
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}) {
   return (
     <div className="bg-card p-8 border border-border shadow-sm hover:shadow-md transition-shadow">
       <div className="w-12 h-12 bg-muted text-foreground flex items-center justify-center mb-6">

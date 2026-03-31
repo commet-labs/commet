@@ -1,5 +1,5 @@
-import { createCheckoutSession } from "@/lib/payments/commet";
 import { redirect } from "next/navigation";
+import { createCheckoutSession } from "@/lib/payments/commet";
 
 type CheckoutPageProps = {
   searchParams: Promise<{

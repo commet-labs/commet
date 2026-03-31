@@ -1,12 +1,15 @@
 "use server";
 
+import { eq } from "drizzle-orm";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth/auth";
 import { getUser } from "@/lib/auth/session";
 import { db } from "@/lib/db/drizzle";
 import {
   ActivityType,
-  type NewActivityLog,
   activityLogs,
+  type NewActivityLog,
   user,
 } from "@/lib/db/schema";
 import {
@@ -14,9 +17,6 @@ import {
   updateAccountSchema,
   updatePasswordSchema,
 } from "@/lib/validations/auth";
-import { eq } from "drizzle-orm";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 
 type ActionState = {
   error?: string;

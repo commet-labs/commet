@@ -1,3 +1,5 @@
+import { Activity, ExternalLink, Info, Zap } from "lucide-react";
+import Link from "next/link";
 import { trackUsageAction } from "@/actions/credits";
 import { getUsageDataAction } from "@/actions/usage";
 import { TransactionHistory } from "@/components/billing/transaction-history";
@@ -6,8 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getUser } from "@/lib/auth/session";
 import { commet } from "@/lib/commet";
-import { Activity, ExternalLink, Info, Zap } from "lucide-react";
-import Link from "next/link";
 
 export default async function DashboardPage() {
   const user = await getUser();
