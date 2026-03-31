@@ -1,6 +1,5 @@
 import {
   Activity,
-  CreditCard,
   Home,
   Lock,
   LogOut,
@@ -44,11 +43,7 @@ export default function DashboardInnerLayout({
             <Home className="size-4" />
             Overview
           </NavLink>
-          <NavLink href="/dashboard/billing">
-            <CreditCard className="size-4" />
-            Billing
-          </NavLink>
-          <NavLink href="/dashboard/activity">
+<NavLink href="/dashboard/activity">
             <Activity className="size-4" />
             Activity
           </NavLink>

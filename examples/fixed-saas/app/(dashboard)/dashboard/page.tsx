@@ -37,70 +37,64 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        {subscription ? (
-          <Card>
-            <CardHeader>
-              <CardTitle>Subscription</CardTitle>
-              <CardDescription>Your current plan and status.</CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Plan</span>
-                <span className="text-sm font-medium">
-                  {subscription.planName}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Status</span>
-                <span className="text-sm font-medium capitalize">
-                  {subscription.status}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Price</span>
-                <span className="text-sm font-medium">
-                  {formatPrice(subscription.planPrice)} /{" "}
-                  {formatBillingInterval(subscription.billingInterval)}
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-        ) : (
-          <Card>
-            <CardHeader>
-              <CardTitle>Subscription</CardTitle>
-              <CardDescription>No active subscription.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                <Link
-                  href="/pricing"
-                  className="text-foreground underline underline-offset-4"
-                >
-                  Subscribe to a plan
-                </Link>{" "}
-                to get started.
-              </p>
-            </CardContent>
-          </Card>
-        )}
-
         <Card>
           <CardHeader>
-            <CardTitle>Customer Portal</CardTitle>
+            <CardTitle>Subscription</CardTitle>
             <CardDescription>
-              Manage payment methods, invoices, and subscription.
+              {subscription
+                ? "Your current plan and status."
+                : "No active subscription."}
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <Button
-              variant="outline"
-              nativeButton={false}
-              render={<Link href="/api/commet/portal" />}
-            >
-              Open portal
-              <ExternalLink className="size-3" />
-            </Button>
+          <CardContent className="flex flex-col gap-3">
+            {subscription ? (
+              <>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Plan</span>
+                  <span className="text-sm font-medium">
+                    {subscription.planName}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Status</span>
+                  <span className="text-sm font-medium capitalize">
+                    {subscription.status}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Price</span>
+                  <span className="text-sm font-medium">
+                    {formatPrice(subscription.planPrice)} /{" "}
+                    {formatBillingInterval(subscription.billingInterval)}
+                  </span>
+                </div>
+                <div className="flex gap-2 pt-2">
+                  <Button
+                    variant="outline"
+                    nativeButton={false}
+                    render={<Link href="/pricing" />}
+                  >
+                    Change plan
+                  </Button>
+                  <Button
+                    variant="outline"
+                    nativeButton={false}
+                    render={<Link href="/api/commet/portal" />}
+                  >
+                    Manage billing
+                    <ExternalLink className="size-3" />
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <Button
+                variant="outline"
+                nativeButton={false}
+                render={<Link href="/pricing" />}
+              >
+                View plans
+              </Button>
+            )}
           </CardContent>
         </Card>
       </div>
