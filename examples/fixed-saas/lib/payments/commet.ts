@@ -26,7 +26,7 @@ async function ensureCommetCustomer(user: AuthUser) {
 
   if (!created.success || !created.data) {
     throw new Error(
-      created.error || "Failed to create Commet customer for checkout",
+      created.message || "Failed to create Commet customer for checkout",
     );
   }
 
@@ -75,12 +75,12 @@ export async function createCheckoutSession({
 
     if (!result.success || !result.data?.checkoutUrl) {
       console.error("Failed to create checkout session:", {
-        error: result.error,
-        details: "details" in result ? result.details : undefined,
+        message: result.message,
+        details: result.details,
         externalId: user.id,
         planId: planCode,
       });
-      throw new Error(result.error || "Failed to create checkout session");
+      throw new Error(result.message || "Failed to create checkout session");
     }
 
     checkoutUrl = result.data.checkoutUrl;
@@ -157,7 +157,7 @@ export async function getCheckoutUrl({
   });
 
   if (!result.success || !result.data?.checkoutUrl) {
-    throw new Error(result.error || "Failed to create checkout session");
+    throw new Error(result.message || "Failed to create checkout session");
   }
 
   return result.data.checkoutUrl;
@@ -169,7 +169,7 @@ export async function createCustomerPortalSession(userId: string) {
   });
 
   if (!result.success || !result.data?.portalUrl) {
-    throw new Error(result.error || "Failed to create portal session");
+    throw new Error(result.message || "Failed to create portal session");
   }
 
   return { url: result.data.portalUrl };

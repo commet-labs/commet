@@ -1,11 +1,17 @@
 "use client";
 
-import { Lock, Trash2 } from "lucide-react";
 import { useActionState } from "react";
 import { deleteAccount, updatePassword } from "@/actions/auth";
-import { SubmitButton } from "@/components/shared/submit-button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FormField } from "@/components/ui/form-field";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useFormToast } from "@/hooks/use-form-toast";
 
 type PasswordState = {
@@ -39,59 +45,71 @@ export default function SecurityPage() {
   useFormToast(deleteState);
 
   return (
-    <section className="flex-1 p-4 lg:p-8">
-      <h1 className="text-lg lg:text-2xl font-bold text-foreground mb-6">
-        Security Settings
-      </h1>
-      <Card className="mb-8">
+    <div className="flex flex-1 flex-col gap-6 p-6">
+      <div>
+        <h1 className="text-lg font-semibold">Security</h1>
+        <p className="text-sm text-muted-foreground">
+          Manage your password and account security.
+        </p>
+      </div>
+
+      <Card>
         <CardHeader>
-          <CardTitle>Password</CardTitle>
+          <CardTitle>Change Password</CardTitle>
+          <CardDescription>Update your account password.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="space-y-4" action={passwordAction}>
-            <FormField
-              id="current-password"
-              name="currentPassword"
-              type="password"
-              label="Current Password"
-              autoComplete="current-password"
-              required
-              minLength={8}
-              maxLength={100}
-              defaultValue={passwordState.currentPassword}
-              error={passwordState.fieldErrors?.currentPassword?.[0]}
-            />
-            <FormField
-              id="new-password"
-              name="newPassword"
-              type="password"
-              label="New Password"
-              autoComplete="new-password"
-              required
-              minLength={8}
-              maxLength={100}
-              defaultValue={passwordState.newPassword}
-              error={passwordState.fieldErrors?.newPassword?.[0]}
-            />
-            <FormField
-              id="confirm-password"
-              name="confirmPassword"
-              type="password"
-              label="Confirm New Password"
-              required
-              minLength={8}
-              maxLength={100}
-              defaultValue={passwordState.confirmPassword}
-              error={passwordState.fieldErrors?.confirmPassword?.[0]}
-            />
-            <SubmitButton
-              isPending={isPasswordPending}
-              pendingText="Updating..."
-              className="bg-foreground text-background hover:bg-foreground/90 border border-border/60"
-              icon={<Lock className="h-4 w-4" />}
-            >
-              Update Password
-            </SubmitButton>
+          <form className="flex flex-col gap-4" action={passwordAction}>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="current-password">Current Password</Label>
+              <Input
+                id="current-password"
+                name="currentPassword"
+                type="password"
+                autoComplete="current-password"
+                required
+                minLength={8}
+              />
+              {passwordState.fieldErrors?.currentPassword?.[0] && (
+                <p className="text-sm text-destructive-foreground">
+                  {passwordState.fieldErrors.currentPassword[0]}
+                </p>
+              )}
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="new-password">New Password</Label>
+              <Input
+                id="new-password"
+                name="newPassword"
+                type="password"
+                autoComplete="new-password"
+                required
+                minLength={8}
+              />
+              {passwordState.fieldErrors?.newPassword?.[0] && (
+                <p className="text-sm text-destructive-foreground">
+                  {passwordState.fieldErrors.newPassword[0]}
+                </p>
+              )}
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="confirm-password">Confirm New Password</Label>
+              <Input
+                id="confirm-password"
+                name="confirmPassword"
+                type="password"
+                required
+                minLength={8}
+              />
+              {passwordState.fieldErrors?.confirmPassword?.[0] && (
+                <p className="text-sm text-destructive-foreground">
+                  {passwordState.fieldErrors.confirmPassword[0]}
+                </p>
+              )}
+            </div>
+            <Button type="submit" disabled={isPasswordPending}>
+              {isPasswordPending ? "Updating..." : "Update password"}
+            </Button>
           </form>
         </CardContent>
       </Card>
@@ -99,35 +117,37 @@ export default function SecurityPage() {
       <Card>
         <CardHeader>
           <CardTitle>Delete Account</CardTitle>
+          <CardDescription>
+            Permanently delete your account. This action cannot be undone.
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground mb-4">
-            Account deletion is irreversible. Please proceed with caution.
-          </p>
-          <form action={deleteAction} className="space-y-4">
-            <FormField
-              id="delete-password"
-              name="password"
-              type="password"
-              label="Confirm Password"
-              required
-              minLength={8}
-              maxLength={100}
-              defaultValue={deleteState.password}
-              error={deleteState.fieldErrors?.password?.[0]}
-            />
-            <SubmitButton
-              isPending={isDeletePending}
-              pendingText="Deleting..."
+          <form className="flex flex-col gap-4" action={deleteAction}>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="delete-password">Confirm Password</Label>
+              <Input
+                id="delete-password"
+                name="password"
+                type="password"
+                required
+                minLength={8}
+              />
+              {deleteState.fieldErrors?.password?.[0] && (
+                <p className="text-sm text-destructive-foreground">
+                  {deleteState.fieldErrors.password[0]}
+                </p>
+              )}
+            </div>
+            <Button
+              type="submit"
               variant="destructive"
-              className="bg-red-600 hover:bg-red-700"
-              icon={<Trash2 className="h-4 w-4" />}
+              disabled={isDeletePending}
             >
-              Delete Account
-            </SubmitButton>
+              {isDeletePending ? "Deleting..." : "Delete account"}
+            </Button>
           </form>
         </CardContent>
       </Card>
-    </section>
+    </div>
   );
 }

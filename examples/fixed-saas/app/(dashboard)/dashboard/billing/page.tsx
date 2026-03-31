@@ -1,9 +1,16 @@
-import { CreditCard, ExternalLink } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { getBillingDataAction } from "@/actions/billing";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { customerPortalAction } from "@/lib/payments/actions";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { getUser } from "@/lib/auth/session";
+import { commet } from "@/lib/commet";
 
 function formatPrice(cents: number): string {
   return `$${(cents / 100).toFixed(2)}`;
@@ -19,132 +26,117 @@ function formatBillingInterval(
 }
 
 export default async function BillingPage() {
+  const user = await getUser();
   const billingResult = await getBillingDataAction();
-
   const subscription = billingResult.data?.subscription || null;
 
+  let portalUrl: string | null = null;
+  if (
+    user &&
+    subscription &&
+    (subscription.status === "active" || subscription.status === "trialing")
+  ) {
+    const portalResult = await commet.portal.getUrl({ externalId: user.id });
+    if (portalResult.success && portalResult.data?.portalUrl) {
+      portalUrl = portalResult.data.portalUrl;
+    }
+  }
+
   return (
-    <section className="flex-1 p-4 lg:p-8 bg-secondary/50 min-h-screen">
-      <div className="max-w-5xl mx-auto space-y-8">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">
-            Billing & Invoices
-          </h1>
-          <p className="text-muted-foreground">
-            Manage your subscription, payment methods and view history
-          </p>
-        </div>
+    <div className="flex flex-1 flex-col gap-6 p-6">
+      <div>
+        <h1 className="text-lg font-semibold">Billing</h1>
+        <p className="text-sm text-muted-foreground">
+          Manage your subscription and payment methods.
+        </p>
+      </div>
 
-        <div className="grid gap-6 md:grid-cols-3">
-          {/* Payment Method - Always show, empty state if no subscription */}
-          <Card className="md:col-span-2 shadow-sm border-border">
-            <CardHeader className="pb-3 border-b border-border/50 bg-secondary/30">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Payment Method
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-6">
-              {subscription ? (
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Current Plan</CardTitle>
+            <CardDescription>Your subscription details.</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-3">
+            {subscription ? (
+              <>
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-8 bg-primary rounded flex items-center justify-center">
-                      <div className="flex gap-1">
-                        <div className="w-3 h-3 rounded-full bg-red-500" />
-                        <div className="w-3 h-3 rounded-full bg-orange-400" />
-                      </div>
-                    </div>
-                    <div>
-                      <div className="font-bold text-foreground">
-                        Manage payment method
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        Update in portal
-                      </div>
-                    </div>
-                  </div>
-                  <form action={customerPortalAction}>
-                    <Button variant="outline" type="submit" className="gap-2">
-                      Manage in Portal
-                      <ExternalLink className="w-3 h-3" />
-                    </Button>
-                  </form>
-                </div>
-              ) : (
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-8 bg-muted rounded flex items-center justify-center">
-                      <CreditCard className="w-5 h-5 text-muted-foreground" />
-                    </div>
-                    <div>
-                      <div className="font-medium text-muted-foreground">
-                        No payment method
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        Add a payment method to get started
-                      </div>
-                    </div>
-                  </div>
-                  <Button variant="outline" className="gap-2" asChild>
-                    <Link href="/pricing">Get Started</Link>
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Current Plan - Always show, empty state if no subscription */}
-          <Card className="shadow-sm border-border">
-            <CardHeader className="pb-3 border-b border-border/50 bg-secondary/30">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Current Plan
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-6">
-              {subscription ? (
-                <>
-                  <div className="text-lg font-bold text-foreground">
+                  <span className="text-sm text-muted-foreground">Plan</span>
+                  <span className="text-sm font-medium">
                     {subscription.planName}
-                  </div>
-                  <div className="text-sm text-muted-foreground mb-4">
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Status</span>
+                  <span className="text-sm font-medium capitalize">
+                    {subscription.status}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Price</span>
+                  <span className="text-sm font-medium">
                     {formatPrice(subscription.planPrice)} /{" "}
                     {formatBillingInterval(subscription.billingInterval)}
-                  </div>
-                  <Button
-                    variant="outline"
-                    className="w-full text-xs h-8"
-                    asChild
-                  >
-                    <Link href="/pricing">Change Plan</Link>
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <div className="text-lg font-bold text-muted-foreground">
-                    No active plan
-                  </div>
-                  <div className="text-sm text-muted-foreground mb-4">
-                    Subscribe to a plan to get started
-                  </div>
-                  <Button
-                    variant="outline"
-                    className="w-full text-xs h-8"
-                    asChild
-                  >
-                    <Link href="/pricing">View Plans</Link>
-                  </Button>
-                </>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+                  </span>
+                </div>
+                <Button
+                  variant="outline"
+                  className="mt-2"
+                  nativeButton={false}
+                  render={<Link href="/pricing" />}
+                >
+                  Change plan
+                </Button>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-muted-foreground">
+                  No active subscription.
+                </p>
+                <Button
+                  variant="outline"
+                  nativeButton={false}
+                  render={<Link href="/pricing" />}
+                >
+                  View plans
+                </Button>
+              </>
+            )}
+          </CardContent>
+        </Card>
 
-        <div className="flex justify-center">
-          <p className="text-xs text-muted-foreground flex items-center gap-1">
-            <CreditCard className="w-3 h-3" />
-            Billing is handled securely
-          </p>
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Customer Portal</CardTitle>
+            <CardDescription>
+              Update payment methods, view invoices, and manage your
+              subscription.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {portalUrl ? (
+              <Button
+                variant="outline"
+                nativeButton={false}
+                render={
+                  <Link
+                    href={portalUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  />
+                }
+              >
+                Open portal
+                <ExternalLink className="size-3" />
+              </Button>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Available once you have an active subscription.
+              </p>
+            )}
+          </CardContent>
+        </Card>
       </div>
-    </section>
+    </div>
   );
 }

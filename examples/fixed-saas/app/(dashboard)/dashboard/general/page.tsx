@@ -2,9 +2,16 @@
 
 import { Suspense, useActionState } from "react";
 import { updateAccount } from "@/actions/auth";
-import { SubmitButton } from "@/components/shared/submit-button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FormField } from "@/components/ui/form-field";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useFormToast } from "@/hooks/use-form-toast";
 import { useSession } from "@/lib/auth/auth-client";
 
@@ -15,38 +22,46 @@ type ActionState = {
   fieldErrors?: Record<string, string[] | undefined>;
 };
 
-type AccountFormProps = {
-  state: ActionState;
-  nameValue?: string;
-  emailValue?: string;
-};
-
 function AccountForm({
   state,
   nameValue = "",
   emailValue = "",
-}: AccountFormProps) {
+}: {
+  state: ActionState;
+  nameValue?: string;
+  emailValue?: string;
+}) {
   return (
     <>
-      <FormField
-        id="name"
-        name="name"
-        label="Name"
-        placeholder="Enter your name"
-        defaultValue={state.name || nameValue}
-        error={state.fieldErrors?.name?.[0]}
-        required
-      />
-      <FormField
-        id="email"
-        name="email"
-        type="email"
-        label="Email"
-        placeholder="Enter your email"
-        defaultValue={emailValue}
-        error={state.fieldErrors?.email?.[0]}
-        required
-      />
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="name">Name</Label>
+        <Input
+          id="name"
+          name="name"
+          defaultValue={state.name || nameValue}
+          required
+        />
+        {state.fieldErrors?.name?.[0] && (
+          <p className="text-sm text-destructive-foreground">
+            {state.fieldErrors.name[0]}
+          </p>
+        )}
+      </div>
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="email">Email</Label>
+        <Input
+          id="email"
+          name="email"
+          type="email"
+          defaultValue={emailValue}
+          required
+        />
+        {state.fieldErrors?.email?.[0] && (
+          <p className="text-sm text-destructive-foreground">
+            {state.fieldErrors.email[0]}
+          </p>
+        )}
+      </div>
     </>
   );
 }
@@ -73,30 +88,30 @@ export default function GeneralPage() {
   useFormToast(state);
 
   return (
-    <section className="flex-1 p-4 lg:p-8">
-      <h1 className="text-lg lg:text-2xl font-medium text-foreground mb-6">
-        General Settings
-      </h1>
+    <div className="flex flex-1 flex-col gap-6 p-6">
+      <div>
+        <h1 className="text-lg font-semibold">General</h1>
+        <p className="text-sm text-muted-foreground">
+          Manage your account information.
+        </p>
+      </div>
 
       <Card>
         <CardHeader>
           <CardTitle>Account Information</CardTitle>
+          <CardDescription>Update your name and email.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="space-y-4" action={formAction}>
+          <form className="flex flex-col gap-4" action={formAction}>
             <Suspense fallback={<AccountForm state={state} />}>
               <AccountFormWithData state={state} />
             </Suspense>
-            <SubmitButton
-              isPending={isPending}
-              pendingText="Saving..."
-              className="bg-foreground text-background hover:bg-foreground/90 border border-border/60"
-            >
-              Save Changes
-            </SubmitButton>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? "Saving..." : "Save changes"}
+            </Button>
           </form>
         </CardContent>
       </Card>
-    </section>
+    </div>
   );
 }

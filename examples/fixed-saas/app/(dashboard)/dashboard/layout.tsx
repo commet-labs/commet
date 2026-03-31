@@ -1,81 +1,85 @@
-"use client";
-
 import {
   Activity,
   CreditCard,
   Home,
-  Menu,
+  Lock,
+  LogOut,
   Settings,
-  Shield,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 
-export default function DashboardLayout({
+function NavLink({
+  href,
+  children,
+  className,
+}: {
+  href: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className={cn(
+        "flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm font-medium hover:bg-muted",
+        className,
+      )}
+    >
+      {children}
+    </Link>
+  );
+}
+
+export default function DashboardInnerLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const pathname = usePathname();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  const navItems = [
-    { href: "/dashboard", icon: Home, label: "Overview" },
-    { href: "/dashboard/general", icon: Settings, label: "General" },
-    { href: "/dashboard/billing", icon: CreditCard, label: "Billing" },
-    { href: "/dashboard/activity", icon: Activity, label: "Activity" },
-    { href: "/dashboard/security", icon: Shield, label: "Security" },
-  ];
-
   return (
-    <div className="flex flex-col min-h-[calc(100dvh-68px)] max-w-7xl mx-auto w-full">
-      {/* Mobile header */}
-      <div className="lg:hidden flex items-center justify-between bg-card border-b border-border p-4">
-        <div className="flex items-center">
-          <span className="font-medium">Settings</span>
-        </div>
-        <Button
-          className="-mr-3"
-          variant="ghost"
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+    <div className="flex min-h-dvh">
+      <aside className="flex w-56 flex-col border-r bg-sidebar p-4">
+        <Link
+          href="/dashboard"
+          className="mb-6 text-lg font-semibold tracking-tight"
         >
-          <Menu className="h-6 w-6" />
-          <span className="sr-only">Toggle sidebar</span>
-        </Button>
-      </div>
-
-      <div className="flex flex-1 overflow-hidden h-full">
-        {/* Sidebar */}
-        <aside
-          className={`w-64 bg-card lg:bg-secondary border-r border-border lg:block ${
-            isSidebarOpen ? "block" : "hidden"
-          } lg:relative absolute inset-y-0 left-0 z-40 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-            isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-          }`}
-        >
-          <nav className="h-full overflow-y-auto p-4">
-            {navItems.map((item) => (
-              <Link key={item.href} href={item.href} passHref>
-                <Button
-                  variant={pathname === item.href ? "secondary" : "ghost"}
-                  className={`shadow-none my-1 w-full justify-start ${
-                    pathname === item.href ? "bg-accent" : ""
-                  }`}
-                  onClick={() => setIsSidebarOpen(false)}
-                >
-                  <item.icon className="h-4 w-4" />
-                  {item.label}
-                </Button>
-              </Link>
-            ))}
-          </nav>
-        </aside>
-
-        {/* Main content */}
-        <main className="flex-1 overflow-y-auto p-0 lg:p-4">{children}</main>
-      </div>
+          Fixed SaaS
+        </Link>
+        <nav className="flex flex-1 flex-col gap-1">
+          <NavLink href="/dashboard">
+            <Home className="size-4" />
+            Overview
+          </NavLink>
+          <NavLink href="/dashboard/general">
+            <Settings className="size-4" />
+            General
+          </NavLink>
+          <NavLink href="/dashboard/billing">
+            <CreditCard className="size-4" />
+            Billing
+          </NavLink>
+          <NavLink href="/dashboard/activity">
+            <Activity className="size-4" />
+            Activity
+          </NavLink>
+          <NavLink href="/dashboard/security">
+            <Lock className="size-4" />
+            Security
+          </NavLink>
+        </nav>
+        <Separator className="my-2" />
+        <form action="/api/auth/sign-out" method="POST">
+          <button
+            type="submit"
+            className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm font-medium hover:bg-muted"
+          >
+            <LogOut className="size-4" />
+            Sign out
+          </button>
+        </form>
+      </aside>
+      <main className="flex flex-1 flex-col">{children}</main>
     </div>
   );
 }

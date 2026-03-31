@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
-interface FormFieldProps extends ComponentProps<typeof Input> {
+interface FormFieldProps extends ComponentProps<"input"> {
   label: string;
   error?: string;
   description?: string;
@@ -27,7 +27,7 @@ export function FormField({
       <Input
         id={id}
         className={cn(
-          error && "border-red-500 focus-visible:ring-red-500",
+          error && "border-destructive focus-visible:ring-destructive/50",
           className,
         )}
         {...props}
@@ -35,7 +35,7 @@ export function FormField({
       {description && !error && (
         <p className="text-xs text-muted-foreground">{description}</p>
       )}
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+      {error && <p className="text-sm text-destructive-foreground">{error}</p>}
     </div>
   );
 }

@@ -1,20 +1,33 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
-import { IBM_Plex_Mono } from "next/font/google";
+import { IBM_Plex_Sans } from "next/font/google";
 import { Toaster } from "sonner";
+import { TemplateHeader } from "@/components/template-header";
 
 export const metadata: Metadata = {
-  title: "Fixed SaaS - Better Auth Demo",
-  description: "Get started quickly with Next.js, Better Auth, and Commet.",
+  title: "Fixed SaaS",
+  description: "Fixed pricing SaaS with subscription billing via Commet.",
+  icons: {
+    icon: [
+      {
+        media: "(prefers-color-scheme: light)",
+        url: "/favicon-light.svg",
+      },
+      {
+        media: "(prefers-color-scheme: dark)",
+        url: "/favicon-dark.svg",
+      },
+    ],
+  },
 };
 
 export const viewport: Viewport = {
   maximumScale: 1,
 };
 
-const ibmPlexMono = IBM_Plex_Mono({
+const ibmPlexSans = IBM_Plex_Sans({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["300", "400", "500", "600"],
 });
 
 export default function RootLayout({
@@ -23,8 +36,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`dark ${ibmPlexMono.className}`}>
-      <body className="min-h-[100dvh] antialiased">
+    <html lang="en" className={ibmPlexSans.className} suppressHydrationWarning>
+      <body className="flex min-h-dvh flex-col antialiased">
+        <TemplateHeader templateName="Fixed SaaS" />
         {children}
         <Toaster position="top-right" richColors />
       </body>
