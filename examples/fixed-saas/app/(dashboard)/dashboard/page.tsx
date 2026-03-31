@@ -51,7 +51,8 @@ export default async function DashboardPage() {
               variant="outline"
               size="sm"
               nativeButton={false}
-              render={<Link href="/api/commet/portal" />}
+              // biome-ignore lint/a11y/useAnchorContent: <explanations>
+              render={<a href="/api/commet/portal" />}
             >
               Manage billing
               <ExternalLink className="size-3" />
