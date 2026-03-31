@@ -1,5 +1,15 @@
 # @commet/node
 
+## 1.7.0
+
+### Minor Changes
+
+- b0b4dea: Add `TrackModelTokensParams` type for tracking AI model token usage with `inputTokens`, `outputTokens`, and optional cache tokens. `TrackParams` is now a discriminated union of `TrackUsageParams` (value-based) and `TrackModelTokensParams` (token-based).
+
+### Patch Changes
+
+- b0b4dea: Fix documentation links in READMEs to point to commet.co/docs.
+
 ## 1.6.2
 
 ### Patch Changes

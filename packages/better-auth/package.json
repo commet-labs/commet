@@ -1,6 +1,6 @@
 {
   "name": "@commet/better-auth",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "Better Auth plugin for Commet integration",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -47,7 +47,7 @@
   "author": "Commet Team",
   "license": "MIT",
   "peerDependencies": {
-    "@commet/node": "1.6.2",
+    "@commet/node": "1.7.0",
     "better-auth": "1.4.6",
     "zod": "3.24.2 || 4"
   },
