@@ -4,7 +4,6 @@ import {
   Home,
   Lock,
   LogOut,
-  Settings,
 } from "lucide-react";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
@@ -40,20 +39,10 @@ export default function DashboardInnerLayout({
   return (
     <div className="flex min-h-dvh">
       <aside className="flex w-56 flex-col border-r bg-sidebar p-4">
-        <Link
-          href="/dashboard"
-          className="mb-6 text-lg font-semibold tracking-tight"
-        >
-          Fixed SaaS
-        </Link>
         <nav className="flex flex-1 flex-col gap-1">
           <NavLink href="/dashboard">
             <Home className="size-4" />
             Overview
-          </NavLink>
-          <NavLink href="/dashboard/general">
-            <Settings className="size-4" />
-            General
           </NavLink>
           <NavLink href="/dashboard/billing">
             <CreditCard className="size-4" />
