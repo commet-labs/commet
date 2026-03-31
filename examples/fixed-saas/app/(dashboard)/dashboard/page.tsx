@@ -9,8 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getUser } from "@/lib/auth/session";
-import { commet } from "@/lib/commet";
 
 function formatPrice(cents: number): string {
   return `$${(cents / 100).toFixed(2)}`;
@@ -26,21 +24,8 @@ function formatBillingInterval(
 }
 
 export default async function DashboardPage() {
-  const user = await getUser();
   const billingResult = await getBillingDataAction();
   const subscription = billingResult.data?.subscription || null;
-
-  let portalUrl: string | null = null;
-  if (
-    user &&
-    subscription &&
-    (subscription.status === "active" || subscription.status === "trialing")
-  ) {
-    const portalResult = await commet.portal.getUrl({ externalId: user.id });
-    if (portalResult.success && portalResult.data?.portalUrl) {
-      portalUrl = portalResult.data.portalUrl;
-    }
-  }
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-6">
@@ -108,26 +93,14 @@ export default async function DashboardPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {portalUrl ? (
-              <Button
-                variant="outline"
-                nativeButton={false}
-                render={
-                  <Link
-                    href={portalUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  />
-                }
-              >
-                Open portal
-                <ExternalLink className="size-3" />
-              </Button>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                Available once you have an active subscription.
-              </p>
-            )}
+            <Button
+              variant="outline"
+              nativeButton={false}
+              render={<Link href="/api/commet/portal" />}
+            >
+              Open portal
+              <ExternalLink className="size-3" />
+            </Button>
           </CardContent>
         </Card>
       </div>

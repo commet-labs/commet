@@ -56,13 +56,7 @@ export default async function PricingPage() {
         subscription.status === "active" ||
         subscription.status === "trialing"
       ) {
-        const portalResult = await commet.portal.getUrl({
-          externalId: user.id,
-        });
-        if (portalResult.success && portalResult.data?.portalUrl) {
-          redirect(portalResult.data.portalUrl);
-        }
-        redirect("/dashboard");
+        redirect("/api/commet/portal");
       }
     }
   }
