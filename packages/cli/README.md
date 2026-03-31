@@ -8,7 +8,7 @@
   <p>CLI for Commet billing platform</p>
 
   <a href="https://www.npmjs.com/package/commet"><img alt="NPM version" src="https://img.shields.io/npm/v/commet.svg?style=for-the-badge&labelColor=000000"></a>
-  <a href="https://commet.co/docs/library/cli/overview"><img alt="Documentation" src="https://img.shields.io/badge/docs-CLI-blue.svg?style=for-the-badge&labelColor=000000"></a>
+  <a href="https://commet.co/docs"><img alt="Documentation" src="https://img.shields.io/badge/docs-CLI-blue.svg?style=for-the-badge&labelColor=000000"></a>
 </div>
 
 <br/>
@@ -68,7 +68,7 @@ commet list plans      # List plans
 
 ## Documentation
 
-Visit [commet.co/docs/library/cli/overview](https://commet.co/docs/library/cli/overview) for:
+Visit [commet.co/docs](https://commet.co/docs) for:
 
 - Complete command reference
 - Configuration guide
@@ -77,8 +77,8 @@ Visit [commet.co/docs/library/cli/overview](https://commet.co/docs/library/cli/o
 
 ## Resources
 
-- [CLI Documentation](https://commet.co/docs/library/cli/overview)
-- [SDK Reference](https://commet.co/docs/library/quickstart)
+- [CLI Documentation](https://commet.co/docs)
+- [SDK Reference](https://commet.co/docs)
 - [GitHub](https://github.com/commet-labs/commet)
 - [Issues](https://github.com/commet-labs/commet/issues)
 

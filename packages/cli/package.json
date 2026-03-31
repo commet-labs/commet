@@ -5,11 +5,7 @@
   "bin": {
     "commet": "./bin/commet"
   },
-  "files": [
-    "dist",
-    "bin",
-    "README.md"
-  ],
+  "files": ["dist", "bin", "README.md"],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
@@ -17,12 +13,7 @@
     "lint:fix": "biome lint --write src/",
     "typecheck": "tsc --noEmit"
   },
-  "keywords": [
-    "billing",
-    "cli",
-    "typescript",
-    "commet"
-  ],
+  "keywords": ["billing", "cli", "typescript", "commet"],
   "author": "Commet Team",
   "license": "MIT",
   "dependencies": {

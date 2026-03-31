@@ -1,5 +1,10 @@
 import { Commet } from "@commet/node";
-import type { BillingInterval, CreditPack, Plan, PlanFeature } from "@commet/node";
+import type {
+  BillingInterval,
+  CreditPack,
+  Plan,
+  PlanFeature,
+} from "@commet/node";
 import { type NextRequest, NextResponse } from "next/server";
 
 export interface PricingMarkdownConfig {
@@ -106,7 +111,10 @@ function generateMarkdown(
   return sections.join("\n\n");
 }
 
-function renderPlansTable(plans: Plan[], filterIntervals?: BillingInterval[]): string {
+function renderPlansTable(
+  plans: Plan[],
+  filterIntervals?: BillingInterval[],
+): string {
   const usageFeatures = collectUsageFeatures(plans);
 
   const headerCols = ["Plan", "Price"];
@@ -179,11 +187,16 @@ function renderPlansTable(plans: Plan[], filterIntervals?: BillingInterval[]): s
     : `## Plans\n\n${lines.join("\n")}`;
 }
 
-function renderPriceCell(plan: Plan, filterIntervals?: BillingInterval[]): string {
+function renderPriceCell(
+  plan: Plan,
+  filterIntervals?: BillingInterval[],
+): string {
   if (plan.isFree) return "Free";
 
   const prices = filterIntervals
-    ? plan.prices.filter((price) => filterIntervals.includes(price.billingInterval))
+    ? plan.prices.filter((price) =>
+        filterIntervals.includes(price.billingInterval),
+      )
     : plan.prices;
 
   if (prices.length === 0) return "—";
@@ -237,8 +250,7 @@ function renderFeatures(plans: Plan[]): string | null {
 
   const commonFeatures = plans[0]?.features
     .filter(
-      (feature) =>
-        feature.type === "boolean" && enabledOnAll.has(feature.code),
+      (feature) => feature.type === "boolean" && enabledOnAll.has(feature.code),
     )
     .map((feature) => feature.name);
 
