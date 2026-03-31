@@ -1,5 +1,11 @@
 # commet
 
+## 1.2.1
+
+### Patch Changes
+
+- b0b4dea: Fix documentation links in READMEs to point to commet.co/docs.
+
 ## 1.2.0
 
 ### Minor Changes

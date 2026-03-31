@@ -1,5 +1,14 @@
 # @commet/next
 
+## 0.3.2
+
+### Patch Changes
+
+- b0b4dea: Fix documentation links in READMEs to point to commet.co/docs.
+- Updated dependencies [b0b4dea]
+- Updated dependencies [b0b4dea]
+  - @commet/node@1.7.0
+
 ## 0.3.1
 
 ### Patch Changes
