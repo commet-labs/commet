@@ -68,23 +68,15 @@ export default async function DashboardPage() {
                     {formatBillingInterval(subscription.billingInterval)}
                   </span>
                 </div>
-                <div className="flex gap-2 pt-2">
-                  <Button
-                    variant="outline"
-                    nativeButton={false}
-                    render={<Link href="/pricing" />}
-                  >
-                    Change plan
-                  </Button>
-                  <Button
-                    variant="outline"
-                    nativeButton={false}
-                    render={<Link href="/api/commet/portal" />}
-                  >
-                    Manage billing
-                    <ExternalLink className="size-3" />
-                  </Button>
-                </div>
+                <Button
+                  variant="outline"
+                  className="mt-2 self-start"
+                  nativeButton={false}
+                  render={<Link href="/api/commet/portal" />}
+                >
+                  Manage billing
+                  <ExternalLink className="size-3" />
+                </Button>
               </>
             ) : (
               <Button
