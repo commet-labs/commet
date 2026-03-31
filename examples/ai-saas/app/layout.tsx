@@ -6,7 +6,19 @@ import { TemplateHeader } from "@/components/template-header";
 
 export const metadata: Metadata = {
   title: "AI SaaS",
-  description: "AI-powered SaaS with usage-based billing via Commet.",
+  description: "AI-powered SaaS with balance-based billing via Commet.",
+  icons: {
+    icon: [
+      {
+        media: "(prefers-color-scheme: light)",
+        url: "/favicon-light.svg",
+      },
+      {
+        media: "(prefers-color-scheme: dark)",
+        url: "/favicon-dark.svg",
+      },
+    ],
+  },
 };
 
 export const viewport: Viewport = {
@@ -24,7 +36,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`dark ${ibmPlexSans.className}`}>
+    <html lang="en" className={ibmPlexSans.className} suppressHydrationWarning>
       <body className="flex min-h-dvh flex-col antialiased">
         <TemplateHeader templateName="AI SaaS" />
         {children}

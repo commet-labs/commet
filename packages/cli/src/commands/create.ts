@@ -38,6 +38,12 @@ const TEMPLATES = [
     templateId: "usage-based-saas",
     description: "Usage-based billing (metered, pay for what you use)",
   },
+  {
+    name: "ai",
+    dir: "ai-saas",
+    templateId: "ai-saas",
+    description: "AI product with automatic token tracking",
+  },
 ] as const;
 
 type TemplateName = (typeof TEMPLATES)[number]["name"];
@@ -120,7 +126,7 @@ export const createCommand = new Command("create")
   .argument("[name]", "Project name")
   .option(
     "-t, --template <template>",
-    "Template to use (fixed, seats, credits, usage-based)",
+    "Template to use (fixed, seats, credits, usage-based, ai)",
   )
   .option("--ref <ref>", "Git ref to fetch templates from", "main")
   .option("--list", "List available templates")
