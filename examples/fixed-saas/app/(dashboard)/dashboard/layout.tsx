@@ -22,7 +22,7 @@ function NavLink({
     <Link
       href={href}
       className={cn(
-        "flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm font-medium hover:bg-muted",
+        "flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm font-medium hover:bg-muted",
         className,
       )}
     >
@@ -38,7 +38,7 @@ export default function DashboardInnerLayout({
 }) {
   return (
     <div className="flex min-h-dvh">
-      <aside className="flex w-56 flex-col border-r bg-sidebar p-4">
+      <aside className="flex w-56 flex-col border-r bg-sidebar px-2 py-4">
         <nav className="flex flex-1 flex-col gap-1">
           <NavLink href="/dashboard">
             <Home className="size-4" />
@@ -61,7 +61,7 @@ export default function DashboardInnerLayout({
         <form action="/api/auth/sign-out" method="POST">
           <button
             type="submit"
-            className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm font-medium hover:bg-muted"
+            className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm font-medium hover:bg-muted"
           >
             <LogOut className="size-4" />
             Sign out
