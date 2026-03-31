@@ -6,8 +6,8 @@ export default function NotFound() {
     <div className="flex min-h-dvh flex-col items-center justify-center gap-4">
       <h1 className="text-2xl font-semibold">404</h1>
       <p className="text-muted-foreground">Page not found.</p>
-      <Button asChild variant="outline">
-        <Link href="/">Go home</Link>
+      <Button variant="outline" nativeButton={false} render={<Link href="/" />}>
+        Go home
       </Button>
     </div>
   );

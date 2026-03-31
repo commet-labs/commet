@@ -21,7 +21,8 @@ export async function POST() {
 
   const result = streamText({
     model,
-    prompt: "Write a short, interesting fun fact about technology in 2-3 sentences.",
+    prompt:
+      "Write a short, interesting fun fact about technology in 2-3 sentences.",
   });
 
   return result.toTextStreamResponse();

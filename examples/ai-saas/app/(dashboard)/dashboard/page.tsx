@@ -2,7 +2,13 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DashboardPage() {
@@ -48,7 +54,8 @@ export default function DashboardPage() {
         <CardHeader>
           <CardTitle>AI Text Generator</CardTitle>
           <CardDescription>
-            Click the button to generate a short text. Tokens are billed automatically.
+            Click the button to generate a short text. Tokens are billed
+            automatically.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
