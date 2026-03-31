@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Sans } from "next/font/google";
 import { Toaster } from "sonner";
+import { TemplateHeader } from "@/components/template-header";
 
 export const metadata: Metadata = {
   title: "AI SaaS",
@@ -24,7 +25,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`dark ${ibmPlexSans.className}`}>
-      <body className="min-h-dvh antialiased">
+      <body className="flex min-h-dvh flex-col antialiased">
+        <TemplateHeader templateName="AI SaaS" />
         {children}
         <Toaster position="top-right" richColors />
       </body>

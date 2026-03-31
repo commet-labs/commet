@@ -1,6 +1,5 @@
 import { ArrowRight, Gauge, Shield, Zap } from "lucide-react";
 import Link from "next/link";
-import { TemplateHeader } from "@/components/template-header";
 import { Button } from "@/components/ui/button";
 
 function FeatureCard({
@@ -23,12 +22,10 @@ function FeatureCard({
 
 export default function HomePage() {
   return (
-    <div className="flex min-h-dvh flex-col">
-      <TemplateHeader templateName="AI SaaS" />
-
+    <div className="flex flex-1 flex-col">
       <main className="flex flex-1 flex-col items-center justify-center gap-16 px-4 py-20">
         <section className="flex max-w-lg flex-col items-center gap-6 text-center">
-          <div className="rounded-full border bg-muted px-3 py-1 text-xs text-muted-foreground">
+          <div className="border bg-muted px-3 py-1 text-xs text-muted-foreground">
             Built with Commet
           </div>
           <h1 className="text-4xl font-semibold tracking-tight">

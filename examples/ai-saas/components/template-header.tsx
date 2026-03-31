@@ -6,12 +6,11 @@ import { Separator } from "@/components/ui/separator";
 function CommetLogo() {
   return (
     <svg
-      width="22"
-      height="22"
-      viewBox="0 0 500 500"
+      width="18"
+      height="18"
+      viewBox="143 71 214 369"
       aria-label="Commet"
     >
-      <path d="M0 0H500V500H0V0Z" className="fill-background" />
       <path
         d="M250 71L356.521 255.5H143.479L250 71Z"
         className="fill-foreground"
@@ -38,7 +37,9 @@ export function TemplateHeader({ templateName }: { templateName: string }) {
           <CommetLogo />
         </Link>
         <Separator orientation="vertical" className="h-4" />
-        <span className="text-sm font-medium">{templateName}</span>
+        <Link href="/" className="text-sm font-medium hover:text-foreground/80">
+          {templateName}
+        </Link>
       </div>
       <div className="flex items-center gap-1">
         <Button
