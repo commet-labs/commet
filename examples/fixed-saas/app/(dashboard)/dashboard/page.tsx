@@ -1,7 +1,4 @@
-import { ExternalLink } from "lucide-react";
-import Link from "next/link";
-import { getBillingDataAction } from "@/actions/billing";
-import { Button } from "@/components/ui/button";
+import { Check, X } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -9,90 +6,72 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { getUser } from "@/lib/auth/session";
+import { commet } from "@/lib/commet";
 
-function formatPrice(cents: number): string {
-  return `$${(cents / 100).toFixed(2)}`;
-}
-
-function formatBillingInterval(
-  interval: "monthly" | "quarterly" | "yearly" | null,
-): string {
-  if (interval === null) return "free";
-  if (interval === "monthly") return "month";
-  if (interval === "quarterly") return "quarter";
-  return "year";
-}
+const FEATURE_CODES = [
+  "api_access",
+  "white_label",
+  "advanced_analytics",
+  "priority_support",
+  "custom_domain",
+] as const;
 
 export default async function DashboardPage() {
-  const billingResult = await getBillingDataAction();
-  const subscription = billingResult.data?.subscription || null;
+  const user = await getUser();
+
+  const results = await Promise.all(
+    FEATURE_CODES.map((code) =>
+      commet.features.check({ externalId: user!.id, code }),
+    ),
+  );
+
+  const features = FEATURE_CODES.map((code, i) => ({
+    code,
+    allowed: results[i]?.data?.allowed ?? false,
+  }));
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-6">
       <div>
         <h1 className="text-lg font-semibold">Dashboard</h1>
         <p className="text-sm text-muted-foreground">
-          Overview of your subscription and account.
+          Your plan features and access.
         </p>
       </div>
 
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div className="flex flex-col gap-1.5">
-            <CardTitle>Subscription</CardTitle>
-            <CardDescription>
-              {subscription
-                ? "Your current plan and status."
-                : "No active subscription."}
-            </CardDescription>
-          </div>
-          {subscription && (
-            <Button
-              variant="outline"
-              size="sm"
-              nativeButton={false}
-              // biome-ignore lint/a11y/useAnchorContent: <explanations>
-              render={<a href="/api/commet/portal" />}
-            >
-              Manage billing
-              <ExternalLink className="size-3" />
-            </Button>
-          )}
+        <CardHeader>
+          <CardTitle>Features</CardTitle>
+          <CardDescription>
+            What's included in your current plan.
+          </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
-          {subscription ? (
-            <>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Plan</span>
-                <span className="text-sm font-medium">
-                  {subscription.planName}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Status</span>
-                <span className="text-sm font-medium capitalize">
-                  {subscription.status}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Price</span>
-                <span className="text-sm font-medium">
-                  {formatPrice(subscription.planPrice)} /{" "}
-                  {formatBillingInterval(subscription.billingInterval)}
-                </span>
-              </div>
-            </>
-          ) : (
-            <Button
-              variant="outline"
-              nativeButton={false}
-              render={<Link href="/pricing" />}
+          {features.map((feature) => (
+            <div
+              key={feature.code}
+              className="flex items-center justify-between"
             >
-              View plans
-            </Button>
-          )}
+              <span className="text-sm text-muted-foreground">
+                {formatFeatureName(feature.code)}
+              </span>
+              {feature.allowed ? (
+                <Check className="size-4 text-emerald-600" />
+              ) : (
+                <X className="size-4 text-muted-foreground/50" />
+              )}
+            </div>
+          ))}
         </CardContent>
       </Card>
     </div>
   );
+}
+
+function formatFeatureName(code: string): string {
+  return code
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 }

@@ -1,4 +1,4 @@
-import { Activity, Home, Lock, LogOut } from "lucide-react";
+import { CreditCard, Home, Lock, LogOut } from "lucide-react";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -38,9 +38,9 @@ export default function DashboardInnerLayout({
             <Home className="size-4" />
             Overview
           </NavLink>
-          <NavLink href="/dashboard/activity">
-            <Activity className="size-4" />
-            Activity
+          <NavLink href="/dashboard/billing">
+            <CreditCard className="size-4" />
+            Billing
           </NavLink>
           <NavLink href="/dashboard/security">
             <Lock className="size-4" />
