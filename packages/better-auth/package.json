@@ -48,13 +48,13 @@
   "license": "MIT",
   "peerDependencies": {
     "@commet/node": "1.7.0",
-    "better-auth": "1.4.6",
+    "better-auth": "1.5.6",
     "zod": "3.24.2 || 4"
   },
   "devDependencies": {
     "@commet/node": "workspace:*",
     "@types/node": "24.10.1",
-    "better-auth": "1.4.6",
+    "better-auth": "1.5.6",
     "tsup": "8.5.1",
     "typescript": "5.9.3",
     "zod": "4.1.12"
