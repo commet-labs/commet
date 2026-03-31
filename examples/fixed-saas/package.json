@@ -2,7 +2,7 @@
   "name": "fixed-saas-example",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 3001 --turbopack",
+    "dev": "drizzle-kit push && next dev --port 3001 --turbopack",
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
