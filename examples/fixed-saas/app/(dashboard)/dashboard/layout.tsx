@@ -1,9 +1,4 @@
-import {
-  Activity,
-  Home,
-  Lock,
-  LogOut,
-} from "lucide-react";
+import { Activity, Home, Lock, LogOut } from "lucide-react";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -36,14 +31,14 @@ export default function DashboardInnerLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-dvh">
-      <aside className="flex w-56 flex-col border-r bg-sidebar px-2 py-4">
+    <div className="flex flex-1">
+      <aside className="sticky top-12 flex h-[calc(100dvh-3rem)] w-56 flex-col border-r bg-sidebar px-2 py-4">
         <nav className="flex flex-1 flex-col gap-1">
           <NavLink href="/dashboard">
             <Home className="size-4" />
             Overview
           </NavLink>
-<NavLink href="/dashboard/activity">
+          <NavLink href="/dashboard/activity">
             <Activity className="size-4" />
             Activity
           </NavLink>

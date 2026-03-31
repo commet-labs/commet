@@ -36,60 +36,62 @@ export default async function DashboardPage() {
         </p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div className="flex flex-col gap-1.5">
             <CardTitle>Subscription</CardTitle>
             <CardDescription>
               {subscription
                 ? "Your current plan and status."
                 : "No active subscription."}
             </CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-3">
-            {subscription ? (
-              <>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Plan</span>
-                  <span className="text-sm font-medium">
-                    {subscription.planName}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Status</span>
-                  <span className="text-sm font-medium capitalize">
-                    {subscription.status}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Price</span>
-                  <span className="text-sm font-medium">
-                    {formatPrice(subscription.planPrice)} /{" "}
-                    {formatBillingInterval(subscription.billingInterval)}
-                  </span>
-                </div>
-                <Button
-                  variant="outline"
-                  className="mt-2 self-start"
-                  nativeButton={false}
-                  render={<Link href="/api/commet/portal" />}
-                >
-                  Manage billing
-                  <ExternalLink className="size-3" />
-                </Button>
-              </>
-            ) : (
-              <Button
-                variant="outline"
-                nativeButton={false}
-                render={<Link href="/pricing" />}
-              >
-                View plans
-              </Button>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+          {subscription && (
+            <Button
+              variant="outline"
+              size="sm"
+              nativeButton={false}
+              render={<Link href="/api/commet/portal" />}
+            >
+              Manage billing
+              <ExternalLink className="size-3" />
+            </Button>
+          )}
+        </CardHeader>
+        <CardContent className="flex flex-col gap-3">
+          {subscription ? (
+            <>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Plan</span>
+                <span className="text-sm font-medium">
+                  {subscription.planName}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Status</span>
+                <span className="text-sm font-medium capitalize">
+                  {subscription.status}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Price</span>
+                <span className="text-sm font-medium">
+                  {formatPrice(subscription.planPrice)} /{" "}
+                  {formatBillingInterval(subscription.billingInterval)}
+                </span>
+              </div>
+            </>
+          ) : (
+            <Button
+              variant="outline"
+              nativeButton={false}
+              render={<Link href="/pricing" />}
+            >
+              View plans
+            </Button>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

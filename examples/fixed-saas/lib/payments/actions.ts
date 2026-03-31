@@ -23,8 +23,7 @@ export async function handlePostSignupCheckout(planCode: string) {
     return { success: false, error: "User not authenticated" } as const;
   }
 
-  const baseUrl =
-    process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3001";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3001";
   const successUrl = `${baseUrl}/dashboard`;
 
   try {

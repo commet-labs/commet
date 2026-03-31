@@ -28,8 +28,7 @@ export default async function CheckoutPage({
   }
 
   // Build success URL for post-checkout redirect
-  const baseUrl =
-    process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3001";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3001";
   const successUrl = `${baseUrl}/dashboard`;
 
   await createCheckoutSession({ planCode, successUrl });
