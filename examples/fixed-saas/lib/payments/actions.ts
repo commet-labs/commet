@@ -24,9 +24,7 @@ export async function handlePostSignupCheckout(planCode: string) {
   }
 
   const baseUrl =
-    process.env.NEXT_PUBLIC_APP_URL ||
-    process.env.BASE_URL ||
-    "http://localhost:3000";
+    process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3001";
   const successUrl = `${baseUrl}/dashboard`;
 
   try {
