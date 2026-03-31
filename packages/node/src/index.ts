@@ -3,112 +3,101 @@
  */
 export { Commet } from "./client";
 export { CustomerContext } from "./customer";
-
-// Type exports
-export type {
-  CommetConfig,
-  CommetGeneratedTypes,
-  GeneratedSeatType,
-  GeneratedPlanCode,
-  GeneratedFeatureCode,
-  Environment,
-  ApiResponse,
-  PaginatedResponse,
-  PaginatedList,
-  Currency,
-  CustomerID,
-  EventID,
-  RequestOptions,
-} from "./types/common";
-
-// Error exports
-export {
-  CommetError,
-  CommetAPIError,
-  CommetValidationError,
-} from "./types/common";
-
-// Customers
-export type {
-  Customer,
-  CustomerAddress,
-  CreateParams as CreateCustomerParams,
-  UpdateParams as UpdateCustomerParams,
-  ListCustomersParams,
-  BatchResult as CustomersBatchResult,
-} from "./resources/customers";
-
-// Usage
-export type {
-  UsageEvent,
-  UsageEventProperty,
-  TrackParams,
-  TrackUsageParams,
-  TrackModelTokensParams,
-  BatchResult as UsageBatchResult,
-} from "./resources/usage";
-
-// Seats
-export type {
-  SeatEvent,
-  SeatBalance,
-  AddParams as AddSeatsParams,
-  RemoveParams as RemoveSeatsParams,
-  SetParams as SetSeatsParams,
-  SetAllParams as SetAllSeatsParams,
-  GetBalanceParams,
-  GetAllBalancesParams,
-} from "./resources/seats";
-
 // Credit Packs
 export type { CreditPack } from "./resources/credit-packs";
-
+// Customers
+export type {
+  BatchResult as CustomersBatchResult,
+  CreateParams as CreateCustomerParams,
+  Customer,
+  CustomerAddress,
+  ListCustomersParams,
+  UpdateParams as UpdateCustomerParams,
+} from "./resources/customers";
+// Features
+export type {
+  CanUseFeatureParams,
+  CanUseResult,
+  CheckFeatureParams,
+  CheckResult,
+  FeatureAccess,
+  GetFeatureParams,
+} from "./resources/features";
 // Plans
 export type {
-  Plan,
-  PlanDetail,
-  PlanPrice,
-  PlanFeature,
-  PlanID,
   BillingInterval,
   FeatureType,
   ListPlansParams,
+  Plan,
+  PlanDetail,
+  PlanFeature,
+  PlanID,
+  PlanPrice,
 } from "./resources/plans";
-
+// Portal
+export type { GetUrlParams, PortalAccess } from "./resources/portal";
+// Seats
+export type {
+  AddParams as AddSeatsParams,
+  GetAllBalancesParams,
+  GetBalanceParams,
+  RemoveParams as RemoveSeatsParams,
+  SeatBalance,
+  SeatEvent,
+  SetAllParams as SetAllSeatsParams,
+  SetParams as SetSeatsParams,
+} from "./resources/seats";
 // Subscriptions
 export type {
-  CreatedSubscription,
-  Subscription,
   ActiveSubscription,
-  SubscriptionStatus,
-  FeatureSummary,
-  CreateSubscriptionParams,
   CancelParams,
+  CreatedSubscription,
+  CreateSubscriptionParams,
+  FeatureSummary,
+  Subscription,
+  SubscriptionStatus,
 } from "./resources/subscriptions";
-
-// Portal
-export type { PortalAccess, GetUrlParams } from "./resources/portal";
-
-// Features
+// Usage
 export type {
-  FeatureAccess,
-  CanUseResult,
-  CheckResult,
-  GetFeatureParams,
-  CheckFeatureParams,
-  CanUseFeatureParams,
-} from "./resources/features";
-
-// Webhooks
-export { Webhooks } from "./resources/webhooks";
+  BatchResult as UsageBatchResult,
+  TrackModelTokensParams,
+  TrackParams,
+  TrackUsageParams,
+  UsageEvent,
+  UsageEventProperty,
+} from "./resources/usage";
 export type {
-  WebhookPayload,
   WebhookData,
   WebhookEvent,
+  WebhookPayload,
 } from "./resources/webhooks";
+// Webhooks
+export { Webhooks } from "./resources/webhooks";
+// Type exports
+export type {
+  ApiResponse,
+  CommetConfig,
+  CommetGeneratedTypes,
+  Currency,
+  CustomerID,
+  Environment,
+  EventID,
+  GeneratedFeatureCode,
+  GeneratedPlanCode,
+  GeneratedSeatType,
+  PaginatedList,
+  PaginatedResponse,
+  RequestOptions,
+} from "./types/common";
+// Error exports
+export {
+  CommetAPIError,
+  CommetError,
+  CommetValidationError,
+} from "./types/common";
 
 // Utility exports
-export { isSandbox, isProduction } from "./utils/environment";
+export { isProduction, isSandbox } from "./utils/environment";
 
 // Default export
 import { Commet } from "./client";

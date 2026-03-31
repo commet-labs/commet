@@ -1,6 +1,5 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
-import chalk from "chalk";
 
 /**
  * Validates that the current directory is a TypeScript project
@@ -21,7 +20,7 @@ export function validateTypeScriptProject(): boolean {
     const content = fs.readFileSync(tsconfigPath, "utf8");
     JSON.parse(content);
     return true;
-  } catch (error) {
+  } catch (_error) {
     return false;
   }
 }

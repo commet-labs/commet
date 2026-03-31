@@ -31,16 +31,14 @@
  * @packageDocumentation
  */
 
-export { Webhooks } from "./webhooks";
+export type { CustomerPortalConfig } from "./portal";
+export { CustomerPortal } from "./portal";
+export type { PricingMarkdownConfig } from "./pricing-markdown";
+export { PricingMarkdown } from "./pricing-markdown";
 export type {
-  WebhooksConfig,
-  WebhookPayload,
   WebhookData,
   WebhookEvent,
+  WebhookPayload,
+  WebhooksConfig,
 } from "./types";
-
-export { CustomerPortal } from "./portal";
-export type { CustomerPortalConfig } from "./portal";
-
-export { PricingMarkdown } from "./pricing-markdown";
-export type { PricingMarkdownConfig } from "./pricing-markdown";
+export { Webhooks } from "./webhooks";

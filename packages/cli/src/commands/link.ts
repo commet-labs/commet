@@ -95,7 +95,7 @@ export const linkCommand = new Command("link")
         })),
         theme: promptTheme,
       });
-    } catch (error) {
+    } catch (_error) {
       // User cancelled with Ctrl+C
       console.log(chalk.yellow("\n⚠ Link cancelled"));
       return;

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.4.10/schema.json",
   "vcs": {
     "enabled": false,
     "clientKind": "git",
@@ -7,16 +7,17 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "ignore": [
-      "node_modules",
-      ".next",
-      ".turbo",
-      ".source",
-      "dist",
-      "build",
-      "coverage",
-      "**/*.min.js",
-      "**/*.min.css"
+    "includes": [
+      "**",
+      "!**/node_modules",
+      "!**/.next",
+      "!**/.turbo",
+      "!**/.source",
+      "!**/dist",
+      "!**/build",
+      "!**/coverage",
+      "!**/*.min.js",
+      "!**/*.min.css"
     ]
   },
   "formatter": {
@@ -24,11 +25,19 @@
     "indentStyle": "space",
     "indentWidth": 2
   },
-  "organizeImports": {
-    "enabled": true
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
   },
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "linter": {
-    "ignore": ["node_modules", ".next", "packages/tsconfig"],
+    "includes": [
+      "**",
+      "!**/node_modules",
+      "!**/.next",
+      "!**/packages/tsconfig"
+    ],
     "enabled": true,
     "rules": {
       "recommended": true,

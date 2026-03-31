@@ -1,5 +1,5 @@
-import { Webhooks as CommetWebhooks } from "@commet/node";
 import type { WebhookPayload } from "@commet/node";
+import { Webhooks as CommetWebhooks } from "@commet/node";
 import { type NextRequest, NextResponse } from "next/server";
 import type { WebhooksConfig } from "./types";
 

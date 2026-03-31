@@ -9,32 +9,26 @@ import type { CommetEndpoints, CommetOptions } from "./types";
 
 // Re-export client plugin
 export { commetClient } from "./client";
-
+export type { FeaturesConfig } from "./plugins/features";
+export { features } from "./plugins/features";
+export type { PortalConfig } from "./plugins/portal";
 // Re-export all plugins
 export { portal } from "./plugins/portal";
-export type { PortalConfig } from "./plugins/portal";
-
-export { subscriptions } from "./plugins/subscriptions";
-export type { SubscriptionsConfig } from "./plugins/subscriptions";
-
-export { features } from "./plugins/features";
-export type { FeaturesConfig } from "./plugins/features";
-
-export { usage } from "./plugins/usage";
-export type { UsageConfig } from "./plugins/usage";
-
-export { seats } from "./plugins/seats";
 export type { SeatsConfig } from "./plugins/seats";
-
+export { seats } from "./plugins/seats";
+export type { SubscriptionsConfig } from "./plugins/subscriptions";
+export { subscriptions } from "./plugins/subscriptions";
+export type { UsageConfig } from "./plugins/usage";
+export { usage } from "./plugins/usage";
+export type { WebhookHandler, WebhooksConfig } from "./plugins/webhooks";
 export { webhooks } from "./plugins/webhooks";
-export type { WebhooksConfig, WebhookHandler } from "./plugins/webhooks";
 
 // Re-export types
 export type {
+  CommetEndpoints,
   CommetOptions,
   CommetPlugin,
   CommetPlugins,
-  CommetEndpoints,
   CustomerCreateParams,
   PlanMapping,
 } from "./types";

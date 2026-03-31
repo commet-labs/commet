@@ -84,7 +84,7 @@ export const switchCommand = new Command("switch")
         })),
         theme: promptTheme,
       });
-    } catch (error) {
+    } catch (_error) {
       // User cancelled with Ctrl+C
       console.log(chalk.yellow("\n⚠ Switch cancelled"));
       return;

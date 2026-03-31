@@ -1,10 +1,10 @@
-import { Commet } from "@commet/node";
 import type {
   BillingInterval,
   CreditPack,
   Plan,
   PlanFeature,
 } from "@commet/node";
+import { Commet } from "@commet/node";
 import { type NextRequest, NextResponse } from "next/server";
 
 export interface PricingMarkdownConfig {

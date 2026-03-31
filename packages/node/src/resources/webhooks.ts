@@ -103,7 +103,7 @@ export class Webhooks {
         Buffer.from(signature, "hex"),
         Buffer.from(expectedSignature, "hex"),
       );
-    } catch (error) {
+    } catch (_error) {
       // timingSafeEqual throws if lengths don't match
       return false;
     }

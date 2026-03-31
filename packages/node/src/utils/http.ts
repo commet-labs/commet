@@ -136,10 +136,10 @@ export class CommetHTTPClient {
       try {
         responseData = await response.json();
         responseText = "";
-      } catch (jsonError) {
+      } catch (_jsonError) {
         try {
           responseText = await response.text();
-        } catch (textError) {
+        } catch (_textError) {
           responseText = "Failed to read response body";
         }
         if (this.config.debug) {

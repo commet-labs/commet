@@ -26,7 +26,7 @@ const CancelSchema = z.object({
  * - POST /subscription/cancel - Cancel the subscription
  */
 export const subscriptions =
-  (config: SubscriptionsConfig = {}) =>
+  (_config: SubscriptionsConfig = {}) =>
   (commet: Commet) => {
     return {
       getSubscription: createAuthEndpoint(
