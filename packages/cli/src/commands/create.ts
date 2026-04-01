@@ -112,6 +112,26 @@ function copyEnvExample(dest: string) {
   }
 }
 
+function writeApiKeyToEnv(
+  dest: string,
+  apiKey: string,
+  environment: "sandbox" | "production",
+) {
+  const envPath = path.join(dest, ".env");
+  if (!fs.existsSync(envPath)) return;
+
+  let content = fs.readFileSync(envPath, "utf-8");
+  content = content.replace(
+    /COMMET_API_KEY=.*/,
+    `COMMET_API_KEY=${apiKey}`,
+  );
+  content = content.replace(
+    /COMMET_ENVIRONMENT=.*/,
+    `COMMET_ENVIRONMENT=${environment}`,
+  );
+  fs.writeFileSync(envPath, content);
+}
+
 function linkProject(
   dest: string,
   orgId: string,
@@ -199,6 +219,18 @@ export const createCommand = new Command("create")
 
     const auth = loadAuth()!;
     const baseURL = getBaseURL(auth.environment);
+
+    if (auth.environment !== "sandbox") {
+      console.log(
+        chalk.red(
+          "\u2717 `commet create` is only available in sandbox environment",
+        ),
+      );
+      console.log(
+        chalk.dim("Run `commet logout` and login to sandbox to use templates"),
+      );
+      return;
+    }
 
     // 3. Select organization
     const orgsSpinner = ora("Fetching organizations...").start();
@@ -314,16 +346,36 @@ export const createCommand = new Command("create")
       );
     }
 
-    // 7. Link project
+    // 7. Create API key
+    const keySpinner = ora("Creating API key...").start();
+    const keyResult = await apiRequest<{
+      apiKey: string;
+    }>(`${baseURL}/api/cli/api-keys`, {
+      method: "POST",
+      body: JSON.stringify({
+        organizationId: selectedOrg.id,
+        name: `${template.name} (CLI)`,
+      }),
+    });
+
+    if (keyResult.error || !keyResult.data) {
+      keySpinner.fail("Failed to create API key");
+      console.log(chalk.dim(keyResult.error));
+      console.log(chalk.dim("You can create one manually in the dashboard"));
+    } else {
+      writeApiKeyToEnv(dest, keyResult.data.apiKey, auth.environment);
+      keySpinner.succeed("API key created and saved to .env");
+    }
+
+    // 8. Link project
     linkProject(dest, selectedOrg.id, selectedOrg.name, auth.environment);
 
-    // 8. Done
+    // 9. Done
     console.log(chalk.green(`\n\u2713 Created ${projectName}`));
     console.log(chalk.dim(`  Template: ${template.name}`));
     console.log(chalk.dim(`  Organization: ${selectedOrg.name}`));
     console.log();
     console.log(`  ${chalk.cyan("cd")} ${projectName}`);
-    console.log(`  ${chalk.dim("Update .env with your keys")}`);
     console.log(`  ${chalk.cyan("npm install")}`);
     console.log(`  ${chalk.cyan("npm run dev")}`);
     console.log();
