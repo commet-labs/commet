@@ -21,18 +21,18 @@ npm install @commet/ai-sdk @commet/node
 
 ## Quick Start
 
-Wrap any AI SDK model with `commetAI` to automatically track token usage through Commet.
+Wrap any AI SDK model with `tracked` to automatically track token usage through Commet.
 
 ```typescript
 import { Commet } from '@commet/node';
-import { commetAI } from '@commet/ai-sdk';
+import { tracked } from '@commet/ai-sdk';
 import { openai } from '@ai-sdk/openai';
 import { generateText } from 'ai';
 
 const commet = new Commet({ apiKey: process.env.COMMET_API_KEY });
 
 const result = await generateText({
-  model: commetAI(openai('gpt-4o'), {
+  model: tracked(openai('gpt-4o'), {
     commet,
     feature: 'ai_chat',
     customerId: 'cus_123', // or an external ID like 'user_123'
@@ -51,7 +51,7 @@ Works the same way with `streamText` — usage is reported when the stream finis
 import { streamText } from 'ai';
 
 const result = streamText({
-  model: commetAI(openai('gpt-4o'), {
+  model: tracked(openai('gpt-4o'), {
     commet,
     feature: 'ai_chat',
     customerId: 'cus_123',
@@ -72,13 +72,13 @@ const result = streamText({
 
 ## How It Works
 
-`commetAI` wraps the model with AI SDK middleware that intercepts `generate` and `stream` completions. After each call, it reports to Commet:
+`tracked` wraps the model with AI SDK middleware that intercepts `generate` and `stream` completions. After each call, it reports to Commet:
 
 - **Input tokens** (including cache read/write breakdown)
 - **Output tokens**
 - **Model ID** (automatically detected)
 
-Tracking is fire-and-forget — it never blocks or delays your AI responses.
+Tracking runs in the stream's `flush` phase — it completes before the HTTP connection closes, so it works reliably in serverless environments without blocking the user's response.
 
 ## Requirements
 
