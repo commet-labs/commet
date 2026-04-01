@@ -35,6 +35,8 @@ The `feature.code` in the dashboard IS the identifier used in the SDK:
 | Boolean features | Included in plan base |
 | Metered overage | True-up (previous period end) |
 | Seats | Hybrid: advance + true-up for mid-period adds |
+| Addons | Prorated on activation + advance at renewal |
+| AI token usage | Real-time balance deduction (balance model) |
 
 ## Consumption Models (Mutually Exclusive Per Plan)
 
@@ -96,6 +98,18 @@ Welcome discounts for new customers (no previous subscriptions):
 ## Regional Pricing
 
 Plans define canonical USD prices. Optional local currency overrides for: ARS, BRL, CLP, COP, PEN, UYU, PYG, BOB, MXN, CAD, EUR. Currency auto-detected at checkout from billing address. Subscription currency is immutable after first payment.
+
+## Addons
+
+Purchasable feature extensions with their own pricing. Each addon links to one feature. Consumption model must match the plan's model or be boolean. Prorated on mid-cycle activation, then charged at full price at renewal.
+
+## Promo Codes
+
+Discount codes (percentage or fixed amount) applied at checkout. Mutually exclusive with intro offers. Supports duration cycles, global redemption caps, plan restrictions, and expiration. One redemption per customer per code.
+
+## AI Token Billing
+
+For AI products using the balance consumption model. AI model catalog provides per-million-token pricing. Usage events track input/output/cache tokens. Costs calculated with configurable margins (basis points) per feature per plan. Use `@commet/ai-sdk` for automatic tracking with the Vercel AI SDK.
 
 ## Monetary Values
 

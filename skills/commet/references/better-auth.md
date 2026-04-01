@@ -77,8 +77,6 @@ All methods are auth-scoped to the current user session.
 ```typescript
 // Subscription
 const { data: subscription } = await authClient.subscription.get();
-await authClient.subscription.changePlan({ planId: "plan_xxx", billingInterval: "yearly" });
-await authClient.subscription.changePlan({ slug: "pro" }); // with plan mapping
 await authClient.subscription.cancel({ reason: "too_expensive" });
 
 // Features

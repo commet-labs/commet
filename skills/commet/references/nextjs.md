@@ -104,6 +104,24 @@ Use in component:
 </Button>
 ```
 
+## Pricing Markdown Route
+
+Generate markdown pricing tables from your plans. Useful for AI agents, docs, or plain-text views.
+
+```typescript
+// app/api/pricing/route.ts
+import { PricingMarkdown } from "@commet/next";
+
+export const GET = PricingMarkdown({
+  apiKey: process.env.COMMET_API_KEY!,
+  title?: "Pricing",
+  includeCreditPacks?: boolean,
+  billingIntervals?: ("monthly" | "quarterly" | "yearly")[],
+  cacheMaxAge?: number,          // Cache TTL in seconds
+  onError?: (error: Error) => void,
+});
+```
+
 ## Common Next.js Patterns
 
 ### Checkout flow with server action

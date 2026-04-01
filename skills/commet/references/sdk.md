@@ -95,13 +95,6 @@ const { data: active } = await commet.subscriptions.get("user_123");
 // active.features: [{ code, name, type, usage: { current, included, overage } }]
 // active.currentPeriod: { start, end, daysRemaining }
 
-// Change plan (upgrade = immediate + proration, downgrade = at renewal)
-await commet.subscriptions.changePlan({
-  subscriptionId: "sub_xxx",
-  planCode: "enterprise",
-  billingInterval?: "yearly",
-});
-
 // Cancel
 await commet.subscriptions.cancel({
   subscriptionId: "sub_xxx",
@@ -114,10 +107,10 @@ await commet.subscriptions.cancel({
 
 ### commet.usage
 
-Track consumption events for metered features.
+Track consumption events for metered features. Two modes: value-based (standard) and token-based (AI models).
 
 ```typescript
-// Track single event
+// Track value-based event (standard metered usage)
 await commet.usage.track({
   externalId: "user_123",     // or customerId
   feature: "api_calls",       // feature.code from your plan
@@ -127,14 +120,27 @@ await commet.usage.track({
   properties?: Record<string, string>, // metadata
 });
 
-// Batch track
+// Track AI model token usage (balance model with AI pricing)
+await commet.usage.track({
+  externalId: "user_123",
+  feature: "ai_generation",
+  model: "anthropic/claude-3-opus",  // provider/modelId
+  inputTokens: 1000,
+  outputTokens: 500,
+  cacheReadTokens?: 100,
+  cacheWriteTokens?: 50,
+});
+
+// Batch track (supports both value and token events)
 await commet.usage.trackBatch({
   events: [
     { externalId: "user_123", feature: "api_calls", value: 1 },
-    { externalId: "user_456", feature: "api_calls", value: 5 },
+    { externalId: "user_456", feature: "ai_generation", model: "anthropic/claude-3-opus", inputTokens: 500, outputTokens: 200 },
   ],
 });
 ```
+
+When `model` is provided, `inputTokens` and `outputTokens` are required. `value` and `model` are mutually exclusive. Token costs are calculated from the AI model catalog with configurable margins. For `@commet/ai-sdk` automatic tracking, see [ai-sdk.md](ai-sdk.md).
 
 ### commet.seats
 
@@ -270,12 +276,25 @@ interface ApiResponse<T> {
 
 ```bash
 commet login          # Authenticate with Commet
+commet logout         # Logout
 commet link           # Link project to organization
 commet pull           # Generate .commet/types.d.ts (autocomplete for plan codes, feature codes, seat types)
 commet list           # List organizations
 commet switch         # Switch active organization
 commet info           # Show project info
 commet whoami         # Show authenticated user
+commet create [name]  # Scaffold new project from template
 ```
 
 After `commet pull`, TypeScript autocomplete works for `planCode`, `feature`, `seatType` parameters.
+
+### Templates (`commet create`)
+
+| Template | Description |
+|----------|-------------|
+| `fixed` | Fixed subscriptions with boolean features |
+| `seats` | Per-seat billing for team collaboration |
+| `metered` | Usage-based billing with included amounts and overage |
+| `credits` | Credit-based consumption with packs and top-ups |
+| `balance-ai` | AI products with automatic token cost tracking and margin |
+| `balance-fixed` | Prepaid balance with fixed unit prices |

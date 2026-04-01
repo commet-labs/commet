@@ -12,9 +12,10 @@ Commet is an all-in-one billing and payments platform. Merchant of Record handli
 | Package | Purpose | Install |
 |---------|---------|---------|
 | `@commet/node` | Core SDK - customers, subscriptions, usage, seats, features, portal, webhooks | `npm i @commet/node` |
-| `@commet/next` | Next.js helpers - webhook route handler, customer portal route | `npm i @commet/next` |
+| `@commet/next` | Next.js helpers - webhook handler, customer portal, pricing markdown | `npm i @commet/next` |
+| `@commet/ai-sdk` | Vercel AI SDK middleware - automatic AI token usage billing | `npm i @commet/ai-sdk` |
 | `@commet/better-auth` | Better Auth plugin - auto customer sync, auth-scoped billing | `npm i @commet/better-auth` |
-| `@commet/cli` | CLI - login, link project, pull types for autocomplete | `npm i -g @commet/cli` |
+| `@commet/cli` | CLI - login, link, pull types, scaffold projects from templates | `npm i -g @commet/cli` |
 
 ## Quick Start
 
@@ -45,7 +46,11 @@ See [references/sdk.md](references/sdk.md) for the complete API surface of `@com
 
 ## Next.js Integration
 
-See [references/nextjs.md](references/nextjs.md) for `@commet/next` webhook handlers and customer portal routes.
+See [references/nextjs.md](references/nextjs.md) for `@commet/next` webhook handlers, customer portal routes, and pricing markdown.
+
+## AI SDK Integration
+
+See [references/ai-sdk.md](references/ai-sdk.md) for `@commet/ai-sdk` middleware that auto-tracks AI token usage for billing.
 
 ## Better Auth Integration
 
