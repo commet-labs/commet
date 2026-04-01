@@ -11,15 +11,26 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
+const MODELS = [
+  { id: "anthropic/claude-haiku-4.5", label: "Claude Haiku 4.5" },
+  { id: "openai/gpt-4o-mini", label: "GPT-4o Mini" },
+  { id: "google/gemini-2.5-flash", label: "Gemini 2.5 Flash" },
+];
+
 export default function DashboardPage() {
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
+  const [model, setModel] = useState(MODELS[0]!.id);
 
   async function handleGenerate() {
     setLoading(true);
     setResult("");
 
-    const response = await fetch("/api/generate", { method: "POST" });
+    const response = await fetch("/api/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ model }),
+    });
 
     if (!response.ok || !response.body) {
       setLoading(false);
@@ -54,14 +65,28 @@ export default function DashboardPage() {
         <CardHeader>
           <CardTitle>AI Text Generator</CardTitle>
           <CardDescription>
-            Click the button to generate a short text. Tokens are billed
-            automatically.
+            Pick a model and generate text. Commet bills tokens automatically
+            based on the model's real cost + your margin.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <Button onClick={handleGenerate} disabled={loading}>
-            {loading ? "Generating..." : "Generate text"}
-          </Button>
+          <div className="flex items-center gap-3">
+            <select
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              disabled={loading}
+              className="h-9 rounded-md border border-input bg-background px-3 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            >
+              {MODELS.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
+            <Button onClick={handleGenerate} disabled={loading}>
+              {loading ? "Generating..." : "Generate"}
+            </Button>
+          </div>
           {loading && !result && <Skeleton className="h-20 w-full" />}
           {result && (
             <div className="rounded-md bg-muted p-4 text-sm whitespace-pre-wrap">

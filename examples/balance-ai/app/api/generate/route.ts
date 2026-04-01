@@ -4,7 +4,13 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/auth/auth";
 import { commet } from "@/lib/commet";
 
-export async function POST() {
+const ALLOWED_MODELS = new Set([
+  "anthropic/claude-haiku-4.5",
+  "openai/gpt-4o-mini",
+  "google/gemini-2.5-flash",
+]);
+
+export async function POST(request: Request) {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -13,7 +19,14 @@ export async function POST() {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const model = commetAI(gateway("anthropic/claude-sonnet-4-20250514"), {
+  const body = (await request.json()) as { model?: string };
+  const modelId = body.model ?? "anthropic/claude-haiku-4.5";
+
+  if (!ALLOWED_MODELS.has(modelId)) {
+    return new Response("Invalid model", { status: 400 });
+  }
+
+  const model = commetAI(gateway(modelId), {
     commet,
     feature: "ai_chat",
     customerId: session.user.id,
