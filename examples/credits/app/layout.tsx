@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Sans } from "next/font/google";
@@ -42,6 +43,7 @@ export default function RootLayout({
         <TemplateHeader templateName="Credits" />
         {children}
         <Toaster position="top-right" richColors />
+        <Analytics />
       </body>
     </html>
   );

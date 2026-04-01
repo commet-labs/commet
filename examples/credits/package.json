@@ -18,6 +18,7 @@
     "@commet/next": "0.3.2",
     "@commet/node": "1.7.0",
     "@radix-ui/react-slot": "1.2.4",
+    "@vercel/analytics": "^2.0.1",
     "better-auth": "1.5.6",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
