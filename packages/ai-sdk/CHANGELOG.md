@@ -1,5 +1,11 @@
 # @commet/ai-sdk
 
+## 0.2.1
+
+### Patch Changes
+
+- e3a9f5b: Fix token usage tracking timeout in serverless environments. Tracking now runs in the stream's `flush()` phase, ensuring it completes before the HTTP connection closes.
+
 ## 0.2.0
 
 ### Minor Changes

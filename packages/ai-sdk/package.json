@@ -1,6 +1,6 @@
 {
   "name": "@commet/ai-sdk",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Commet billing middleware for Vercel AI SDK",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
