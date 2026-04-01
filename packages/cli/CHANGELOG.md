@@ -1,5 +1,11 @@
 # commet
 
+## 1.3.0
+
+### Minor Changes
+
+- a1270db: Automatically create an API key and configure `.env` during `commet create`, removing the manual step of creating a key in the dashboard. Also restricts `commet create` to sandbox environment only.
+
 ## 1.2.1
 
 ### Patch Changes
