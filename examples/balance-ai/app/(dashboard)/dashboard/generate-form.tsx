@@ -2,6 +2,13 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const MODELS = [
@@ -48,18 +55,22 @@ export function GenerateForm() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-3">
-        <select
+        <Select
           value={model}
-          onChange={(e) => setModel(e.target.value)}
+          onValueChange={(value) => value && setModel(value)}
           disabled={loading}
-          className="h-9 rounded-md border border-input bg-background px-3 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
         >
-          {MODELS.map((m) => (
-            <option key={m.id} value={m.id}>
-              {m.label}
-            </option>
-          ))}
-        </select>
+          <SelectTrigger className="w-48">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {MODELS.map((m) => (
+              <SelectItem key={m.id} value={m.id}>
+                {m.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <Button onClick={handleGenerate} disabled={loading}>
           {loading ? "Generating..." : "Generate"}
         </Button>
