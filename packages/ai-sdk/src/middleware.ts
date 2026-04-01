@@ -13,11 +13,11 @@ interface TokenUsage {
   };
 }
 
-function reportTokenUsage(
+async function reportTokenUsage(
   options: CommetAIOptions,
   modelId: string,
   usage: TokenUsage,
-): void {
+): Promise<void> {
   const inputTokens = usage.inputTokens?.total ?? 0;
   const outputTokens = usage.outputTokens?.total ?? 0;
 
@@ -28,8 +28,8 @@ function reportTokenUsage(
 
   const isCommetId = options.customerId.startsWith("cus_");
 
-  options.commet.usage
-    .track({
+  try {
+    await options.commet.usage.track({
       feature: options.feature,
       ...(isCommetId
         ? { customerId: options.customerId as `cus_${string}` }
@@ -40,20 +40,20 @@ function reportTokenUsage(
       ...(cacheReadTokens > 0 && { cacheReadTokens }),
       ...(cacheWriteTokens > 0 && { cacheWriteTokens }),
       idempotencyKey: options.idempotencyKey,
-    })
-    .catch((error) => {
-      const trackingError =
-        error instanceof Error ? error : new Error("Unknown tracking error");
-
-      if (options.onTrackingError) {
-        options.onTrackingError(trackingError);
-      } else {
-        console.warn(
-          "[commet/ai-sdk] Failed to report token usage:",
-          trackingError.message,
-        );
-      }
     });
+  } catch (error) {
+    const trackingError =
+      error instanceof Error ? error : new Error("Unknown tracking error");
+
+    if (options.onTrackingError) {
+      options.onTrackingError(trackingError);
+    } else {
+      console.warn(
+        "[commet/ai-sdk] Failed to report token usage:",
+        trackingError.message,
+      );
+    }
+  }
 }
 
 export function tracked(
@@ -75,7 +75,7 @@ export function tracked(
     wrapGenerate: async ({ doGenerate, model: wrappedModel }) => {
       const result = await doGenerate();
 
-      reportTokenUsage(options, wrappedModel.modelId, result.usage);
+      await reportTokenUsage(options, wrappedModel.modelId, result.usage);
 
       return result;
     },
@@ -83,14 +83,25 @@ export function tracked(
     wrapStream: async ({ doStream, model: wrappedModel }) => {
       const { stream, ...rest } = await doStream();
 
+      let pendingUsage: TokenUsage | null = null;
+
       const trackingStream = stream.pipeThrough(
         new TransformStream({
           transform(chunk, controller) {
-            if (chunk.type === "finish") {
-              reportTokenUsage(options, wrappedModel.modelId, chunk.usage);
-            }
-
             controller.enqueue(chunk);
+
+            if (chunk.type === "finish") {
+              pendingUsage = chunk.usage;
+            }
+          },
+          async flush() {
+            if (pendingUsage) {
+              await reportTokenUsage(
+                options,
+                wrappedModel.modelId,
+                pendingUsage,
+              );
+            }
           },
         }),
       );
