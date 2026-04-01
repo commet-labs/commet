@@ -1,4 +1,4 @@
-import { commetAI } from "@commet/ai-sdk";
+import { tracked } from "@commet/ai-sdk";
 import { gateway, streamText } from "ai";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth/auth";
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     return new Response("Invalid model", { status: 400 });
   }
 
-  const model = commetAI(gateway(modelId), {
+  const model = tracked(gateway(modelId), {
     commet,
     feature: "ai_chat",
     customerId: session.user.id,

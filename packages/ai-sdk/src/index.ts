@@ -1,2 +1,2 @@
-export { commetAI } from "./middleware";
+export { tracked } from "./middleware";
 export type { CommetAIOptions } from "./types";

@@ -56,7 +56,7 @@ function reportTokenUsage(
     });
 }
 
-export function commetAI(
+export function tracked(
   model: LanguageModelV3,
   options: CommetAIOptions,
 ): LanguageModelV3 {
