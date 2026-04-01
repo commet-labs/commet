@@ -16,33 +16,39 @@ const GITHUB_REPO = "commet-labs/commet";
 const TEMPLATES = [
   {
     name: "fixed",
-    dir: "fixed-saas",
-    templateId: "fixed-saas",
-    description: "Fixed subscriptions (monthly/yearly plans)",
+    dir: "fixed",
+    templateId: "fixed",
+    description: "Fixed subscriptions with boolean features",
   },
   {
     name: "seats",
-    dir: "team-saas",
-    templateId: "seat-based-saas",
-    description: "Seat-based billing (per team member)",
+    dir: "seats",
+    templateId: "seats",
+    description: "Per-seat billing for team collaboration",
+  },
+  {
+    name: "metered",
+    dir: "metered",
+    templateId: "metered",
+    description: "Usage-based billing with included amounts and overage",
   },
   {
     name: "credits",
-    dir: "credits-saas",
-    templateId: "credits-saas",
-    description: "Credit-based billing (prepaid usage blocks)",
+    dir: "credits",
+    templateId: "credits",
+    description: "Credit-based consumption with packs and top-ups",
   },
   {
-    name: "usage-based",
-    dir: "usage-based-saas",
-    templateId: "usage-based-saas",
-    description: "Usage-based billing (metered, pay for what you use)",
+    name: "balance-ai",
+    dir: "balance-ai",
+    templateId: "balance-ai",
+    description: "AI product with automatic token cost tracking and margin",
   },
   {
-    name: "ai",
-    dir: "ai-saas",
-    templateId: "ai-saas",
-    description: "AI product with automatic token tracking",
+    name: "balance-fixed",
+    dir: "balance-fixed",
+    templateId: "balance-fixed",
+    description: "Prepaid balance with fixed unit prices",
   },
 ] as const;
 
@@ -126,7 +132,7 @@ export const createCommand = new Command("create")
   .argument("[name]", "Project name")
   .option(
     "-t, --template <template>",
-    "Template to use (fixed, seats, credits, usage-based, ai)",
+    "Template to use (fixed, seats, metered, credits, balance-ai, balance-fixed)",
   )
   .option("--ref <ref>", "Git ref to fetch templates from", "main")
   .option("--list", "List available templates")
