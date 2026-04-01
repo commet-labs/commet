@@ -19,6 +19,7 @@
     "@commet/next": "0.3.2",
     "@commet/node": "1.7.0",
     "@radix-ui/react-slot": "1.2.4",
+    "@t3-oss/env-nextjs": "^0.13.11",
     "ai": "6.0.134",
     "better-auth": "1.5.6",
     "class-variance-authority": "0.7.1",

@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { env } from "@/lib/env";
 import { createCheckoutSession } from "@/lib/payments/commet";
 
 type CheckoutPageProps = {
@@ -27,7 +28,7 @@ export default async function CheckoutPage({
     redirect("/pricing?error=missing_plan");
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3005";
+  const baseUrl = env.NEXT_PUBLIC_APP_URL;
   const successUrl = `${baseUrl}/dashboard`;
 
   await createCheckoutSession({ planCode, successUrl });

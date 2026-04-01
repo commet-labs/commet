@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { getUser } from "@/lib/auth/session";
+import { env } from "@/lib/env";
 import { getCheckoutUrl } from "@/lib/payments/commet";
 
 export async function checkoutAction(formData: FormData) {
@@ -23,7 +24,7 @@ export async function handlePostSignupCheckout(planCode: string) {
     return { success: false, error: "User not authenticated" } as const;
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3005";
+  const baseUrl = env.NEXT_PUBLIC_APP_URL;
   const successUrl = `${baseUrl}/dashboard`;
 
   try {
