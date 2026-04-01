@@ -54,7 +54,7 @@ export default async function BillingPage() {
               size="sm"
               nativeButton={false}
               // biome-ignore lint/a11y/useAnchorContent: renders children via Button
-              render={<a href="/api/commet/portal" />}
+              render={<a href="/api/portal" />}
             >
               Manage billing
               <ExternalLink className="size-3" />
