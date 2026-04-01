@@ -13,6 +13,8 @@
 
 <br/>
 
+Manage your [Commet](https://commet.co) project from the terminal. Link to your organization, generate TypeScript types for autocomplete on plan codes and feature codes, and inspect your billing setup.
+
 ## Installation
 
 ```bash

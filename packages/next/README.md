@@ -13,13 +13,29 @@
 
 <br/>
 
+Ready-to-use Next.js route handlers for [Commet](https://commet.co) webhooks and customer portal. Drop them into your App Router and you're set.
+
 ## Installation
 
 ```bash
-npm install @commet/next
+npm install @commet/next @commet/node
 ```
 
-## Webhooks
+## Getting Started
+
+### 1. Set up your environment
+
+Get your API key and webhook secret from your [Commet dashboard](https://commet.co).
+
+```bash
+# .env
+COMMET_API_KEY=ck_...
+COMMET_WEBHOOK_SECRET=whsec_...
+```
+
+### 2. Add webhook handler
+
+Create a route handler to receive billing events from Commet:
 
 ```typescript
 // app/api/webhooks/commet/route.ts
@@ -28,12 +44,28 @@ import { Webhooks } from "@commet/next";
 export const POST = Webhooks({
   webhookSecret: process.env.COMMET_WEBHOOK_SECRET!,
   onSubscriptionActivated: async (payload) => {
-    // Grant access
+    // Grant access to your product
+  },
+  onSubscriptionCanceled: async (payload) => {
+    // Revoke access
+  },
+  onSubscriptionCreated: async (payload) => {
+    // Handle new subscriptions
+  },
+  onSubscriptionUpdated: async (payload) => {
+    // Handle plan changes
+  },
+  onPayload: async (payload) => {
+    // Catch-all for any event
   },
 });
 ```
 
-## Customer Portal
+Then register the URL `https://yourapp.com/api/webhooks/commet` in your Commet dashboard under **Settings → Webhooks**.
+
+### 3. Add customer portal
+
+Let your customers manage their billing (update payment method, view invoices, cancel) without leaving your app:
 
 ```typescript
 // app/api/commet/portal/route.ts
@@ -49,20 +81,29 @@ export const GET = CustomerPortal({
 });
 ```
 
+Then link to it from your dashboard:
+
 ```tsx
-// Use in component
 <Button asChild>
   <Link href="/api/commet/portal">Manage Billing</Link>
 </Button>
 ```
 
+## Note About Webhooks
+
+Webhooks are optional in Commet. You can always query the current state directly using [`@commet/node`](https://www.npmjs.com/package/@commet/node):
+
+```typescript
+const subscription = await commet.subscriptions.get({ externalId: userId });
+const features = await commet.features.list({ externalId: userId });
+```
+
+Webhooks are useful when you want to react immediately to changes — send emails, update your database, revoke access, etc.
+
 ## Documentation
 
-- [Webhooks](https://commet.co/docs)
-- [Customer Portal](https://commet.co/docs)
-- [SDK Reference](https://commet.co/docs)
+Visit [commet.co/docs](https://commet.co/docs) for the full guide on webhooks, portal customization, and more.
 
 ## License
 
 MIT
-

@@ -13,13 +13,26 @@
 
 <br/>
 
+[Commet](https://commet.co) is an all-in-one billing and payments platform for SaaS and AI products. `@commet/node` is the core SDK — use it to manage customers, track usage, handle subscriptions, and more from your server.
+
 ## Installation
 
 ```bash
 npm install @commet/node
 ```
 
-## Quick Start
+## Getting Started
+
+### 1. Create a Commet account
+
+Sign up at [commet.co](https://commet.co) and create an organization. Go to **Settings → API Keys** to get your key.
+
+```bash
+# .env
+COMMET_API_KEY=ck_...
+```
+
+### 2. Initialize the SDK
 
 ```typescript
 import { Commet } from '@commet/node';
@@ -30,9 +43,22 @@ const commet = new Commet({
 });
 ```
 
-## Usage
+### 3. Start using it
 
 ```typescript
+// Create a customer
+const customer = await commet.customers.create({
+  fullName: 'Acme Corp',
+  billingEmail: 'billing@acme.com'
+});
+
+// Subscribe them to a plan
+await commet.subscriptions.create({
+  externalId: 'user_123',
+  planCode: 'pro', // autocomplete works after `commet pull`
+  billingInterval: 'yearly',
+});
+
 // Track usage events
 await commet.usage.create({
   feature: 'api_call',
@@ -47,22 +73,15 @@ await commet.seats.add({
   count: 5
 });
 
-// Create subscriptions
-await commet.subscriptions.create({
+// Check feature access
+const feature = await commet.features.check({
   externalId: 'user_123',
-  planCode: 'pro', // autocomplete works after `commet pull`
-  billingInterval: 'yearly',
+  code: 'api_calls'
 });
 
-// Manage customers
-await commet.customers.create({
-  fullName: 'Acme Corp',
-  billingEmail: 'billing@acme.com'
-});
-
-// Generate customer portal access
-await commet.portal.getUrl({
-    externalId: 'my-customer-123'
+// Generate customer portal link
+const portal = await commet.portal.getUrl({
+  externalId: 'user_123'
 });
 ```
 

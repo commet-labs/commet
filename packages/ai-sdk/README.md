@@ -13,6 +13,8 @@
 
 <br/>
 
+If you're using the [Vercel AI SDK](https://sdk.vercel.ai), this middleware automatically tracks token usage (input, output, cache) through Commet. Wrap your model and every `generateText` / `streamText` call gets billed — zero manual tracking.
+
 ## Installation
 
 ```bash

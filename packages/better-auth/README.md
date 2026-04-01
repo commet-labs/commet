@@ -1,16 +1,19 @@
-# @commet/better-auth
+<div align="center">
+  <p align="center">
+    <a href="https://commet.co">
+      <img src="https://commet.co/logo-bg-dark.png" height="96">
+      <h3 align="center">@commet/better-auth</h3>
+    </a>
+  </p>
+  <p>Better Auth plugin for Commet billing</p>
 
-A [Better Auth](https://github.com/better-auth/better-auth) plugin for integrating [Commet](https://commet.co) billing into your authentication flow.
+  <a href="https://www.npmjs.com/package/@commet/better-auth"><img alt="NPM version" src="https://img.shields.io/npm/v/@commet/better-auth.svg?style=for-the-badge&labelColor=000000"></a>
+  <a href="https://commet.co/docs"><img alt="Documentation" src="https://img.shields.io/badge/docs-Better_Auth-blue.svg?style=for-the-badge&labelColor=000000"></a>
+</div>
 
-## Features
+<br/>
 
-- Automatic Customer creation on signup
-- Customer Portal access
-- Subscription management (get, change plan, cancel)
-- Feature access checks (boolean, metered, seats)
-- Usage event tracking
-- Seat management
-- Optional webhook handling
+Full billing integration between [Better Auth](https://www.better-auth.com) and [Commet](https://commet.co). Auto-create customers on signup, manage subscriptions, check feature access, track usage, and handle seats — all through your auth client.
 
 ## Installation
 
