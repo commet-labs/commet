@@ -121,10 +121,7 @@ function writeApiKeyToEnv(
   if (!fs.existsSync(envPath)) return;
 
   let content = fs.readFileSync(envPath, "utf-8");
-  content = content.replace(
-    /COMMET_API_KEY=.*/,
-    `COMMET_API_KEY=${apiKey}`,
-  );
+  content = content.replace(/COMMET_API_KEY=.*/, `COMMET_API_KEY=${apiKey}`);
   content = content.replace(
     /COMMET_ENVIRONMENT=.*/,
     `COMMET_ENVIRONMENT=${environment}`,

@@ -1,5 +1,5 @@
 import { Check } from "lucide-react";
-import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,13 +9,35 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { getUser } from "@/lib/auth/session";
 import { commet } from "@/lib/commet";
+import { checkoutAction } from "@/lib/payments/actions";
 
 function formatPrice(cents: number) {
   return `$${(cents / 100).toFixed(0)}`;
 }
 
 export default async function PricingPage() {
+  const user = await getUser();
+  if (user) {
+    const subscriptionResult = await commet.subscriptions.get(user.id);
+    if (subscriptionResult.success && subscriptionResult.data) {
+      const subscription = subscriptionResult.data;
+      if (
+        subscription.status === "pending_payment" &&
+        subscription.checkoutUrl
+      ) {
+        redirect(subscription.checkoutUrl);
+      }
+      if (
+        subscription.status === "active" ||
+        subscription.status === "trialing"
+      ) {
+        redirect("/dashboard");
+      }
+    }
+  }
+
   const result = await commet.plans.list();
   const plans =
     result.success && result.data ? result.data.filter((p) => p.isPublic) : [];
@@ -77,13 +99,12 @@ export default async function PricingPage() {
                   </ul>
                 </CardContent>
                 <CardFooter>
-                  <Button
-                    className="w-full"
-                    nativeButton={false}
-                    render={<Link href="/sign-up" />}
-                  >
-                    Get started
-                  </Button>
+                  <form action={checkoutAction} className="w-full">
+                    <input type="hidden" name="planCode" value={plan.code} />
+                    <Button type="submit" className="w-full">
+                      Get started
+                    </Button>
+                  </form>
                 </CardFooter>
               </Card>
             );
