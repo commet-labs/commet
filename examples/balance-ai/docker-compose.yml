@@ -5,9 +5,9 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: ai_saas
+      POSTGRES_DB: balance_ai
     ports:
-      - "5432:5432"
+      - "54325:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
