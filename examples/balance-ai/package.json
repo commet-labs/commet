@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "dev": "drizzle-kit push && next dev --port 3005 --turbopack",
-    "build": "next build",
+    "build": "drizzle-kit push && next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf .turbo node_modules .next",
