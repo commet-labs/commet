@@ -1,5 +1,13 @@
 # @commet/better-auth
 
+## 1.3.5
+
+### Patch Changes
+
+- d7f25e1: Improve README documentation across all packages. Add getting started guides, intro descriptions, and consistent header with badges so developers can understand and start using each package directly from the README.
+- Updated dependencies [d7f25e1]
+  - @commet/node@1.7.1
+
 ## 1.3.4
 
 ### Patch Changes
