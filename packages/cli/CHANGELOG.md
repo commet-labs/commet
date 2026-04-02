@@ -1,5 +1,11 @@
 # commet
 
+## 1.4.0
+
+### Minor Changes
+
+- 1023b83: Add agent skills prompt to `commet create` — asks users if they want to install the Commet skill from skills.sh during project scaffolding
+
 ## 1.3.1
 
 ### Patch Changes
