@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://vercel.com">
+  <a href="https://commet.co">
     <img src="https://commet.co/logo-bg-dark.png" height="96">
     <h3 align="center">Commet</h3>
   </a>
@@ -10,9 +10,8 @@
 </p>
 
 <p align="center">
-  <a href="https://commet.co/docs/platform/overview"><strong>Documentation</strong></a> ·
-  <a href="https://commet.co/examples"><strong>Examples</strong></a> ·
-  <a href="https://commet.co/docs/library/cli/overview"><strong>CLI</strong></a>
+  <a href="https://commet.co/docs"><strong>Documentation</strong></a> ·
+  <a href="https://commet.co/docs/cli"><strong>CLI</strong></a>
 </p>
 <br/>
 
@@ -23,10 +22,10 @@ Commet is an all-in-one billing and payments platform. The easiest way to integr
 
 ## Documentation
 
-For details on how to use Commet, check out our [documentation](https://commet.co/docs/platform/overview).
+For details on how to use Commet, check out our [documentation](https://commet.co/docs).
 
 ## Reference
 
 - [Apache 2.0 License](./LICENSE)
-- [CLI Documentation](https://commet.co/docs/library/cli/overview)
-- [SDK Reference](https://commet.co/docs/library/quickstart)
+- [CLI Documentation](https://commet.co/docs/cli)
+- [SDK Reference](https://commet.co/docs/sdk-reference)
