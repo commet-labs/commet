@@ -1,10 +1,10 @@
+import { execFile } from "node:child_process";
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
 import { confirm, input, select } from "@inquirer/prompts";
 import chalk from "chalk";
 import { Command } from "commander";
-import { execFile } from "node:child_process";
 import ora from "ora";
 import { extract as tarExtract } from "tar";
 import { apiRequest, getBaseURL } from "../utils/api";
