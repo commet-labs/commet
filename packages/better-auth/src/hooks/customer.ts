@@ -37,6 +37,7 @@ export const onBeforeUserCreate =
       if (!existingCustomer) {
         await options.client.customers.create({
           email: user.email,
+          id: user.id,
           fullName: customParams.fullName ?? user.name,
           domain: customParams.domain,
           metadata: customParams.metadata,
@@ -61,7 +62,7 @@ export const onBeforeUserCreate =
 
 /**
  * Hook called after a user is created in Better Auth
- * Updates the Commet customer with the externalId (Better Auth user ID)
+ * Links the Commet customer with the user ID via idempotent create
  */
 export const onAfterUserCreate =
   (options: CommetOptions) =>
@@ -71,30 +72,21 @@ export const onAfterUserCreate =
     }
 
     try {
-      // Find customer by email and update with externalId
-      const existingCustomers = await options.client.customers.list({
-        search: user.email,
+      // Idempotent create — if customer already exists with this email,
+      // the id links them. If not, creates a new one.
+      await options.client.customers.create({
+        email: user.email,
+        id: user.id,
       });
-
-      const existingCustomer = existingCustomers.data?.find(
-        (c) => c.billingEmail === user.email,
-      );
-
-      if (existingCustomer && existingCustomer.externalId !== user.id) {
-        await options.client.customers.update({
-          customerId: existingCustomer.id,
-          externalId: user.id,
-        });
-      }
     } catch (e: unknown) {
       if (e instanceof Error) {
         throw new APIError("INTERNAL_SERVER_ERROR", {
-          message: `Commet customer update failed: ${e.message}`,
+          message: `Commet customer link failed: ${e.message}`,
         });
       }
 
       throw new APIError("INTERNAL_SERVER_ERROR", {
-        message: "Commet customer update failed",
+        message: "Commet customer link failed",
       });
     }
   };
