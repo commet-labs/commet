@@ -48,7 +48,7 @@ export const seats =
 
           try {
             const result = await commet.seats.getAllBalances({
-              externalId: userId,
+              customerId: userId,
             });
 
             if (!result.success) {
@@ -95,7 +95,7 @@ export const seats =
           try {
             const result = await commet.seats.add(
               {
-                externalId: userId,
+                customerId: userId,
                 seatType: ctx.body.seatType,
                 count: ctx.body.count,
               },
@@ -144,7 +144,7 @@ export const seats =
           try {
             const result = await commet.seats.remove(
               {
-                externalId: userId,
+                customerId: userId,
                 seatType: ctx.body.seatType,
                 count: ctx.body.count,
               },
@@ -195,7 +195,7 @@ export const seats =
           try {
             const result = await commet.seats.set(
               {
-                externalId: userId,
+                customerId: userId,
                 seatType: ctx.body.seatType,
                 count: ctx.body.count,
               },
@@ -244,7 +244,7 @@ export const seats =
           try {
             const result = await commet.seats.setAll(
               {
-                externalId: userId,
+                customerId: userId,
                 seats: ctx.body.seats,
               },
               {},

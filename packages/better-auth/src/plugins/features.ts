@@ -87,7 +87,7 @@ export const features =
 
           try {
             const result = await commet.features.get({
-              externalId: userId,
+              customerId: userId,
               code,
             });
 
@@ -140,7 +140,7 @@ export const features =
 
           try {
             const result = await commet.features.check({
-              externalId: userId,
+              customerId: userId,
               code,
             });
 
@@ -193,7 +193,7 @@ export const features =
 
           try {
             const result = await commet.features.canUse({
-              externalId: userId,
+              customerId: userId,
               code,
             });
 

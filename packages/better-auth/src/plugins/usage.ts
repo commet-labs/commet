@@ -44,7 +44,7 @@ export const usage =
           try {
             const result = await commet.usage.track(
               {
-                externalId: userId,
+                customerId: userId,
                 feature: ctx.body.feature,
                 value: ctx.body.value,
                 idempotencyKey: ctx.body.idempotencyKey,

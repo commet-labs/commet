@@ -39,7 +39,7 @@ export const portal =
 
           try {
             const portalAccess = await commet.portal.getUrl({
-              externalId: userId,
+              customerId: userId,
             });
 
             if (!portalAccess.success || !portalAccess.data) {

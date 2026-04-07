@@ -26,14 +26,10 @@ async function reportTokenUsage(
   const cacheReadTokens = usage.inputTokens?.cacheRead ?? 0;
   const cacheWriteTokens = usage.inputTokens?.cacheWrite ?? 0;
 
-  const isCommetId = options.customerId.startsWith("cus_");
-
   try {
     await options.commet.usage.track({
       feature: options.feature,
-      ...(isCommetId
-        ? { customerId: options.customerId as `cus_${string}` }
-        : { externalId: options.customerId }),
+      customerId: options.customerId,
       model: modelId,
       inputTokens,
       outputTokens,

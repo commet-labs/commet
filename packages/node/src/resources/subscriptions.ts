@@ -104,15 +104,15 @@ type PlanIdentifier =
   | { planCode?: never; planId: string };
 
 export type CreateSubscriptionParams = PlanIdentifier & {
-    customerId: string;
-  } & {
-    billingInterval?: BillingInterval;
-    initialSeats?: Record<string, number>;
-    skipTrial?: boolean;
-    name?: string;
-    startDate?: string;
-    successUrl?: string;
-  };
+  customerId: string;
+} & {
+  billingInterval?: BillingInterval;
+  initialSeats?: Record<string, number>;
+  skipTrial?: boolean;
+  name?: string;
+  startDate?: string;
+  successUrl?: string;
+};
 
 export interface CancelParams {
   subscriptionId: string;

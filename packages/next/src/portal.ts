@@ -63,7 +63,7 @@ export const CustomerPortal = ({
 
       // Get portal URL from Commet
       const result = await commet.portal.getUrl({
-        externalId: customerId,
+        customerId,
       });
 
       if (!result.success || !result.data) {

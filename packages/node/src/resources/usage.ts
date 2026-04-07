@@ -86,5 +86,4 @@ export class UsageResource {
 
     return this.httpClient.post("/usage/events", eventData, options);
   }
-
 }
