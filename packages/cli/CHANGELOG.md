@@ -1,5 +1,12 @@
 # commet
 
+## 1.4.1
+
+### Patch Changes
+
+- f3c1642: Point CLI skills install to standalone commet-labs/commet-skills repo
+- ea587f9: Update CLI skills installation to use standalone commet-skills repository
+
 ## 1.4.0
 
 ### Minor Changes
