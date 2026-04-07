@@ -168,9 +168,7 @@ async function installSkills(projectRoot: string): Promise<void> {
         "--loglevel=error",
         "skills",
         "add",
-        "https://github.com/commet-labs/commet",
-        "--skill",
-        "commet",
+        "commet-labs/commet-skills",
       ],
       { cwd: projectRoot },
       (error) => {
@@ -178,7 +176,7 @@ async function installSkills(projectRoot: string): Promise<void> {
           console.log(chalk.dim("  You can install them manually by running:"));
           console.log(
             chalk.dim(
-              "  npx skills add https://github.com/commet-labs/commet --skill commet",
+              "  npx skills add commet-labs/commet-skills",
             ),
           );
         }
