@@ -35,7 +35,7 @@ export interface CustomerAddress {
 
 export interface CreateParams {
   email: string; // billingEmail - the only required field
-  externalId?: string;
+  id?: string; // Your user ID — stored as externalId, used to identify the customer in all SDK methods
   fullName?: string;
   domain?: string;
   website?: string;
@@ -48,7 +48,6 @@ export interface CreateParams {
 
 export interface UpdateParams {
   customerId: CustomerID;
-  externalId?: string;
   email?: string;
   fullName?: string;
   domain?: string;
@@ -61,7 +60,6 @@ export interface UpdateParams {
 }
 
 export interface ListCustomersParams extends BaseListParams {
-  externalId?: string;
   isActive?: boolean;
   search?: string;
 }
@@ -82,7 +80,7 @@ export class CustomersResource {
   constructor(private httpClient: CommetHTTPClient) {}
 
   /**
-   * Create a customer (idempotent with externalId)
+   * Create a customer (idempotent when id is provided)
    */
   async create(
     params: CreateParams,
@@ -92,7 +90,7 @@ export class CustomersResource {
       "/customers",
       {
         billingEmail: params.email,
-        externalId: params.externalId,
+        externalId: params.id,
         fullName: params.fullName,
         domain: params.domain,
         website: params.website,
@@ -115,7 +113,7 @@ export class CustomersResource {
   ): Promise<ApiResponse<BatchResult>> {
     const customers = params.customers.map((c) => ({
       billingEmail: c.email,
-      externalId: c.externalId,
+      externalId: c.id,
       fullName: c.fullName,
       domain: c.domain,
       website: c.website,
@@ -146,7 +144,6 @@ export class CustomersResource {
       `/customers/${params.customerId}`,
       {
         billingEmail: params.email,
-        externalId: params.externalId,
         fullName: params.fullName,
         domain: params.domain,
         website: params.website,
