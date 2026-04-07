@@ -8,7 +8,7 @@ import type { RequestOptions } from "./types/common";
 /**
  * Customer-scoped API context
  *
- * Provides a cleaner API where you don't have to pass externalId
+ * Provides a cleaner API where you don't have to pass customerId
  * on every call. All operations are scoped to a specific customer.
  *
  * @example
@@ -22,7 +22,7 @@ import type { RequestOptions } from "./types/common";
  * ```
  */
 export class CustomerContext {
-  private readonly externalId: string;
+  private readonly customerId: string;
   private readonly featuresResource: FeaturesResource;
   private readonly seatsResource: SeatsResource;
   private readonly usageResource: UsageResource;
@@ -30,7 +30,7 @@ export class CustomerContext {
   private readonly portalResource: PortalResource;
 
   constructor(
-    externalId: string,
+    customerId: string,
     resources: {
       features: FeaturesResource;
       seats: SeatsResource;
@@ -39,7 +39,7 @@ export class CustomerContext {
       portal: PortalResource;
     },
   ) {
-    this.externalId = externalId;
+    this.customerId = customerId;
     this.featuresResource = resources.features;
     this.seatsResource = resources.seats;
     this.usageResource = resources.usage;
@@ -47,58 +47,49 @@ export class CustomerContext {
     this.portalResource = resources.portal;
   }
 
-  /**
-   * Feature access methods - delegates to FeaturesResource
-   */
   features = {
     get: (code: string, options?: RequestOptions) =>
-      this.featuresResource.get({ code, externalId: this.externalId }, options),
+      this.featuresResource.get({ code, customerId: this.customerId }, options),
 
     check: (code: string, options?: RequestOptions) =>
       this.featuresResource.check(
-        { code, externalId: this.externalId },
+        { code, customerId: this.customerId },
         options,
       ),
 
     canUse: (code: string, options?: RequestOptions) =>
       this.featuresResource.canUse(
-        { code, externalId: this.externalId },
+        { code, customerId: this.customerId },
         options,
       ),
 
     list: (options?: RequestOptions) =>
-      this.featuresResource.list(this.externalId, options),
+      this.featuresResource.list(this.customerId, options),
   };
 
-  /**
-   * Seat management methods - delegates to SeatsResource
-   */
   seats = {
     add: (seatType: string, count = 1, options?: RequestOptions) =>
       this.seatsResource.add(
-        { externalId: this.externalId, seatType, count },
+        { customerId: this.customerId, seatType, count },
         options,
       ),
 
     remove: (seatType: string, count = 1, options?: RequestOptions) =>
       this.seatsResource.remove(
-        { externalId: this.externalId, seatType, count },
+        { customerId: this.customerId, seatType, count },
         options,
       ),
 
     set: (seatType: string, count: number, options?: RequestOptions) =>
       this.seatsResource.set(
-        { externalId: this.externalId, seatType, count },
+        { customerId: this.customerId, seatType, count },
         options,
       ),
 
     getBalance: (seatType: string) =>
-      this.seatsResource.getBalance({ externalId: this.externalId, seatType }),
+      this.seatsResource.getBalance({ customerId: this.customerId, seatType }),
   };
 
-  /**
-   * Usage tracking methods - delegates to UsageResource
-   */
   usage = {
     track: (
       feature: string,
@@ -107,23 +98,17 @@ export class CustomerContext {
       options?: RequestOptions,
     ) =>
       this.usageResource.track(
-        { externalId: this.externalId, feature, value, properties },
+        { customerId: this.customerId, feature, value, properties },
         options,
       ),
   };
 
-  /**
-   * Subscription methods - delegates to SubscriptionsResource
-   */
   subscription = {
-    get: () => this.subscriptionsResource.get(this.externalId),
+    get: () => this.subscriptionsResource.get(this.customerId),
   };
 
-  /**
-   * Portal methods - delegates to PortalResource
-   */
   portal = {
     getUrl: (options?: RequestOptions) =>
-      this.portalResource.getUrl({ externalId: this.externalId }, options),
+      this.portalResource.getUrl({ customerId: this.customerId }, options),
   };
 }

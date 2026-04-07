@@ -26,19 +26,9 @@ export interface UsageEventProperty {
   createdAt: string;
 }
 
-export interface BatchResult<T> {
-  successful: T[];
-  failed: Array<{
-    index: number;
-    error: string;
-    data: TrackParams;
-  }>;
-}
-
 interface TrackBaseParams {
   feature: GeneratedFeatureCode;
-  customerId?: CustomerID;
-  externalId?: string;
+  customerId: CustomerID;
   idempotencyKey?: string;
   timestamp?: string;
   properties?: Record<string, string>;
@@ -70,7 +60,6 @@ export class UsageResource {
     const eventData: Record<string, unknown> = {
       feature: params.feature,
       customerId: params.customerId,
-      externalId: params.externalId,
       idempotencyKey: params.idempotencyKey,
       timestamp: params.timestamp || new Date().toISOString(),
       properties: params.properties
@@ -98,42 +87,4 @@ export class UsageResource {
     return this.httpClient.post("/usage/events", eventData, options);
   }
 
-  async trackBatch(
-    params: { events: TrackParams[] },
-    options?: RequestOptions,
-  ): Promise<ApiResponse<BatchResult<UsageEvent>>> {
-    const events = params.events.map((event) => {
-      const eventData: Record<string, unknown> = {
-        feature: event.feature,
-        customerId: event.customerId,
-        externalId: event.externalId,
-        idempotencyKey: event.idempotencyKey,
-        timestamp: event.timestamp || new Date().toISOString(),
-        properties: event.properties
-          ? Object.entries(event.properties).map(([property, value]) => ({
-              property,
-              value,
-            }))
-          : undefined,
-      };
-
-      if ("model" in event && event.model) {
-        eventData.model = event.model;
-        eventData.inputTokens = event.inputTokens;
-        eventData.outputTokens = event.outputTokens;
-        if (event.cacheReadTokens) {
-          eventData.cacheReadTokens = event.cacheReadTokens;
-        }
-        if (event.cacheWriteTokens) {
-          eventData.cacheWriteTokens = event.cacheWriteTokens;
-        }
-      } else {
-        eventData.value = (event as TrackUsageParams).value;
-      }
-
-      return eventData;
-    });
-
-    return this.httpClient.post("/usage/events/batch", { events }, options);
-  }
 }

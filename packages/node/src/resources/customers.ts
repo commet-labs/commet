@@ -57,6 +57,7 @@ export interface UpdateParams {
   language?: string;
   industry?: string;
   metadata?: Record<string, unknown>;
+  address?: CustomerAddress;
 }
 
 export interface ListCustomersParams extends BaseListParams {
@@ -153,6 +154,7 @@ export class CustomersResource {
         language: params.language,
         industry: params.industry,
         metadata: params.metadata,
+        address: params.address,
       },
       options,
     );

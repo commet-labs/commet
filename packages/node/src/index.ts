@@ -59,7 +59,6 @@ export type {
 } from "./resources/subscriptions";
 // Usage
 export type {
-  BatchResult as UsageBatchResult,
   TrackModelTokensParams,
   TrackParams,
   TrackUsageParams,

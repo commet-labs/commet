@@ -60,7 +60,6 @@ export interface ActiveSubscription {
 export interface CreatedSubscription {
   id: string;
   customerId: string;
-  externalId: string;
   planId: string;
   planName: string;
   name: string;
@@ -100,18 +99,13 @@ export interface Subscription {
   updatedAt: string;
 }
 
-// Customer identifier: mutually exclusive customerId or externalId
-type CustomerIdentifier =
-  | { customerId: string; externalId?: never }
-  | { customerId?: never; externalId: string };
-
-// Plan identifier: use planCode (with autocomplete) or planId (legacy)
 type PlanIdentifier =
   | { planCode: GeneratedPlanCode; planId?: never }
   | { planCode?: never; planId: string };
 
-export type CreateSubscriptionParams = CustomerIdentifier &
-  PlanIdentifier & {
+export type CreateSubscriptionParams = PlanIdentifier & {
+    customerId: string;
+  } & {
     billingInterval?: BillingInterval;
     initialSeats?: Record<string, number>;
     skipTrial?: boolean;
@@ -163,9 +157,9 @@ export class SubscriptionsResource {
    * ```
    */
   async get(
-    externalId: string,
+    customerId: string,
   ): Promise<ApiResponse<ActiveSubscription | null>> {
-    return this.httpClient.get("/subscriptions/active", { externalId });
+    return this.httpClient.get("/subscriptions/active", { customerId });
   }
 
   /**

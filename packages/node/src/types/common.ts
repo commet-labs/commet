@@ -67,7 +67,7 @@ export class CommetValidationError extends CommetError {
   }
 }
 
-export type CustomerID = `cus_${string}`;
+export type CustomerID = string;
 export type AgreementID = `agr_${string}`;
 export type InvoiceID = `inv_${string}`;
 export type PhaseID = `phs_${string}`;

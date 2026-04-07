@@ -77,8 +77,8 @@ export class Commet {
    * await customer.usage.track("api_call");
    * ```
    */
-  customer(externalId: string): CustomerContext {
-    return new CustomerContext(externalId, {
+  customer(customerId: string): CustomerContext {
+    return new CustomerContext(customerId, {
       features: this.features,
       seats: this.seats,
       usage: this.usage,
