@@ -163,22 +163,12 @@ async function installSkills(projectRoot: string): Promise<void> {
   return new Promise((resolve) => {
     execFile(
       npx,
-      [
-        "-y",
-        "--loglevel=error",
-        "skills",
-        "add",
-        "commet-labs/commet-skills",
-      ],
+      ["-y", "--loglevel=error", "skills", "add", "commet-labs/commet-skills"],
       { cwd: projectRoot },
       (error) => {
         if (error) {
           console.log(chalk.dim("  You can install them manually by running:"));
-          console.log(
-            chalk.dim(
-              "  npx skills add commet-labs/commet-skills",
-            ),
-          );
+          console.log(chalk.dim("  npx skills add commet-labs/commet-skills"));
         }
         resolve();
       },
