@@ -1,5 +1,14 @@
 # @commet/ai-sdk
 
+## 0.2.3
+
+### Patch Changes
+
+- 4c30dbc: Fix build errors: use customerId consistently across all SDK packages and add better-call as dependency to resolve DTS generation
+- Updated dependencies [13e0953]
+- Updated dependencies [0b1877d]
+  - @commet/node@1.8.0
+
 ## 0.2.2
 
 ### Patch Changes

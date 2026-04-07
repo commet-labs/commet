@@ -1,5 +1,12 @@
 # @commet/node
 
+## 1.8.0
+
+### Minor Changes
+
+- 13e0953: Add address support to customer update and refactor customer context to use customerId parameter
+- 0b1877d: Replace externalId with id in customers.create for simpler API surface
+
 ## 1.7.1
 
 ### Patch Changes
