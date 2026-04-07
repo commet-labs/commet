@@ -1,6 +1,6 @@
 # @commet/better-auth
 
-## 2.0.0
+## 1.3.6
 
 ### Patch Changes
 
