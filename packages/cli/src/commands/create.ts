@@ -1,8 +1,7 @@
-import { execFile } from "node:child_process";
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import { confirm, input, select } from "@inquirer/prompts";
+import { input, select } from "@inquirer/prompts";
 import chalk from "chalk";
 import { Command } from "commander";
 import ora from "ora";
@@ -143,37 +142,6 @@ function linkProject(
     JSON.stringify({ orgId, orgName, environment }, null, 2),
     "utf8",
   );
-}
-
-async function askSkills(): Promise<boolean> {
-  try {
-    return await confirm({
-      message: `Add ${commetColor("agent skills")}?`,
-      default: true,
-      theme: promptTheme,
-    });
-  } catch {
-    return false;
-  }
-}
-
-async function installSkills(projectRoot: string): Promise<void> {
-  const npx = process.platform === "win32" ? "npx.cmd" : "npx";
-
-  return new Promise((resolve) => {
-    execFile(
-      npx,
-      ["-y", "--loglevel=error", "skills", "add", "commet-labs/commet-skills"],
-      { cwd: projectRoot },
-      (error) => {
-        if (error) {
-          console.log(chalk.dim("  You can install them manually by running:"));
-          console.log(chalk.dim("  npx skills add commet-labs/commet-skills"));
-        }
-        resolve();
-      },
-    );
-  });
 }
 
 export const createCommand = new Command("create")
@@ -333,10 +301,7 @@ export const createCommand = new Command("create")
       return;
     }
 
-    // 5. Agent skills
-    const shouldInstallSkills = await askSkills();
-
-    // 6. Download template
+    // 5. Download template
     const downloadSpinner = ora("Downloading template...").start();
 
     try {
@@ -356,7 +321,7 @@ export const createCommand = new Command("create")
     updatePackageJson(dest, projectName);
     copyEnvExample(dest);
 
-    // 7. Create plans in platform
+    // 6. Create plans in platform
     const planSpinner = ora("Creating plans...").start();
     const templateResult = await apiRequest<{
       plansCreated: number;
@@ -378,7 +343,7 @@ export const createCommand = new Command("create")
       );
     }
 
-    // 8. Create API key
+    // 7. Create API key
     const keySpinner = ora("Creating API key...").start();
     const keyResult = await apiRequest<{
       apiKey: string;
@@ -399,17 +364,10 @@ export const createCommand = new Command("create")
       keySpinner.succeed("API key created and saved to .env");
     }
 
-    // 9. Link project
+    // 8. Link project
     linkProject(dest, selectedOrg.id, selectedOrg.name, auth.environment);
 
-    // 10. Install skills
-    if (shouldInstallSkills) {
-      const skillsSpinner = ora("Installing agent skills...").start();
-      await installSkills(dest);
-      skillsSpinner.succeed("Agent skills installed");
-    }
-
-    // 11. Done
+    // 9. Done
     console.log(chalk.green(`\n\u2713 Created ${projectName}`));
     console.log(chalk.dim(`  Template: ${template.name}`));
     console.log(chalk.dim(`  Organization: ${selectedOrg.name}`));
