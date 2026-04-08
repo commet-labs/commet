@@ -1,5 +1,11 @@
 # commet
 
+## 1.4.2
+
+### Patch Changes
+
+- e33041b: Remove non-functional agent skills prompt from `commet create`
+
 ## 1.4.1
 
 ### Patch Changes
