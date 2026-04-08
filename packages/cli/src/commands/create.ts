@@ -2,7 +2,7 @@ import { spawn } from "node:child_process";
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import { checkbox, input, select } from "@inquirer/prompts";
+import { confirm, input, select } from "@inquirer/prompts";
 import chalk from "chalk";
 import { Command } from "commander";
 import ora from "ora";
@@ -145,37 +145,25 @@ function linkProject(
   );
 }
 
-const SKILLS = [
-  { name: "commet", description: "Commet SDK integration" },
-  { name: "commet-cli", description: "CLI usage and commands" },
-  { name: "commet-webhooks", description: "Webhook setup and handling" },
-  { name: "ai-billing", description: "AI token cost tracking and billing" },
-  { name: "billing-behaviors", description: "Billing rules and edge cases" },
-] as const;
-
-async function askSkills(): Promise<string[]> {
+async function askSkills(): Promise<boolean> {
   try {
-    return await checkbox({
-      message: `Select ${commetColor("agent skills")} to install:`,
-      choices: SKILLS.map((s) => ({
-        name: `${s.name.padEnd(22)} ${chalk.dim(s.description)}`,
-        value: s.name,
-        checked: false,
-      })),
+    return await confirm({
+      message: `Add ${commetColor("agent skills")}?`,
+      default: true,
       theme: promptTheme,
     });
   } catch {
-    return [];
+    return false;
   }
 }
 
-async function installSkills(projectRoot: string, skills: string[]): Promise<void> {
+async function installSkills(projectRoot: string): Promise<void> {
   const npx = process.platform === "win32" ? "npx.cmd" : "npx";
 
   return new Promise((resolve) => {
     const child = spawn(
       npx,
-      ["-y", "--loglevel=error", "skills", "add", "commet-labs/commet-skills", "--skill", ...skills],
+      ["-y", "--loglevel=error", "skills", "add", "commet-labs/commet-skills"],
       { cwd: projectRoot, stdio: "inherit" },
     );
 
@@ -347,7 +335,7 @@ export const createCommand = new Command("create")
     }
 
     // 5. Agent skills
-    const selectedSkills = await askSkills();
+    const shouldInstallSkills = await askSkills();
 
     // 6. Download template
     const downloadSpinner = ora("Downloading template...").start();
@@ -416,8 +404,8 @@ export const createCommand = new Command("create")
     linkProject(dest, selectedOrg.id, selectedOrg.name, auth.environment);
 
     // 10. Install skills
-    if (selectedSkills.length > 0) {
-      await installSkills(dest, selectedSkills);
+    if (shouldInstallSkills) {
+      await installSkills(dest);
     }
 
     // 11. Done
