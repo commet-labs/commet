@@ -1,5 +1,11 @@
 # commet
 
+## 1.4.3
+
+### Patch Changes
+
+- 35c7513: Fix agent skills installation in `commet create` with interactive skill selection
+
 ## 1.4.2
 
 ### Patch Changes
