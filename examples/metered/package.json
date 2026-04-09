@@ -35,6 +35,7 @@
     "tailwind-merge": "3.5.0",
     "zod": "4.3.6"
   },
+  "packageManager": "pnpm@10.28.0",
   "devDependencies": {
     "@tailwindcss/postcss": "4.2.1",
     "@types/node": "25.3.2",
