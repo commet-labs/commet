@@ -1,5 +1,6 @@
-import { CreditCard, Home, Lock, LogOut } from "lucide-react";
+import { CreditCard, Home, Lock } from "lucide-react";
 import Link from "next/link";
+import { SignOutButton } from "@/components/sign-out-button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
@@ -48,15 +49,7 @@ export default function DashboardInnerLayout({
           </NavLink>
         </nav>
         <Separator className="my-2" />
-        <form action="/api/auth/sign-out" method="POST">
-          <button
-            type="submit"
-            className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm font-medium hover:bg-muted"
-          >
-            <LogOut className="size-4" />
-            Sign out
-          </button>
-        </form>
+        <SignOutButton />
       </aside>
       <main className="flex flex-1 flex-col">{children}</main>
     </div>
