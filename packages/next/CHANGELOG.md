@@ -1,5 +1,11 @@
 # @commet/next
 
+## 0.3.5
+
+### Patch Changes
+
+- 567b519: Update Next.js dev dependency from 16.2.1 to 16.2.3
+
 ## 0.3.4
 
 ### Patch Changes
