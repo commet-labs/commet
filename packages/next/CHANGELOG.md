@@ -5,7 +5,7 @@
 ### Patch Changes
 
 - Updated dependencies [06d0041]
-  - @commet/node@1.10.0
+  - @commet/node@1.9.0
 
 ## 0.3.5
 
