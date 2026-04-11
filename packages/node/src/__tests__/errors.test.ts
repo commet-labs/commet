@@ -34,7 +34,12 @@ describe("Error classes", () => {
 
     it("carries details", () => {
       const details = { field: "email", reason: "invalid" };
-      const error = new CommetAPIError("bad request", 400, "bad_request", details);
+      const error = new CommetAPIError(
+        "bad request",
+        400,
+        "bad_request",
+        details,
+      );
       expect(error.details).toEqual(details);
     });
   });

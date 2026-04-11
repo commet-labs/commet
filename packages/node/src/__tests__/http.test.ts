@@ -95,9 +95,7 @@ describe("CommetHTTPClient", () => {
 
     it("normalizes endpoint without leading slash", async () => {
       const client = createClient();
-      vi.mocked(fetch).mockResolvedValueOnce(
-        jsonResponse({ success: true }),
-      );
+      vi.mocked(fetch).mockResolvedValueOnce(jsonResponse({ success: true }));
 
       await client.get("customers");
 
@@ -111,9 +109,7 @@ describe("CommetHTTPClient", () => {
   describe("request headers", () => {
     it("sends API key and content-type headers", async () => {
       const client = createClient();
-      vi.mocked(fetch).mockResolvedValueOnce(
-        jsonResponse({ success: true }),
-      );
+      vi.mocked(fetch).mockResolvedValueOnce(jsonResponse({ success: true }));
 
       await client.get("/test");
 
@@ -126,9 +122,7 @@ describe("CommetHTTPClient", () => {
 
     it("includes custom idempotency key when provided", async () => {
       const client = createClient();
-      vi.mocked(fetch).mockResolvedValueOnce(
-        jsonResponse({ success: true }),
-      );
+      vi.mocked(fetch).mockResolvedValueOnce(jsonResponse({ success: true }));
 
       await client.post("/test", { name: "x" }, { idempotencyKey: "idem_123" });
 
@@ -139,9 +133,7 @@ describe("CommetHTTPClient", () => {
 
     it("auto-generates idempotency key for POST with body", async () => {
       const client = createClient();
-      vi.mocked(fetch).mockResolvedValueOnce(
-        jsonResponse({ success: true }),
-      );
+      vi.mocked(fetch).mockResolvedValueOnce(jsonResponse({ success: true }));
 
       await client.post("/test", { name: "x" });
 
@@ -155,10 +147,7 @@ describe("CommetHTTPClient", () => {
     it("throws CommetAPIError on 4xx response", async () => {
       const client = createClient({ retries: 0 });
       vi.mocked(fetch).mockResolvedValueOnce(
-        jsonResponse(
-          { message: "Customer not found", code: "not_found" },
-          404,
-        ),
+        jsonResponse({ message: "Customer not found", code: "not_found" }, 404),
       );
 
       await expect(client.get("/customers/missing")).rejects.toThrow(
@@ -167,7 +156,7 @@ describe("CommetHTTPClient", () => {
 
       try {
         await client.get("/customers/missing");
-      } catch (error) {
+      } catch (_error) {
         // fetch was already consumed above, this block documents the shape
       }
     });
@@ -175,10 +164,7 @@ describe("CommetHTTPClient", () => {
     it("includes statusCode and code on API error", async () => {
       const client = createClient({ retries: 0 });
       vi.mocked(fetch).mockResolvedValueOnce(
-        jsonResponse(
-          { message: "Forbidden", code: "forbidden" },
-          403,
-        ),
+        jsonResponse({ message: "Forbidden", code: "forbidden" }, 403),
       );
 
       try {
@@ -258,9 +244,7 @@ describe("CommetHTTPClient", () => {
         const client = createClient({ retries: 2 });
 
         vi.mocked(fetch)
-          .mockResolvedValueOnce(
-            jsonResponse({ message: "error" }, status),
-          )
+          .mockResolvedValueOnce(jsonResponse({ message: "error" }, status))
           .mockResolvedValueOnce(
             jsonResponse({ success: true, data: { id: "1" } }),
           );
@@ -305,9 +289,7 @@ describe("CommetHTTPClient", () => {
 
       vi.mocked(fetch)
         .mockRejectedValueOnce(new TypeError("fetch failed"))
-        .mockResolvedValueOnce(
-          jsonResponse({ success: true, data: {} }),
-        );
+        .mockResolvedValueOnce(jsonResponse({ success: true, data: {} }));
 
       const promise = client.get("/test");
       await vi.advanceTimersByTimeAsync(10_000);
@@ -332,13 +314,14 @@ describe("CommetHTTPClient", () => {
 
     it("retries on AbortError (timeout)", async () => {
       const client = createClient({ retries: 1 });
-      const abortError = new DOMException("The operation was aborted", "AbortError");
+      const abortError = new DOMException(
+        "The operation was aborted",
+        "AbortError",
+      );
 
       vi.mocked(fetch)
         .mockRejectedValueOnce(abortError)
-        .mockResolvedValueOnce(
-          jsonResponse({ success: true, data: {} }),
-        );
+        .mockResolvedValueOnce(jsonResponse({ success: true, data: {} }));
 
       const promise = client.get("/test");
       await vi.advanceTimersByTimeAsync(10_000);
@@ -349,13 +332,14 @@ describe("CommetHTTPClient", () => {
 
     it("retries on TimeoutError", async () => {
       const client = createClient({ retries: 1 });
-      const timeoutError = new DOMException("The operation timed out", "TimeoutError");
+      const timeoutError = new DOMException(
+        "The operation timed out",
+        "TimeoutError",
+      );
 
       vi.mocked(fetch)
         .mockRejectedValueOnce(timeoutError)
-        .mockResolvedValueOnce(
-          jsonResponse({ success: true, data: {} }),
-        );
+        .mockResolvedValueOnce(jsonResponse({ success: true, data: {} }));
 
       const promise = client.get("/test");
       await vi.advanceTimersByTimeAsync(10_000);
@@ -366,7 +350,10 @@ describe("CommetHTTPClient", () => {
 
     it("gives up after max retries on timeout errors", async () => {
       const client = createClient({ retries: 1 });
-      const abortError = new DOMException("The operation was aborted", "AbortError");
+      const abortError = new DOMException(
+        "The operation was aborted",
+        "AbortError",
+      );
 
       vi.mocked(fetch)
         .mockRejectedValueOnce(abortError)
@@ -415,9 +402,7 @@ describe("CommetHTTPClient", () => {
   describe("HTTP methods", () => {
     it("sends GET requests", async () => {
       const client = createClient();
-      vi.mocked(fetch).mockResolvedValueOnce(
-        jsonResponse({ success: true }),
-      );
+      vi.mocked(fetch).mockResolvedValueOnce(jsonResponse({ success: true }));
 
       await client.get("/test");
 
@@ -428,9 +413,7 @@ describe("CommetHTTPClient", () => {
 
     it("sends POST with JSON body", async () => {
       const client = createClient();
-      vi.mocked(fetch).mockResolvedValueOnce(
-        jsonResponse({ success: true }),
-      );
+      vi.mocked(fetch).mockResolvedValueOnce(jsonResponse({ success: true }));
 
       await client.post("/test", { name: "hello" });
 
@@ -441,9 +424,7 @@ describe("CommetHTTPClient", () => {
 
     it("sends PUT with JSON body", async () => {
       const client = createClient();
-      vi.mocked(fetch).mockResolvedValueOnce(
-        jsonResponse({ success: true }),
-      );
+      vi.mocked(fetch).mockResolvedValueOnce(jsonResponse({ success: true }));
 
       await client.put("/test", { name: "updated" });
 
@@ -453,9 +434,7 @@ describe("CommetHTTPClient", () => {
 
     it("sends DELETE requests", async () => {
       const client = createClient();
-      vi.mocked(fetch).mockResolvedValueOnce(
-        jsonResponse({ success: true }),
-      );
+      vi.mocked(fetch).mockResolvedValueOnce(jsonResponse({ success: true }));
 
       await client.delete("/test");
 

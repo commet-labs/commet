@@ -23,9 +23,7 @@ describe("Webhooks", () => {
   describe("verify", () => {
     it("accepts a valid signature", () => {
       const signature = signPayload(payload, secret);
-      expect(
-        webhooks.verify({ payload, signature, secret }),
-      ).toBe(true);
+      expect(webhooks.verify({ payload, signature, secret })).toBe(true);
     });
 
     it("rejects an invalid signature", () => {
@@ -40,11 +38,14 @@ describe("Webhooks", () => {
 
     it("rejects a tampered payload", () => {
       const signature = signPayload(payload, secret);
-      const tampered = payload.replace("subscription.activated", "subscription.canceled");
+      const tampered = payload.replace(
+        "subscription.activated",
+        "subscription.canceled",
+      );
 
-      expect(
-        webhooks.verify({ payload: tampered, signature, secret }),
-      ).toBe(false);
+      expect(webhooks.verify({ payload: tampered, signature, secret })).toBe(
+        false,
+      );
     });
 
     it("rejects a wrong secret", () => {
@@ -60,22 +61,18 @@ describe("Webhooks", () => {
     });
 
     it("returns false when signature is null", () => {
-      expect(
-        webhooks.verify({ payload, signature: null, secret }),
-      ).toBe(false);
+      expect(webhooks.verify({ payload, signature: null, secret })).toBe(false);
     });
 
     it("returns false when secret is empty", () => {
       const signature = signPayload(payload, secret);
-      expect(
-        webhooks.verify({ payload, signature, secret: "" }),
-      ).toBe(false);
+      expect(webhooks.verify({ payload, signature, secret: "" })).toBe(false);
     });
 
     it("returns false when payload is empty", () => {
-      expect(
-        webhooks.verify({ payload: "", signature: "abc", secret }),
-      ).toBe(false);
+      expect(webhooks.verify({ payload: "", signature: "abc", secret })).toBe(
+        false,
+      );
     });
 
     it("returns false for non-hex signature (catches timingSafeEqual throw)", () => {
