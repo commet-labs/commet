@@ -151,9 +151,7 @@ export async function deleteAccount(
     };
   }
 
-  await db
-    .delete(activityLogs)
-    .where(eq(activityLogs.userId, currentUser.id));
+  await db.delete(activityLogs).where(eq(activityLogs.userId, currentUser.id));
 
   await db.delete(user).where(eq(user.id, currentUser.id));
 
