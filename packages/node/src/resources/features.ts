@@ -67,15 +67,15 @@ export class FeaturesResource {
     if (!result.success || !result.data) {
       return {
         success: false,
-        data: { allowed: false },
+        code: result.code,
         message: result.message,
+        details: result.details,
       };
     }
 
     return {
       success: true,
       data: { allowed: result.data.allowed },
-      message: result.message,
     };
   }
 

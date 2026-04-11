@@ -13,6 +13,7 @@
     "lint:fix": {},
     "typecheck": {
       "dependsOn": ["^build"]
-    }
+    },
+    "test": {}
   }
 }

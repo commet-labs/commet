@@ -1,6 +1,6 @@
 {
   "name": "@commet/node",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "description": "Commet SDK for Node.js - Billing and usage tracking",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -21,7 +21,9 @@
     "dev": "tsup --watch",
     "lint": "biome lint src/",
     "lint:fix": "biome lint --write src/",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "keywords": [
     "billing",
@@ -34,13 +36,12 @@
   ],
   "author": "Commet Team",
   "license": "MIT",
-  "dependencies": {
-    "zod": "4.1.12"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/node": "24.10.1",
     "tsup": "8.5.1",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "vitest": "4.0.13"
   },
   "peerDependencies": {
     "typescript": ">=5.0.0"
