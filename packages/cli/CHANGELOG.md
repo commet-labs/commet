@@ -1,5 +1,11 @@
 # commet
 
+## 1.5.0
+
+### Minor Changes
+
+- 39730b5: `commet create` now resolves `workspace:*` dependencies to the latest published npm version when scaffolding a project. This lets the monorepo link `examples/*` to local packages for immediate feedback, while users who run `commet create` get a standalone project with real installable versions.
+
 ## 1.4.3
 
 ### Patch Changes
