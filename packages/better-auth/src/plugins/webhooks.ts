@@ -41,9 +41,12 @@ export interface WebhooksConfig {
 }
 
 /**
- * Map event types to their handler keys
+ * Map event types to their handler keys. Only the subscription events exposed
+ * in WebhooksConfig are mapped here — other webhook events (payment.*,
+ * invoice.*, subscription.plan_changed) are handled via the `onPayload`
+ * catch-all.
  */
-const EVENT_HANDLER_MAP: Record<WebhookEvent, keyof WebhooksConfig> = {
+const EVENT_HANDLER_MAP: Partial<Record<WebhookEvent, keyof WebhooksConfig>> = {
   "subscription.created": "onSubscriptionCreated",
   "subscription.activated": "onSubscriptionActivated",
   "subscription.canceled": "onSubscriptionCanceled",
