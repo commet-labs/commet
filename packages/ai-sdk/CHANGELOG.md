@@ -1,6 +1,6 @@
 # @commet/ai-sdk
 
-## 1.0.0
+## 0.2.5
 
 ### Patch Changes
 
