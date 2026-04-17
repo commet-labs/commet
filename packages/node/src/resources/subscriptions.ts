@@ -29,6 +29,20 @@ export interface FeatureSummary {
   };
 }
 
+export interface CreditsSummary {
+  remaining: number;
+  included: number;
+  purchased: number;
+}
+
+export interface BalanceSummary {
+  remaining: number;
+  included: number;
+  currency: string;
+}
+
+export type ConsumptionModel = "metered" | "credits" | "balance";
+
 export interface ActiveSubscription {
   id: string;
   customerId: string;
@@ -41,6 +55,7 @@ export interface ActiveSubscription {
   name: string;
   description: string | null;
   status: SubscriptionStatus;
+  consumptionModel: ConsumptionModel | null;
   trialEndsAt: string | null;
   currentPeriod: {
     start: string;
@@ -48,6 +63,8 @@ export interface ActiveSubscription {
     daysRemaining: number;
   };
   features: FeatureSummary[];
+  credits: CreditsSummary | null;
+  balance: BalanceSummary | null;
   startDate: string;
   endDate: string | null;
   billingDayOfMonth: number;
