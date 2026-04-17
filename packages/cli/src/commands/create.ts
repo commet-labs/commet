@@ -208,7 +208,17 @@ function linkProject(
   );
 }
 
-async function askSkills(): Promise<boolean> {
+function isInteractive(): boolean {
+  return process.stdin.isTTY === true;
+}
+
+async function resolveSkills(opts: {
+  skills?: boolean;
+  yes?: boolean;
+}): Promise<boolean> {
+  if (typeof opts.skills === "boolean") return opts.skills;
+  if (opts.yes) return true;
+  if (!isInteractive()) return false;
   try {
     return await confirm({
       message: `Add ${commetColor("agent skills")}?`,
@@ -247,6 +257,10 @@ export const createCommand = new Command("create")
     "-t, --template <template>",
     "Template to use (fixed, seats, metered, credits, balance-ai, balance-fixed)",
   )
+  .option("--org <slug>", "Organization slug or ID (skips selection)")
+  .option("--skills", "Install agent skills")
+  .option("--no-skills", "Skip agent skills installation")
+  .option("-y, --yes", "Accept defaults for optional prompts")
   .option("--ref <ref>", "Git ref to fetch templates from", "main")
   .option("--list", "List available templates")
   .action(async (argName: string | undefined, opts) => {
@@ -263,16 +277,23 @@ export const createCommand = new Command("create")
 
     // 1. Project name
     let projectName = argName;
-    try {
-      if (!projectName) {
+    if (!projectName) {
+      if (!isInteractive()) {
+        console.log(chalk.red("\u2717 Project name is required"));
+        console.log(
+          chalk.dim("Pass as positional argument: commet create <name>"),
+        );
+        return;
+      }
+      try {
         projectName = await input({
           message: "Project name:",
           theme: promptTheme,
         });
+      } catch {
+        console.log(chalk.yellow("\n\u26A0 Cancelled"));
+        return;
       }
-    } catch {
-      console.log(chalk.yellow("\n\u26A0 Cancelled"));
-      return;
     }
 
     const dest = path.resolve(projectName);
@@ -285,6 +306,11 @@ export const createCommand = new Command("create")
 
     // 2. Login (if not authenticated)
     if (!authExists()) {
+      if (!isInteractive()) {
+        console.log(chalk.red("\u2717 Not authenticated"));
+        console.log(chalk.dim("Run `commet login` first"));
+        return;
+      }
       let environment: "sandbox" | "production";
       try {
         environment = await select<"sandbox" | "production">({
@@ -350,9 +376,32 @@ export const createCommand = new Command("create")
 
     let selectedOrg: (typeof organizations)[0];
 
-    if (organizations.length === 1) {
+    if (opts.org) {
+      const match = organizations.find(
+        (org) => org.slug === opts.org || org.id === opts.org,
+      );
+      if (!match) {
+        console.log(chalk.red(`\u2717 Organization "${opts.org}" not found`));
+        console.log(
+          chalk.dim(
+            `Available: ${organizations.map((o) => o.slug).join(", ")}`,
+          ),
+        );
+        return;
+      }
+      selectedOrg = match;
+    } else if (organizations.length === 1) {
       selectedOrg = organizations[0]!;
     } else {
+      if (!isInteractive()) {
+        console.log(chalk.red("\u2717 Organization is required"));
+        console.log(
+          chalk.dim(
+            `Pass --org=<slug>. Available: ${organizations.map((o) => o.slug).join(", ")}`,
+          ),
+        );
+        return;
+      }
       try {
         const orgId = await select({
           message: "Organization:",
@@ -380,8 +429,17 @@ export const createCommand = new Command("create")
       return;
     }
 
-    try {
-      if (!template) {
+    if (!template) {
+      if (!isInteractive()) {
+        console.log(chalk.red("\u2717 Template is required"));
+        console.log(
+          chalk.dim(
+            `Pass --template=<name>. Available: ${TEMPLATES.map((t) => t.name).join(", ")}`,
+          ),
+        );
+        return;
+      }
+      try {
         const selected = await select<TemplateName>({
           message: "Billing model:",
           choices: TEMPLATES.map((t) => ({
@@ -391,14 +449,14 @@ export const createCommand = new Command("create")
           theme: promptTheme,
         });
         template = TEMPLATES.find((t) => t.name === selected)!;
+      } catch {
+        console.log(chalk.yellow("\n\u26A0 Cancelled"));
+        return;
       }
-    } catch {
-      console.log(chalk.yellow("\n\u26A0 Cancelled"));
-      return;
     }
 
     // 5. Agent skills
-    const shouldInstallSkills = await askSkills();
+    const shouldInstallSkills = await resolveSkills(opts);
 
     // 6. Download template
     const downloadSpinner = ora("Downloading template...").start();
