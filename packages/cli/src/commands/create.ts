@@ -105,6 +105,69 @@ function updatePackageJson(dest: string, projectName: string) {
   fs.writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);
 }
 
+async function fetchLatestVersion(packageName: string): Promise<string> {
+  const response = await fetch(
+    `https://registry.npmjs.org/${packageName}/latest`,
+  );
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch version for ${packageName} (HTTP ${response.status})`,
+    );
+  }
+  const data = (await response.json()) as { version: string };
+  return data.version;
+}
+
+async function resolveWorkspaceDeps(dest: string): Promise<number> {
+  const pkgPath = path.join(dest, "package.json");
+  const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8"));
+
+  const depSections = [
+    "dependencies",
+    "devDependencies",
+    "peerDependencies",
+  ] as const;
+
+  const workspaceDeps = new Map<string, Array<(typeof depSections)[number]>>();
+
+  for (const section of depSections) {
+    const deps = pkg[section];
+    if (!deps) continue;
+    for (const [name, version] of Object.entries(deps)) {
+      if (typeof version === "string" && version.startsWith("workspace:")) {
+        const existing = workspaceDeps.get(name);
+        if (existing) {
+          existing.push(section);
+        } else {
+          workspaceDeps.set(name, [section]);
+        }
+      }
+    }
+  }
+
+  if (workspaceDeps.size === 0) return 0;
+
+  const resolved = new Map<string, string>();
+  await Promise.all(
+    Array.from(workspaceDeps.keys()).map(async (name) => {
+      resolved.set(name, await fetchLatestVersion(name));
+    }),
+  );
+
+  for (const [name, sections] of workspaceDeps) {
+    const version = resolved.get(name);
+    if (!version) {
+      throw new Error(`Could not resolve version for ${name}`);
+    }
+    for (const section of sections) {
+      pkg[section][name] = version;
+    }
+  }
+
+  fs.writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);
+  return workspaceDeps.size;
+}
+
 function copyEnvExample(dest: string) {
   const examplePath = path.join(dest, ".env.example");
   const envPath = path.join(dest, ".env");
@@ -357,7 +420,27 @@ export const createCommand = new Command("create")
     updatePackageJson(dest, projectName);
     copyEnvExample(dest);
 
-    // 7. Create plans in platform
+    // 7. Resolve workspace:* deps to published npm versions
+    const resolveSpinner = ora("Resolving package versions...").start();
+    try {
+      const count = await resolveWorkspaceDeps(dest);
+      if (count > 0) {
+        resolveSpinner.succeed(`Resolved ${count} package versions`);
+      } else {
+        resolveSpinner.stop();
+      }
+    } catch (error) {
+      resolveSpinner.fail("Failed to resolve package versions");
+      if (error instanceof Error) {
+        console.error(chalk.red(error.message));
+      }
+      if (fs.existsSync(dest)) {
+        fs.rmSync(dest, { recursive: true, force: true });
+      }
+      return;
+    }
+
+    // 8. Create plans in platform
     const planSpinner = ora("Creating plans...").start();
     const templateResult = await apiRequest<{
       plansCreated: number;
@@ -379,7 +462,7 @@ export const createCommand = new Command("create")
       );
     }
 
-    // 8. Create API key
+    // 9. Create API key
     const keySpinner = ora("Creating API key...").start();
     const keyResult = await apiRequest<{
       apiKey: string;
@@ -400,15 +483,15 @@ export const createCommand = new Command("create")
       keySpinner.succeed("API key created and saved to .env");
     }
 
-    // 9. Link project
+    // 10. Link project
     linkProject(dest, selectedOrg.id, selectedOrg.name, auth.environment);
 
-    // 10. Install skills
+    // 11. Install skills
     if (shouldInstallSkills) {
       await installSkills(dest);
     }
 
-    // 11. Done
+    // 12. Done
     console.log(chalk.green(`\n\u2713 Created ${projectName}`));
     console.log(chalk.dim(`  Template: ${template.name}`));
     console.log(chalk.dim(`  Organization: ${selectedOrg.name}`));
