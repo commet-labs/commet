@@ -30,7 +30,7 @@ export async function createCheckoutSession({
   }
 
   const result = await commet.subscriptions.create({
-    externalId: user.id,
+    customerId: user.id,
     planCode,
     successUrl,
   });
@@ -70,7 +70,7 @@ export async function getCheckoutUrl({
   }
 
   const result = await commet.subscriptions.create({
-    externalId: user.id,
+    customerId: user.id,
     planCode,
     successUrl,
   });

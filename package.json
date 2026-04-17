@@ -8,6 +8,7 @@
     "lint": "turbo lint --filter=./packages/*",
     "lint:fix": "turbo lint:fix --filter=./packages/*",
     "typecheck": "turbo typecheck --filter=./packages/*",
+    "clean": "turbo clean && rm -rf node_modules .turbo",
     "format": "biome format --write .",
     "format:check": "biome format .",
     "changeset": "changeset",

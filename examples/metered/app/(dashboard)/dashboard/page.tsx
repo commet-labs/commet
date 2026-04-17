@@ -16,7 +16,7 @@ export default async function DashboardPage() {
 
   const results = await Promise.all(
     FEATURE_CODES.map((code) =>
-      commet.features.check({ externalId: user!.id, code }),
+      commet.features.check({ customerId: user!.id, code }),
     ),
   );
 

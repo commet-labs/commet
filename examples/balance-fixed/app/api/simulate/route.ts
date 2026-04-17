@@ -20,7 +20,7 @@ export async function POST(request: Request) {
   }
 
   const result = await commet.usage.track({
-    externalId: user.id,
+    customerId: user.id,
     feature: featureCode,
     value: 1,
   });
