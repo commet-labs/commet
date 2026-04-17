@@ -1,5 +1,5 @@
 ---
-"@commet/node": minor
+"@commet/node": patch
 "@commet/better-auth": patch
 ---
 
