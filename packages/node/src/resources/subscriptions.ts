@@ -55,7 +55,7 @@ export interface ActiveSubscription {
   name: string;
   description: string | null;
   status: SubscriptionStatus;
-  consumptionModel: ConsumptionModel;
+  consumptionModel: ConsumptionModel | null;
   trialEndsAt: string | null;
   currentPeriod: {
     start: string;
