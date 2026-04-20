@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import type { SubscriptionStatus } from "./subscriptions";
 
 /**
  * Webhook payload structure from Commet
@@ -11,7 +12,12 @@ export interface WebhookPayload {
 }
 
 /**
- * Webhook data structure (subscription-related fields)
+ * Webhook data structure (subscription-related fields).
+ *
+ * The `status` field is present on `subscription.*` events. Grant access only
+ * when it is `"active"` or `"trialing"`. `"pending_payment"` means the first
+ * charge has not been confirmed yet — wait for `subscription.activated` before
+ * granting access.
  */
 export interface WebhookData {
   id?: string;
@@ -19,7 +25,11 @@ export interface WebhookData {
   subscriptionId?: string;
   customerId?: string;
   externalId?: string;
-  status?: string;
+  /**
+   * Subscription status. Present on `subscription.*` events.
+   * Grant access when this is `"active"` or `"trialing"`.
+   */
+  status?: SubscriptionStatus;
   name?: string;
   canceledAt?: string;
   [key: string]: unknown;
@@ -32,7 +42,11 @@ export type WebhookEvent =
   | "subscription.created"
   | "subscription.activated"
   | "subscription.canceled"
-  | "subscription.updated";
+  | "subscription.updated"
+  | "subscription.plan_changed"
+  | "payment.received"
+  | "payment.failed"
+  | "invoice.created";
 
 export interface VerifyParams {
   payload: string;
