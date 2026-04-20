@@ -1,6 +1,6 @@
 {
   "name": "@commet/ai-sdk",
-  "version": "0.2.3",
+  "version": "0.2.5",
   "description": "Commet billing middleware for Vercel AI SDK",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -21,7 +21,8 @@
     "dev": "tsup --watch",
     "lint": "biome lint src/",
     "lint:fix": "biome lint --write src/",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf .turbo node_modules dist"
   },
   "keywords": [
     "billing",
@@ -34,7 +35,7 @@
   "author": "Commet Team",
   "license": "MIT",
   "peerDependencies": {
-    "@commet/node": ">=1.8.0",
+    "@commet/node": ">=1.10.0",
     "ai": ">=6.0.0"
   },
   "devDependencies": {

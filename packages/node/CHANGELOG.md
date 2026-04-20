@@ -1,5 +1,24 @@
 # @commet/node
 
+## 1.10.0
+
+### Minor Changes
+
+- 37ded39: Add `consumptionModel`, `credits`, and `balance` fields to `ActiveSubscription` response from `subscriptions.get()`. Clients can now read credits or balance state for credits/balance plans instead of inferring it. `consumptionModel` is `"metered" | "credits" | "balance"` and indicates which summary (if any) is populated.
+
+## 1.9.0
+
+### Minor Changes
+
+- 06d0041: Add tests, typed error propagation, timeout retry, and version unification
+
+  - Add vitest with 54 tests covering webhooks, HTTP client, retry logic, and error parsing
+  - Fix features.check() to propagate API errors instead of swallowing them
+  - Remove non-JSON 404 fallback that could hide proxy/CDN errors
+  - Retry timeout errors (AbortError/TimeoutError) alongside network errors
+  - Remove unused zod dependency
+  - Update User-Agent to commet-node/1.9.0
+
 ## 1.8.0
 
 ### Minor Changes

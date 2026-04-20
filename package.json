@@ -3,17 +3,18 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "turbo build",
+    "build": "turbo build --filter=./packages/*",
     "dev": "turbo dev",
-    "lint": "turbo lint",
-    "lint:fix": "turbo lint:fix",
-    "typecheck": "turbo typecheck",
+    "lint": "turbo lint --filter=./packages/*",
+    "lint:fix": "turbo lint:fix --filter=./packages/*",
+    "typecheck": "turbo typecheck --filter=./packages/*",
+    "clean": "turbo clean && rm -rf node_modules .turbo",
     "format": "biome format --write .",
     "format:check": "biome format .",
     "changeset": "changeset",
     "changeset:add": "changeset add",
     "version-packages": "changeset version",
-    "release": "turbo build && changeset publish"
+    "release": "turbo build --filter=./packages/* && changeset publish"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.10",
@@ -22,7 +23,7 @@
     "turbo": "2.9.1",
     "typescript": "6.0.2"
   },
-  "packageManager": "pnpm@9.0.0",
+  "packageManager": "pnpm@10.28.0",
   "engines": {
     "node": ">=18.0.0"
   }

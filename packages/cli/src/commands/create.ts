@@ -105,6 +105,69 @@ function updatePackageJson(dest: string, projectName: string) {
   fs.writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);
 }
 
+async function fetchLatestVersion(packageName: string): Promise<string> {
+  const response = await fetch(
+    `https://registry.npmjs.org/${packageName}/latest`,
+  );
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch version for ${packageName} (HTTP ${response.status})`,
+    );
+  }
+  const data = (await response.json()) as { version: string };
+  return data.version;
+}
+
+async function resolveWorkspaceDeps(dest: string): Promise<number> {
+  const pkgPath = path.join(dest, "package.json");
+  const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8"));
+
+  const depSections = [
+    "dependencies",
+    "devDependencies",
+    "peerDependencies",
+  ] as const;
+
+  const workspaceDeps = new Map<string, Array<(typeof depSections)[number]>>();
+
+  for (const section of depSections) {
+    const deps = pkg[section];
+    if (!deps) continue;
+    for (const [name, version] of Object.entries(deps)) {
+      if (typeof version === "string" && version.startsWith("workspace:")) {
+        const existing = workspaceDeps.get(name);
+        if (existing) {
+          existing.push(section);
+        } else {
+          workspaceDeps.set(name, [section]);
+        }
+      }
+    }
+  }
+
+  if (workspaceDeps.size === 0) return 0;
+
+  const resolved = new Map<string, string>();
+  await Promise.all(
+    Array.from(workspaceDeps.keys()).map(async (name) => {
+      resolved.set(name, await fetchLatestVersion(name));
+    }),
+  );
+
+  for (const [name, sections] of workspaceDeps) {
+    const version = resolved.get(name);
+    if (!version) {
+      throw new Error(`Could not resolve version for ${name}`);
+    }
+    for (const section of sections) {
+      pkg[section][name] = version;
+    }
+  }
+
+  fs.writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);
+  return workspaceDeps.size;
+}
+
 function copyEnvExample(dest: string) {
   const examplePath = path.join(dest, ".env.example");
   const envPath = path.join(dest, ".env");
@@ -145,7 +208,17 @@ function linkProject(
   );
 }
 
-async function askSkills(): Promise<boolean> {
+function isInteractive(): boolean {
+  return process.stdin.isTTY === true;
+}
+
+async function resolveSkills(opts: {
+  skills?: boolean;
+  yes?: boolean;
+}): Promise<boolean> {
+  if (typeof opts.skills === "boolean") return opts.skills;
+  if (opts.yes) return true;
+  if (!isInteractive()) return false;
   try {
     return await confirm({
       message: `Add ${commetColor("agent skills")}?`,
@@ -184,6 +257,10 @@ export const createCommand = new Command("create")
     "-t, --template <template>",
     "Template to use (fixed, seats, metered, credits, balance-ai, balance-fixed)",
   )
+  .option("--org <slug>", "Organization slug or ID (skips selection)")
+  .option("--skills", "Install agent skills")
+  .option("--no-skills", "Skip agent skills installation")
+  .option("-y, --yes", "Accept defaults for optional prompts")
   .option("--ref <ref>", "Git ref to fetch templates from", "main")
   .option("--list", "List available templates")
   .action(async (argName: string | undefined, opts) => {
@@ -200,16 +277,23 @@ export const createCommand = new Command("create")
 
     // 1. Project name
     let projectName = argName;
-    try {
-      if (!projectName) {
+    if (!projectName) {
+      if (!isInteractive()) {
+        console.log(chalk.red("\u2717 Project name is required"));
+        console.log(
+          chalk.dim("Pass as positional argument: commet create <name>"),
+        );
+        return;
+      }
+      try {
         projectName = await input({
           message: "Project name:",
           theme: promptTheme,
         });
+      } catch {
+        console.log(chalk.yellow("\n\u26A0 Cancelled"));
+        return;
       }
-    } catch {
-      console.log(chalk.yellow("\n\u26A0 Cancelled"));
-      return;
     }
 
     const dest = path.resolve(projectName);
@@ -222,6 +306,11 @@ export const createCommand = new Command("create")
 
     // 2. Login (if not authenticated)
     if (!authExists()) {
+      if (!isInteractive()) {
+        console.log(chalk.red("\u2717 Not authenticated"));
+        console.log(chalk.dim("Run `commet login` first"));
+        return;
+      }
       let environment: "sandbox" | "production";
       try {
         environment = await select<"sandbox" | "production">({
@@ -287,9 +376,32 @@ export const createCommand = new Command("create")
 
     let selectedOrg: (typeof organizations)[0];
 
-    if (organizations.length === 1) {
+    if (opts.org) {
+      const match = organizations.find(
+        (org) => org.slug === opts.org || org.id === opts.org,
+      );
+      if (!match) {
+        console.log(chalk.red(`\u2717 Organization "${opts.org}" not found`));
+        console.log(
+          chalk.dim(
+            `Available: ${organizations.map((o) => o.slug).join(", ")}`,
+          ),
+        );
+        return;
+      }
+      selectedOrg = match;
+    } else if (organizations.length === 1) {
       selectedOrg = organizations[0]!;
     } else {
+      if (!isInteractive()) {
+        console.log(chalk.red("\u2717 Organization is required"));
+        console.log(
+          chalk.dim(
+            `Pass --org=<slug>. Available: ${organizations.map((o) => o.slug).join(", ")}`,
+          ),
+        );
+        return;
+      }
       try {
         const orgId = await select({
           message: "Organization:",
@@ -317,8 +429,17 @@ export const createCommand = new Command("create")
       return;
     }
 
-    try {
-      if (!template) {
+    if (!template) {
+      if (!isInteractive()) {
+        console.log(chalk.red("\u2717 Template is required"));
+        console.log(
+          chalk.dim(
+            `Pass --template=<name>. Available: ${TEMPLATES.map((t) => t.name).join(", ")}`,
+          ),
+        );
+        return;
+      }
+      try {
         const selected = await select<TemplateName>({
           message: "Billing model:",
           choices: TEMPLATES.map((t) => ({
@@ -328,14 +449,14 @@ export const createCommand = new Command("create")
           theme: promptTheme,
         });
         template = TEMPLATES.find((t) => t.name === selected)!;
+      } catch {
+        console.log(chalk.yellow("\n\u26A0 Cancelled"));
+        return;
       }
-    } catch {
-      console.log(chalk.yellow("\n\u26A0 Cancelled"));
-      return;
     }
 
     // 5. Agent skills
-    const shouldInstallSkills = await askSkills();
+    const shouldInstallSkills = await resolveSkills(opts);
 
     // 6. Download template
     const downloadSpinner = ora("Downloading template...").start();
@@ -357,7 +478,27 @@ export const createCommand = new Command("create")
     updatePackageJson(dest, projectName);
     copyEnvExample(dest);
 
-    // 7. Create plans in platform
+    // 7. Resolve workspace:* deps to published npm versions
+    const resolveSpinner = ora("Resolving package versions...").start();
+    try {
+      const count = await resolveWorkspaceDeps(dest);
+      if (count > 0) {
+        resolveSpinner.succeed(`Resolved ${count} package versions`);
+      } else {
+        resolveSpinner.stop();
+      }
+    } catch (error) {
+      resolveSpinner.fail("Failed to resolve package versions");
+      if (error instanceof Error) {
+        console.error(chalk.red(error.message));
+      }
+      if (fs.existsSync(dest)) {
+        fs.rmSync(dest, { recursive: true, force: true });
+      }
+      return;
+    }
+
+    // 8. Create plans in platform
     const planSpinner = ora("Creating plans...").start();
     const templateResult = await apiRequest<{
       plansCreated: number;
@@ -379,7 +520,7 @@ export const createCommand = new Command("create")
       );
     }
 
-    // 8. Create API key
+    // 9. Create API key
     const keySpinner = ora("Creating API key...").start();
     const keyResult = await apiRequest<{
       apiKey: string;
@@ -400,15 +541,15 @@ export const createCommand = new Command("create")
       keySpinner.succeed("API key created and saved to .env");
     }
 
-    // 9. Link project
+    // 10. Link project
     linkProject(dest, selectedOrg.id, selectedOrg.name, auth.environment);
 
-    // 10. Install skills
+    // 11. Install skills
     if (shouldInstallSkills) {
       await installSkills(dest);
     }
 
-    // 11. Done
+    // 12. Done
     console.log(chalk.green(`\n\u2713 Created ${projectName}`));
     console.log(chalk.dim(`  Template: ${template.name}`));
     console.log(chalk.dim(`  Organization: ${selectedOrg.name}`));

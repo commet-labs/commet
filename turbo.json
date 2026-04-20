@@ -3,7 +3,14 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
+      "env": [
+        "BETTER_AUTH_URL",
+        "BETTER_AUTH_SECRET",
+        "POSTGRES_URL",
+        "COMMET_API_KEY",
+        "COMMET_ENVIRONMENT"
+      ]
     },
     "dev": {
       "cache": false,
@@ -13,6 +20,10 @@
     "lint:fix": {},
     "typecheck": {
       "dependsOn": ["^build"]
+    },
+    "test": {},
+    "clean": {
+      "cache": false
     }
   }
 }

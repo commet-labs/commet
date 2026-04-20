@@ -48,8 +48,12 @@ try {
   program.parse(process.argv);
 } catch (error) {
   if (error instanceof Error) {
-    if (error.message.includes("outputHelp")) {
-      // Help was displayed, exit cleanly
+    const code = (error as { code?: string }).code;
+    if (
+      code === "commander.version" ||
+      code === "commander.help" ||
+      code === "commander.helpDisplayed"
+    ) {
       process.exit(0);
     }
     console.error(chalk.red("Error:"), error.message);

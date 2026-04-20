@@ -94,7 +94,7 @@ export class CommetHTTPClient {
       const headers: Record<string, string> = {
         "x-api-key": this.config.apiKey,
         "Content-Type": "application/json",
-        "User-Agent": "commet/0.1.0",
+        "User-Agent": "commet-node/1.9.0",
       };
 
       if (options?.idempotencyKey) {
@@ -147,16 +147,6 @@ export class CommetHTTPClient {
             "[Commet SDK] Failed to parse JSON response:",
             responseText,
           );
-        }
-
-        // For 404 errors with invalid JSON, return a graceful response
-        // This handles cases like HTML error pages or empty responses
-        if (response.status === 404) {
-          return {
-            success: false,
-            code: "not_found",
-            message: "Resource not found",
-          } as ApiResponse<T>;
         }
 
         throw new CommetAPIError(
@@ -243,7 +233,16 @@ export class CommetHTTPClient {
       return responseData as ApiResponse<T>;
     } catch (error) {
       // Handle network errors and timeouts
-      if (error instanceof TypeError && error.message.includes("fetch")) {
+      const isNetworkError =
+        error instanceof TypeError && error.message.includes("fetch");
+      const isTimeoutError =
+        error instanceof DOMException && error.name === "AbortError";
+      const isTimeoutErrorModern =
+        typeof globalThis.DOMException !== "undefined" &&
+        error instanceof DOMException &&
+        error.name === "TimeoutError";
+
+      if (isNetworkError || isTimeoutError || isTimeoutErrorModern) {
         if (attempt <= this.retryConfig.maxRetries) {
           const delay = Math.min(
             this.retryConfig.baseDelay * 2 ** (attempt - 1),

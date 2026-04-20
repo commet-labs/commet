@@ -1,6 +1,6 @@
 {
   "name": "@commet/next",
-  "version": "0.3.4",
+  "version": "0.3.7",
   "description": "Next.js integration for Commet billing platform",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -23,7 +23,8 @@
     "lint:fix": "biome lint --write src/",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "clean": "rm -rf .turbo node_modules dist"
   },
   "keywords": [
     "commet",
@@ -39,7 +40,7 @@
   },
   "devDependencies": {
     "@types/node": "24.10.1",
-    "next": "16.2.1",
+    "next": "16.2.3",
     "tsup": "8.5.1",
     "typescript": "5.9.3",
     "vitest": "4.0.13"
