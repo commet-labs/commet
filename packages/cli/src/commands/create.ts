@@ -190,7 +190,7 @@ function linkProject(dest: string, orgId: string, orgName: string) {
   fs.mkdirSync(commetDir, { recursive: true });
   fs.writeFileSync(
     path.join(commetDir, "config.json"),
-    JSON.stringify({ orgId, orgName }, null, 2),
+    JSON.stringify({ orgId, orgName, mode: "sandbox" }, null, 2),
     "utf8",
   );
 }
@@ -304,10 +304,15 @@ export const createCommand = new Command("create")
       }
     }
 
-    // 3. Select organization
-    const orgsSpinner = ora("Fetching organizations...").start();
+    // 3. Select sandbox organization (templates can't run on live orgs)
+    const orgsSpinner = ora("Fetching sandbox organizations...").start();
     const orgsResult = await apiRequest<{
-      organizations: Array<{ id: string; name: string; slug: string }>;
+      organizations: Array<{
+        id: string;
+        name: string;
+        slug: string;
+        mode: "live" | "sandbox";
+      }>;
     }>(`${BASE_URL}/api/cli/organizations`);
 
     if (orgsResult.error || !orgsResult.data) {
@@ -316,11 +321,13 @@ export const createCommand = new Command("create")
       return;
     }
 
-    const { organizations } = orgsResult.data;
+    const organizations = orgsResult.data.organizations.filter(
+      (org) => org.mode === "sandbox",
+    );
     orgsSpinner.stop();
 
     if (organizations.length === 0) {
-      console.log(chalk.yellow("\u26A0 No organizations found"));
+      console.log(chalk.yellow("\u26A0 No sandbox organizations found"));
       console.log(
         chalk.dim("Create an organization at https://commet.co first"),
       );
@@ -357,7 +364,7 @@ export const createCommand = new Command("create")
       }
       try {
         const orgId = await select({
-          message: "Organization:",
+          message: "Sandbox organization:",
           choices: organizations.map((org) => ({
             name: `${org.name} ${chalk.dim(`(${org.slug})`)}`,
             value: org.id,
@@ -505,10 +512,10 @@ export const createCommand = new Command("create")
     // 12. Done
     console.log(chalk.green(`\n\u2713 Created ${projectName}`));
     console.log(chalk.dim(`  Template: ${template.name}`));
-    console.log(chalk.dim(`  Organization: ${selectedOrg.name}`));
+    console.log(chalk.dim(`  Organization: ${selectedOrg.name} · sandbox`));
     console.log();
-    console.log(`  ${chalk.cyan("cd")} ${projectName}`);
-    console.log(`  ${chalk.cyan("npm install")}`);
-    console.log(`  ${chalk.cyan("npm run dev")}`);
+    console.log(`  ${commetColor("cd")} ${projectName}`);
+    console.log(`  ${commetColor("npm install")}`);
+    console.log(`  ${commetColor("npm run dev")}`);
     console.log();
   });

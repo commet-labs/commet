@@ -5,7 +5,6 @@ import ora from "ora";
 import { apiRequest, BASE_URL } from "../utils/api";
 import {
   authExists,
-  loadAuth,
   loadProjectConfig,
   projectConfigExists,
   saveProjectConfig,
@@ -17,6 +16,7 @@ interface Organization {
   id: string;
   name: string;
   slug: string;
+  mode: "live" | "sandbox";
 }
 
 interface OrganizationsResponse {
@@ -27,18 +27,18 @@ interface OrganizationsResponse {
 export const linkCommand = new Command("link")
   .description("Link this project to a Commet organization")
   .action(async () => {
-    // Check auth
     if (!authExists()) {
       console.log(chalk.red("✗ Not authenticated"));
       console.log(chalk.dim("Run `commet login` first"));
       return;
     }
 
-    // Check if already linked
     if (projectConfigExists()) {
       const config = loadProjectConfig();
       console.log(chalk.yellow("⚠ This project is already linked"));
-      console.log(chalk.dim(`Organization: ${config?.orgName}`));
+      console.log(
+        chalk.dim(`Organization: ${config?.orgName} · ${config?.mode}`),
+      );
       console.log(
         chalk.dim(
           "\nRun `commet unlink` first if you want to change the organization",
@@ -48,13 +48,6 @@ export const linkCommand = new Command("link")
     }
 
     const spinner = ora("Fetching organizations...").start();
-
-    const auth = loadAuth();
-    if (!auth) {
-      spinner.fail("Authentication error");
-      console.log(chalk.red("✗ Could not load authentication"));
-      return;
-    }
 
     const result = await apiRequest<OrganizationsResponse>(
       `${BASE_URL}/api/cli/organizations`,
@@ -79,19 +72,17 @@ export const linkCommand = new Command("link")
 
     spinner.stop();
 
-    // Prompt user to select organization only
     let orgId: string;
     try {
       orgId = await select({
         message: "Select organization:",
         choices: organizations.map((org) => ({
-          name: `${org.name} ${chalk.dim(`(${org.slug})`)}`,
+          name: `${org.name} ${chalk.dim(`(${org.slug}) · ${org.mode}`)}`,
           value: org.id,
         })),
         theme: promptTheme,
       });
     } catch (_error) {
-      // User cancelled with Ctrl+C
       console.log(chalk.yellow("\n⚠ Link cancelled"));
       return;
     }
@@ -102,17 +93,18 @@ export const linkCommand = new Command("link")
       return;
     }
 
-    // Save project config
     saveProjectConfig({
       orgId: selectedOrg.id,
       orgName: selectedOrg.name,
+      mode: selectedOrg.mode,
     });
 
-    // Update .gitignore
     const gitignoreResult = updateGitignore(".commet/");
 
     console.log(chalk.green("\n✓ Project linked successfully"));
-    console.log(chalk.dim(`Organization: ${selectedOrg.name}`));
+    console.log(
+      chalk.dim(`Organization: ${selectedOrg.name} · ${selectedOrg.mode}`),
+    );
 
     if (gitignoreResult.success) {
       console.log(chalk.green("✓ Updated .gitignore"));

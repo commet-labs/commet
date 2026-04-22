@@ -38,6 +38,7 @@ export const infoCommand = new Command("info")
     console.log(chalk.green("\nProject: Linked ✓"));
     console.log(chalk.dim("  Organization:"), projectConfig.orgName);
     console.log(chalk.dim("  Organization ID:"), projectConfig.orgId);
+    console.log(chalk.dim("  Mode:"), projectConfig.mode);
     console.log(
       chalk.dim("\nRun `commet pull` to generate type definitions\n"),
     );

@@ -5,7 +5,6 @@ import ora from "ora";
 import { apiRequest, BASE_URL } from "../utils/api";
 import {
   authExists,
-  loadAuth,
   projectConfigExists,
   saveProjectConfig,
 } from "../utils/config";
@@ -15,6 +14,7 @@ interface Organization {
   id: string;
   name: string;
   slug: string;
+  mode: "live" | "sandbox";
 }
 
 interface OrganizationsResponse {
@@ -25,14 +25,12 @@ interface OrganizationsResponse {
 export const switchCommand = new Command("switch")
   .description("Switch to a different organization")
   .action(async () => {
-    // Check auth
     if (!authExists()) {
       console.log(chalk.red("✗ Not authenticated"));
       console.log(chalk.dim("Run `commet login` first"));
       return;
     }
 
-    // Check if project is linked
     if (!projectConfigExists()) {
       console.log(chalk.yellow("⚠ Project not linked"));
       console.log(
@@ -42,13 +40,6 @@ export const switchCommand = new Command("switch")
     }
 
     const spinner = ora("Fetching organizations...").start();
-
-    const auth = loadAuth();
-    if (!auth) {
-      spinner.fail("Authentication error");
-      console.log(chalk.red("✗ Could not load authentication"));
-      return;
-    }
 
     const result = await apiRequest<OrganizationsResponse>(
       `${BASE_URL}/api/cli/organizations`,
@@ -70,19 +61,17 @@ export const switchCommand = new Command("switch")
 
     spinner.stop();
 
-    // Prompt user to select organization
     let orgId: string;
     try {
       orgId = await select({
         message: "Select organization:",
         choices: organizations.map((org) => ({
-          name: `${org.name} ${chalk.dim(`(${org.slug})`)}`,
+          name: `${org.name} ${chalk.dim(`(${org.slug}) · ${org.mode}`)}`,
           value: org.id,
         })),
         theme: promptTheme,
       });
     } catch (_error) {
-      // User cancelled with Ctrl+C
       console.log(chalk.yellow("\n⚠ Switch cancelled"));
       return;
     }
@@ -93,15 +82,16 @@ export const switchCommand = new Command("switch")
       return;
     }
 
-    // Save project config
     saveProjectConfig({
       orgId: selectedOrg.id,
       orgName: selectedOrg.name,
+      mode: selectedOrg.mode,
     });
 
     console.log(chalk.green("\n✓ Switched organization successfully!"));
-    console.log(chalk.dim("\nNew configuration:"));
-    console.log(chalk.dim(`  Organization: ${selectedOrg.name}`));
+    console.log(
+      chalk.dim(`\nOrganization: ${selectedOrg.name} · ${selectedOrg.mode}`),
+    );
     console.log(
       chalk.dim(
         "\nRun `commet pull` to update TypeScript types for this organization",

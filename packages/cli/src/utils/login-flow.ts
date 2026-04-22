@@ -3,6 +3,7 @@ import open from "open";
 import ora from "ora";
 import { BASE_URL } from "./api";
 import { saveAuth } from "./config";
+import { commetColor } from "./prompt-theme";
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -43,7 +44,7 @@ export async function performLogin(): Promise<boolean> {
 
     console.log(chalk.bold("\n\u{1F510} Commet CLI Login\n"));
     console.log("Visit the following URL in your browser:");
-    console.log(chalk.cyan.underline(verification_uri_complete));
+    console.log(commetColor.underline(verification_uri_complete));
     console.log("\nOr enter this code manually:");
     console.log(chalk.bold.green(`  ${user_code}`));
     console.log(chalk.dim("\nOpening browser...\n"));

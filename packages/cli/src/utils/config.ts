@@ -13,6 +13,7 @@ interface AuthConfig {
 interface ProjectConfig {
   orgId: string;
   orgName: string;
+  mode: "live" | "sandbox";
 }
 
 // Get paths

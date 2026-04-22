@@ -5,7 +5,7 @@
 "commet": minor
 ---
 
-Unify sandbox and production into a single environment. Sandbox no longer exists — everything runs on `https://commet.co`.
+Unify auth between sandbox and production. A single login now gives access to both live and sandbox organizations.
 
 **@commet/node (breaking):** Removed the `environment` option from `CommetConfig`. Also removed `isSandbox()`, `isProduction()`, `getEnvironment()`, and the `Environment` type. If you were passing `environment: "production"`, just drop the line.
 
@@ -16,7 +16,11 @@ const commet = new Commet({
 });
 ```
 
-**commet (CLI):** Removed the sandbox/production selector from `commet login` and `commet create`. The `environment` field is no longer written to `~/.commet/auth.json` or `.commet/config.json` (existing files still load, the field is ignored). The sandbox-only restriction on `commet create` is gone — templates can be created in any organization.
+**commet (CLI):**
+- `commet login` no longer prompts for environment — a single token grants access to every org the user can see.
+- `commet link` / `commet switch` now list both live and sandbox orgs together, showing the mode next to each.
+- `commet create` filters to sandbox orgs automatically (the API still enforces sandbox-only for templates).
+- `.commet/config.json` now persists `mode: "live" | "sandbox"` alongside the org; `whoami` and `info` surface it.
 
 **@commet/next:** Removed the `environment` option from `CustomerPortal` route handler config.
 
