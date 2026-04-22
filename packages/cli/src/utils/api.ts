@@ -1,14 +1,6 @@
 import { loadAuth } from "./config";
 
-/**
- * Get base URL for Commet platform
- */
-export function getBaseURL(environment: "sandbox" | "production"): string {
-  if (environment === "production") {
-    return "https://commet.co";
-  }
-  return "https://sandbox.commet.co";
-}
+export const BASE_URL = "https://commet.co";
 
 export async function apiRequest<T>(
   endpoint: string,

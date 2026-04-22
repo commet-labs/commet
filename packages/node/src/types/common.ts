@@ -1,8 +1,5 @@
-export type Environment = "sandbox" | "production";
-
 export type CommetConfig = {
   apiKey: string;
-  environment?: Environment;
   debug?: boolean;
   timeout?: number;
   retries?: number;

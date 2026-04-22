@@ -4,7 +4,6 @@ import { type NextRequest, NextResponse } from "next/server";
 export interface CustomerPortalConfig {
   apiKey: string;
   getCustomerId: (req: NextRequest) => Promise<string | null>;
-  environment?: "sandbox" | "production";
   onError?: (error: Error) => void;
 }
 
@@ -40,13 +39,11 @@ export interface CustomerPortalConfig {
  */
 export const CustomerPortal = ({
   apiKey,
-  environment = "production",
   getCustomerId,
   onError,
 }: CustomerPortalConfig) => {
   const commet = new Commet({
     apiKey,
-    environment,
   });
 
   return async (req: NextRequest) => {

@@ -19,7 +19,6 @@ export const whoamiCommand = new Command("whoami")
     if (projectConfig) {
       console.log(chalk.bold("\nProject:"));
       console.log(chalk.dim("Organization:"), projectConfig.orgName);
-      console.log(chalk.dim("Environment:"), projectConfig.environment);
     } else {
       console.log(chalk.yellow("\n⚠ No project linked"));
       console.log(

@@ -3,14 +3,11 @@ import { CommetAPIError, CommetValidationError } from "../types/common";
 import { CommetHTTPClient } from "../utils/http";
 
 function createClient(overrides: Record<string, unknown> = {}) {
-  return new CommetHTTPClient(
-    {
-      apiKey: "ck_test_abc123",
-      timeout: 5000,
-      ...overrides,
-    },
-    (overrides.environment as "sandbox" | "production") ?? "sandbox",
-  );
+  return new CommetHTTPClient({
+    apiKey: "ck_test_abc123",
+    timeout: 5000,
+    ...overrides,
+  });
 }
 
 function jsonResponse(body: unknown, status = 200): Response {
@@ -32,22 +29,8 @@ describe("CommetHTTPClient", () => {
   });
 
   describe("URL building", () => {
-    it("builds sandbox URL with /api prefix", async () => {
+    it("builds URL with /api prefix", async () => {
       const client = createClient();
-      vi.mocked(fetch).mockResolvedValueOnce(
-        jsonResponse({ success: true, data: {} }),
-      );
-
-      await client.get("/customers");
-
-      expect(fetch).toHaveBeenCalledWith(
-        "https://sandbox.commet.co/api/customers",
-        expect.any(Object),
-      );
-    });
-
-    it("builds production URL", async () => {
-      const client = createClient({ environment: "production" });
       vi.mocked(fetch).mockResolvedValueOnce(
         jsonResponse({ success: true, data: {} }),
       );
@@ -100,7 +83,7 @@ describe("CommetHTTPClient", () => {
       await client.get("customers");
 
       expect(fetch).toHaveBeenCalledWith(
-        "https://sandbox.commet.co/api/customers",
+        "https://commet.co/api/customers",
         expect.any(Object),
       );
     });

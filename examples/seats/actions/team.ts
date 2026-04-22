@@ -238,9 +238,7 @@ export async function checkSubscriptionStatusAction(): Promise<SubscriptionStatu
       "statusCode" in error &&
       error.statusCode === 429
     ) {
-      console.warn(
-        "Rate limit reached - this is expected in sandbox with frequent refreshes",
-      );
+      console.warn("Rate limit reached - expected with frequent refreshes");
       return defaultStatus;
     }
     console.error("Error checking subscription status:", error);

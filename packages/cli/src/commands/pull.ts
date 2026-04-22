@@ -3,7 +3,7 @@ import * as path from "node:path";
 import chalk from "chalk";
 import { Command } from "commander";
 import ora from "ora";
-import { apiRequest, getBaseURL } from "../utils/api";
+import { apiRequest, BASE_URL } from "../utils/api";
 import {
   authExists,
   loadProjectConfig,
@@ -77,9 +77,8 @@ export const pullCommand = new Command("pull")
     const spinner = ora("Fetching type definitions...").start();
 
     // Fetch types from API
-    const baseURL = getBaseURL(projectConfig.environment);
     const result = await apiRequest<TypesResponse>(
-      `${baseURL}/api/cli/types?orgId=${projectConfig.orgId}`,
+      `${BASE_URL}/api/cli/types?orgId=${projectConfig.orgId}`,
     );
 
     if (result.error || !result.data) {

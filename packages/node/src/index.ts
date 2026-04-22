@@ -79,7 +79,6 @@ export type {
   CommetGeneratedTypes,
   Currency,
   CustomerID,
-  Environment,
   EventID,
   GeneratedFeatureCode,
   GeneratedPlanCode,
@@ -94,9 +93,6 @@ export {
   CommetError,
   CommetValidationError,
 } from "./types/common";
-
-// Utility exports
-export { isProduction, isSandbox } from "./utils/environment";
 
 // Default export
 import { Commet } from "./client";

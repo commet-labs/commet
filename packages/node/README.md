@@ -39,7 +39,6 @@ import { Commet } from '@commet/node';
 
 const commet = new Commet({
   apiKey: process.env.COMMET_API_KEY,
-  environment: 'production' // or 'sandbox'
 });
 ```
 

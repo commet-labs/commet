@@ -7,8 +7,8 @@ import chalk from "chalk";
 import { Command } from "commander";
 import ora from "ora";
 import { extract as tarExtract } from "tar";
-import { apiRequest, getBaseURL } from "../utils/api";
-import { authExists, loadAuth } from "../utils/config";
+import { apiRequest, BASE_URL } from "../utils/api";
+import { authExists } from "../utils/config";
 import { performLogin } from "../utils/login-flow";
 import { commetColor, promptTheme } from "../utils/prompt-theme";
 
@@ -176,34 +176,21 @@ function copyEnvExample(dest: string) {
   }
 }
 
-function writeApiKeyToEnv(
-  dest: string,
-  apiKey: string,
-  environment: "sandbox" | "production",
-) {
+function writeApiKeyToEnv(dest: string, apiKey: string) {
   const envPath = path.join(dest, ".env");
   if (!fs.existsSync(envPath)) return;
 
   let content = fs.readFileSync(envPath, "utf-8");
   content = content.replace(/COMMET_API_KEY=.*/, `COMMET_API_KEY=${apiKey}`);
-  content = content.replace(
-    /COMMET_ENVIRONMENT=.*/,
-    `COMMET_ENVIRONMENT=${environment}`,
-  );
   fs.writeFileSync(envPath, content);
 }
 
-function linkProject(
-  dest: string,
-  orgId: string,
-  orgName: string,
-  environment: "sandbox" | "production",
-) {
+function linkProject(dest: string, orgId: string, orgName: string) {
   const commetDir = path.join(dest, ".commet");
   fs.mkdirSync(commetDir, { recursive: true });
   fs.writeFileSync(
     path.join(commetDir, "config.json"),
-    JSON.stringify({ orgId, orgName, environment }, null, 2),
+    JSON.stringify({ orgId, orgName }, null, 2),
     "utf8",
   );
 }
@@ -311,51 +298,17 @@ export const createCommand = new Command("create")
         console.log(chalk.dim("Run `commet login` first"));
         return;
       }
-      let environment: "sandbox" | "production";
-      try {
-        environment = await select<"sandbox" | "production">({
-          message: "Environment:",
-          choices: [
-            {
-              name: `Sandbox ${chalk.dim("(Development)")}`,
-              value: "sandbox",
-            },
-            { name: "Production", value: "production" },
-          ],
-          default: "sandbox",
-          theme: promptTheme,
-        });
-      } catch {
-        console.log(chalk.yellow("\n\u26A0 Cancelled"));
-        return;
-      }
-
-      const loggedIn = await performLogin(environment);
+      const loggedIn = await performLogin();
       if (!loggedIn) {
         return;
       }
-    }
-
-    const auth = loadAuth()!;
-    const baseURL = getBaseURL(auth.environment);
-
-    if (auth.environment !== "sandbox") {
-      console.log(
-        chalk.red(
-          "\u2717 `commet create` is only available in sandbox environment",
-        ),
-      );
-      console.log(
-        chalk.dim("Run `commet logout` and login to sandbox to use templates"),
-      );
-      return;
     }
 
     // 3. Select organization
     const orgsSpinner = ora("Fetching organizations...").start();
     const orgsResult = await apiRequest<{
       organizations: Array<{ id: string; name: string; slug: string }>;
-    }>(`${baseURL}/api/cli/organizations`);
+    }>(`${BASE_URL}/api/cli/organizations`);
 
     if (orgsResult.error || !orgsResult.data) {
       orgsSpinner.fail("Failed to fetch organizations");
@@ -503,7 +456,7 @@ export const createCommand = new Command("create")
     const templateResult = await apiRequest<{
       plansCreated: number;
       featuresCreated: number;
-    }>(`${baseURL}/api/cli/templates`, {
+    }>(`${BASE_URL}/api/cli/templates`, {
       method: "POST",
       body: JSON.stringify({
         templateId: template.templateId,
@@ -524,7 +477,7 @@ export const createCommand = new Command("create")
     const keySpinner = ora("Creating API key...").start();
     const keyResult = await apiRequest<{
       apiKey: string;
-    }>(`${baseURL}/api/cli/api-keys`, {
+    }>(`${BASE_URL}/api/cli/api-keys`, {
       method: "POST",
       body: JSON.stringify({
         organizationId: selectedOrg.id,
@@ -537,12 +490,12 @@ export const createCommand = new Command("create")
       console.log(chalk.dim(keyResult.error));
       console.log(chalk.dim("You can create one manually in the dashboard"));
     } else {
-      writeApiKeyToEnv(dest, keyResult.data.apiKey, auth.environment);
+      writeApiKeyToEnv(dest, keyResult.data.apiKey);
       keySpinner.succeed("API key created and saved to .env");
     }
 
     // 10. Link project
-    linkProject(dest, selectedOrg.id, selectedOrg.name, auth.environment);
+    linkProject(dest, selectedOrg.id, selectedOrg.name);
 
     // 11. Install skills
     if (shouldInstallSkills) {

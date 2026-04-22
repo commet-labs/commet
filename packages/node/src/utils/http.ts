@@ -1,10 +1,11 @@
 import type {
   ApiResponse,
   CommetConfig,
-  Environment,
   RequestOptions,
 } from "../types/common";
 import { CommetAPIError, CommetValidationError } from "../types/common";
+
+const BASE_URL = "https://commet.co";
 
 export interface RetryConfig {
   maxRetries: number;
@@ -22,12 +23,10 @@ const DEFAULT_RETRY_CONFIG: RetryConfig = {
 
 export class CommetHTTPClient {
   private config: CommetConfig;
-  private environment: Environment;
   private retryConfig: RetryConfig;
 
-  constructor(config: CommetConfig, environment: Environment) {
+  constructor(config: CommetConfig) {
     this.config = config;
-    this.environment = environment;
     this.retryConfig = {
       ...DEFAULT_RETRY_CONFIG,
       maxRetries: config.retries ?? DEFAULT_RETRY_CONFIG.maxRetries,
@@ -94,7 +93,7 @@ export class CommetHTTPClient {
       const headers: Record<string, string> = {
         "x-api-key": this.config.apiKey,
         "Content-Type": "application/json",
-        "User-Agent": "commet-node/1.9.0",
+        "User-Agent": "commet-node/2.0.0",
       };
 
       if (options?.idempotencyKey) {
@@ -263,20 +262,9 @@ export class CommetHTTPClient {
   }
 
   /**
-   * Get base URL based on environment
-   */
-  private getBaseURL(): string {
-    return this.environment === "production"
-      ? "https://commet.co"
-      : "https://sandbox.commet.co";
-  }
-
-  /**
    * Build full URL from endpoint and params
    */
   private buildURL(endpoint: string, params?: Record<string, unknown>): string {
-    const baseURL = this.getBaseURL();
-
     // Construct full path with /api prefix
     const normalizedEndpoint = endpoint.startsWith("/")
       ? endpoint
@@ -286,11 +274,11 @@ export class CommetHTTPClient {
     // Debug logging
     if (this.config.debug) {
       console.log(
-        `[Commet SDK] Building URL - baseURL: ${baseURL}, endpoint: ${endpoint}, fullPath: ${fullPath}`,
+        `[Commet SDK] Building URL - endpoint: ${endpoint}, fullPath: ${fullPath}`,
       );
     }
 
-    const url = new URL(fullPath, baseURL);
+    const url = new URL(fullPath, BASE_URL);
 
     if (params) {
       for (const [key, value] of Object.entries(params)) {

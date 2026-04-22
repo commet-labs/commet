@@ -7,14 +7,12 @@ interface AuthConfig {
   token: string;
   refreshToken?: string;
   expiresAt?: number;
-  environment: "sandbox" | "production";
 }
 
 // .commet (project config) structure
 interface ProjectConfig {
   orgId: string;
   orgName: string;
-  environment: "sandbox" | "production";
 }
 
 // Get paths

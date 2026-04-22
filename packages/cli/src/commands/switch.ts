@@ -2,7 +2,7 @@ import { select } from "@inquirer/prompts";
 import chalk from "chalk";
 import { Command } from "commander";
 import ora from "ora";
-import { apiRequest, getBaseURL } from "../utils/api";
+import { apiRequest, BASE_URL } from "../utils/api";
 import {
   authExists,
   loadAuth,
@@ -43,7 +43,6 @@ export const switchCommand = new Command("switch")
 
     const spinner = ora("Fetching organizations...").start();
 
-    // Fetch user's organizations from the authenticated environment
     const auth = loadAuth();
     if (!auth) {
       spinner.fail("Authentication error");
@@ -51,9 +50,8 @@ export const switchCommand = new Command("switch")
       return;
     }
 
-    const baseURL = getBaseURL(auth.environment);
     const result = await apiRequest<OrganizationsResponse>(
-      `${baseURL}/api/cli/organizations`,
+      `${BASE_URL}/api/cli/organizations`,
     );
 
     if (result.error || !result.data) {
@@ -72,8 +70,7 @@ export const switchCommand = new Command("switch")
 
     spinner.stop();
 
-    // Prompt user to select organization only
-    // Environment is already determined by the auth token
+    // Prompt user to select organization
     let orgId: string;
     try {
       orgId = await select({
@@ -97,17 +94,14 @@ export const switchCommand = new Command("switch")
     }
 
     // Save project config
-    // Environment comes from the auth token (sandbox or production)
     saveProjectConfig({
       orgId: selectedOrg.id,
       orgName: selectedOrg.name,
-      environment: auth.environment,
     });
 
     console.log(chalk.green("\n✓ Switched organization successfully!"));
     console.log(chalk.dim("\nNew configuration:"));
     console.log(chalk.dim(`  Organization: ${selectedOrg.name}`));
-    console.log(chalk.dim(`  Environment: ${auth.environment}`));
     console.log(
       chalk.dim(
         "\nRun `commet pull` to update TypeScript types for this organization",

@@ -8,7 +8,7 @@ import { SeatsResource } from "./resources/seats";
 import { SubscriptionsResource } from "./resources/subscriptions";
 import { UsageResource } from "./resources/usage";
 import { Webhooks } from "./resources/webhooks";
-import type { CommetConfig, Environment } from "./types/common";
+import type { CommetConfig } from "./types/common";
 import { CommetHTTPClient } from "./utils/http";
 
 /**
@@ -16,7 +16,6 @@ import { CommetHTTPClient } from "./utils/http";
  */
 export class Commet {
   private httpClient: CommetHTTPClient;
-  private environment: Environment;
 
   public readonly customers: CustomersResource;
   public readonly creditPacks: CreditPacksResource;
@@ -39,10 +38,7 @@ export class Commet {
       );
     }
 
-    // Default to sandbox for safety
-    this.environment = config.environment || "sandbox";
-
-    this.httpClient = new CommetHTTPClient(config, this.environment);
+    this.httpClient = new CommetHTTPClient(config);
     this.customers = new CustomersResource(this.httpClient);
     this.creditPacks = new CreditPacksResource(this.httpClient);
     this.plans = new PlansResource(this.httpClient);
@@ -54,13 +50,8 @@ export class Commet {
     this.webhooks = new Webhooks();
 
     if (config.debug) {
-      console.log(`[Commet SDK] Initialized in ${this.environment} mode`);
+      console.log("[Commet SDK] Initialized");
       console.log("API Key:", `${config.apiKey.substring(0, 12)}...`);
-      const baseURL =
-        this.environment === "production"
-          ? "https://commet.co"
-          : "https://sandbox.commet.co";
-      console.log("Base URL:", baseURL);
     }
   }
 
@@ -85,17 +76,5 @@ export class Commet {
       subscriptions: this.subscriptions,
       portal: this.portal,
     });
-  }
-
-  getEnvironment(): Environment {
-    return this.environment;
-  }
-
-  isSandbox(): boolean {
-    return this.environment === "sandbox";
-  }
-
-  isProduction(): boolean {
-    return this.environment === "production";
   }
 }

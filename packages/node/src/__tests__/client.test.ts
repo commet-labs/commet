@@ -2,10 +2,9 @@ import { describe, expect, it } from "vitest";
 import { Commet } from "../client";
 
 describe("Commet client", () => {
-  it("creates client with valid key and sandbox defaults", () => {
+  it("creates client with valid key", () => {
     const client = new Commet({ apiKey: "ck_test_abc123" });
     expect(client).toBeInstanceOf(Commet);
-    expect(client.isSandbox()).toBe(true);
   });
 
   it("rejects invalid API keys", () => {

@@ -48,7 +48,6 @@ import { Commet } from "@commet/node";
 
 const commetClient = new Commet({
   apiKey: process.env.COMMET_API_KEY,
-  environment: "production" // or "sandbox"
 });
 
 const auth = betterAuth({

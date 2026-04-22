@@ -2,7 +2,7 @@ import { select } from "@inquirer/prompts";
 import chalk from "chalk";
 import { Command } from "commander";
 import ora from "ora";
-import { apiRequest, getBaseURL } from "../utils/api";
+import { apiRequest, BASE_URL } from "../utils/api";
 import {
   authExists,
   loadAuth,
@@ -38,9 +38,7 @@ export const linkCommand = new Command("link")
     if (projectConfigExists()) {
       const config = loadProjectConfig();
       console.log(chalk.yellow("⚠ This project is already linked"));
-      console.log(
-        chalk.dim(`Organization: ${config?.orgName} (${config?.environment})`),
-      );
+      console.log(chalk.dim(`Organization: ${config?.orgName}`));
       console.log(
         chalk.dim(
           "\nRun `commet unlink` first if you want to change the organization",
@@ -51,7 +49,6 @@ export const linkCommand = new Command("link")
 
     const spinner = ora("Fetching organizations...").start();
 
-    // Fetch user's organizations from the authenticated environment
     const auth = loadAuth();
     if (!auth) {
       spinner.fail("Authentication error");
@@ -59,9 +56,8 @@ export const linkCommand = new Command("link")
       return;
     }
 
-    const baseURL = getBaseURL(auth.environment);
     const result = await apiRequest<OrganizationsResponse>(
-      `${baseURL}/api/cli/organizations`,
+      `${BASE_URL}/api/cli/organizations`,
     );
 
     if (result.error || !result.data) {
@@ -84,7 +80,6 @@ export const linkCommand = new Command("link")
     spinner.stop();
 
     // Prompt user to select organization only
-    // Environment is already determined by the auth token
     let orgId: string;
     try {
       orgId = await select({
@@ -108,11 +103,9 @@ export const linkCommand = new Command("link")
     }
 
     // Save project config
-    // Environment comes from the auth token (sandbox or production)
     saveProjectConfig({
       orgId: selectedOrg.id,
       orgName: selectedOrg.name,
-      environment: auth.environment,
     });
 
     // Update .gitignore
@@ -120,7 +113,6 @@ export const linkCommand = new Command("link")
 
     console.log(chalk.green("\n✓ Project linked successfully"));
     console.log(chalk.dim(`Organization: ${selectedOrg.name}`));
-    console.log(chalk.dim(`Environment: ${auth.environment}`));
 
     if (gitignoreResult.success) {
       console.log(chalk.green("✓ Updated .gitignore"));

@@ -46,7 +46,6 @@ export type {
  *
  * const commetClient = new Commet({
  *   apiKey: process.env.COMMET_API_KEY,
- *   environment: "production"
  * });
  *
  * const auth = betterAuth({

@@ -1,21 +1,18 @@
 import chalk from "chalk";
 import open from "open";
 import ora from "ora";
-import { getBaseURL } from "./api";
+import { BASE_URL } from "./api";
 import { saveAuth } from "./config";
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export async function performLogin(
-  environment: "sandbox" | "production",
-): Promise<boolean> {
-  const baseURL = getBaseURL(environment);
+export async function performLogin(): Promise<boolean> {
   const spinner = ora("Initiating login flow...").start();
 
   try {
-    const deviceResponse = await fetch(`${baseURL}/api/auth/device/code`, {
+    const deviceResponse = await fetch(`${BASE_URL}/api/auth/device/code`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -54,7 +51,7 @@ export async function performLogin(
     try {
       await open(verification_uri_complete);
     } catch {
-      console.log(chalk.yellow("\u26A0 Could not open browser automatically."));
+      console.log(chalk.yellow("⚠ Could not open browser automatically."));
     }
 
     const pollSpinner = ora("Waiting for authorization...").start();
@@ -67,7 +64,7 @@ export async function performLogin(
       await sleep(pollingInterval * 1000);
 
       try {
-        const tokenResponse = await fetch(`${baseURL}/api/auth/device/token`, {
+        const tokenResponse = await fetch(`${BASE_URL}/api/auth/device/token`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -89,10 +86,8 @@ export async function performLogin(
             token: string;
             refreshToken?: string;
             expiresAt?: number;
-            environment: "sandbox" | "production";
           } = {
             token: tokenData.access_token,
-            environment,
           };
 
           if (tokenData.refresh_token) {
