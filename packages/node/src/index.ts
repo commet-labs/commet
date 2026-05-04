@@ -50,9 +50,11 @@ export type {
 // Subscriptions
 export type {
   ActiveSubscription,
+  CancellationSummary,
   CancelParams,
   CreatedSubscription,
   CreateSubscriptionParams,
+  DiscountSummary,
   FeatureSummary,
   Subscription,
   SubscriptionStatus,

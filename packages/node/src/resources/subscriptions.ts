@@ -41,6 +41,19 @@ export interface BalanceSummary {
   currency: string;
 }
 
+export interface CancellationSummary {
+  scheduledAt: string;
+  reason: string | null;
+  effectiveAt: string;
+}
+
+export interface DiscountSummary {
+  type: "percentage" | "amount";
+  value: number;
+  name: string | null;
+  endsAt: string | null;
+}
+
 export type ConsumptionModel = "metered" | "credits" | "balance";
 
 export interface ActiveSubscription {
@@ -65,6 +78,8 @@ export interface ActiveSubscription {
   features: FeatureSummary[];
   credits: CreditsSummary | null;
   balance: BalanceSummary | null;
+  cancellation: CancellationSummary | null;
+  discount: DiscountSummary | null;
   startDate: string;
   endDate: string | null;
   billingDayOfMonth: number;
