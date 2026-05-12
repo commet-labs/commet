@@ -1,5 +1,6 @@
 export type CommetConfig = {
   apiKey: string;
+  apiVersion?: string;
   debug?: boolean;
   timeout?: number;
   retries?: number;
@@ -100,6 +101,7 @@ export interface RetrieveOptions {
 
 // Request options
 export interface RequestOptions {
+  apiVersion?: string;
   idempotencyKey?: string;
   timeout?: number;
 }

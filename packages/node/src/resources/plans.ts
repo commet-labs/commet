@@ -6,7 +6,7 @@ import type {
 import type { CommetHTTPClient } from "../utils/http";
 
 export type PlanID = `plan_${string}`;
-export type BillingInterval = "monthly" | "quarterly" | "yearly";
+export type BillingInterval = "weekly" | "monthly" | "quarterly" | "yearly";
 export type FeatureType = "boolean" | "metered" | "seats";
 
 export interface PlanPrice {

@@ -4,6 +4,7 @@ import type {
   RequestOptions,
 } from "../types/common";
 import { CommetAPIError, CommetValidationError } from "../types/common";
+import { API_VERSION } from "../version";
 
 const BASE_URL = "https://commet.co";
 
@@ -65,9 +66,10 @@ export class CommetHTTPClient {
     return this.request("DELETE", endpoint, data, options);
   }
 
-  /**
-   * Core request method with retry logic
-   */
+  private resolveApiVersion(options?: RequestOptions): string {
+    return options?.apiVersion ?? this.config.apiVersion ?? API_VERSION;
+  }
+
   private async request<T = unknown>(
     method: string,
     endpoint: string,
@@ -90,10 +92,13 @@ export class CommetHTTPClient {
     attempt = 1,
   ): Promise<ApiResponse<T>> {
     try {
+      const apiVersion = this.resolveApiVersion(options);
+
       const headers: Record<string, string> = {
         "x-api-key": this.config.apiKey,
+        "commet-version": apiVersion,
         "Content-Type": "application/json",
-        "User-Agent": "commet-node/2.0.0",
+        "User-Agent": "commet-node/3.0.0",
       };
 
       if (options?.idempotencyKey) {
@@ -269,7 +274,7 @@ export class CommetHTTPClient {
     const normalizedEndpoint = endpoint.startsWith("/")
       ? endpoint
       : `/${endpoint}`;
-    const fullPath = `/api${normalizedEndpoint}`;
+    const fullPath = `/api/v1${normalizedEndpoint}`;
 
     // Debug logging
     if (this.config.debug) {
