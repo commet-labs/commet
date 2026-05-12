@@ -1,5 +1,17 @@
 # @commet/ai-sdk
 
+## 2.0.0
+
+### Major Changes
+
+- 56ddb2d: Requires `@commet/node` >= 3.0.0 for API versioning support.
+
+### Patch Changes
+
+- Updated dependencies [184be03]
+- Updated dependencies [ed6315a]
+  - @commet/node@3.0.0
+
 ## 1.0.0
 
 ### Patch Changes

@@ -1,5 +1,29 @@
 # @commet/node
 
+## 3.0.0
+
+### Major Changes
+
+- ed6315a: API versioning support: SDK now targets `/api/v1` and always sends `commet-version` header pinned to the release version. Adds `apiVersion` option to both `CommetConfig` (client-level) and `RequestOptions` (per-request override). Exports `API_VERSION` constant.
+
+### Minor Changes
+
+- 184be03: `commet.subscriptions.get(...)` now exposes scheduled cancellation and discount state.
+
+  `ActiveSubscription` adds two optional nested objects:
+
+  - `cancellation: { scheduledAt, reason, effectiveAt } | null` — populated when a cancellation has been requested but the period has not yet ended. `effectiveAt` is when the subscription will actually finish (= current period end).
+  - `discount: { type, value, name, endsAt } | null` — populated when the subscription has an applied discount (promo code, intro offer, etc.).
+
+  Both fields are additive — existing consumers keep working untouched.
+
+  ```ts
+  const sub = await commet.subscriptions.get("user_123");
+  if (sub?.cancellation) {
+    // sub will end on sub.cancellation.effectiveAt
+  }
+  ```
+
 ## 2.0.0
 
 ### Major Changes
