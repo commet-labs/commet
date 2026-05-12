@@ -14,6 +14,14 @@ interface ClientInfo {
   arch: string;
   runtime: string;
   runtimeVersion: string;
+  integrations: string[];
+}
+
+const registeredIntegrations: Set<string> = new Set();
+
+export function registerIntegration(name: string, version: string): void {
+  registeredIntegrations.add(`${name}@${version}`);
+  cachedClientInfo = null;
 }
 
 function detectRuntime(): { name: string; version: string } {
@@ -39,6 +47,7 @@ function collectClientInfo(): ClientInfo {
     arch: process.arch,
     runtime: runtime.name,
     runtimeVersion: runtime.version,
+    integrations: [...registeredIntegrations],
   };
 }
 

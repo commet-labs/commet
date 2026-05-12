@@ -1,3 +1,4 @@
+import { registerIntegration } from "@commet/node";
 import type { BetterAuthPlugin } from "better-auth";
 import {
   onAfterUserCreate,
@@ -22,6 +23,9 @@ export type { UsageConfig } from "./plugins/usage";
 export { usage } from "./plugins/usage";
 export type { WebhookHandler, WebhooksConfig } from "./plugins/webhooks";
 export { webhooks } from "./plugins/webhooks";
+
+declare const __PKG_VERSION__: string;
+registerIntegration("@commet/better-auth", __PKG_VERSION__);
 
 // Re-export types
 export type {

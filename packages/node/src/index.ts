@@ -95,6 +95,7 @@ export {
   CommetError,
   CommetValidationError,
 } from "./types/common";
+export { registerIntegration } from "./utils/telemetry";
 export { API_VERSION, SDK_VERSION } from "./version";
 
 // Default export

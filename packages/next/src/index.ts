@@ -31,6 +31,11 @@
  * @packageDocumentation
  */
 
+import { registerIntegration } from "@commet/node";
+
+declare const __PKG_VERSION__: string;
+registerIntegration("@commet/next", __PKG_VERSION__);
+
 export type { CustomerPortalConfig } from "./portal";
 export { CustomerPortal } from "./portal";
 export type { PricingMarkdownConfig } from "./pricing-markdown";
