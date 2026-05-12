@@ -5,6 +5,11 @@ import type {
 } from "../types/common";
 import { CommetAPIError, CommetValidationError } from "../types/common";
 import { API_VERSION } from "../version";
+import {
+  formatRequestMetrics,
+  getClientInfoHeader,
+  getUserAgent,
+} from "./telemetry";
 
 const BASE_URL = "https://commet.co";
 
@@ -25,9 +30,13 @@ const DEFAULT_RETRY_CONFIG: RetryConfig = {
 export class CommetHTTPClient {
   private config: CommetConfig;
   private retryConfig: RetryConfig;
+  private telemetryEnabled: boolean;
+  private lastRequestMetrics: { requestId: string; durationMs: number } | null =
+    null;
 
   constructor(config: CommetConfig) {
     this.config = config;
+    this.telemetryEnabled = config.telemetry !== false;
     this.retryConfig = {
       ...DEFAULT_RETRY_CONFIG,
       maxRetries: config.retries ?? DEFAULT_RETRY_CONFIG.maxRetries,
@@ -98,8 +107,18 @@ export class CommetHTTPClient {
         "x-api-key": this.config.apiKey,
         "commet-version": apiVersion,
         "Content-Type": "application/json",
-        "User-Agent": "commet-node/3.0.0",
+        "User-Agent": getUserAgent(),
       };
+
+      if (this.telemetryEnabled) {
+        headers["commet-client-info"] = getClientInfoHeader();
+        if (this.lastRequestMetrics) {
+          headers["commet-client-telemetry"] = formatRequestMetrics(
+            this.lastRequestMetrics,
+          );
+          this.lastRequestMetrics = null;
+        }
+      }
 
       if (options?.idempotencyKey) {
         headers["Idempotency-Key"] = options.idempotencyKey;
@@ -126,6 +145,7 @@ export class CommetHTTPClient {
         }
       }
 
+      const requestStart = Date.now();
       const response = await fetch(url, requestConfig);
 
       if (this.config.debug) {
@@ -232,6 +252,14 @@ export class CommetHTTPClient {
 
       if (this.config.debug) {
         console.log("[Commet SDK] Response:", responseData);
+      }
+
+      if (this.telemetryEnabled) {
+        this.lastRequestMetrics = {
+          requestId:
+            response.headers.get("x-request-id") ?? `req_${Date.now()}`,
+          durationMs: Date.now() - requestStart,
+        };
       }
 
       return responseData as ApiResponse<T>;

@@ -95,7 +95,7 @@ export {
   CommetError,
   CommetValidationError,
 } from "./types/common";
-export { API_VERSION } from "./version";
+export { API_VERSION, SDK_VERSION } from "./version";
 
 // Default export
 import { Commet } from "./client";

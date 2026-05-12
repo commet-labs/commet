@@ -4,6 +4,7 @@ export type CommetConfig = {
   debug?: boolean;
   timeout?: number;
   retries?: number;
+  telemetry?: boolean;
 };
 
 // API Response types
