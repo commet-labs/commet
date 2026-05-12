@@ -1,4 +1,4 @@
-import type { PlanFeature } from "@commet/node";
+import type { BillingInterval, PlanFeature } from "@commet/node";
 import { Check } from "lucide-react";
 import { redirect } from "next/navigation";
 import { getPlansAction } from "@/actions/plans";
@@ -19,12 +19,12 @@ function formatPrice(cents: number) {
   return `$${(cents / 100).toFixed(0)}`;
 }
 
-function formatBillingInterval(
-  interval: "monthly" | "yearly" | "quarterly",
-): string {
+function formatBillingInterval(interval: BillingInterval): string {
+  if (interval === "weekly") return "wk";
   if (interval === "monthly") return "mo";
   if (interval === "yearly") return "yr";
-  return "qtr";
+  if (interval === "quarterly") return "qtr";
+  return interval;
 }
 
 function formatFeature(feature: PlanFeature): string {

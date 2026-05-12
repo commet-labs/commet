@@ -1,5 +1,6 @@
 "use server";
 
+import type { BillingInterval } from "@commet/node";
 import { getUser } from "@/lib/auth/session";
 import { commet } from "@/lib/commet";
 
@@ -7,7 +8,7 @@ export interface BillingSubscription {
   id: string;
   planName: string;
   planPrice: number;
-  billingInterval: "monthly" | "quarterly" | "yearly" | null;
+  billingInterval: BillingInterval | null;
   status: string;
 }
 

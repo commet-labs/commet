@@ -18,6 +18,7 @@ export interface PricingMarkdownConfig {
 }
 
 const INTERVAL_SHORT: Record<BillingInterval, string> = {
+  weekly: "/wk",
   monthly: "/mo",
   quarterly: "/qtr",
   yearly: "/yr",

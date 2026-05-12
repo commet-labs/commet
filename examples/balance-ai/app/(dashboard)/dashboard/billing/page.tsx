@@ -1,3 +1,4 @@
+import type { BillingInterval } from "@commet/node";
 import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,10 +15,9 @@ function formatPrice(cents: number): string {
   return `$${(cents / 100).toFixed(2)}`;
 }
 
-function formatBillingInterval(
-  interval: "monthly" | "quarterly" | "yearly" | null,
-): string {
+function formatBillingInterval(interval: BillingInterval | null): string {
   if (interval === null) return "free";
+  if (interval === "weekly") return "week";
   if (interval === "monthly") return "month";
   if (interval === "quarterly") return "quarter";
   return "year";

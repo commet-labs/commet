@@ -1,5 +1,8 @@
 import { ExternalLink } from "lucide-react";
-import { getBillingDataAction } from "@/actions/billing";
+import {
+  type BillingSubscription,
+  getBillingDataAction,
+} from "@/actions/billing";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,9 +17,10 @@ function formatPrice(cents: number): string {
 }
 
 function formatBillingInterval(
-  interval: "monthly" | "quarterly" | "yearly" | null,
+  interval: BillingSubscription["billingInterval"],
 ): string {
   if (interval === null) return "free";
+  if (interval === "weekly") return "week";
   if (interval === "monthly") return "month";
   if (interval === "quarterly") return "quarter";
   return "year";
