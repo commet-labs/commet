@@ -184,9 +184,7 @@ export const listenCommand = new Command("listen")
     );
     console.log(chalk.green("  ✓ Connected to Commet webhook stream"));
     console.log(chalk.cyan(`  ⟶ Forwarding to ${targetUrl}`));
-    console.log(
-      chalk.dim(`  ⟶ Signing secret: ${signingSecret}`),
-    );
+    console.log(chalk.dim(`  ⟶ Signing secret: ${signingSecret}`));
     console.log("");
     console.log("  Ready! Listening for webhook events...");
     console.log("");
