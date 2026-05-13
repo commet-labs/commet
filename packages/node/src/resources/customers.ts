@@ -19,7 +19,6 @@ export interface Customer {
   industry?: string;
   employeeCount?: string;
   metadata?: Record<string, unknown>;
-  isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -60,7 +59,6 @@ export interface UpdateParams {
 }
 
 export interface ListCustomersParams extends BaseListParams {
-  isActive?: boolean;
   search?: string;
 }
 
@@ -164,17 +162,4 @@ export class CustomersResource {
     return this.httpClient.get("/customers", params as Record<string, unknown>);
   }
 
-  /**
-   * Archive a customer
-   */
-  async archive(
-    customerId: CustomerID,
-    options?: RequestOptions,
-  ): Promise<ApiResponse<Customer>> {
-    return this.httpClient.put(
-      `/customers/${customerId}`,
-      { isActive: false },
-      options,
-    );
-  }
 }
