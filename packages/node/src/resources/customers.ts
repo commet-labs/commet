@@ -161,5 +161,4 @@ export class CustomersResource {
   async list(params?: ListCustomersParams): Promise<ApiResponse<Customer[]>> {
     return this.httpClient.get("/customers", params as Record<string, unknown>);
   }
-
 }
