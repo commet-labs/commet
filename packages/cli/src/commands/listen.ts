@@ -10,6 +10,10 @@ interface ListenStartResponse {
   tokenRequest: Ably.TokenRequest;
 }
 
+interface ListenRefreshResponse {
+  tokenRequest: Ably.TokenRequest;
+}
+
 interface ListenOptions {
   port: string;
   events?: string;
@@ -40,16 +44,8 @@ function printEventLine(line: EventLineSuccess | EventLineError) {
   console.log(`  ${chalk.dim(time)}  ${eventName} →  ${status}  ${timing}`);
 }
 
-function isWebhookMessage(
-  data: unknown,
-): data is { event: string; timestamp: string; data: unknown } {
-  if (typeof data !== "object" || data === null) return false;
-  const obj = data as Record<string, unknown>;
-  return (
-    typeof obj.event === "string" &&
-    typeof obj.timestamp === "string" &&
-    "data" in obj
-  );
+function isWebhookPayload(data: unknown): data is Record<string, unknown> {
+  return typeof data === "object" && data !== null;
 }
 
 export const listenCommand = new Command("listen")
@@ -101,13 +97,39 @@ export const listenCommand = new Command("listen")
     }
 
     const initialSession = await fetchTokenRequest();
-    const { sessionId, channelName } = initialSession;
+    const { sessionId, channelName, tokenRequest } = initialSession;
+
+    async function refreshToken(): Promise<Ably.TokenRequest> {
+      const result = await apiRequest<ListenRefreshResponse>(
+        `${BASE_URL}/api/cli/listen/refresh`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            sessionId,
+            organizationId: projectConfig!.orgId,
+          }),
+        },
+      );
+
+      if (result.error || !result.data) {
+        throw new Error(result.error ?? "Failed to refresh token");
+      }
+
+      return result.data.tokenRequest;
+    }
+
+    let isFirstToken = true;
 
     const ably = new Ably.Realtime({
       authCallback: async (_tokenParams, callback) => {
         try {
-          const refreshed = await fetchTokenRequest();
-          callback(null, refreshed.tokenRequest);
+          if (isFirstToken) {
+            isFirstToken = false;
+            callback(null, tokenRequest);
+            return;
+          }
+          const refreshed = await refreshToken();
+          callback(null, refreshed);
         } catch (error) {
           callback(
             error instanceof Error ? error.message : "Token refresh failed",
@@ -157,9 +179,11 @@ export const listenCommand = new Command("listen")
       .filter(Boolean);
 
     channel.subscribe((message: Ably.Message) => {
-      if (!isWebhookMessage(message.data)) return;
+      if (!message.name || !isWebhookPayload(message.data)) return;
 
-      const { event, timestamp, data } = message.data;
+      const event = message.name;
+      const timestamp =
+        message.timestamp?.toString() ?? new Date().toISOString();
 
       if (eventFilter && !eventFilter.includes(event)) return;
 
@@ -172,7 +196,7 @@ export const listenCommand = new Command("listen")
           "X-Commet-Event": event,
           "X-Commet-Timestamp": timestamp,
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(message.data),
       })
         .then((response) => {
           const ms = Math.round(performance.now() - start);
@@ -200,7 +224,10 @@ export const listenCommand = new Command("listen")
 
       await apiRequest(`${BASE_URL}/api/cli/listen/stop`, {
         method: "POST",
-        body: JSON.stringify({ sessionId }),
+        body: JSON.stringify({
+          sessionId,
+          organizationId: projectConfig!.orgId,
+        }),
       });
 
       process.exit(0);

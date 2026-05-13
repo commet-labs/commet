@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import open from "open";
 import ora from "ora";
-import { BASE_URL } from "./api";
+import { BASE_URL, bypassHeaders } from "./api";
 import { saveAuth } from "./config";
 import { commetColor } from "./prompt-theme";
 
@@ -15,7 +15,7 @@ export async function performLogin(): Promise<boolean> {
   try {
     const deviceResponse = await fetch(`${BASE_URL}/api/auth/device/code`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...bypassHeaders() },
       body: JSON.stringify({
         client_id: "commet-cli",
         scope: "openid profile email",
@@ -67,7 +67,7 @@ export async function performLogin(): Promise<boolean> {
       try {
         const tokenResponse = await fetch(`${BASE_URL}/api/auth/device/token`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", ...bypassHeaders() },
           body: JSON.stringify({
             grant_type: "urn:ietf:params:oauth:grant-type:device_code",
             device_code,
