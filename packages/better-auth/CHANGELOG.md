@@ -1,5 +1,11 @@
 # @commet/better-auth
 
+## 4.0.0
+
+### Major Changes
+
+- 40158ef: Remove `archive()` method and `isActive` from Customer type. Pin SDK to API version `2026-05-12`.
+
 ## 3.1.0
 
 ### Minor Changes
