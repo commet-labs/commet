@@ -1,5 +1,11 @@
 # @commet/node
 
+## 4.1.0
+
+### Minor Changes
+
+- a9bf1cf: Add `one_time` to `BillingInterval` type for lifetime/one-time payment plans
+
 ## 4.0.0
 
 ### Major Changes
