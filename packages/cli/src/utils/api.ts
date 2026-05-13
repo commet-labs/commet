@@ -1,14 +1,6 @@
 import { loadAuth } from "./config";
 
-export const BASE_URL = "https://beta.commet.co";
-
-export function bypassHeaders(): Record<string, string> {
-  return {
-    Cookie:
-      "_vercel_jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJiZXRhLmNvbW1ldC5jbyIsImJ5cGFzcyI6IjFERUlTcngyczA3YXFjVmhBbVhDUnhjTEdvOHNZaGFTIiwiaWF0IjoxNzc4NjkxNzMxLCJzdWIiOiJwcm90ZWN0aW9uLWJ5cGFzcy1hdXRvbWF0aW9uIn0.ONjvMguLM-7wXfTppY1cQveu9IN05x4VSblB39YpW_A",
-    Origin: "https://beta.commet.co",
-  };
-}
+export const BASE_URL = "https://commet.co";
 
 export async function apiRequest<T>(
   endpoint: string,
@@ -25,7 +17,6 @@ export async function apiRequest<T>(
       ...options,
       headers: {
         ...options.headers,
-        ...bypassHeaders(),
         Authorization: `Bearer ${auth.token}`,
         "Content-Type": "application/json",
       },
