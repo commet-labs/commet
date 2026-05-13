@@ -1,5 +1,11 @@
 # commet
 
+## 1.8.0
+
+### Minor Changes
+
+- ba8edda: Add `commet listen` command for real-time webhook forwarding to localhost during development
+
 ## 1.7.0
 
 ### Minor Changes
