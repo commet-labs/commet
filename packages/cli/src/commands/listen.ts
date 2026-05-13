@@ -110,7 +110,7 @@ export const listenCommand = new Command("listen")
           callback(null, refreshed.tokenRequest);
         } catch (error) {
           callback(
-            error instanceof Error ? error : new Error("Token refresh failed"),
+            error instanceof Error ? error.message : "Token refresh failed",
             null,
           );
         }
