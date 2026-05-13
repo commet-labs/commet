@@ -22,6 +22,7 @@ const INTERVAL_SHORT: Record<BillingInterval, string> = {
   monthly: "/mo",
   quarterly: "/qtr",
   yearly: "/yr",
+  one_time: "",
 };
 
 export const PricingMarkdown = ({
