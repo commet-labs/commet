@@ -1,5 +1,11 @@
 # commet
 
+## 1.8.1
+
+### Patch Changes
+
+- aa93179: fix: clean up CLI API configuration
+
 ## 1.8.0
 
 ### Minor Changes
