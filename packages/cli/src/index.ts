@@ -7,6 +7,7 @@ import { createCommand } from "./commands/create";
 import { infoCommand } from "./commands/info";
 import { linkCommand } from "./commands/link";
 import { listCommand } from "./commands/list";
+import { listenCommand } from "./commands/listen";
 import { loginCommand } from "./commands/login";
 import { logoutCommand } from "./commands/logout";
 import { pullCommand } from "./commands/pull";
@@ -40,6 +41,8 @@ program.addCommand(infoCommand);
 // Type generation commands
 program.addCommand(pullCommand);
 program.addCommand(listCommand);
+
+program.addCommand(listenCommand);
 
 // Error handling
 program.exitOverride();
