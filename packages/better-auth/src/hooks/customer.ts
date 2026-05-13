@@ -129,36 +129,3 @@ export const onUserUpdate =
     }
   };
 
-/**
- * Hook called when a user is deleted in Better Auth
- * Archives the corresponding Commet customer
- */
-export const onUserDelete =
-  (options: CommetOptions) =>
-  async (user: User, context: GenericEndpointContext | null) => {
-    if (!context || !options.createCustomerOnSignUp) {
-      return;
-    }
-
-    try {
-      // Find customer by externalId and archive
-      const existingCustomers = await options.client.customers.list({
-        externalId: user.id,
-      });
-
-      const existingCustomer = existingCustomers.data?.[0];
-
-      if (existingCustomer) {
-        await options.client.customers.archive(existingCustomer.id);
-      }
-    } catch (e: unknown) {
-      // Log but don't throw - archive failures shouldn't break the auth flow
-      if (e instanceof Error) {
-        context?.context.logger.error(
-          `Commet customer archive failed: ${e.message}`,
-        );
-      } else {
-        context?.context.logger.error("Commet customer archive failed");
-      }
-    }
-  };

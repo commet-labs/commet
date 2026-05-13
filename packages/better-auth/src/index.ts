@@ -3,7 +3,6 @@ import type { BetterAuthPlugin } from "better-auth";
 import {
   onAfterUserCreate,
   onBeforeUserCreate,
-  onUserDelete,
   onUserUpdate,
 } from "./hooks/customer";
 import type { CommetEndpoints, CommetOptions } from "./types";
@@ -103,9 +102,6 @@ export const commet = <O extends CommetOptions>(options: O) => {
               },
               update: {
                 after: onUserUpdate(options),
-              },
-              delete: {
-                after: onUserDelete(options),
               },
             },
           },
