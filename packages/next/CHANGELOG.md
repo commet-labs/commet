@@ -1,5 +1,13 @@
 # @commet/next
 
+## 0.5.2
+
+### Patch Changes
+
+- a9bf1cf: Add `one_time` to `BillingInterval` type for lifetime/one-time payment plans
+- Updated dependencies [a9bf1cf]
+  - @commet/node@4.1.0
+
 ## 0.5.1
 
 ### Patch Changes
