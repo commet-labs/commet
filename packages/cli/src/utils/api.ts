@@ -1,6 +1,6 @@
 import { loadAuth } from "./config";
 
-export const BASE_URL = "https://commet.co";
+export const BASE_URL = process.env.COMMET_API_URL || "https://commet.co";
 
 export async function apiRequest<T>(
   endpoint: string,
