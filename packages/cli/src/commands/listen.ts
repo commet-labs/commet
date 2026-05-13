@@ -7,6 +7,7 @@ import { loadAuth, loadProjectConfig } from "../utils/config";
 interface ListenStartResponse {
   sessionId: string;
   channelName: string;
+  signingSecret: string;
   tokenRequest: Ably.TokenRequest;
 }
 
@@ -44,8 +45,20 @@ function printEventLine(line: EventLineSuccess | EventLineError) {
   console.log(`  ${chalk.dim(time)}  ${eventName} →  ${status}  ${timing}`);
 }
 
-function isWebhookPayload(data: unknown): data is Record<string, unknown> {
-  return typeof data === "object" && data !== null;
+interface ListenMessage {
+  payload: Record<string, unknown>;
+  headers: Record<string, string>;
+}
+
+function isListenMessage(data: unknown): data is ListenMessage {
+  if (typeof data !== "object" || data === null) return false;
+  const obj = data as Record<string, unknown>;
+  return (
+    typeof obj.payload === "object" &&
+    obj.payload !== null &&
+    typeof obj.headers === "object" &&
+    obj.headers !== null
+  );
 }
 
 export const listenCommand = new Command("listen")
@@ -75,6 +88,7 @@ export const listenCommand = new Command("listen")
     async function fetchTokenRequest(): Promise<{
       sessionId: string;
       channelName: string;
+      signingSecret: string;
       tokenRequest: Ably.TokenRequest;
     }> {
       const result = await apiRequest<ListenStartResponse>(
@@ -97,7 +111,8 @@ export const listenCommand = new Command("listen")
     }
 
     const initialSession = await fetchTokenRequest();
-    const { sessionId, channelName, tokenRequest } = initialSession;
+    const { sessionId, channelName, signingSecret, tokenRequest } =
+      initialSession;
 
     async function refreshToken(): Promise<Ably.TokenRequest> {
       const result = await apiRequest<ListenRefreshResponse>(
@@ -169,6 +184,9 @@ export const listenCommand = new Command("listen")
     );
     console.log(chalk.green("  ✓ Connected to Commet webhook stream"));
     console.log(chalk.cyan(`  ⟶ Forwarding to ${targetUrl}`));
+    console.log(
+      chalk.dim(`  ⟶ Signing secret: ${signingSecret}`),
+    );
     console.log("");
     console.log("  Ready! Listening for webhook events...");
     console.log("");
@@ -179,11 +197,10 @@ export const listenCommand = new Command("listen")
       .filter(Boolean);
 
     channel.subscribe((message: Ably.Message) => {
-      if (!message.name || !isWebhookPayload(message.data)) return;
+      if (!message.name || !isListenMessage(message.data)) return;
 
       const event = message.name;
-      const timestamp =
-        message.timestamp?.toString() ?? new Date().toISOString();
+      const { payload, headers } = message.data;
 
       if (eventFilter && !eventFilter.includes(event)) return;
 
@@ -191,12 +208,8 @@ export const listenCommand = new Command("listen")
 
       fetch(targetUrl, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Commet-Event": event,
-          "X-Commet-Timestamp": timestamp,
-        },
-        body: JSON.stringify(message.data),
+        headers,
+        body: JSON.stringify(payload),
       })
         .then((response) => {
           const ms = Math.round(performance.now() - start);
