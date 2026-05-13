@@ -37,9 +37,7 @@ function printEventLine(line: EventLineSuccess | EventLineError) {
       ? chalk.green(`${line.statusCode} OK`)
       : chalk.red(`${line.statusCode} Error`);
 
-  console.log(
-    `  ${chalk.dim(time)}  ${eventName} →  ${status}  ${timing}`,
-  );
+  console.log(`  ${chalk.dim(time)}  ${eventName} →  ${status}  ${timing}`);
 }
 
 function isWebhookMessage(
