@@ -16,9 +16,7 @@ interface ListenRefreshResponse {
 }
 
 interface ListenOptions {
-  port: string;
   events?: string;
-  path: string;
 }
 
 type EventLineSuccess = { event: string; statusCode: number; ms: number };
@@ -61,12 +59,39 @@ function isListenMessage(data: unknown): data is ListenMessage {
   );
 }
 
+function resolveTargetUrl(input: string): string {
+  if (/^\d+$/.test(input)) {
+    return `http://localhost:${input}/`;
+  }
+
+  const withProtocol =
+    input.startsWith("http://") || input.startsWith("https://")
+      ? input
+      : `http://${input}`;
+
+  const parsed = new URL(withProtocol);
+
+  if (!parsed.port) {
+    throw new Error(
+      `Missing port in "${input}". Example: commet listen localhost:3000/webhooks`,
+    );
+  }
+
+  if (!parsed.pathname.endsWith("/")) {
+    parsed.pathname += "/";
+  }
+
+  return parsed.toString();
+}
+
 export const listenCommand = new Command("listen")
   .description("Forward webhook events to your local server")
-  .requiredOption("--port <number>", "Local port to forward to")
+  .argument(
+    "<url>",
+    "URL to forward to (e.g. localhost:3000, local.commet.co:3010/webhooks, or just a port)",
+  )
   .option("--events <types>", "Comma-separated event types to filter")
-  .option("--path <path>", "Path within localhost", "/")
-  .action(async (options: ListenOptions) => {
+  .action(async (url: string, options: ListenOptions) => {
     const auth = loadAuth();
     if (!auth) {
       console.log(chalk.red("Not authenticated. Run: commet login"));
@@ -79,9 +104,13 @@ export const listenCommand = new Command("listen")
       process.exit(1);
     }
 
-    const port = Number(options.port);
-    if (Number.isNaN(port) || port <= 0 || port > 65535) {
-      console.log(chalk.red("Invalid port number"));
+    let targetUrl: string;
+    try {
+      targetUrl = resolveTargetUrl(url);
+    } catch (error) {
+      console.log(
+        chalk.red(error instanceof Error ? error.message : "Invalid URL"),
+      );
       process.exit(1);
     }
 
@@ -175,8 +204,6 @@ export const listenCommand = new Command("listen")
     });
 
     const channel = ably.channels.get(channelName);
-
-    const targetUrl = `http://localhost:${port}${options.path}`;
 
     console.log("");
     console.log(
