@@ -39,12 +39,12 @@
     "ai": ">=6.0.0"
   },
   "devDependencies": {
-    "@ai-sdk/provider": "^3.0.0",
+    "@ai-sdk/provider": "^3.0.10",
     "@commet/node": "workspace:*",
-    "@types/node": "24.10.1",
-    "ai": "^6.0.0",
+    "@types/node": "25.8.0",
+    "ai": "^6.0.184",
     "tsup": "8.5.1",
-    "typescript": "5.9.3"
+    "typescript": "6.0.3"
   },
   "engines": {
     "node": ">=18.0.0"
