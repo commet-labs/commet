@@ -1,5 +1,11 @@
 # commet
 
+## 1.9.0
+
+### Minor Changes
+
+- 351c323: Accept a full URL in `commet listen` instead of just a port number. Supports `localhost:3000`, `local.commet.co:3010/webhooks`, or a bare port for backwards compatibility.
+
 ## 1.8.1
 
 ### Patch Changes
