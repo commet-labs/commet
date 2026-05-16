@@ -39,10 +39,10 @@
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
-    "@types/node": "24.10.1",
+    "@types/node": "24.12.4",
     "tsup": "8.5.1",
     "typescript": "5.9.3",
-    "vitest": "4.0.13"
+    "vitest": "4.1.6"
   },
   "peerDependencies": {
     "typescript": ">=5.0.0"

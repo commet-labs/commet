@@ -17,10 +17,10 @@
     "release": "turbo build --filter=./packages/* && changeset publish"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.10",
-    "@changesets/cli": "2.30.0",
-    "@types/node": "25.5.0",
-    "turbo": "2.9.1",
+    "@biomejs/biome": "2.4.15",
+    "@changesets/cli": "2.31.0",
+    "@types/node": "24.12.4",
+    "turbo": "2.9.14",
     "typescript": "6.0.2"
   },
   "packageManager": "pnpm@10.28.0",
