@@ -1,5 +1,11 @@
 # @commet/node
 
+## 4.2.0
+
+### Minor Changes
+
+- d559237: Add `featureCode` as the recommended param for seats operations (`add`, `remove`, `set`, `getBalance`). The `seatType` param is now deprecated but continues to work. Response objects now include both `featureCode` and `seatType` fields.
+
 ## 4.1.0
 
 ### Minor Changes
