@@ -81,7 +81,7 @@ export const listCommand = new Command("list")
     const spinner = ora(`Fetching ${type}...`).start();
 
     const result = await apiRequest<TypesResponse>(
-      `${BASE_URL}/api/cli/types?orgId=${projectConfig.orgId}`,
+      `${BASE_URL}/api/cli/pull?orgId=${projectConfig.orgId}`,
     );
 
     if (result.error || !result.data) {

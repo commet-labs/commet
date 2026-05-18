@@ -104,7 +104,7 @@ export const pushCommand = new Command("push")
       : ora("Fetching remote state...").start();
 
     const remoteResult = await apiRequest<ConfigResponse>(
-      `${BASE_URL}/api/cli/types?orgId=${projectConfig.orgId}&mode=config`,
+      `${BASE_URL}/api/cli/pull?orgId=${projectConfig.orgId}`,
     );
 
     if (remoteResult.error || !remoteResult.data) {
