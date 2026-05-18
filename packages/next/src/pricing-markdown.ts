@@ -293,7 +293,7 @@ function collectUsageFeatures(plans: Plan[]): UsageFeatureColumn[] {
   for (const plan of plans) {
     for (const feature of plan.features) {
       if (
-        (feature.type === "metered" || feature.type === "seats") &&
+        (feature.type === "usage" || feature.type === "seats") &&
         !seen.has(feature.code) &&
         hasUsageData(feature)
       ) {
