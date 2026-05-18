@@ -52,7 +52,7 @@ export const pushCommand = new Command("push")
         console.log(chalk.red("✗ Not authenticated"));
         console.log(chalk.dim("Run `commet login` first"));
       }
-      return;
+      process.exit(1);
     }
 
     if (!projectConfigExists()) {
@@ -64,7 +64,7 @@ export const pushCommand = new Command("push")
           chalk.dim("Run `commet link` first to connect to an organization"),
         );
       }
-      return;
+      process.exit(1);
     }
 
     const projectConfig = loadProjectConfig();
@@ -74,7 +74,7 @@ export const pushCommand = new Command("push")
       } else {
         console.log(chalk.red("✗ Invalid project configuration"));
       }
-      return;
+      process.exit(1);
     }
 
     const loadSpinner = jsonMode
@@ -94,7 +94,7 @@ export const pushCommand = new Command("push")
       },
     );
 
-    if (!loaded) return;
+    if (!loaded) process.exit(1);
 
     const { config, configPath } = loaded;
     loadSpinner?.succeed(`Loaded ${configPath}`);
@@ -114,7 +114,7 @@ export const pushCommand = new Command("push")
         fetchSpinner?.fail("Failed to fetch remote state");
         console.error(chalk.red("Error:"), remoteResult.error);
       }
-      return;
+      process.exit(1);
     }
 
     fetchSpinner?.succeed("Remote state fetched");
@@ -169,7 +169,7 @@ export const pushCommand = new Command("push")
           console.log(chalk.red(`  - ${change.code}`));
         }
       }
-      return;
+      process.exit(1);
     }
 
     if (options.dryRun) {
@@ -214,17 +214,20 @@ export const pushCommand = new Command("push")
         pushSpinner?.fail("Push failed");
         console.error(chalk.red("Error:"), pushResult.error);
       }
-      return;
+      process.exit(1);
     }
 
-    const result = pushResult.data;
+    const pushOutcome = pushResult.data;
 
     if (jsonMode) {
-      console.log(JSON.stringify({ diff, applied: true, result }));
+      console.log(JSON.stringify({ diff, applied: true, result: pushOutcome }));
       return;
     }
 
-    const errors = [...result.features.errors, ...result.plans.errors];
+    const errors = [
+      ...pushOutcome.features.errors,
+      ...pushOutcome.plans.errors,
+    ];
 
     if (errors.length > 0) {
       pushSpinner?.warn("Push completed with errors");
@@ -235,28 +238,30 @@ export const pushCommand = new Command("push")
       pushSpinner?.succeed("Push complete");
     }
 
-    if (result.features.created.length > 0) {
+    if (pushOutcome.features.created.length > 0) {
       console.log(
         chalk.green(
-          `  Created features: ${result.features.created.join(", ")}`,
+          `  Created features: ${pushOutcome.features.created.join(", ")}`,
         ),
       );
     }
-    if (result.features.updated.length > 0) {
+    if (pushOutcome.features.updated.length > 0) {
       console.log(
         chalk.yellow(
-          `  Updated features: ${result.features.updated.join(", ")}`,
+          `  Updated features: ${pushOutcome.features.updated.join(", ")}`,
         ),
       );
     }
-    if (result.plans.created.length > 0) {
+    if (pushOutcome.plans.created.length > 0) {
       console.log(
-        chalk.green(`  Created plans: ${result.plans.created.join(", ")}`),
+        chalk.green(`  Created plans: ${pushOutcome.plans.created.join(", ")}`),
       );
     }
-    if (result.plans.updated.length > 0) {
+    if (pushOutcome.plans.updated.length > 0) {
       console.log(
-        chalk.yellow(`  Updated plans: ${result.plans.updated.join(", ")}`),
+        chalk.yellow(
+          `  Updated plans: ${pushOutcome.plans.updated.join(", ")}`,
+        ),
       );
     }
   });

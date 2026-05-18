@@ -61,20 +61,25 @@ export async function loadBillingConfig(
   const configPath = findConfigFile(cwd);
   if (!configPath) {
     throw new Error(
-      `No commet.config.ts found in ${cwd}. Create one with defineConfig() or run 'commet pull --config' to generate it.`,
+      `No commet.config.ts found in ${cwd}. Create one with defineConfig() or run 'commet pull' to generate it.`,
     );
   }
 
   const jiti = createJiti(configPath, { interopDefault: true });
-  const mod = (await jiti.import(configPath)) as Record<string, unknown>;
+  const mod: unknown = await jiti.import(configPath);
 
-  if (!mod.default) {
+  if (!mod || typeof mod !== "object") {
+    throw new Error(`${configPath}: failed to load config module`);
+  }
+
+  const moduleRecord = mod as Record<string, unknown>;
+  if (!moduleRecord.default) {
     throw new Error(
       `${configPath}: must use \`export default defineConfig({...})\``,
     );
   }
 
-  const config = mod.default as LoadedConfig;
+  const config = moduleRecord.default as LoadedConfig;
 
   validateConfig(config, configPath);
 

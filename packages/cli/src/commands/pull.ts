@@ -10,7 +10,11 @@ import {
   loadProjectConfig,
   projectConfigExists,
 } from "../utils/config";
-import { findConfigFile, loadBillingConfig } from "../utils/config-loader";
+import {
+  findConfigFile,
+  type LoadedConfig,
+  loadBillingConfig,
+} from "../utils/config-loader";
 import { computeDiff, formatDiff, type RemoteState } from "../utils/diff";
 import { generateConfigFile } from "../utils/generator";
 
@@ -20,7 +24,7 @@ interface Feature {
   code: string;
   name: string;
   description?: string | null;
-  type: string;
+  type: "boolean" | "metered" | "seats";
   unitName?: string | null;
 }
 
@@ -30,7 +34,7 @@ interface Plan {
   code: string;
   name: string;
   description?: string | null;
-  consumptionModel?: string | null;
+  consumptionModel?: "metered" | "credits" | "balance" | null;
   isFree?: boolean;
   isPublic?: boolean;
   sortOrder?: number;
@@ -76,7 +80,7 @@ export const pullCommand = new Command("pull")
         console.log(chalk.red("✗ Not authenticated"));
         console.log(chalk.dim("Run `commet login` first"));
       }
-      return;
+      process.exit(1);
     }
 
     if (!projectConfigExists()) {
@@ -88,7 +92,7 @@ export const pullCommand = new Command("pull")
           chalk.dim("Run `commet link` first to connect to an organization"),
         );
       }
-      return;
+      process.exit(1);
     }
 
     const projectConfig = loadProjectConfig();
@@ -98,7 +102,7 @@ export const pullCommand = new Command("pull")
       } else {
         console.log(chalk.red("✗ Invalid project configuration"));
       }
-      return;
+      process.exit(1);
     }
 
     const spinner = jsonMode
@@ -116,7 +120,7 @@ export const pullCommand = new Command("pull")
         spinner?.fail("Failed to fetch config");
         console.error(chalk.red("Error:"), result.error);
       }
-      return;
+      process.exit(1);
     }
 
     spinner?.succeed("Remote state fetched");
@@ -169,30 +173,35 @@ export const pullCommand = new Command("pull")
     }
 
     const localLoaded = await loadBillingConfig(process.cwd()).catch(
-      () => null,
+      (error: unknown) => ({
+        parseError: error instanceof Error ? error.message : String(error),
+      }),
     );
 
-    if (!localLoaded) {
+    if ("parseError" in localLoaded) {
       if (options.dryRun) {
         if (jsonMode) {
           console.log(
             JSON.stringify({
               action: "overwrite",
-              reason: "local config invalid",
+              reason: localLoaded.parseError,
               applied: false,
             }),
           );
         } else {
           console.log(
-            chalk.yellow("\n⚠ Local config is invalid, would overwrite"),
+            chalk.yellow(
+              `\n⚠ Local config is invalid: ${localLoaded.parseError}`,
+            ),
           );
         }
         return;
       }
 
       if (!options.yes && !jsonMode) {
+        console.log(chalk.yellow(`\n⚠ ${localLoaded.parseError}`));
         const shouldProceed = await confirm({
-          message: "Local config is invalid. Overwrite with remote?",
+          message: "Overwrite with remote?",
           default: true,
         });
         if (!shouldProceed) {
@@ -212,39 +221,68 @@ export const pullCommand = new Command("pull")
 
     const localConfig = localLoaded.config;
 
-    const remoteAsLocal: RemoteState = {
-      features: features.map((f) => ({
-        code: f.code,
+    const remoteAsConfig: LoadedConfig = {
+      features: Object.fromEntries(
+        features.map((f) => [
+          f.code,
+          {
+            name: f.name,
+            type: f.type,
+            ...(f.unitName ? { unitName: f.unitName } : {}),
+            ...(f.description ? { description: f.description } : {}),
+          },
+        ]),
+      ),
+      plans: Object.fromEntries(
+        plans.map((p) => [
+          p.code,
+          {
+            name: p.name,
+            ...(p.description ? { description: p.description } : {}),
+            ...(p.consumptionModel
+              ? {
+                  consumptionModel: p.consumptionModel,
+                }
+              : {}),
+            ...(p.isFree ? { isFree: true } : {}),
+            ...(p.isPublic === false ? { isPublic: false } : {}),
+            ...(p.sortOrder ? { sortOrder: p.sortOrder } : {}),
+            prices: (p.prices ?? []).map((pr) => ({
+              interval: pr.billingInterval,
+              amount: pr.price,
+              ...(pr.trialDays ? { trialDays: pr.trialDays } : {}),
+            })),
+          },
+        ]),
+      ),
+    };
+
+    const localAsRemote: RemoteState = {
+      features: Object.entries(localConfig.features).map(([code, f]) => ({
+        code,
         name: f.name,
         type: f.type,
-        description: f.description,
-        unitName: f.unitName,
+        description: f.description ?? null,
+        unitName: f.unitName ?? null,
       })),
-      plans: plans.map((p) => ({
-        code: p.code,
+      plans: Object.entries(localConfig.plans).map(([code, p]) => ({
+        code,
         name: p.name,
-        description: p.description,
-        consumptionModel: p.consumptionModel,
+        description: p.description ?? null,
+        consumptionModel: p.consumptionModel ?? null,
         isFree: p.isFree,
         isPublic: p.isPublic,
         sortOrder: p.sortOrder,
-        prices: (p.prices ?? []).map((pr) => ({
-          billingInterval: pr.billingInterval,
-          price: pr.price,
-          trialDays: pr.trialDays,
+        prices: p.prices.map((pr) => ({
+          billingInterval: pr.interval,
+          price: pr.amount,
+          trialDays: pr.trialDays ?? null,
         })),
-        features: (p.features ?? []).map((pf) => ({
-          featureCode: pf.featureCode,
-          enabled: pf.enabled,
-          includedAmount: pf.includedAmount,
-          unlimited: pf.unlimited,
-          overageEnabled: pf.overageEnabled,
-          overageUnitPrice: pf.overageUnitPrice,
-        })),
+        features: [],
       })),
     };
 
-    const diff = computeDiff(localConfig, remoteAsLocal);
+    const diff = computeDiff(remoteAsConfig, localAsRemote);
 
     if (
       !diff.hasChanges &&
