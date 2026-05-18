@@ -31,64 +31,93 @@ interface PushResponse {
   };
 }
 
+interface PushOptions {
+  yes?: boolean;
+  dryRun?: boolean;
+  json?: boolean;
+}
+
 export const pushCommand = new Command("push")
   .description("Push commet.config.ts to your Commet organization")
   .option("-y, --yes", "Skip confirmation prompt")
-  .action(async (options: { yes?: boolean }) => {
+  .option("--dry-run", "Show diff without applying changes")
+  .option("--json", "Output structured JSON (no colors, no prompts)")
+  .action(async (options: PushOptions) => {
+    const jsonMode = options.json;
+
     if (!authExists()) {
-      console.log(chalk.red("✗ Not authenticated"));
-      console.log(chalk.dim("Run `commet login` first"));
+      if (jsonMode) {
+        console.log(JSON.stringify({ error: "Not authenticated" }));
+      } else {
+        console.log(chalk.red("✗ Not authenticated"));
+        console.log(chalk.dim("Run `commet login` first"));
+      }
       return;
     }
 
     if (!projectConfigExists()) {
-      console.log(chalk.red("✗ Project not linked"));
-      console.log(
-        chalk.dim("Run `commet link` first to connect to an organization"),
-      );
+      if (jsonMode) {
+        console.log(JSON.stringify({ error: "Project not linked" }));
+      } else {
+        console.log(chalk.red("✗ Project not linked"));
+        console.log(
+          chalk.dim("Run `commet link` first to connect to an organization"),
+        );
+      }
       return;
     }
 
     const projectConfig = loadProjectConfig();
     if (!projectConfig) {
-      console.log(chalk.red("✗ Invalid project configuration"));
+      if (jsonMode) {
+        console.log(JSON.stringify({ error: "Invalid project configuration" }));
+      } else {
+        console.log(chalk.red("✗ Invalid project configuration"));
+      }
       return;
     }
 
-    const loadSpinner = ora("Loading commet.config.ts...").start();
+    const loadSpinner = jsonMode
+      ? null
+      : ora("Loading commet.config.ts...").start();
 
-    let config;
-    let configPath;
-    try {
-      const loaded = await loadBillingConfig(process.cwd());
-      config = loaded.config;
-      configPath = loaded.configPath;
-      loadSpinner.succeed(`Loaded ${configPath}`);
-    } catch (error) {
-      loadSpinner.fail("Failed to load config");
-      console.error(
-        chalk.red(error instanceof Error ? error.message : String(error)),
-      );
-      return;
-    }
+    const loaded = await loadBillingConfig(process.cwd()).catch(
+      (error: unknown) => {
+        const message = error instanceof Error ? error.message : String(error);
+        if (jsonMode) {
+          console.log(JSON.stringify({ error: message }));
+        } else {
+          loadSpinner?.fail("Failed to load config");
+          console.error(chalk.red(message));
+        }
+        return null;
+      },
+    );
 
-    const featureCount = Object.keys(config.features).length;
-    const planCount = Object.keys(config.plans).length;
-    console.log(chalk.dim(`  ${featureCount} features, ${planCount} plans`));
+    if (!loaded) return;
 
-    const fetchSpinner = ora("Fetching remote state...").start();
+    const { config, configPath } = loaded;
+    loadSpinner?.succeed(`Loaded ${configPath}`);
+
+    const fetchSpinner = jsonMode
+      ? null
+      : ora("Fetching remote state...").start();
 
     const remoteResult = await apiRequest<ConfigResponse>(
       `${BASE_URL}/api/cli/types?orgId=${projectConfig.orgId}&mode=config`,
     );
 
     if (remoteResult.error || !remoteResult.data) {
-      fetchSpinner.fail("Failed to fetch remote state");
-      console.error(chalk.red("Error:"), remoteResult.error);
+      if (jsonMode) {
+        console.log(JSON.stringify({ error: remoteResult.error }));
+      } else {
+        fetchSpinner?.fail("Failed to fetch remote state");
+        console.error(chalk.red("Error:"), remoteResult.error);
+      }
       return;
     }
 
-    fetchSpinner.succeed("Remote state fetched");
+    fetchSpinner?.succeed("Remote state fetched");
 
     const remote: RemoteState = {
       features: remoteResult.data.features,
@@ -97,10 +126,21 @@ export const pushCommand = new Command("push")
 
     const diff = computeDiff(config, remote);
 
-    console.log(formatDiff(diff));
+    if (jsonMode) {
+      if (options.dryRun) {
+        console.log(JSON.stringify({ diff, applied: false }));
+        return;
+      }
+    } else {
+      console.log(formatDiff(diff));
+    }
 
     if (!diff.hasChanges) {
-      console.log(chalk.green("\n✓ Everything is up to date"));
+      if (jsonMode) {
+        console.log(JSON.stringify({ diff, applied: false, upToDate: true }));
+      } else {
+        console.log(chalk.green("\n✓ Everything is up to date"));
+      }
       return;
     }
 
@@ -110,18 +150,36 @@ export const pushCommand = new Command("push")
         c.changes?.some((ch) => ch.includes("BLOCKED")),
     );
     if (typeChanges.length > 0) {
-      console.log(
-        chalk.red(
-          "\n✗ Cannot change feature types. Update them in the dashboard:",
-        ),
-      );
-      for (const change of typeChanges) {
-        console.log(chalk.red(`  - ${change.code}`));
+      const blockedCodes = typeChanges.map((c) => c.code);
+      if (jsonMode) {
+        console.log(
+          JSON.stringify({
+            error: "Feature type changes blocked",
+            blockedCodes,
+            diff,
+          }),
+        );
+      } else {
+        console.log(
+          chalk.red(
+            "\n✗ Cannot change feature types. Update them in the dashboard:",
+          ),
+        );
+        for (const change of typeChanges) {
+          console.log(chalk.red(`  - ${change.code}`));
+        }
       }
       return;
     }
 
-    if (!options.yes) {
+    if (options.dryRun) {
+      if (!jsonMode) {
+        console.log(chalk.dim("\n(dry run — no changes applied)"));
+      }
+      return;
+    }
+
+    if (!options.yes && !jsonMode) {
       const shouldProceed = await confirm({
         message: "Apply these changes?",
         default: true,
@@ -133,7 +191,7 @@ export const pushCommand = new Command("push")
       }
     }
 
-    const pushSpinner = ora("Pushing config...").start();
+    const pushSpinner = jsonMode ? null : ora("Pushing config...").start();
 
     const pushResult = await apiRequest<PushResponse>(
       `${BASE_URL}/api/cli/push`,
@@ -150,22 +208,31 @@ export const pushCommand = new Command("push")
     );
 
     if (pushResult.error || !pushResult.data) {
-      pushSpinner.fail("Push failed");
-      console.error(chalk.red("Error:"), pushResult.error);
+      if (jsonMode) {
+        console.log(JSON.stringify({ error: pushResult.error }));
+      } else {
+        pushSpinner?.fail("Push failed");
+        console.error(chalk.red("Error:"), pushResult.error);
+      }
       return;
     }
 
     const result = pushResult.data;
 
+    if (jsonMode) {
+      console.log(JSON.stringify({ diff, applied: true, result }));
+      return;
+    }
+
     const errors = [...result.features.errors, ...result.plans.errors];
 
     if (errors.length > 0) {
-      pushSpinner.warn("Push completed with errors");
+      pushSpinner?.warn("Push completed with errors");
       for (const error of errors) {
         console.log(chalk.red(`  ✗ ${error.code}: ${error.message}`));
       }
     } else {
-      pushSpinner.succeed("Push complete");
+      pushSpinner?.succeed("Push complete");
     }
 
     if (result.features.created.length > 0) {

@@ -1,8 +1,8 @@
-import type { Commet, GeneratedFeatureCode } from "@commet/node";
+import type { Commet } from "@commet/node";
 
 export interface CommetAIOptions {
   commet: Commet;
-  feature: GeneratedFeatureCode;
+  feature: string;
   customerId: string;
   idempotencyKey?: string;
   onTrackingError?: (error: Error) => void;

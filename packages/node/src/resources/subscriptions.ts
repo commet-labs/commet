@@ -1,8 +1,4 @@
-import type {
-  ApiResponse,
-  GeneratedPlanCode,
-  RequestOptions,
-} from "../types/common";
+import type { ApiResponse, RequestOptions } from "../types/common";
 import type { CommetHTTPClient } from "../utils/http";
 import type { BillingInterval } from "./plans";
 
@@ -132,7 +128,7 @@ export interface Subscription {
 }
 
 type PlanIdentifier =
-  | { planCode: GeneratedPlanCode; planId?: never }
+  | { planCode: string; planId?: never }
   | { planCode?: never; planId: string };
 
 export type CreateSubscriptionParams = PlanIdentifier & {
