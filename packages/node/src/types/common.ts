@@ -1,4 +1,4 @@
-export type CommetConfig = {
+export type CommetClientOptions = {
   apiKey: string;
   apiVersion?: string;
   debug?: boolean;
@@ -6,6 +6,9 @@ export type CommetConfig = {
   retries?: number;
   telemetry?: boolean;
 };
+
+/** @deprecated Use CommetClientOptions */
+export type CommetConfig = CommetClientOptions;
 
 // API Response types
 export interface ApiResponse<T = unknown> {
@@ -142,3 +145,35 @@ export type GeneratedFeatureCode = CommetGeneratedTypes extends {
 }
   ? T
   : string;
+
+// Config-derived resolved types: config generic → module augmentation → string
+import type {
+  InferFeatureCodes,
+  InferMeteredCodes,
+  InferPlanCodes,
+  InferSeatCodes,
+} from "./config";
+
+export type ResolvedFeatureCode<TConfig> = [
+  InferFeatureCodes<TConfig>,
+] extends [never]
+  ? GeneratedFeatureCode
+  : InferFeatureCodes<TConfig>;
+
+export type ResolvedSeatCode<TConfig> = [InferSeatCodes<TConfig>] extends [
+  never,
+]
+  ? GeneratedSeatType
+  : InferSeatCodes<TConfig>;
+
+export type ResolvedMeteredCode<TConfig> = [
+  InferMeteredCodes<TConfig>,
+] extends [never]
+  ? GeneratedFeatureCode
+  : InferMeteredCodes<TConfig>;
+
+export type ResolvedPlanCode<TConfig> = [InferPlanCodes<TConfig>] extends [
+  never,
+]
+  ? GeneratedPlanCode
+  : InferPlanCodes<TConfig>;

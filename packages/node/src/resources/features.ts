@@ -1,14 +1,9 @@
-import type {
-  ApiResponse,
-  CustomerID,
-  GeneratedFeatureCode,
-  RequestOptions,
-} from "../types/common";
+import type { ApiResponse, CustomerID, RequestOptions } from "../types/common";
 import type { CommetHTTPClient } from "../utils/http";
 
 export interface FeatureParams {
   customerId: CustomerID;
-  code: GeneratedFeatureCode;
+  code: string;
 }
 
 export type GetFeatureParams = FeatureParams;

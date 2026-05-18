@@ -11,6 +11,7 @@ import { listenCommand } from "./commands/listen";
 import { loginCommand } from "./commands/login";
 import { logoutCommand } from "./commands/logout";
 import { pullCommand } from "./commands/pull";
+import { pushCommand } from "./commands/push";
 import { switchCommand } from "./commands/switch";
 import { unlinkCommand } from "./commands/unlink";
 import { whoamiCommand } from "./commands/whoami";
@@ -38,7 +39,8 @@ program.addCommand(unlinkCommand);
 program.addCommand(switchCommand);
 program.addCommand(infoCommand);
 
-// Type generation commands
+// Config sync commands
+program.addCommand(pushCommand);
 program.addCommand(pullCommand);
 program.addCommand(listCommand);
 

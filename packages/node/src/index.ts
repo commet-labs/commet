@@ -1,7 +1,7 @@
 /**
  * Commet SDK - Billing and usage tracking for SaaS
  */
-export { Commet } from "./client";
+export { Commet, createCommet } from "./client";
 export { CustomerContext } from "./customer";
 // Credit Packs
 export type { CreditPack } from "./resources/credit-packs";
@@ -77,6 +77,7 @@ export { Webhooks } from "./resources/webhooks";
 // Type exports
 export type {
   ApiResponse,
+  CommetClientOptions,
   CommetConfig,
   CommetGeneratedTypes,
   Currency,
@@ -88,6 +89,10 @@ export type {
   PaginatedList,
   PaginatedResponse,
   RequestOptions,
+  ResolvedFeatureCode,
+  ResolvedMeteredCode,
+  ResolvedPlanCode,
+  ResolvedSeatCode,
 } from "./types/common";
 // Error exports
 export {
@@ -95,6 +100,19 @@ export {
   CommetError,
   CommetValidationError,
 } from "./types/common";
+export type {
+  BillingConfig,
+  FeatureDef,
+  InferFeatureCodes,
+  InferMeteredCodes,
+  InferPlanCodes,
+  InferSeatCodes,
+  PlanDef,
+  PlanFeatureValue,
+  PriceDef,
+} from "./types/config";
+// Config
+export { defineConfig } from "./types/config";
 export { registerIntegration } from "./utils/telemetry";
 export { API_VERSION, SDK_VERSION } from "./version";
 

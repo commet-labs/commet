@@ -9,26 +9,16 @@ import {
   loadProjectConfig,
   projectConfigExists,
 } from "../utils/config";
-import { validateTypeScriptProject } from "../utils/environment-validator";
-import { generateTypes } from "../utils/generator";
-import { updateGitignore } from "../utils/gitignore-updater";
-import { updateTsConfig } from "../utils/tsconfig-updater";
-
-interface SeatType {
-  id: string;
-  code: string;
-  name: string;
-  description?: string;
-  isFree: boolean;
-}
+import { generateConfigFile } from "../utils/generator";
 
 interface Feature {
   id: string;
   publicId: string;
   code: string;
   name: string;
-  description?: string;
+  description?: string | null;
   type: string;
+  unitName?: string | null;
 }
 
 interface Plan {
@@ -36,30 +26,41 @@ interface Plan {
   publicId: string;
   code: string;
   name: string;
-  description?: string;
+  description?: string | null;
+  consumptionModel?: string | null;
+  isFree?: boolean;
+  isPublic?: boolean;
+  sortOrder?: number;
+  prices?: Array<{
+    billingInterval: string;
+    price: number;
+    trialDays?: number | null;
+  }>;
+  features?: Array<{
+    featureCode: string;
+    enabled?: boolean | null;
+    includedAmount?: number | null;
+    unlimited?: boolean | null;
+    overageEnabled?: boolean | null;
+    overageUnitPrice?: number | null;
+  }>;
 }
 
-interface TypesResponse {
+interface ConfigResponse {
   success: boolean;
-  seatTypes: SeatType[];
   features: Feature[];
   plans: Plan[];
 }
 
 export const pullCommand = new Command("pull")
-  .description("Pull type definitions from Commet")
+  .description("Pull config from Commet and generate commet.config.ts")
   .action(async () => {
-    // Check auth
     if (!authExists()) {
       console.log(chalk.red("✗ Not authenticated"));
       console.log(chalk.dim("Run `commet login` first"));
       return;
     }
 
-    // Validate TypeScript project (warning only, doesn't stop execution)
-    const hasTsConfig = validateTypeScriptProject();
-
-    // Check project config
     if (!projectConfigExists()) {
       console.log(chalk.red("✗ Project not linked"));
       console.log(
@@ -74,89 +75,34 @@ export const pullCommand = new Command("pull")
       return;
     }
 
-    const spinner = ora("Fetching type definitions...").start();
+    const spinner = ora("Fetching config from remote...").start();
 
-    // Fetch types from API
-    const result = await apiRequest<TypesResponse>(
-      `${BASE_URL}/api/cli/types?orgId=${projectConfig.orgId}`,
+    const result = await apiRequest<ConfigResponse>(
+      `${BASE_URL}/api/cli/types?orgId=${projectConfig.orgId}&mode=config`,
     );
 
     if (result.error || !result.data) {
-      spinner.fail("Failed to fetch types");
+      spinner.fail("Failed to fetch config");
       console.error(chalk.red("Error:"), result.error);
       return;
     }
 
-    const { seatTypes, features, plans } = result.data;
+    const { features, plans } = result.data;
 
-    const typeDefinitions = generateTypes(seatTypes, features, plans);
+    const configContent = generateConfigFile(features, plans);
+    const outputPath = path.resolve(process.cwd(), "commet.config.ts");
+    fs.writeFileSync(outputPath, configContent, "utf8");
 
-    // Write to .commet/types.d.ts
-    const commetDir = path.resolve(process.cwd(), ".commet");
-    const outputPath = path.join(commetDir, "types.d.ts");
-
-    // Ensure .commet directory exists
-    fs.mkdirSync(commetDir, { recursive: true });
-
-    // Write types file
-    fs.writeFileSync(outputPath, typeDefinitions, "utf8");
-
-    spinner.succeed("Type definitions generated!");
-
-    // Update tsconfig.json (only if we found one earlier)
-    if (hasTsConfig) {
-      const tsconfigResult = updateTsConfig(".commet/types.d.ts");
-      if (tsconfigResult.success) {
-        console.log(chalk.green("✓ Updated tsconfig.json"));
-      } else {
-        console.log(chalk.yellow("⚠ Could not update tsconfig.json"));
-        console.log(
-          chalk.dim(
-            'Add ".commet/types.d.ts" to your tsconfig.json include array',
-          ),
-        );
-      }
-    } else {
-      console.log(chalk.yellow("⚠ No tsconfig.json found"));
-      console.log(
-        chalk.dim(
-          'Add ".commet/types.d.ts" to your tsconfig.json to enable types',
-        ),
-      );
-    }
-
-    // Update .gitignore
-    const gitignoreResult = updateGitignore(".commet/");
-    if (gitignoreResult.success) {
-      console.log(chalk.green("✓ Updated .gitignore"));
-    } else {
-      console.log(chalk.yellow("⚠ No .gitignore found"));
-      console.log(chalk.dim("Add .commet/ to your .gitignore file"));
-    }
-
-    console.log(chalk.green("\nSuccess!"));
-    console.log(chalk.dim("\nGenerated types:"));
+    spinner.succeed("Config file generated!");
     console.log(
-      chalk.dim(
-        `  Features: ${features.length > 0 ? features.map((f) => f.code).join(", ") : "none"}`,
-      ),
+      chalk.dim(`  ${features.length} features, ${plans.length} plans`),
     );
-    console.log(
-      chalk.dim(
-        `  Seat types: ${seatTypes.length > 0 ? seatTypes.map((s) => s.code).join(", ") : "none"}`,
-      ),
-    );
-    console.log(
-      chalk.dim(
-        `  Plans: ${plans.length > 0 ? plans.map((p) => p.code).join(", ") : "none"}`,
-      ),
-    );
-    console.log(chalk.dim(`\nOutput: ${outputPath}`));
+    console.log(chalk.dim(`  Output: ${outputPath}`));
 
-    if (seatTypes.length === 0 && plans.length === 0 && features.length === 0) {
+    if (features.length === 0 && plans.length === 0) {
       console.log(
         chalk.yellow(
-          "\n⚠ No types found. Create features, seat types, and plans in your Commet dashboard.",
+          "\n⚠ No resources found. Create features and plans in the dashboard or define them in commet.config.ts and run 'commet push'.",
         ),
       );
     }

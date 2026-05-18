@@ -1,10 +1,4 @@
-import type {
-  ApiResponse,
-  CustomerID,
-  GeneratedFeatureCode,
-  GeneratedSeatType,
-  RequestOptions,
-} from "../types/common";
+import type { ApiResponse, CustomerID, RequestOptions } from "../types/common";
 import type { CommetHTTPClient } from "../utils/http";
 
 export interface SeatEvent {
@@ -29,25 +23,25 @@ export interface SeatBalance {
 
 export interface AddParams {
   customerId: CustomerID;
-  featureCode?: GeneratedFeatureCode;
+  featureCode?: string;
   /** @deprecated Use featureCode instead */
-  seatType?: GeneratedSeatType;
+  seatType?: string;
   count: number;
 }
 
 export interface RemoveParams {
   customerId: CustomerID;
-  featureCode?: GeneratedFeatureCode;
+  featureCode?: string;
   /** @deprecated Use featureCode instead */
-  seatType?: GeneratedSeatType;
+  seatType?: string;
   count: number;
 }
 
 export interface SetParams {
   customerId: CustomerID;
-  featureCode?: GeneratedFeatureCode;
+  featureCode?: string;
   /** @deprecated Use featureCode instead */
-  seatType?: GeneratedSeatType;
+  seatType?: string;
   count: number;
 }
 
@@ -58,9 +52,9 @@ export interface SetAllParams {
 
 export interface GetBalanceParams {
   customerId: CustomerID;
-  featureCode?: GeneratedFeatureCode;
+  featureCode?: string;
   /** @deprecated Use featureCode instead */
-  seatType?: GeneratedSeatType;
+  seatType?: string;
 }
 
 export interface GetAllBalancesParams {

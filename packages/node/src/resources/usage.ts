@@ -2,7 +2,6 @@ import type {
   ApiResponse,
   CustomerID,
   EventID,
-  GeneratedFeatureCode,
   RequestOptions,
 } from "../types/common";
 import type { CommetHTTPClient } from "../utils/http";
@@ -27,7 +26,7 @@ export interface UsageEventProperty {
 }
 
 interface TrackBaseParams {
-  feature: GeneratedFeatureCode;
+  feature: string;
   customerId: CustomerID;
   idempotencyKey?: string;
   timestamp?: string;

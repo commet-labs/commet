@@ -3,25 +3,14 @@ import type { PortalResource } from "./resources/portal";
 import type { SeatsResource } from "./resources/seats";
 import type { SubscriptionsResource } from "./resources/subscriptions";
 import type { UsageResource } from "./resources/usage";
-import type { RequestOptions } from "./types/common";
+import type {
+  RequestOptions,
+  ResolvedFeatureCode,
+  ResolvedMeteredCode,
+  ResolvedSeatCode,
+} from "./types/common";
 
-/**
- * Customer-scoped API context
- *
- * Provides a cleaner API where you don't have to pass customerId
- * on every call. All operations are scoped to a specific customer.
- *
- * @example
- * ```typescript
- * const customer = commet.customer("user_123");
- *
- * // All operations are now scoped to this customer
- * const seats = await customer.features.get("team_members");
- * await customer.seats.add("editor_seats");
- * await customer.usage.track("api_call");
- * ```
- */
-export class CustomerContext {
+export class CustomerContext<TConfig = unknown> {
   private readonly customerId: string;
   private readonly featuresResource: FeaturesResource;
   private readonly seatsResource: SeatsResource;
@@ -48,16 +37,16 @@ export class CustomerContext {
   }
 
   features = {
-    get: (code: string, options?: RequestOptions) =>
+    get: (code: ResolvedFeatureCode<TConfig>, options?: RequestOptions) =>
       this.featuresResource.get({ code, customerId: this.customerId }, options),
 
-    check: (code: string, options?: RequestOptions) =>
+    check: (code: ResolvedFeatureCode<TConfig>, options?: RequestOptions) =>
       this.featuresResource.check(
         { code, customerId: this.customerId },
         options,
       ),
 
-    canUse: (code: string, options?: RequestOptions) =>
+    canUse: (code: ResolvedFeatureCode<TConfig>, options?: RequestOptions) =>
       this.featuresResource.canUse(
         { code, customerId: this.customerId },
         options,
@@ -68,25 +57,37 @@ export class CustomerContext {
   };
 
   seats = {
-    add: (featureCode: string, count = 1, options?: RequestOptions) =>
+    add: (
+      featureCode: ResolvedSeatCode<TConfig>,
+      count = 1,
+      options?: RequestOptions,
+    ) =>
       this.seatsResource.add(
         { customerId: this.customerId, featureCode, count },
         options,
       ),
 
-    remove: (featureCode: string, count = 1, options?: RequestOptions) =>
+    remove: (
+      featureCode: ResolvedSeatCode<TConfig>,
+      count = 1,
+      options?: RequestOptions,
+    ) =>
       this.seatsResource.remove(
         { customerId: this.customerId, featureCode, count },
         options,
       ),
 
-    set: (featureCode: string, count: number, options?: RequestOptions) =>
+    set: (
+      featureCode: ResolvedSeatCode<TConfig>,
+      count: number,
+      options?: RequestOptions,
+    ) =>
       this.seatsResource.set(
         { customerId: this.customerId, featureCode, count },
         options,
       ),
 
-    getBalance: (featureCode: string) =>
+    getBalance: (featureCode: ResolvedSeatCode<TConfig>) =>
       this.seatsResource.getBalance({
         customerId: this.customerId,
         featureCode,
@@ -95,7 +96,7 @@ export class CustomerContext {
 
   usage = {
     track: (
-      feature: string,
+      feature: ResolvedMeteredCode<TConfig>,
       value?: number,
       properties?: Record<string, string>,
       options?: RequestOptions,

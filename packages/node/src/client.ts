@@ -8,13 +8,14 @@ import { SeatsResource } from "./resources/seats";
 import { SubscriptionsResource } from "./resources/subscriptions";
 import { UsageResource } from "./resources/usage";
 import { Webhooks } from "./resources/webhooks";
-import type { CommetConfig } from "./types/common";
+import type { CommetClientOptions } from "./types/common";
+import type { BillingConfig } from "./types/config";
 import { CommetHTTPClient } from "./utils/http";
 
 /**
  * Main Commet SDK client
  */
-export class Commet {
+export class Commet<TConfig = unknown> {
   private httpClient: CommetHTTPClient;
 
   public readonly customers: CustomersResource;
@@ -27,7 +28,7 @@ export class Commet {
   public readonly features: FeaturesResource;
   public readonly webhooks: Webhooks;
 
-  constructor(config: CommetConfig) {
+  constructor(config: CommetClientOptions) {
     if (!config.apiKey) {
       throw new Error("Commet SDK: API key is required");
     }
@@ -68,8 +69,8 @@ export class Commet {
    * await customer.usage.track("api_call");
    * ```
    */
-  customer(customerId: string): CustomerContext {
-    return new CustomerContext(customerId, {
+  customer(customerId: string): CustomerContext<TConfig> {
+    return new CustomerContext<TConfig>(customerId, {
       features: this.features,
       seats: this.seats,
       usage: this.usage,
@@ -77,4 +78,11 @@ export class Commet {
       portal: this.portal,
     });
   }
+}
+
+export function createCommet<const TConfig extends BillingConfig>(
+  _billingConfig: TConfig,
+  options: CommetClientOptions,
+): Commet<TConfig> {
+  return new Commet<TConfig>(options);
 }

@@ -1,8 +1,4 @@
-import type {
-  ApiResponse,
-  GeneratedPlanCode,
-  ListParams,
-} from "../types/common";
+import type { ApiResponse, ListParams } from "../types/common";
 import type { CommetHTTPClient } from "../utils/http";
 
 export type PlanID = `plan_${string}`;
@@ -118,7 +114,7 @@ export class PlansResource {
    * console.log(plan.data.prices); // [{ billingInterval: 'monthly', price: 9900 }]
    * ```
    */
-  async get(planCode: GeneratedPlanCode): Promise<ApiResponse<PlanDetail>> {
+  async get(planCode: string): Promise<ApiResponse<PlanDetail>> {
     return this.httpClient.get(`/plans/${planCode}`);
   }
 }
