@@ -17,7 +17,7 @@ import type { RequestOptions } from "./types/common";
  *
  * // All operations are now scoped to this customer
  * const seats = await customer.features.get("team_members");
- * await customer.seats.add("member");
+ * await customer.seats.add("editor_seats");
  * await customer.usage.track("api_call");
  * ```
  */
@@ -68,26 +68,29 @@ export class CustomerContext {
   };
 
   seats = {
-    add: (seatType: string, count = 1, options?: RequestOptions) =>
+    add: (featureCode: string, count = 1, options?: RequestOptions) =>
       this.seatsResource.add(
-        { customerId: this.customerId, seatType, count },
+        { customerId: this.customerId, featureCode, count },
         options,
       ),
 
-    remove: (seatType: string, count = 1, options?: RequestOptions) =>
+    remove: (featureCode: string, count = 1, options?: RequestOptions) =>
       this.seatsResource.remove(
-        { customerId: this.customerId, seatType, count },
+        { customerId: this.customerId, featureCode, count },
         options,
       ),
 
-    set: (seatType: string, count: number, options?: RequestOptions) =>
+    set: (featureCode: string, count: number, options?: RequestOptions) =>
       this.seatsResource.set(
-        { customerId: this.customerId, seatType, count },
+        { customerId: this.customerId, featureCode, count },
         options,
       ),
 
-    getBalance: (seatType: string) =>
-      this.seatsResource.getBalance({ customerId: this.customerId, seatType }),
+    getBalance: (featureCode: string) =>
+      this.seatsResource.getBalance({
+        customerId: this.customerId,
+        featureCode,
+      }),
   };
 
   usage = {

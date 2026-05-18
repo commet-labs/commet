@@ -1,6 +1,7 @@
 import type {
   ApiResponse,
   CustomerID,
+  GeneratedFeatureCode,
   GeneratedSeatType,
   RequestOptions,
 } from "../types/common";
@@ -10,7 +11,9 @@ export interface SeatEvent {
   id: string;
   organizationId: string;
   customerId: CustomerID;
-  seatType: GeneratedSeatType;
+  featureCode: string;
+  /** @deprecated Use featureCode */
+  seatType: string;
   eventType: "add" | "remove" | "set";
   quantity: number;
   previousBalance?: number;
@@ -26,19 +29,25 @@ export interface SeatBalance {
 
 export interface AddParams {
   customerId: CustomerID;
-  seatType: GeneratedSeatType;
+  featureCode?: GeneratedFeatureCode;
+  /** @deprecated Use featureCode instead */
+  seatType?: GeneratedSeatType;
   count: number;
 }
 
 export interface RemoveParams {
   customerId: CustomerID;
-  seatType: GeneratedSeatType;
+  featureCode?: GeneratedFeatureCode;
+  /** @deprecated Use featureCode instead */
+  seatType?: GeneratedSeatType;
   count: number;
 }
 
 export interface SetParams {
   customerId: CustomerID;
-  seatType: GeneratedSeatType;
+  featureCode?: GeneratedFeatureCode;
+  /** @deprecated Use featureCode instead */
+  seatType?: GeneratedSeatType;
   count: number;
 }
 
@@ -49,11 +58,24 @@ export interface SetAllParams {
 
 export interface GetBalanceParams {
   customerId: CustomerID;
-  seatType: GeneratedSeatType;
+  featureCode?: GeneratedFeatureCode;
+  /** @deprecated Use featureCode instead */
+  seatType?: GeneratedSeatType;
 }
 
 export interface GetAllBalancesParams {
   customerId: CustomerID;
+}
+
+function resolveCode(params: {
+  featureCode?: string;
+  seatType?: string;
+}): string {
+  const code = params.featureCode ?? params.seatType;
+  if (!code) {
+    throw new Error("Either featureCode or seatType must be provided");
+  }
+  return code;
 }
 
 export class SeatsResource {
@@ -63,21 +85,36 @@ export class SeatsResource {
     params: AddParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<SeatEvent>> {
-    return this.httpClient.post("/seats", params, options);
+    const code = resolveCode(params);
+    return this.httpClient.post(
+      "/seats",
+      { customerId: params.customerId, seatType: code, count: params.count },
+      options,
+    );
   }
 
   async remove(
     params: RemoveParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<SeatEvent>> {
-    return this.httpClient.delete("/seats", params, options);
+    const code = resolveCode(params);
+    return this.httpClient.delete(
+      "/seats",
+      { customerId: params.customerId, seatType: code, count: params.count },
+      options,
+    );
   }
 
   async set(
     params: SetParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<SeatEvent>> {
-    return this.httpClient.put("/seats", params, options);
+    const code = resolveCode(params);
+    return this.httpClient.put(
+      "/seats",
+      { customerId: params.customerId, seatType: code, count: params.count },
+      options,
+    );
   }
 
   async setAll(
@@ -90,9 +127,10 @@ export class SeatsResource {
   async getBalance(
     params: GetBalanceParams,
   ): Promise<ApiResponse<SeatBalance>> {
+    const code = resolveCode(params);
     return this.httpClient.get("/seats/balance", {
       customerId: params.customerId,
-      seatType: params.seatType,
+      seatType: code,
     });
   }
 
