@@ -24,6 +24,7 @@ export interface LoadedConfig {
       name: string;
       description?: string;
       consumptionModel?: "metered" | "credits" | "balance";
+      defaultInterval?: string;
       isFree?: boolean;
       isPublic?: boolean;
       sortOrder?: number;
@@ -135,6 +136,20 @@ function validateConfig(config: LoadedConfig, configPath: string): void {
       }
       if (typeof price.amount !== "number") {
         throw new Error(`Plan "${code}": price amount must be a number`);
+      }
+    }
+
+    if (plan.prices.length > 0) {
+      if (!plan.defaultInterval) {
+        throw new Error(
+          `Plan "${code}": defaultInterval is required when prices are defined`,
+        );
+      }
+      const priceIntervals = new Set(plan.prices.map((p) => p.interval));
+      if (!priceIntervals.has(plan.defaultInterval)) {
+        throw new Error(
+          `Plan "${code}": defaultInterval "${plan.defaultInterval}" does not match any price interval (${[...priceIntervals].join(", ")})`,
+        );
       }
     }
 

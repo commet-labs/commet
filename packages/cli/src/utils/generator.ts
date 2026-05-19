@@ -11,6 +11,7 @@ interface Plan {
   name: string;
   description?: string | null;
   consumptionModel?: string | null;
+  defaultInterval?: string | null;
   isFree?: boolean;
   isPublic?: boolean;
   sortOrder?: number;
@@ -18,6 +19,7 @@ interface Plan {
     billingInterval: string;
     price: number;
     trialDays?: number | null;
+    isDefault?: boolean;
   }>;
   features?: Array<{
     featureCode: string;
@@ -58,6 +60,13 @@ export function generateConfigFile(features: Feature[], plans: Plan[]): string {
       lines.push(`      sortOrder: ${p.sortOrder},`);
 
     const prices = p.prices ?? [];
+    const defaultInterval =
+      p.defaultInterval ??
+      prices.find((pr) => pr.isDefault)?.billingInterval ??
+      prices[0]?.billingInterval;
+    if (defaultInterval)
+      lines.push(`      defaultInterval: "${defaultInterval}",`);
+
     if (prices.length === 0) {
       lines.push("      prices: [],");
     } else {

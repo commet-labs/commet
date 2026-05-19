@@ -32,6 +32,7 @@ export interface PlanDef {
   name: string;
   description?: string;
   consumptionModel?: "metered" | "credits" | "balance";
+  defaultInterval?: PriceDef["interval"];
   isFree?: boolean;
   isPublic?: boolean;
   sortOrder?: number;

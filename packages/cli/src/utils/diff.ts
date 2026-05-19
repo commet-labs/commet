@@ -13,6 +13,7 @@ export interface RemotePlanPrice {
   billingInterval: string;
   price: number;
   trialDays?: number | null;
+  isDefault?: boolean;
 }
 
 export interface RemotePlanFeature {
@@ -29,6 +30,7 @@ export interface RemotePlan {
   name: string;
   description?: string | null;
   consumptionModel?: string | null;
+  defaultInterval?: string | null;
   isFree?: boolean;
   isPublic?: boolean;
   sortOrder?: number;
@@ -120,6 +122,19 @@ export function computeDiff(
     const changes: string[] = [];
     if (remotePlan.name !== localPlan.name) {
       changes.push(`name: "${remotePlan.name}" → "${localPlan.name}"`);
+    }
+
+    const remoteDefaultInterval =
+      remotePlan.defaultInterval ??
+      remotePlan.prices.find((p) => p.isDefault)?.billingInterval ??
+      null;
+    if (
+      localPlan.defaultInterval &&
+      remoteDefaultInterval !== localPlan.defaultInterval
+    ) {
+      changes.push(
+        `defaultInterval: "${remoteDefaultInterval ?? "none"}" → "${localPlan.defaultInterval}"`,
+      );
     }
 
     const localPriceMap = new Map(localPlan.prices.map((p) => [p.interval, p]));

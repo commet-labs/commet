@@ -42,6 +42,7 @@ interface Plan {
     billingInterval: string;
     price: number;
     trialDays?: number | null;
+    isDefault?: boolean;
   }>;
   features?: Array<{
     featureCode: string;
@@ -247,6 +248,13 @@ export const pullCommand = new Command("pull")
             ...(p.isFree ? { isFree: true } : {}),
             ...(p.isPublic === false ? { isPublic: false } : {}),
             ...(p.sortOrder ? { sortOrder: p.sortOrder } : {}),
+            ...(() => {
+              const planPrices = p.prices ?? [];
+              const defaultPrice = planPrices.find((pr) => pr.isDefault);
+              const defaultInterval =
+                defaultPrice?.billingInterval ?? planPrices[0]?.billingInterval;
+              return defaultInterval ? { defaultInterval } : {};
+            })(),
             prices: (p.prices ?? []).map((pr) => ({
               interval: pr.billingInterval,
               amount: pr.price,
@@ -270,6 +278,7 @@ export const pullCommand = new Command("pull")
         name: p.name,
         description: p.description ?? null,
         consumptionModel: p.consumptionModel ?? null,
+        defaultInterval: p.defaultInterval ?? null,
         isFree: p.isFree,
         isPublic: p.isPublic,
         sortOrder: p.sortOrder,

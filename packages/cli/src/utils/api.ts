@@ -1,6 +1,6 @@
 import { loadAuth } from "./config";
 
-export const BASE_URL = "https://commet.co";
+export const BASE_URL = "http://localhost:3010";
 
 export async function apiRequest<T>(
   endpoint: string,
