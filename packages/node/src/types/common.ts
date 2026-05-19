@@ -112,9 +112,9 @@ export interface RequestOptions {
 
 import type {
   InferFeatureCodes,
-  InferMeteredCodes,
   InferPlanCodes,
   InferSeatCodes,
+  InferUsageCodes,
 } from "./config";
 
 export type ResolvedFeatureCode<TConfig> = [
@@ -129,11 +129,11 @@ export type ResolvedSeatCode<TConfig> = [InferSeatCodes<TConfig>] extends [
   ? string
   : InferSeatCodes<TConfig>;
 
-export type ResolvedMeteredCode<TConfig> = [
-  InferMeteredCodes<TConfig>,
-] extends [never]
+export type ResolvedUsageCode<TConfig> = [InferUsageCodes<TConfig>] extends [
+  never,
+]
   ? string
-  : InferMeteredCodes<TConfig>;
+  : InferUsageCodes<TConfig>;
 
 export type ResolvedPlanCode<TConfig> = [InferPlanCodes<TConfig>] extends [
   never,

@@ -86,9 +86,9 @@ export type {
   PaginatedResponse,
   RequestOptions,
   ResolvedFeatureCode,
-  ResolvedMeteredCode,
   ResolvedPlanCode,
   ResolvedSeatCode,
+  ResolvedUsageCode,
 } from "./types/common";
 // Error exports
 export {
@@ -100,9 +100,9 @@ export type {
   BillingConfig,
   FeatureDef,
   InferFeatureCodes,
-  InferMeteredCodes,
   InferPlanCodes,
   InferSeatCodes,
+  InferUsageCodes,
   PlanDef,
   PlanFeatureValue,
   PriceDef,

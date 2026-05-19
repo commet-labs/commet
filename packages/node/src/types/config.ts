@@ -2,7 +2,7 @@ export type FeatureDef =
   | { name: string; type: "boolean"; description?: string }
   | {
       name: string;
-      type: "metered";
+      type: "usage";
       unitName?: string;
       description?: string;
     }
@@ -62,8 +62,8 @@ export type InferSeatCodes<T> = T extends { features: infer F }
     }[keyof F]
   : never;
 
-export type InferMeteredCodes<T> = T extends { features: infer F }
+export type InferUsageCodes<T> = T extends { features: infer F }
   ? {
-      [K in keyof F]: F[K] extends { type: "metered" } ? K & string : never;
+      [K in keyof F]: F[K] extends { type: "usage" } ? K & string : never;
     }[keyof F]
   : never;

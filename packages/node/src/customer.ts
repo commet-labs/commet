@@ -6,8 +6,8 @@ import type { UsageResource } from "./resources/usage";
 import type {
   RequestOptions,
   ResolvedFeatureCode,
-  ResolvedMeteredCode,
   ResolvedSeatCode,
+  ResolvedUsageCode,
 } from "./types/common";
 
 export class CustomerContext<TConfig = unknown> {
@@ -96,7 +96,7 @@ export class CustomerContext<TConfig = unknown> {
 
   usage = {
     track: (
-      feature: ResolvedMeteredCode<TConfig>,
+      feature: ResolvedUsageCode<TConfig>,
       value?: number,
       properties?: Record<string, string>,
       options?: RequestOptions,

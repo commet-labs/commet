@@ -24,7 +24,7 @@ interface Feature {
   code: string;
   name: string;
   description?: string | null;
-  type: "boolean" | "metered" | "seats";
+  type: "boolean" | "usage" | "seats";
   unitName?: string | null;
 }
 

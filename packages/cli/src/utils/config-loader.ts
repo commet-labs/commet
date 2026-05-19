@@ -13,7 +13,7 @@ export interface LoadedConfig {
     string,
     {
       name: string;
-      type: "boolean" | "metered" | "seats";
+      type: "boolean" | "usage" | "seats";
       unitName?: string;
       description?: string;
     }
@@ -86,7 +86,7 @@ export async function loadBillingConfig(
   return { config, configPath };
 }
 
-const VALID_FEATURE_TYPES = new Set(["boolean", "metered", "seats"]);
+const VALID_FEATURE_TYPES = new Set(["boolean", "usage", "seats"]);
 const VALID_INTERVALS = new Set([
   "weekly",
   "monthly",
@@ -114,7 +114,7 @@ function validateConfig(config: LoadedConfig, configPath: string): void {
     }
     if (!VALID_FEATURE_TYPES.has(feature.type)) {
       throw new Error(
-        `Feature "${code}": type must be one of: boolean, metered, seats`,
+        `Feature "${code}": type must be one of: boolean, usage, seats`,
       );
     }
   }
