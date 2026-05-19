@@ -13,7 +13,7 @@ export type CanUseFeatureParams = FeatureParams;
 export interface FeatureAccess {
   code: string;
   name: string;
-  type: "boolean" | "metered" | "seats";
+  type: "boolean" | "usage" | "seats";
   allowed: boolean;
   enabled?: boolean;
   current?: number;

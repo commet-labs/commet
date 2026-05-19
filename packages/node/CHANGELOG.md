@@ -1,5 +1,13 @@
 # @commet/node
 
+## 4.3.0
+
+### Minor Changes
+
+- c3cf2d8: Rename feature type enum value from `metered` to `usage` to disambiguate from the plan consumption model.
+
+  Feature types are now `boolean | usage | seats`. The consumption model `metered` is unchanged.
+
 ## 4.2.0
 
 ### Minor Changes

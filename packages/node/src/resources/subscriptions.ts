@@ -15,7 +15,7 @@ export type SubscriptionStatus =
 export interface FeatureSummary {
   code: string;
   name: string;
-  type: "boolean" | "metered" | "seats";
+  type: "boolean" | "usage" | "seats";
   enabled?: boolean;
   usage?: {
     current: number;
