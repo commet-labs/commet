@@ -31,7 +31,7 @@ function formatFeature(feature: PlanFeature): string {
   if (feature.type === "boolean" && feature.enabled) {
     return feature.name;
   }
-  if (feature.type === "metered" && feature.includedAmount !== undefined) {
+  if (feature.type === "usage" && feature.includedAmount !== undefined) {
     return `${feature.includedAmount.toLocaleString()} ${feature.name} included`;
   }
   if (feature.type === "seats" && feature.includedAmount !== undefined) {
