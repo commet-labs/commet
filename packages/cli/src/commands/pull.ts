@@ -1,5 +1,6 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { confirm } from "@inquirer/prompts";
 import chalk from "chalk";
 import { Command } from "commander";
 import ora from "ora";
@@ -9,26 +10,22 @@ import {
   loadProjectConfig,
   projectConfigExists,
 } from "../utils/config";
-import { validateTypeScriptProject } from "../utils/environment-validator";
-import { generateTypes } from "../utils/generator";
-import { updateGitignore } from "../utils/gitignore-updater";
-import { updateTsConfig } from "../utils/tsconfig-updater";
-
-interface SeatType {
-  id: string;
-  code: string;
-  name: string;
-  description?: string;
-  isFree: boolean;
-}
+import {
+  findConfigFile,
+  type LoadedConfig,
+  loadBillingConfig,
+} from "../utils/config-loader";
+import { computeDiff, formatDiff, type RemoteState } from "../utils/diff";
+import { generateConfigFile } from "../utils/generator";
 
 interface Feature {
   id: string;
   publicId: string;
   code: string;
   name: string;
-  description?: string;
-  type: string;
+  description?: string | null;
+  type: "boolean" | "usage" | "seats";
+  unitName?: string | null;
 }
 
 interface Plan {
@@ -36,128 +33,315 @@ interface Plan {
   publicId: string;
   code: string;
   name: string;
-  description?: string;
+  description?: string | null;
+  consumptionModel?: "metered" | "credits" | "balance" | null;
+  isFree?: boolean;
+  isPublic?: boolean;
+  sortOrder?: number;
+  prices?: Array<{
+    billingInterval: string;
+    price: number;
+    trialDays?: number | null;
+    isDefault?: boolean;
+  }>;
+  features?: Array<{
+    featureCode: string;
+    enabled?: boolean | null;
+    includedAmount?: number | null;
+    unlimited?: boolean | null;
+    overageEnabled?: boolean | null;
+    overageUnitPrice?: number | null;
+  }>;
 }
 
-interface TypesResponse {
+interface ConfigResponse {
   success: boolean;
-  seatTypes: SeatType[];
   features: Feature[];
   plans: Plan[];
 }
 
+interface PullOptions {
+  yes?: boolean;
+  dryRun?: boolean;
+  json?: boolean;
+}
+
 export const pullCommand = new Command("pull")
-  .description("Pull type definitions from Commet")
-  .action(async () => {
-    // Check auth
+  .description("Pull config from Commet and generate commet.config.ts")
+  .option("-y, --yes", "Skip confirmation prompt")
+  .option("--dry-run", "Show diff without applying changes")
+  .option("--json", "Output structured JSON (no colors, no prompts)")
+  .action(async (options: PullOptions) => {
+    const jsonMode = options.json;
+
     if (!authExists()) {
-      console.log(chalk.red("✗ Not authenticated"));
-      console.log(chalk.dim("Run `commet login` first"));
-      return;
+      if (jsonMode) {
+        console.log(JSON.stringify({ error: "Not authenticated" }));
+      } else {
+        console.log(chalk.red("✗ Not authenticated"));
+        console.log(chalk.dim("Run `commet login` first"));
+      }
+      process.exit(1);
     }
 
-    // Validate TypeScript project (warning only, doesn't stop execution)
-    const hasTsConfig = validateTypeScriptProject();
-
-    // Check project config
     if (!projectConfigExists()) {
-      console.log(chalk.red("✗ Project not linked"));
-      console.log(
-        chalk.dim("Run `commet link` first to connect to an organization"),
-      );
-      return;
+      if (jsonMode) {
+        console.log(JSON.stringify({ error: "Project not linked" }));
+      } else {
+        console.log(chalk.red("✗ Project not linked"));
+        console.log(
+          chalk.dim("Run `commet link` first to connect to an organization"),
+        );
+      }
+      process.exit(1);
     }
 
     const projectConfig = loadProjectConfig();
     if (!projectConfig) {
-      console.log(chalk.red("✗ Invalid project configuration"));
-      return;
+      if (jsonMode) {
+        console.log(JSON.stringify({ error: "Invalid project configuration" }));
+      } else {
+        console.log(chalk.red("✗ Invalid project configuration"));
+      }
+      process.exit(1);
     }
 
-    const spinner = ora("Fetching type definitions...").start();
+    const spinner = jsonMode
+      ? null
+      : ora("Fetching config from remote...").start();
 
-    // Fetch types from API
-    const result = await apiRequest<TypesResponse>(
-      `${BASE_URL}/api/cli/types?orgId=${projectConfig.orgId}`,
+    const result = await apiRequest<ConfigResponse>(
+      `${BASE_URL}/api/cli/pull?orgId=${projectConfig.orgId}`,
     );
 
     if (result.error || !result.data) {
-      spinner.fail("Failed to fetch types");
-      console.error(chalk.red("Error:"), result.error);
+      if (jsonMode) {
+        console.log(JSON.stringify({ error: result.error }));
+      } else {
+        spinner?.fail("Failed to fetch config");
+        console.error(chalk.red("Error:"), result.error);
+      }
+      process.exit(1);
+    }
+
+    spinner?.succeed("Remote state fetched");
+
+    const { features, plans } = result.data;
+    const configContent = generateConfigFile(features, plans);
+    const outputPath = path.resolve(process.cwd(), "commet.config.ts");
+
+    const existingConfigPath = findConfigFile(process.cwd());
+
+    if (!existingConfigPath) {
+      if (options.dryRun) {
+        if (jsonMode) {
+          console.log(
+            JSON.stringify({
+              action: "create",
+              features: features.length,
+              plans: plans.length,
+              applied: false,
+            }),
+          );
+        } else {
+          console.log(
+            chalk.green(
+              `\nWould create commet.config.ts (${features.length} features, ${plans.length} plans)`,
+            ),
+          );
+        }
+        return;
+      }
+
+      fs.writeFileSync(outputPath, configContent, "utf8");
+
+      if (jsonMode) {
+        console.log(
+          JSON.stringify({
+            action: "create",
+            features: features.length,
+            plans: plans.length,
+            applied: true,
+          }),
+        );
+      } else {
+        console.log(chalk.green(`\n✓ Created commet.config.ts`));
+        console.log(
+          chalk.dim(`  ${features.length} features, ${plans.length} plans`),
+        );
+      }
       return;
     }
 
-    const { seatTypes, features, plans } = result.data;
+    const localLoaded = await loadBillingConfig(process.cwd()).catch(
+      (error: unknown) => ({
+        parseError: error instanceof Error ? error.message : String(error),
+      }),
+    );
 
-    const typeDefinitions = generateTypes(seatTypes, features, plans);
+    if ("parseError" in localLoaded) {
+      if (options.dryRun) {
+        if (jsonMode) {
+          console.log(
+            JSON.stringify({
+              action: "overwrite",
+              reason: localLoaded.parseError,
+              applied: false,
+            }),
+          );
+        } else {
+          console.log(
+            chalk.yellow(
+              `\n⚠ Local config is invalid: ${localLoaded.parseError}`,
+            ),
+          );
+        }
+        return;
+      }
 
-    // Write to .commet/types.d.ts
-    const commetDir = path.resolve(process.cwd(), ".commet");
-    const outputPath = path.join(commetDir, "types.d.ts");
+      if (!options.yes && !jsonMode) {
+        console.log(chalk.yellow(`\n⚠ ${localLoaded.parseError}`));
+        const shouldProceed = await confirm({
+          message: "Overwrite with remote?",
+          default: true,
+        });
+        if (!shouldProceed) {
+          console.log(chalk.dim("Pull cancelled"));
+          return;
+        }
+      }
 
-    // Ensure .commet directory exists
-    fs.mkdirSync(commetDir, { recursive: true });
-
-    // Write types file
-    fs.writeFileSync(outputPath, typeDefinitions, "utf8");
-
-    spinner.succeed("Type definitions generated!");
-
-    // Update tsconfig.json (only if we found one earlier)
-    if (hasTsConfig) {
-      const tsconfigResult = updateTsConfig(".commet/types.d.ts");
-      if (tsconfigResult.success) {
-        console.log(chalk.green("✓ Updated tsconfig.json"));
+      fs.writeFileSync(outputPath, configContent, "utf8");
+      if (jsonMode) {
+        console.log(JSON.stringify({ action: "overwrite", applied: true }));
       } else {
-        console.log(chalk.yellow("⚠ Could not update tsconfig.json"));
-        console.log(
-          chalk.dim(
-            'Add ".commet/types.d.ts" to your tsconfig.json include array',
-          ),
-        );
+        console.log(chalk.green("\n✓ Overwritten commet.config.ts"));
+      }
+      return;
+    }
+
+    const localConfig = localLoaded.config;
+
+    const remoteAsConfig: LoadedConfig = {
+      features: Object.fromEntries(
+        features.map((f) => [
+          f.code,
+          {
+            name: f.name,
+            type: f.type,
+            ...(f.unitName ? { unitName: f.unitName } : {}),
+            ...(f.description ? { description: f.description } : {}),
+          },
+        ]),
+      ),
+      plans: Object.fromEntries(
+        plans.map((p) => [
+          p.code,
+          {
+            name: p.name,
+            ...(p.description ? { description: p.description } : {}),
+            ...(p.consumptionModel
+              ? {
+                  consumptionModel: p.consumptionModel,
+                }
+              : {}),
+            ...(p.isFree ? { isFree: true } : {}),
+            ...(p.isPublic === false ? { isPublic: false } : {}),
+            ...(p.sortOrder ? { sortOrder: p.sortOrder } : {}),
+            ...(() => {
+              const planPrices = p.prices ?? [];
+              const defaultPrice = planPrices.find((pr) => pr.isDefault);
+              const defaultInterval =
+                defaultPrice?.billingInterval ?? planPrices[0]?.billingInterval;
+              return defaultInterval ? { defaultInterval } : {};
+            })(),
+            prices: (p.prices ?? []).map((pr) => ({
+              interval: pr.billingInterval,
+              amount: pr.price,
+              ...(pr.trialDays ? { trialDays: pr.trialDays } : {}),
+            })),
+          },
+        ]),
+      ),
+    };
+
+    const localAsRemote: RemoteState = {
+      features: Object.entries(localConfig.features).map(([code, f]) => ({
+        code,
+        name: f.name,
+        type: f.type,
+        description: f.description ?? null,
+        unitName: f.unitName ?? null,
+      })),
+      plans: Object.entries(localConfig.plans).map(([code, p]) => ({
+        code,
+        name: p.name,
+        description: p.description ?? null,
+        consumptionModel: p.consumptionModel ?? null,
+        defaultInterval: p.defaultInterval ?? null,
+        isFree: p.isFree,
+        isPublic: p.isPublic,
+        sortOrder: p.sortOrder,
+        prices: p.prices.map((pr) => ({
+          billingInterval: pr.interval,
+          price: pr.amount,
+          trialDays: pr.trialDays ?? null,
+        })),
+        features: [],
+      })),
+    };
+
+    const diff = computeDiff(remoteAsConfig, localAsRemote);
+
+    if (
+      !diff.hasChanges &&
+      diff.features.unmanaged.length === 0 &&
+      diff.plans.unmanaged.length === 0
+    ) {
+      if (jsonMode) {
+        console.log(JSON.stringify({ diff, applied: false, upToDate: true }));
+      } else {
+        console.log(chalk.green("\n✓ Already up to date"));
+      }
+      return;
+    }
+
+    if (jsonMode) {
+      if (options.dryRun) {
+        console.log(JSON.stringify({ diff, applied: false }));
+        return;
       }
     } else {
-      console.log(chalk.yellow("⚠ No tsconfig.json found"));
-      console.log(
-        chalk.dim(
-          'Add ".commet/types.d.ts" to your tsconfig.json to enable types',
-        ),
-      );
+      console.log(formatDiff(diff));
     }
 
-    // Update .gitignore
-    const gitignoreResult = updateGitignore(".commet/");
-    if (gitignoreResult.success) {
-      console.log(chalk.green("✓ Updated .gitignore"));
+    if (options.dryRun) {
+      if (!jsonMode) {
+        console.log(chalk.dim("\n(dry run — no changes applied)"));
+      }
+      return;
+    }
+
+    if (!options.yes && !jsonMode) {
+      const shouldProceed = await confirm({
+        message: "Overwrite commet.config.ts with remote state?",
+        default: true,
+      });
+
+      if (!shouldProceed) {
+        console.log(chalk.dim("Pull cancelled"));
+        return;
+      }
+    }
+
+    fs.writeFileSync(outputPath, configContent, "utf8");
+
+    if (jsonMode) {
+      console.log(JSON.stringify({ diff, applied: true }));
     } else {
-      console.log(chalk.yellow("⚠ No .gitignore found"));
-      console.log(chalk.dim("Add .commet/ to your .gitignore file"));
-    }
-
-    console.log(chalk.green("\nSuccess!"));
-    console.log(chalk.dim("\nGenerated types:"));
-    console.log(
-      chalk.dim(
-        `  Features: ${features.length > 0 ? features.map((f) => f.code).join(", ") : "none"}`,
-      ),
-    );
-    console.log(
-      chalk.dim(
-        `  Seat types: ${seatTypes.length > 0 ? seatTypes.map((s) => s.code).join(", ") : "none"}`,
-      ),
-    );
-    console.log(
-      chalk.dim(
-        `  Plans: ${plans.length > 0 ? plans.map((p) => p.code).join(", ") : "none"}`,
-      ),
-    );
-    console.log(chalk.dim(`\nOutput: ${outputPath}`));
-
-    if (seatTypes.length === 0 && plans.length === 0 && features.length === 0) {
+      console.log(chalk.green("\n✓ Updated commet.config.ts"));
       console.log(
-        chalk.yellow(
-          "\n⚠ No types found. Create features, seat types, and plans in your Commet dashboard.",
-        ),
+        chalk.dim(`  ${features.length} features, ${plans.length} plans`),
       );
     }
   });

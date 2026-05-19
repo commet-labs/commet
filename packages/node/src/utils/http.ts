@@ -1,6 +1,6 @@
 import type {
   ApiResponse,
-  CommetConfig,
+  CommetClientOptions,
   RequestOptions,
 } from "../types/common";
 import { CommetAPIError, CommetValidationError } from "../types/common";
@@ -28,13 +28,13 @@ const DEFAULT_RETRY_CONFIG: RetryConfig = {
 };
 
 export class CommetHTTPClient {
-  private config: CommetConfig;
+  private config: CommetClientOptions;
   private retryConfig: RetryConfig;
   private telemetryEnabled: boolean;
   private lastRequestMetrics: { requestId: string; durationMs: number } | null =
     null;
 
-  constructor(config: CommetConfig) {
+  constructor(config: CommetClientOptions) {
     this.config = config;
     this.telemetryEnabled = config.telemetry !== false;
     this.retryConfig = {

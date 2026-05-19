@@ -1,4 +1,4 @@
-export type CommetConfig = {
+export type CommetClientOptions = {
   apiKey: string;
   apiVersion?: string;
   debug?: boolean;
@@ -6,6 +6,9 @@ export type CommetConfig = {
   retries?: number;
   telemetry?: boolean;
 };
+
+/** @deprecated Use CommetClientOptions */
+export type CommetConfig = CommetClientOptions;
 
 // API Response types
 export interface ApiResponse<T = unknown> {
@@ -107,38 +110,33 @@ export interface RequestOptions {
   timeout?: number;
 }
 
-/**
- * Generated types interface - augmented by CLI after 'commet pull'
- *
- * This interface gets filled by module augmentation when you run `commet pull`.
- * The CLI generates a .commet/types.d.ts file that augments this interface with your
- * organization's specific feature codes, seat types, and plan codes.
- *
- * @example
- * // After running `commet pull`, TypeScript will automatically know your types:
- * await commet.usage.track({
- *   feature: 'api_calls', // Autocomplete works!
- *   externalId: 'user_123'
- * });
- */
+import type {
+  InferFeatureCodes,
+  InferPlanCodes,
+  InferSeatCodes,
+  InferUsageCodes,
+} from "./config";
 
-// biome-ignore lint/suspicious/noEmptyInterface: augmented by CLI-generated .commet/types.d.ts
-export interface CommetGeneratedTypes {}
+export type ResolvedFeatureCode<TConfig> = [
+  InferFeatureCodes<TConfig>,
+] extends [never]
+  ? string
+  : InferFeatureCodes<TConfig>;
 
-export type GeneratedSeatType = CommetGeneratedTypes extends {
-  seatType: infer T;
-}
-  ? T
-  : string;
+export type ResolvedSeatCode<TConfig> = [InferSeatCodes<TConfig>] extends [
+  never,
+]
+  ? string
+  : InferSeatCodes<TConfig>;
 
-export type GeneratedPlanCode = CommetGeneratedTypes extends {
-  planCode: infer T;
-}
-  ? T
-  : string;
+export type ResolvedUsageCode<TConfig> = [InferUsageCodes<TConfig>] extends [
+  never,
+]
+  ? string
+  : InferUsageCodes<TConfig>;
 
-export type GeneratedFeatureCode = CommetGeneratedTypes extends {
-  featureCode: infer T;
-}
-  ? T
-  : string;
+export type ResolvedPlanCode<TConfig> = [InferPlanCodes<TConfig>] extends [
+  never,
+]
+  ? string
+  : InferPlanCodes<TConfig>;
