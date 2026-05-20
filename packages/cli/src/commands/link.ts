@@ -24,13 +24,33 @@ interface OrganizationsResponse {
   organizations: Organization[];
 }
 
+interface LinkOptions {
+  org?: string;
+}
+
 export const linkCommand = new Command("link")
-  .description("Link this project to a Commet organization")
-  .action(async () => {
+  .description(
+    "Link this project directory to a Commet organization. Creates .commet/config.json with the selected org.",
+  )
+  .option(
+    "--org <slug-or-id>",
+    "Organization slug or ID — skips interactive selection",
+  )
+  .addHelpText(
+    "after",
+    `
+Examples:
+  $ commet link                  Interactive — choose from a list
+  $ commet link --org acme       Non-interactive — match by slug or ID
+
+Use 'commet orgs' to see available organizations and their slugs.
+`,
+  )
+  .action(async (options: LinkOptions) => {
     if (!authExists()) {
       console.log(chalk.red("✗ Not authenticated"));
       console.log(chalk.dim("Run `commet login` first"));
-      return;
+      process.exit(1);
     }
 
     if (projectConfigExists()) {
@@ -56,7 +76,7 @@ export const linkCommand = new Command("link")
     if (result.error || !result.data) {
       spinner.fail("Failed to fetch organizations");
       console.error(chalk.red("Error:"), result.error);
-      return;
+      process.exit(1);
     }
 
     const { organizations } = result.data;
@@ -72,25 +92,43 @@ export const linkCommand = new Command("link")
 
     spinner.stop();
 
-    let orgId: string;
-    try {
-      orgId = await select({
-        message: "Select organization:",
-        choices: organizations.map((org) => ({
-          name: `${org.name} ${chalk.dim(`(${org.slug}) · ${org.mode}`)}`,
-          value: org.id,
-        })),
-        theme: promptTheme,
-      });
-    } catch (_error) {
-      console.log(chalk.yellow("\n⚠ Link cancelled"));
-      return;
-    }
+    let selectedOrg: Organization | undefined;
 
-    const selectedOrg = organizations.find((org) => org.id === orgId);
-    if (!selectedOrg) {
-      console.log(chalk.red("✗ Organization not found"));
-      return;
+    if (options.org) {
+      selectedOrg = organizations.find(
+        (org) => org.slug === options.org || org.id === options.org,
+      );
+      if (!selectedOrg) {
+        console.log(
+          chalk.red(`✗ Organization "${options.org}" not found`),
+        );
+        console.log(chalk.dim("\nAvailable organizations:"));
+        for (const org of organizations) {
+          console.log(chalk.dim(`  ${org.slug} (${org.mode})`));
+        }
+        process.exit(1);
+      }
+    } else {
+      let orgId: string;
+      try {
+        orgId = await select({
+          message: "Select organization:",
+          choices: organizations.map((org) => ({
+            name: `${org.name} ${chalk.dim(`(${org.slug}) · ${org.mode}`)}`,
+            value: org.id,
+          })),
+          theme: promptTheme,
+        });
+      } catch (_error) {
+        console.log(chalk.yellow("\n⚠ Link cancelled"));
+        return;
+      }
+
+      selectedOrg = organizations.find((org) => org.id === orgId);
+      if (!selectedOrg) {
+        console.log(chalk.red("✗ Organization not found"));
+        process.exit(1);
+      }
     }
 
     saveProjectConfig({

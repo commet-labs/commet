@@ -67,10 +67,22 @@ interface PullOptions {
 }
 
 export const pullCommand = new Command("pull")
-  .description("Pull config from Commet and generate commet.config.ts")
+  .description(
+    "Fetch your billing config from Commet and generate (or update) commet.config.ts with features and plans.",
+  )
   .option("-y, --yes", "Skip confirmation prompt")
-  .option("--dry-run", "Show diff without applying changes")
+  .option("--dry-run", "Show what would change without writing any files")
   .option("--json", "Output structured JSON (no colors, no prompts)")
+  .addHelpText(
+    "after",
+    `
+Examples:
+  $ commet pull                  Interactive — shows diff, asks to confirm
+  $ commet pull --dry-run        Preview changes without applying
+  $ commet pull --yes            Apply without confirmation
+  $ commet pull --json --yes     Agent/CI — structured JSON, no prompts
+`,
+  )
   .action(async (options: PullOptions) => {
     const jsonMode = options.json;
 

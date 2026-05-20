@@ -22,13 +22,34 @@ interface OrganizationsResponse {
   organizations: Organization[];
 }
 
+interface SwitchOptions {
+  org?: string;
+}
+
 export const switchCommand = new Command("switch")
-  .description("Switch to a different organization")
-  .action(async () => {
+  .description(
+    "Switch this project to a different organization. Updates .commet/config.json with the new org.",
+  )
+  .option(
+    "--org <slug-or-id>",
+    "Organization slug or ID — skips interactive selection",
+  )
+  .addHelpText(
+    "after",
+    `
+Examples:
+  $ commet switch                Interactive — choose from a list
+  $ commet switch --org acme     Non-interactive — match by slug or ID
+
+Use 'commet orgs' to see available organizations and their slugs.
+After switching, run 'commet pull' to update your config file.
+`,
+  )
+  .action(async (options: SwitchOptions) => {
     if (!authExists()) {
       console.log(chalk.red("✗ Not authenticated"));
       console.log(chalk.dim("Run `commet login` first"));
-      return;
+      process.exit(1);
     }
 
     if (!projectConfigExists()) {
@@ -36,7 +57,7 @@ export const switchCommand = new Command("switch")
       console.log(
         chalk.dim("Run `commet link` first to connect to an organization"),
       );
-      return;
+      process.exit(1);
     }
 
     const spinner = ora("Fetching organizations...").start();
@@ -48,7 +69,7 @@ export const switchCommand = new Command("switch")
     if (result.error || !result.data) {
       spinner.fail("Failed to fetch organizations");
       console.error(chalk.red("Error:"), result.error);
-      return;
+      process.exit(1);
     }
 
     const { organizations } = result.data;
@@ -56,30 +77,48 @@ export const switchCommand = new Command("switch")
     if (organizations.length === 0) {
       spinner.stop();
       console.log(chalk.yellow("⚠ No organizations found"));
-      return;
+      process.exit(1);
     }
 
     spinner.stop();
 
-    let orgId: string;
-    try {
-      orgId = await select({
-        message: "Select organization:",
-        choices: organizations.map((org) => ({
-          name: `${org.name} ${chalk.dim(`(${org.slug}) · ${org.mode}`)}`,
-          value: org.id,
-        })),
-        theme: promptTheme,
-      });
-    } catch (_error) {
-      console.log(chalk.yellow("\n⚠ Switch cancelled"));
-      return;
-    }
+    let selectedOrg: Organization | undefined;
 
-    const selectedOrg = organizations.find((org) => org.id === orgId);
-    if (!selectedOrg) {
-      console.log(chalk.red("✗ Organization not found"));
-      return;
+    if (options.org) {
+      selectedOrg = organizations.find(
+        (org) => org.slug === options.org || org.id === options.org,
+      );
+      if (!selectedOrg) {
+        console.log(
+          chalk.red(`✗ Organization "${options.org}" not found`),
+        );
+        console.log(chalk.dim("\nAvailable organizations:"));
+        for (const org of organizations) {
+          console.log(chalk.dim(`  ${org.slug} (${org.mode})`));
+        }
+        process.exit(1);
+      }
+    } else {
+      let orgId: string;
+      try {
+        orgId = await select({
+          message: "Select organization:",
+          choices: organizations.map((org) => ({
+            name: `${org.name} ${chalk.dim(`(${org.slug}) · ${org.mode}`)}`,
+            value: org.id,
+          })),
+          theme: promptTheme,
+        });
+      } catch (_error) {
+        console.log(chalk.yellow("\n⚠ Switch cancelled"));
+        return;
+      }
+
+      selectedOrg = organizations.find((org) => org.id === orgId);
+      if (!selectedOrg) {
+        console.log(chalk.red("✗ Organization not found"));
+        process.exit(1);
+      }
     }
 
     saveProjectConfig({
@@ -88,9 +127,9 @@ export const switchCommand = new Command("switch")
       mode: selectedOrg.mode,
     });
 
-    console.log(chalk.green("\n✓ Switched organization successfully!"));
+    console.log(chalk.green("\n✓ Switched organization"));
     console.log(
-      chalk.dim(`\nOrganization: ${selectedOrg.name} · ${selectedOrg.mode}`),
+      chalk.dim(`Organization: ${selectedOrg.name} · ${selectedOrg.mode}`),
     );
     console.log(
       chalk.dim(

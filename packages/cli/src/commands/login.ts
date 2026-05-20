@@ -4,7 +4,9 @@ import { authExists } from "../utils/config";
 import { performLogin } from "../utils/login-flow";
 
 export const loginCommand = new Command("login")
-  .description("Authenticate with Commet")
+  .description(
+    "Authenticate with Commet via browser. Opens a device-code flow — you confirm in the browser and the CLI stores your token locally at ~/.commet/auth.json.",
+  )
   .action(async () => {
     if (authExists()) {
       console.log(chalk.yellow("⚠ You are already logged in."));

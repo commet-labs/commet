@@ -3,7 +3,9 @@ import { Command } from "commander";
 import { clearProjectConfig, projectConfigExists } from "../utils/config";
 
 export const unlinkCommand = new Command("unlink")
-  .description("Unlink this project from Commet")
+  .description(
+    "Unlink this project from its organization. Removes the .commet/ directory. Does not delete anything on remote.",
+  )
   .action(async () => {
     if (!projectConfigExists()) {
       console.log(

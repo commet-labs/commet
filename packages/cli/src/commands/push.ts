@@ -38,10 +38,26 @@ interface PushOptions {
 }
 
 export const pushCommand = new Command("push")
-  .description("Push commet.config.ts to your Commet organization")
+  .description(
+    "Push your local commet.config.ts to Commet. Creates or updates features and plans to match your config file.",
+  )
   .option("-y, --yes", "Skip confirmation prompt")
-  .option("--dry-run", "Show diff without applying changes")
+  .option("--dry-run", "Show what would change without pushing")
   .option("--json", "Output structured JSON (no colors, no prompts)")
+  .addHelpText(
+    "after",
+    `
+Examples:
+  $ commet push                  Interactive — shows diff, asks to confirm
+  $ commet push --dry-run        Preview what would change on remote
+  $ commet push --yes            Push without confirmation
+  $ commet push --json --yes     Agent/CI — structured JSON, no prompts
+
+Notes:
+  Feature types (boolean, usage, seats) cannot be changed via push.
+  Resources in remote but not in your config are left as-is (not deleted).
+`,
+  )
   .action(async (options: PushOptions) => {
     const jsonMode = options.json;
 

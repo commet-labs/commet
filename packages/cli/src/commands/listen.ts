@@ -85,12 +85,23 @@ function resolveTargetUrl(input: string): string {
 }
 
 export const listenCommand = new Command("listen")
-  .description("Forward webhook events to your local server")
+  .description(
+    "Forward webhook events from Commet to your local server in real time. Opens a persistent connection and replays every event as an HTTP POST to your URL.",
+  )
   .argument(
     "<url>",
-    "URL to forward to (e.g. localhost:3000, local.commet.co:3010/webhooks, or just a port)",
+    "Target URL — a port (3000), host:port (localhost:3000), or full URL",
   )
-  .option("--events <types>", "Comma-separated event types to filter")
+  .option("--events <types>", "Only forward these event types (comma-separated)")
+  .addHelpText(
+    "after",
+    `
+Examples:
+  $ commet listen 3000                          Forward to http://localhost:3000/
+  $ commet listen localhost:3000/webhooks        Forward to a specific path
+  $ commet listen 3000 --events invoice.paid     Only forward invoice.paid events
+`,
+  )
   .action(async (url: string, options: ListenOptions) => {
     const auth = loadAuth();
     if (!auth) {
