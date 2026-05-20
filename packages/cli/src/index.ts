@@ -131,7 +131,9 @@ function printDefaultScreen() {
   console.log(dim("\n  Config"));
   console.log(`    ${cmd("pull")}${dim("Sync remote → commet.config.ts")}`);
   console.log(`    ${cmd("push")}${dim("Sync commet.config.ts → remote")}`);
-  console.log(`    ${cmd("list <type>")}${dim("List features, plans, or seats")}`);
+  console.log(
+    `    ${cmd("list <type>")}${dim("List features, plans, or seats")}`,
+  );
 
   console.log(dim("\n  Development"));
   console.log(`    ${cmd("listen <url>")}${dim("Forward webhooks locally")}`);
@@ -147,6 +149,8 @@ function printDefaultScreen() {
   console.log(`    ${cmd("logout")}${dim("Log out")}`);
 
   console.log(
-    dim("\n  commet --help for full reference · commet agent-info for agents/CI\n"),
+    dim(
+      "\n  commet --help for full reference · commet agent-info for agents/CI\n",
+    ),
   );
 }

@@ -99,9 +99,7 @@ Use 'commet orgs' to see available organizations and their slugs.
         (org) => org.slug === options.org || org.id === options.org,
       );
       if (!selectedOrg) {
-        console.log(
-          chalk.red(`✗ Organization "${options.org}" not found`),
-        );
+        console.log(chalk.red(`✗ Organization "${options.org}" not found`));
         console.log(chalk.dim("\nAvailable organizations:"));
         for (const org of organizations) {
           console.log(chalk.dim(`  ${org.slug} (${org.mode})`));

@@ -153,7 +153,9 @@ Examples:
 
       console.log(chalk.bold(`\n  Features (${features.length})\n`));
       for (const feature of features) {
-        console.log(chalk.green(`  ${feature.code} ${chalk.dim(`(${feature.type})`)}`));
+        console.log(
+          chalk.green(`  ${feature.code} ${chalk.dim(`(${feature.type})`)}`),
+        );
         console.log(chalk.dim(`    ${feature.name}`));
         if (feature.description) {
           console.log(chalk.dim(`    ${feature.description}`));
@@ -179,7 +181,9 @@ Examples:
       console.log(chalk.bold(`\n  Seat Types (${seatTypes.length})\n`));
       for (const seatType of seatTypes) {
         console.log(
-          chalk.green(`  ${seatType.code}${seatType.isFree ? chalk.dim(" (free)") : ""}`),
+          chalk.green(
+            `  ${seatType.code}${seatType.isFree ? chalk.dim(" (free)") : ""}`,
+          ),
         );
         console.log(chalk.dim(`    ${seatType.name}`));
         if (seatType.description) {

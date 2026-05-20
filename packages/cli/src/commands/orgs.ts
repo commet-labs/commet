@@ -48,9 +48,7 @@ The slug shown here is what you pass to 'commet link --org <slug>'.
       process.exit(1);
     }
 
-    const spinner = jsonMode
-      ? null
-      : ora("Fetching organizations...").start();
+    const spinner = jsonMode ? null : ora("Fetching organizations...").start();
 
     const result = await apiRequest<OrganizationsResponse>(
       `${BASE_URL}/api/cli/organizations`,

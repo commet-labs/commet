@@ -92,7 +92,10 @@ export const listenCommand = new Command("listen")
     "<url>",
     "Target URL — a port (3000), host:port (localhost:3000), or full URL",
   )
-  .option("--events <types>", "Only forward these event types (comma-separated)")
+  .option(
+    "--events <types>",
+    "Only forward these event types (comma-separated)",
+  )
   .addHelpText(
     "after",
     `
