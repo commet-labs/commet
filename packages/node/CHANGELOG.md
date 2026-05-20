@@ -1,5 +1,11 @@
 # @commet/node
 
+## 4.4.1
+
+### Patch Changes
+
+- bdcd4ef: Remove unused `"tiered"` value from `PlanDetailFeature.overage.model` type — the platform no longer supports tiered pricing
+
 ## 4.4.0
 
 ### Minor Changes
