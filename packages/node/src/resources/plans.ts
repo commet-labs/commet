@@ -59,7 +59,7 @@ export interface PlanDetailPrice {
 export interface PlanDetailFeature extends PlanFeature {
   overage: {
     enabled: boolean;
-    model: "per_unit" | "tiered" | null;
+    model: "per_unit" | null;
     unitPrice: number | null;
   } | null;
 }
