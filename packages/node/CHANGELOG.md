@@ -1,5 +1,11 @@
 # @commet/node
 
+## 4.5.0
+
+### Minor Changes
+
+- dcdc94a: Add `subscriptions.uncancel()` method to revert a scheduled cancellation
+
 ## 4.4.1
 
 ### Patch Changes

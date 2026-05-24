@@ -1,5 +1,12 @@
 # @commet/next
 
+## 0.5.7
+
+### Patch Changes
+
+- Updated dependencies [dcdc94a]
+  - @commet/node@4.5.0
+
 ## 0.5.6
 
 ### Patch Changes
