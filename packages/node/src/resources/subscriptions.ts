@@ -148,6 +148,10 @@ export interface CancelParams {
   immediate?: boolean;
 }
 
+export interface UncancelParams {
+  subscriptionId: string;
+}
+
 /**
  * Subscription resource for managing subscriptions (plan-first model)
  *
@@ -208,6 +212,30 @@ export class SubscriptionsResource {
     return this.httpClient.post(
       `/subscriptions/${params.subscriptionId}/cancel`,
       params || {},
+      options,
+    );
+  }
+
+  /**
+   * Revert a scheduled cancellation
+   *
+   * Only works on subscriptions with a pending cancellation (canceledAt is set
+   * but status is not yet "canceled"). Cannot revert already-canceled subscriptions.
+   *
+   * @example
+   * ```typescript
+   * await commet.subscriptions.uncancel({
+   *   subscriptionId: 'sub_xxx',
+   * });
+   * ```
+   */
+  async uncancel(
+    params: UncancelParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<Subscription>> {
+    return this.httpClient.post(
+      `/subscriptions/${params.subscriptionId}/uncancel`,
+      {},
       options,
     );
   }
