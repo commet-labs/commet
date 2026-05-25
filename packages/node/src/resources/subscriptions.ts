@@ -152,6 +152,35 @@ export interface UncancelParams {
   subscriptionId: string;
 }
 
+export interface ChangePlanParams {
+  subscriptionId: string;
+  newPlanId?: string;
+  newBillingInterval?: BillingInterval;
+}
+
+export interface ChangePlanResult {
+  id: string;
+  scheduled: boolean;
+  customerId?: string;
+  previousPlan?: { id: string; name: string };
+  currentPlan?: { id: string; name: string; price: number };
+  billingInterval?: string;
+  billing?: {
+    credit: number;
+    creditsApplied: number;
+    charge: number;
+    taxAmount: number;
+    netAmount: number;
+    totalCharged: number;
+    remainingCreditBalance: number;
+  };
+  invoiceId?: string;
+  scheduledFor?: string;
+  changeType?: string;
+  requiresCheckout?: boolean;
+  checkoutUrl?: string;
+}
+
 /**
  * Subscription resource for managing subscriptions (plan-first model)
  *
@@ -236,6 +265,31 @@ export class SubscriptionsResource {
     return this.httpClient.post(
       `/subscriptions/${params.subscriptionId}/uncancel`,
       {},
+      options,
+    );
+  }
+
+  /**
+   * Change the plan of a subscription (upgrade/downgrade)
+   *
+   * Upgrades execute immediately. Downgrades are scheduled for end of period.
+   *
+   * @example
+   * ```typescript
+   * await commet.subscriptions.changePlan({
+   *   subscriptionId: 'sub_xxx',
+   *   newPlanId: 'pln_xxx',
+   * });
+   * ```
+   */
+  async changePlan(
+    params: ChangePlanParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<ChangePlanResult>> {
+    const { subscriptionId, ...body } = params;
+    return this.httpClient.post(
+      `/subscriptions/${subscriptionId}/change-plan`,
+      body,
       options,
     );
   }

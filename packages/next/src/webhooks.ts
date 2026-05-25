@@ -34,6 +34,10 @@ export const Webhooks = (config: WebhooksConfig) => {
     onSubscriptionCanceled,
     onSubscriptionCreated,
     onSubscriptionUpdated,
+    onSubscriptionPlanChanged,
+    onPaymentReceived,
+    onPaymentFailed,
+    onInvoiceCreated,
     onPayload,
     onError,
   } = config;
@@ -115,6 +119,30 @@ export const Webhooks = (config: WebhooksConfig) => {
         case "subscription.updated":
           if (onSubscriptionUpdated) {
             promises.push(onSubscriptionUpdated(payload));
+          }
+          break;
+
+        case "subscription.plan_changed":
+          if (onSubscriptionPlanChanged) {
+            promises.push(onSubscriptionPlanChanged(payload));
+          }
+          break;
+
+        case "payment.received":
+          if (onPaymentReceived) {
+            promises.push(onPaymentReceived(payload));
+          }
+          break;
+
+        case "payment.failed":
+          if (onPaymentFailed) {
+            promises.push(onPaymentFailed(payload));
+          }
+          break;
+
+        case "invoice.created":
+          if (onInvoiceCreated) {
+            promises.push(onInvoiceCreated(payload));
           }
           break;
 

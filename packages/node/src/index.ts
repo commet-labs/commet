@@ -3,6 +3,11 @@
  */
 export { Commet, createCommet } from "./client";
 export { CustomerContext } from "./customer";
+// Addons
+export type {
+  ActiveAddon,
+  GetActiveAddonsParams,
+} from "./resources/addons";
 // Credit Packs
 export type { CreditPack } from "./resources/credit-packs";
 // Customers
@@ -52,18 +57,23 @@ export type {
   ActiveSubscription,
   CancellationSummary,
   CancelParams,
+  ChangePlanParams,
+  ChangePlanResult,
   CreatedSubscription,
   CreateSubscriptionParams,
   DiscountSummary,
   FeatureSummary,
   Subscription,
   SubscriptionStatus,
+  UncancelParams,
 } from "./resources/subscriptions";
 // Usage
 export type {
+  CheckUsageParams,
   TrackModelTokensParams,
   TrackParams,
   TrackUsageParams,
+  UsageCheckResult,
   UsageEvent,
   UsageEventProperty,
 } from "./resources/usage";

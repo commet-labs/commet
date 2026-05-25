@@ -88,6 +88,53 @@ export interface WebhooksConfig {
   onSubscriptionUpdated?: (payload: WebhookPayload) => Promise<void>;
 
   /**
+   * Handles the `subscription.plan_changed` webhook event
+   *
+   * Fired when a subscription changes from one plan to another (upgrade, downgrade,
+   * or billing interval change). The subscription stays active — access does not change.
+   *
+   * @param payload - The webhook payload containing plan change data
+   *
+   * @example
+   * ```typescript
+   * onSubscriptionPlanChanged: async (payload) => {
+   *   await db.update(users)
+   *     .set({ planId: payload.data.currentPlan.id })
+   *     .where(eq(users.id, payload.data.externalId));
+   * }
+   * ```
+   */
+  onSubscriptionPlanChanged?: (payload: WebhookPayload) => Promise<void>;
+
+  /**
+   * Handles the `payment.received` webhook event
+   *
+   * Fired when a payment is successfully processed for a subscription.
+   *
+   * @param payload - The webhook payload containing payment data
+   */
+  onPaymentReceived?: (payload: WebhookPayload) => Promise<void>;
+
+  /**
+   * Handles the `payment.failed` webhook event
+   *
+   * Fired when a payment attempt fails. Use this to notify users
+   * or trigger dunning flows.
+   *
+   * @param payload - The webhook payload containing payment data
+   */
+  onPaymentFailed?: (payload: WebhookPayload) => Promise<void>;
+
+  /**
+   * Handles the `invoice.created` webhook event
+   *
+   * Fired when a new invoice is generated for a subscription billing cycle.
+   *
+   * @param payload - The webhook payload containing invoice data
+   */
+  onInvoiceCreated?: (payload: WebhookPayload) => Promise<void>;
+
+  /**
    * Catch-all handler that receives all webhook events
    *
    * Useful for logging, analytics, or handling events without specific handlers.

@@ -49,6 +49,37 @@ export interface TrackModelTokensParams extends TrackBaseParams {
 
 export type TrackParams = TrackUsageParams | TrackModelTokensParams;
 
+export interface CheckUsageParams {
+  customerId: CustomerID;
+  featureCode: string;
+  quantity: number;
+}
+
+export interface UsageCheckResult {
+  allowed: boolean;
+  consumptionModel: string;
+  feature: string;
+  quantity: number;
+  current?: number;
+  remaining?: number;
+  unlimited?: boolean;
+  included?: number;
+  overageEnabled?: boolean;
+  overageUnitPrice?: number | null;
+  creditsPerUnit?: number;
+  estimatedCredits?: number;
+  planCredits?: number;
+  purchasedCredits?: number;
+  totalCredits?: number;
+  unitPrice?: number;
+  estimatedAmount?: number;
+  currentBalance?: number;
+  blockOnExhaustion?: boolean;
+  currency?: string;
+  reason?: string;
+  message?: string;
+}
+
 export class UsageResource {
   constructor(private httpClient: CommetHTTPClient) {}
 
@@ -84,5 +115,27 @@ export class UsageResource {
     }
 
     return this.httpClient.post("/usage/events", eventData, options);
+  }
+
+  /**
+   * Check if a usage event would be allowed before tracking it
+   *
+   * @example
+   * ```typescript
+   * const { data } = await commet.usage.check({
+   *   customerId: 'cus_xxx',
+   *   featureCode: 'api_calls',
+   *   quantity: 1,
+   * });
+   * if (data.allowed) {
+   *   // proceed with the operation
+   * }
+   * ```
+   */
+  async check(
+    params: CheckUsageParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<UsageCheckResult>> {
+    return this.httpClient.post("/usage/check", params, options);
   }
 }
