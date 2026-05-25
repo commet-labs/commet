@@ -3,13 +3,9 @@ import chalk from "chalk";
 import { Command } from "commander";
 import ora from "ora";
 import { apiRequest, BASE_URL } from "../utils/api";
-import {
-  authExists,
-  loadProjectConfig,
-  projectConfigExists,
-} from "../utils/config";
 import { loadBillingConfig } from "../utils/config-loader";
 import { computeDiff, formatDiff, type RemoteState } from "../utils/diff";
+import { isAgentMode, requireOrgContext } from "../utils/output";
 
 interface ConfigResponse {
   success: boolean;
@@ -34,7 +30,7 @@ interface PushResponse {
 interface PushOptions {
   yes?: boolean;
   dryRun?: boolean;
-  json?: boolean;
+  output?: string;
 }
 
 export const pushCommand = new Command("push")
@@ -43,7 +39,11 @@ export const pushCommand = new Command("push")
   )
   .option("-y, --yes", "Skip confirmation prompt")
   .option("--dry-run", "Show what would change without pushing")
-  .option("--json", "Output structured JSON (no colors, no prompts)")
+  .option(
+    "--output <format>",
+    "Output format: human (default) or agent",
+    "human",
+  )
   .addHelpText(
     "after",
     `
@@ -51,57 +51,27 @@ Examples:
   $ commet push                  Interactive — shows diff, asks to confirm
   $ commet push --dry-run        Preview what would change on remote
   $ commet push --yes            Push without confirmation
-  $ commet push --json --yes     Agent/CI — structured JSON, no prompts
-
-Notes:
-  Feature types (boolean, usage, seats) cannot be changed via push.
-  Resources in remote but not in your config are left as-is (not deleted).
+  $ commet push --output agent --yes   Agent/CI — structured JSON, no prompts
+  $ COMMET_API_KEY=sk_... commet push --yes   CI pipeline
 `,
   )
   .action(async (options: PushOptions) => {
-    const jsonMode = options.json;
+    const agentMode = isAgentMode(options);
+    const { orgId } = requireOrgContext();
 
-    if (!authExists()) {
-      if (jsonMode) {
-        console.log(JSON.stringify({ error: "Not authenticated" }));
-      } else {
-        console.log(chalk.red("✗ Not authenticated"));
-        console.log(chalk.dim("Run `commet login` first"));
-      }
-      process.exit(1);
-    }
-
-    if (!projectConfigExists()) {
-      if (jsonMode) {
-        console.log(JSON.stringify({ error: "Project not linked" }));
-      } else {
-        console.log(chalk.red("✗ Project not linked"));
-        console.log(
-          chalk.dim("Run `commet link` first to connect to an organization"),
-        );
-      }
-      process.exit(1);
-    }
-
-    const projectConfig = loadProjectConfig();
-    if (!projectConfig) {
-      if (jsonMode) {
-        console.log(JSON.stringify({ error: "Invalid project configuration" }));
-      } else {
-        console.log(chalk.red("✗ Invalid project configuration"));
-      }
-      process.exit(1);
-    }
-
-    const loadSpinner = jsonMode
+    const loadSpinner = agentMode
       ? null
       : ora("Loading commet.config.ts...").start();
 
     const loaded = await loadBillingConfig(process.cwd()).catch(
       (error: unknown) => {
         const message = error instanceof Error ? error.message : String(error);
-        if (jsonMode) {
-          console.log(JSON.stringify({ error: message }));
+        if (agentMode) {
+          console.log(
+            JSON.stringify({
+              error: { code: "config_invalid", message },
+            }),
+          );
         } else {
           loadSpinner?.fail("Failed to load config");
           console.error(chalk.red(message));
@@ -115,20 +85,21 @@ Notes:
     const { config, configPath } = loaded;
     loadSpinner?.succeed(`Loaded ${configPath}`);
 
-    const fetchSpinner = jsonMode
+    const fetchSpinner = agentMode
       ? null
       : ora("Fetching remote state...").start();
 
+    const orgQuery = orgId === "__from_api_key__" ? "" : `?orgId=${orgId}`;
     const remoteResult = await apiRequest<ConfigResponse>(
-      `${BASE_URL}/api/cli/pull?orgId=${projectConfig.orgId}`,
+      `${BASE_URL}/api/cli/pull${orgQuery}`,
     );
 
     if (remoteResult.error || !remoteResult.data) {
-      if (jsonMode) {
+      if (agentMode) {
         console.log(JSON.stringify({ error: remoteResult.error }));
       } else {
         fetchSpinner?.fail("Failed to fetch remote state");
-        console.error(chalk.red("Error:"), remoteResult.error);
+        console.error(chalk.red("Error:"), remoteResult.error?.message);
       }
       process.exit(1);
     }
@@ -142,7 +113,7 @@ Notes:
 
     const diff = computeDiff(config, remote);
 
-    if (jsonMode) {
+    if (agentMode) {
       if (options.dryRun) {
         console.log(JSON.stringify({ diff, applied: false }));
         return;
@@ -152,7 +123,7 @@ Notes:
     }
 
     if (!diff.hasChanges) {
-      if (jsonMode) {
+      if (agentMode) {
         console.log(JSON.stringify({ diff, applied: false, upToDate: true }));
       } else {
         console.log(chalk.green("\n✓ Everything is up to date"));
@@ -167,10 +138,13 @@ Notes:
     );
     if (typeChanges.length > 0) {
       const blockedCodes = typeChanges.map((c) => c.code);
-      if (jsonMode) {
+      if (agentMode) {
         console.log(
           JSON.stringify({
-            error: "Feature type changes blocked",
+            error: {
+              code: "type_change_blocked",
+              message: "Feature type changes must be done in the dashboard",
+            },
             blockedCodes,
             diff,
           }),
@@ -189,13 +163,13 @@ Notes:
     }
 
     if (options.dryRun) {
-      if (!jsonMode) {
+      if (!agentMode) {
         console.log(chalk.dim("\n(dry run — no changes applied)"));
       }
       return;
     }
 
-    if (!options.yes && !jsonMode) {
+    if (!options.yes && !agentMode) {
       const shouldProceed = await confirm({
         message: "Apply these changes?",
         default: true,
@@ -207,35 +181,33 @@ Notes:
       }
     }
 
-    const pushSpinner = jsonMode ? null : ora("Pushing config...").start();
+    const pushSpinner = agentMode ? null : ora("Pushing config...").start();
+
+    const pushBody: Record<string, unknown> = {
+      config: { features: config.features, plans: config.plans },
+    };
+    if (orgId !== "__from_api_key__") {
+      pushBody.orgId = orgId;
+    }
 
     const pushResult = await apiRequest<PushResponse>(
       `${BASE_URL}/api/cli/push`,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          orgId: projectConfig.orgId,
-          config: {
-            features: config.features,
-            plans: config.plans,
-          },
-        }),
-      },
+      { method: "POST", body: JSON.stringify(pushBody) },
     );
 
     if (pushResult.error || !pushResult.data) {
-      if (jsonMode) {
+      if (agentMode) {
         console.log(JSON.stringify({ error: pushResult.error }));
       } else {
         pushSpinner?.fail("Push failed");
-        console.error(chalk.red("Error:"), pushResult.error);
+        console.error(chalk.red("Error:"), pushResult.error?.message);
       }
       process.exit(1);
     }
 
     const pushOutcome = pushResult.data;
 
-    if (jsonMode) {
+    if (agentMode) {
       console.log(JSON.stringify({ diff, applied: true, result: pushOutcome }));
       return;
     }

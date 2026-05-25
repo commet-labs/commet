@@ -6,17 +6,13 @@ import { Command } from "commander";
 import ora from "ora";
 import { apiRequest, BASE_URL } from "../utils/api";
 import {
-  authExists,
-  loadProjectConfig,
-  projectConfigExists,
-} from "../utils/config";
-import {
   findConfigFile,
   type LoadedConfig,
   loadBillingConfig,
 } from "../utils/config-loader";
 import { computeDiff, formatDiff, type RemoteState } from "../utils/diff";
 import { generateConfigFile } from "../utils/generator";
+import { isAgentMode, requireOrgContext } from "../utils/output";
 
 interface Feature {
   id: string;
@@ -63,7 +59,7 @@ interface ConfigResponse {
 interface PullOptions {
   yes?: boolean;
   dryRun?: boolean;
-  json?: boolean;
+  output?: string;
 }
 
 export const pullCommand = new Command("pull")
@@ -72,7 +68,11 @@ export const pullCommand = new Command("pull")
   )
   .option("-y, --yes", "Skip confirmation prompt")
   .option("--dry-run", "Show what would change without writing any files")
-  .option("--json", "Output structured JSON (no colors, no prompts)")
+  .option(
+    "--output <format>",
+    "Output format: human (default) or agent",
+    "human",
+  )
   .addHelpText(
     "after",
     `
@@ -80,58 +80,29 @@ Examples:
   $ commet pull                  Interactive — shows diff, asks to confirm
   $ commet pull --dry-run        Preview changes without applying
   $ commet pull --yes            Apply without confirmation
-  $ commet pull --json --yes     Agent/CI — structured JSON, no prompts
+  $ commet pull --output agent --yes   Agent/CI — structured JSON, no prompts
+  $ COMMET_API_KEY=sk_... commet pull --yes   CI pipeline
 `,
   )
   .action(async (options: PullOptions) => {
-    const jsonMode = options.json;
+    const agentMode = isAgentMode(options);
+    const { orgId } = requireOrgContext();
 
-    if (!authExists()) {
-      if (jsonMode) {
-        console.log(JSON.stringify({ error: "Not authenticated" }));
-      } else {
-        console.log(chalk.red("✗ Not authenticated"));
-        console.log(chalk.dim("Run `commet login` first"));
-      }
-      process.exit(1);
-    }
-
-    if (!projectConfigExists()) {
-      if (jsonMode) {
-        console.log(JSON.stringify({ error: "Project not linked" }));
-      } else {
-        console.log(chalk.red("✗ Project not linked"));
-        console.log(
-          chalk.dim("Run `commet link` first to connect to an organization"),
-        );
-      }
-      process.exit(1);
-    }
-
-    const projectConfig = loadProjectConfig();
-    if (!projectConfig) {
-      if (jsonMode) {
-        console.log(JSON.stringify({ error: "Invalid project configuration" }));
-      } else {
-        console.log(chalk.red("✗ Invalid project configuration"));
-      }
-      process.exit(1);
-    }
-
-    const spinner = jsonMode
+    const spinner = agentMode
       ? null
       : ora("Fetching config from remote...").start();
 
+    const orgQuery = orgId === "__from_api_key__" ? "" : `?orgId=${orgId}`;
     const result = await apiRequest<ConfigResponse>(
-      `${BASE_URL}/api/cli/pull?orgId=${projectConfig.orgId}`,
+      `${BASE_URL}/api/cli/pull${orgQuery}`,
     );
 
     if (result.error || !result.data) {
-      if (jsonMode) {
+      if (agentMode) {
         console.log(JSON.stringify({ error: result.error }));
       } else {
         spinner?.fail("Failed to fetch config");
-        console.error(chalk.red("Error:"), result.error);
+        console.error(chalk.red("Error:"), result.error?.message);
       }
       process.exit(1);
     }
@@ -146,7 +117,7 @@ Examples:
 
     if (!existingConfigPath) {
       if (options.dryRun) {
-        if (jsonMode) {
+        if (agentMode) {
           console.log(
             JSON.stringify({
               action: "create",
@@ -167,7 +138,7 @@ Examples:
 
       fs.writeFileSync(outputPath, configContent, "utf8");
 
-      if (jsonMode) {
+      if (agentMode) {
         console.log(
           JSON.stringify({
             action: "create",
@@ -177,7 +148,7 @@ Examples:
           }),
         );
       } else {
-        console.log(chalk.green(`\n✓ Created commet.config.ts`));
+        console.log(chalk.green("\n✓ Created commet.config.ts"));
         console.log(
           chalk.dim(`  ${features.length} features, ${plans.length} plans`),
         );
@@ -193,7 +164,7 @@ Examples:
 
     if ("parseError" in localLoaded) {
       if (options.dryRun) {
-        if (jsonMode) {
+        if (agentMode) {
           console.log(
             JSON.stringify({
               action: "overwrite",
@@ -211,7 +182,7 @@ Examples:
         return;
       }
 
-      if (!options.yes && !jsonMode) {
+      if (!options.yes && !agentMode) {
         console.log(chalk.yellow(`\n⚠ ${localLoaded.parseError}`));
         const shouldProceed = await confirm({
           message: "Overwrite with remote?",
@@ -224,7 +195,7 @@ Examples:
       }
 
       fs.writeFileSync(outputPath, configContent, "utf8");
-      if (jsonMode) {
+      if (agentMode) {
         console.log(JSON.stringify({ action: "overwrite", applied: true }));
       } else {
         console.log(chalk.green("\n✓ Overwritten commet.config.ts"));
@@ -253,9 +224,7 @@ Examples:
             name: p.name,
             ...(p.description ? { description: p.description } : {}),
             ...(p.consumptionModel
-              ? {
-                  consumptionModel: p.consumptionModel,
-                }
+              ? { consumptionModel: p.consumptionModel }
               : {}),
             ...(p.isFree ? { isFree: true } : {}),
             ...(p.isPublic === false ? { isPublic: false } : {}),
@@ -310,7 +279,7 @@ Examples:
       diff.features.unmanaged.length === 0 &&
       diff.plans.unmanaged.length === 0
     ) {
-      if (jsonMode) {
+      if (agentMode) {
         console.log(JSON.stringify({ diff, applied: false, upToDate: true }));
       } else {
         console.log(chalk.green("\n✓ Already up to date"));
@@ -318,7 +287,7 @@ Examples:
       return;
     }
 
-    if (jsonMode) {
+    if (agentMode) {
       if (options.dryRun) {
         console.log(JSON.stringify({ diff, applied: false }));
         return;
@@ -328,13 +297,13 @@ Examples:
     }
 
     if (options.dryRun) {
-      if (!jsonMode) {
+      if (!agentMode) {
         console.log(chalk.dim("\n(dry run — no changes applied)"));
       }
       return;
     }
 
-    if (!options.yes && !jsonMode) {
+    if (!options.yes && !agentMode) {
       const shouldProceed = await confirm({
         message: "Overwrite commet.config.ts with remote state?",
         default: true,
@@ -348,7 +317,7 @@ Examples:
 
     fs.writeFileSync(outputPath, configContent, "utf8");
 
-    if (jsonMode) {
+    if (agentMode) {
       console.log(JSON.stringify({ diff, applied: true }));
     } else {
       console.log(chalk.green("\n✓ Updated commet.config.ts"));

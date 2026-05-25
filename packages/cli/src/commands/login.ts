@@ -2,12 +2,27 @@ import chalk from "chalk";
 import { Command } from "commander";
 import { authExists } from "../utils/config";
 import { performLogin } from "../utils/login-flow";
+import { isAgentMode } from "../utils/output";
 
 export const loginCommand = new Command("login")
   .description(
     "Authenticate with Commet via browser. Opens a device-code flow — you confirm in the browser and the CLI stores your token locally at ~/.commet/auth.json.",
   )
   .action(async () => {
+    if (process.env.COMMET_API_KEY) {
+      if (isAgentMode()) {
+        console.log(
+          JSON.stringify({
+            success: true,
+            message: "Using COMMET_API_KEY — login not needed",
+          }),
+        );
+      } else {
+        console.log(chalk.green("✓ Using COMMET_API_KEY — login not needed"));
+      }
+      return;
+    }
+
     if (authExists()) {
       console.log(chalk.yellow("⚠ You are already logged in."));
       console.log(
