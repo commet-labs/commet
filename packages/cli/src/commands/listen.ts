@@ -2,7 +2,8 @@ import Ably from "ably";
 import chalk from "chalk";
 import { Command } from "commander";
 import { apiRequest, BASE_URL } from "../utils/api";
-import { loadAuth, loadProjectConfig } from "../utils/config";
+import { loadProjectConfig } from "../utils/config";
+import { exitWithError, requireOrgContext } from "../utils/output";
 
 interface ListenStartResponse {
   sessionId: string;
@@ -106,75 +107,41 @@ Examples:
 `,
   )
   .action(async (url: string, options: ListenOptions) => {
-    const auth = loadAuth();
-    if (!auth) {
-      console.log(chalk.red("Not authenticated. Run: commet login"));
-      process.exit(1);
-    }
-
-    const projectConfig = loadProjectConfig();
-    if (!projectConfig) {
-      console.log(chalk.red("No project linked. Run: commet link"));
-      process.exit(1);
-    }
+    const { orgId } = requireOrgContext();
 
     let targetUrl: string;
     try {
       targetUrl = resolveTargetUrl(url);
     } catch (error) {
-      console.log(
-        chalk.red(error instanceof Error ? error.message : "Invalid URL"),
-      );
-      process.exit(1);
+      exitWithError({
+        code: "invalid_url",
+        message: error instanceof Error ? error.message : "Invalid URL",
+      });
     }
 
-    async function fetchTokenRequest(): Promise<{
-      sessionId: string;
-      channelName: string;
-      signingSecret: string;
-      tokenRequest: Ably.TokenRequest;
-    }> {
-      const result = await apiRequest<ListenStartResponse>(
-        `${BASE_URL}/api/cli/listen/start`,
-        {
-          method: "POST",
-          body: JSON.stringify({ organizationId: projectConfig!.orgId }),
-        },
-      );
+    const projectConfig = loadProjectConfig();
+    const organizationId = orgId === "__from_api_key__" ? undefined : orgId;
+    const orgName = projectConfig?.orgName ?? "API key";
 
-      if (result.error || !result.data) {
-        console.log(chalk.red("Failed to start listen session"));
-        if (result.error) {
-          console.log(chalk.dim(result.error));
-        }
-        process.exit(1);
-      }
+    const startResult = await apiRequest<ListenStartResponse>(
+      `${BASE_URL}/api/cli/listen/start`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          ...(organizationId ? { organizationId } : {}),
+        }),
+      },
+    );
 
-      return result.data;
+    if (startResult.error || !startResult.data) {
+      exitWithError({
+        code: "listen_failed",
+        message: "Failed to start listen session",
+      });
     }
 
-    const initialSession = await fetchTokenRequest();
     const { sessionId, channelName, signingSecret, tokenRequest } =
-      initialSession;
-
-    async function refreshToken(): Promise<Ably.TokenRequest> {
-      const result = await apiRequest<ListenRefreshResponse>(
-        `${BASE_URL}/api/cli/listen/refresh`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            sessionId,
-            organizationId: projectConfig!.orgId,
-          }),
-        },
-      );
-
-      if (result.error || !result.data) {
-        throw new Error(result.error ?? "Failed to refresh token");
-      }
-
-      return result.data.tokenRequest;
-    }
+      startResult.data;
 
     let isFirstToken = true;
 
@@ -186,8 +153,22 @@ Examples:
             callback(null, tokenRequest);
             return;
           }
-          const refreshed = await refreshToken();
-          callback(null, refreshed);
+          const refreshResult = await apiRequest<ListenRefreshResponse>(
+            `${BASE_URL}/api/cli/listen/refresh`,
+            {
+              method: "POST",
+              body: JSON.stringify({
+                sessionId,
+                ...(organizationId ? { organizationId } : {}),
+              }),
+            },
+          );
+
+          if (refreshResult.error || !refreshResult.data) {
+            throw new Error("Failed to refresh token");
+          }
+
+          callback(null, refreshResult.data.tokenRequest);
         } catch (error) {
           callback(
             error instanceof Error ? error.message : "Token refresh failed",
@@ -220,9 +201,7 @@ Examples:
     const channel = ably.channels.get(channelName);
 
     console.log("");
-    console.log(
-      chalk.green(`  ✓ Authenticated (org: ${projectConfig.orgName})`),
-    );
+    console.log(chalk.green(`  ✓ Authenticated (org: ${orgName})`));
     console.log(chalk.green("  ✓ Connected to Commet webhook stream"));
     console.log(chalk.cyan(`  ⟶ Forwarding to ${targetUrl}`));
     console.log(chalk.dim(`  ⟶ Signing secret: ${signingSecret}`));
@@ -252,7 +231,11 @@ Examples:
       })
         .then((response) => {
           const ms = Math.round(performance.now() - start);
-          printEventLine({ event, statusCode: response.status, ms });
+          printEventLine({
+            event,
+            statusCode: response.status,
+            ms,
+          });
         })
         .catch((error) => {
           const ms = Math.round(performance.now() - start);
@@ -278,7 +261,7 @@ Examples:
         method: "POST",
         body: JSON.stringify({
           sessionId,
-          organizationId: projectConfig!.orgId,
+          ...(organizationId ? { organizationId } : {}),
         }),
       });
 

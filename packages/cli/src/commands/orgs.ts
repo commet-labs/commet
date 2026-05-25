@@ -2,7 +2,8 @@ import chalk from "chalk";
 import { Command } from "commander";
 import ora from "ora";
 import { apiRequest, BASE_URL } from "../utils/api";
-import { authExists, loadProjectConfig } from "../utils/config";
+import { loadProjectConfig } from "../utils/config";
+import { isAgentMode, requireAuth } from "../utils/output";
 
 interface Organization {
   id: string;
@@ -17,14 +18,18 @@ interface OrganizationsResponse {
 }
 
 interface OrgsOptions {
-  json?: boolean;
+  output?: string;
 }
 
 export const orgsCommand = new Command("orgs")
   .description(
     "List all organizations you have access to. Shows name, slug, mode (live/sandbox), and which one is currently linked.",
   )
-  .option("--json", "Output as JSON array")
+  .option(
+    "--output <format>",
+    "Output format: human (default) or agent",
+    "human",
+  )
   .addHelpText(
     "after",
     `
@@ -36,30 +41,22 @@ The slug shown here is what you pass to 'commet link --org <slug>'.
 `,
   )
   .action(async (options: OrgsOptions) => {
-    const jsonMode = options.json;
+    const agentMode = isAgentMode(options);
 
-    if (!authExists()) {
-      if (jsonMode) {
-        console.log(JSON.stringify({ error: "Not authenticated" }));
-      } else {
-        console.log(chalk.red("✗ Not authenticated"));
-        console.log(chalk.dim("Run `commet login` first"));
-      }
-      process.exit(1);
-    }
+    requireAuth();
 
-    const spinner = jsonMode ? null : ora("Fetching organizations...").start();
+    const spinner = agentMode ? null : ora("Fetching organizations...").start();
 
     const result = await apiRequest<OrganizationsResponse>(
       `${BASE_URL}/api/cli/organizations`,
     );
 
     if (result.error || !result.data) {
-      if (jsonMode) {
+      if (agentMode) {
         console.log(JSON.stringify({ error: result.error }));
       } else {
         spinner?.fail("Failed to fetch organizations");
-        console.error(chalk.red("Error:"), result.error);
+        console.error(chalk.red("Error:"), result.error?.message);
       }
       process.exit(1);
     }
@@ -68,7 +65,7 @@ The slug shown here is what you pass to 'commet link --org <slug>'.
 
     const { organizations } = result.data;
 
-    if (jsonMode) {
+    if (agentMode) {
       console.log(JSON.stringify(organizations));
       return;
     }
