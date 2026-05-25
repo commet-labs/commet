@@ -35,7 +35,7 @@ export const orgsCommand = new Command("orgs")
     `
 Examples:
   $ commet orgs                  Show orgs with current selection marked
-  $ commet orgs --json           JSON array for agent/CI use
+  $ commet orgs --output agent   JSON array for agent/CI use
 
 The slug shown here is what you pass to 'commet link --org <slug>'.
 `,

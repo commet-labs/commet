@@ -24,6 +24,10 @@ import {
   markCommandStart,
   reportCommand,
 } from "./utils/telemetry";
+import {
+  printUpdateNotification,
+  scheduleUpdateCheck,
+} from "./utils/update-check";
 
 const program = new Command();
 
@@ -82,11 +86,13 @@ program.exitOverride();
 
 installCrashHandler();
 markCommandStart();
+scheduleUpdateCheck(packageJson.version);
 
 const commandName = process.argv[2] || "(default)";
 
 program.hook("postAction", () => {
   reportCommand(commandName, "success");
+  printUpdateNotification(packageJson.version);
 });
 
 try {
