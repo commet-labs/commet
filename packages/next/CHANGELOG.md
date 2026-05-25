@@ -1,5 +1,30 @@
 # @commet/next
 
+## 0.6.0
+
+### Minor Changes
+
+- 370bb66: feat: add missing SDK methods and webhook handlers
+
+  @commet/node:
+
+  - Add `subscriptions.changePlan()` for upgrading/downgrading plans
+  - Add `usage.check()` for verifying quota before consuming
+  - Add `addons.getActive()` for fetching active addons
+  - Export `ChangePlanParams`, `ChangePlanResult`, `UncancelParams`, `CheckUsageParams`, `UsageCheckResult`, `ActiveAddon`, `GetActiveAddonsParams` types
+
+  @commet/next:
+
+  - Add `onSubscriptionPlanChanged` webhook handler
+  - Add `onPaymentReceived` webhook handler
+  - Add `onPaymentFailed` webhook handler
+  - Add `onInvoiceCreated` webhook handler
+
+### Patch Changes
+
+- Updated dependencies [370bb66]
+  - @commet/node@4.6.0
+
 ## 0.5.7
 
 ### Patch Changes
