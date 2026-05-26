@@ -8,6 +8,8 @@ import type { CommetHTTPClient } from "../utils/http";
 
 export interface Customer {
   id: CustomerID;
+  object: "customer";
+  livemode: boolean;
   organizationId: string;
   externalId?: string;
   fullName?: string;
@@ -45,8 +47,12 @@ export interface CreateParams {
   address?: CustomerAddress;
 }
 
+export interface GetCustomerParams {
+  id: CustomerID;
+}
+
 export interface UpdateParams {
-  customerId: CustomerID;
+  id: CustomerID;
   email?: string;
   fullName?: string;
   domain?: string;
@@ -71,15 +77,10 @@ export interface BatchResult {
   }>;
 }
 
-/**
- * Customers resource - Manage your customers
- */
 export class CustomersResource {
   constructor(private httpClient: CommetHTTPClient) {}
 
-  /**
-   * Create a customer (idempotent when id is provided)
-   */
+  /** Idempotent when `id` is provided — returns existing customer instead of duplicating. */
   async create(
     params: CreateParams,
     options?: RequestOptions,
@@ -102,9 +103,6 @@ export class CustomersResource {
     );
   }
 
-  /**
-   * Create multiple customers in batch
-   */
   async createBatch(
     params: { customers: CreateParams[] },
     options?: RequestOptions,
@@ -124,22 +122,16 @@ export class CustomersResource {
     return this.httpClient.post("/customers/batch", { customers }, options);
   }
 
-  /**
-   * Get a customer by ID
-   */
-  async get(customerId: CustomerID): Promise<ApiResponse<Customer>> {
-    return this.httpClient.get(`/customers/${customerId}`);
+  async get(params: GetCustomerParams): Promise<ApiResponse<Customer>> {
+    return this.httpClient.get(`/customers/${params.id}`);
   }
 
-  /**
-   * Update a customer
-   */
   async update(
     params: UpdateParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<Customer>> {
     return this.httpClient.put(
-      `/customers/${params.customerId}`,
+      `/customers/${params.id}`,
       {
         billingEmail: params.email,
         fullName: params.fullName,
@@ -155,9 +147,6 @@ export class CustomersResource {
     );
   }
 
-  /**
-   * List customers with optional filters
-   */
   async list(params?: ListCustomersParams): Promise<ApiResponse<Customer[]>> {
     return this.httpClient.get("/customers", params as Record<string, unknown>);
   }

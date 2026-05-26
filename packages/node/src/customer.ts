@@ -40,12 +40,6 @@ export class CustomerContext<TConfig = unknown> {
     get: (code: ResolvedFeatureCode<TConfig>, options?: RequestOptions) =>
       this.featuresResource.get({ code, customerId: this.customerId }, options),
 
-    check: (code: ResolvedFeatureCode<TConfig>, options?: RequestOptions) =>
-      this.featuresResource.check(
-        { code, customerId: this.customerId },
-        options,
-      ),
-
     canUse: (code: ResolvedFeatureCode<TConfig>, options?: RequestOptions) =>
       this.featuresResource.canUse(
         { code, customerId: this.customerId },
@@ -53,7 +47,7 @@ export class CustomerContext<TConfig = unknown> {
       ),
 
     list: (options?: RequestOptions) =>
-      this.featuresResource.list(this.customerId, options),
+      this.featuresResource.list({ customerId: this.customerId }, options),
   };
 
   seats = {
@@ -87,11 +81,20 @@ export class CustomerContext<TConfig = unknown> {
         options,
       ),
 
+    setAll: (seats: Record<string, number>, options?: RequestOptions) =>
+      this.seatsResource.setAll(
+        { customerId: this.customerId, seats },
+        options,
+      ),
+
     getBalance: (featureCode: ResolvedSeatCode<TConfig>) =>
       this.seatsResource.getBalance({
         customerId: this.customerId,
         featureCode,
       }),
+
+    getAllBalances: () =>
+      this.seatsResource.getAllBalances({ customerId: this.customerId }),
   };
 
   usage = {
@@ -105,10 +108,21 @@ export class CustomerContext<TConfig = unknown> {
         { customerId: this.customerId, feature, value, properties },
         options,
       ),
+
+    check: (
+      featureCode: ResolvedUsageCode<TConfig>,
+      quantity: number,
+      options?: RequestOptions,
+    ) =>
+      this.usageResource.check(
+        { customerId: this.customerId, featureCode, quantity },
+        options,
+      ),
   };
 
   subscription = {
-    get: () => this.subscriptionsResource.get(this.customerId),
+    get: () =>
+      this.subscriptionsResource.getActive({ customerId: this.customerId }),
   };
 
   portal = {

@@ -2,6 +2,8 @@ import type { ApiResponse, CustomerID, RequestOptions } from "../types/common";
 import type { CommetHTTPClient } from "../utils/http";
 
 export interface ActiveAddon {
+  object: "addon";
+  livemode: boolean;
   slug: string;
   name: string;
   basePrice: number;
@@ -12,25 +14,15 @@ export interface ActiveAddon {
   activatedAt: string;
 }
 
-export interface GetActiveAddonsParams {
+export interface ListActiveAddonsParams {
   customerId: CustomerID;
 }
 
 export class AddonsResource {
   constructor(private httpClient: CommetHTTPClient) {}
 
-  /**
-   * Get active addons for a customer's subscription
-   *
-   * @example
-   * ```typescript
-   * const { data } = await commet.addons.getActive({
-   *   customerId: 'cus_xxx',
-   * });
-   * ```
-   */
-  async getActive(
-    params: GetActiveAddonsParams,
+  async listActive(
+    params: ListActiveAddonsParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<ActiveAddon[]>> {
     return this.httpClient.get(

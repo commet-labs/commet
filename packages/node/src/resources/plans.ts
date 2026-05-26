@@ -31,6 +31,8 @@ export interface PlanFeature {
 
 export interface Plan {
   id: PlanID;
+  object: "plan";
+  livemode: boolean;
   code: string;
   name: string;
   description: string | null;
@@ -66,6 +68,8 @@ export interface PlanDetailFeature extends PlanFeature {
 
 export interface PlanDetail {
   id: PlanID;
+  object: "plan";
+  livemode: boolean;
   code: string;
   name: string;
   description: string | null;
@@ -82,39 +86,14 @@ export interface ListPlansParams extends ListParams {
   includePrivate?: boolean;
 }
 
-/**
- * Plans resource for listing available plans
- */
 export class PlansResource {
   constructor(private httpClient: CommetHTTPClient) {}
 
-  /**
-   * List all available plans
-   *
-   * @example
-   * ```typescript
-   * // List public plans
-   * const plans = await commet.plans.list();
-   *
-   * // Include private plans
-   * const allPlans = await commet.plans.list({ includePrivate: true });
-   * ```
-   */
   async list(params?: ListPlansParams): Promise<ApiResponse<Plan[]>> {
     return this.httpClient.get("/plans", params);
   }
 
-  /**
-   * Get a specific plan by code
-   *
-   * @example
-   * ```typescript
-   * const plan = await commet.plans.get('pro');
-   * console.log(plan.data.name); // "Pro"
-   * console.log(plan.data.prices); // [{ billingInterval: 'monthly', price: 9900 }]
-   * ```
-   */
-  async get(planCode: string): Promise<ApiResponse<PlanDetail>> {
-    return this.httpClient.get(`/plans/${planCode}`);
+  async get(params: { id: string }): Promise<ApiResponse<PlanDetail>> {
+    return this.httpClient.get(`/plans/${params.id}`);
   }
 }

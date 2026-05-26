@@ -1,16 +1,23 @@
 import type { ApiResponse, CustomerID, RequestOptions } from "../types/common";
 import type { CommetHTTPClient } from "../utils/http";
 
-export interface FeatureParams {
+export interface GetFeatureParams {
   customerId: CustomerID;
   code: string;
 }
 
-export type GetFeatureParams = FeatureParams;
-export type CheckFeatureParams = FeatureParams;
-export type CanUseFeatureParams = FeatureParams;
+export interface CanUseFeatureParams {
+  customerId: CustomerID;
+  code: string;
+}
+
+export interface ListFeaturesParams {
+  customerId: CustomerID;
+}
 
 export interface FeatureAccess {
+  object: "feature";
+  livemode: boolean;
   code: string;
   name: string;
   type: "boolean" | "usage" | "seats";
@@ -31,10 +38,6 @@ export interface CanUseResult {
   reason?: string;
 }
 
-export interface CheckResult {
-  allowed: boolean;
-}
-
 export class FeaturesResource {
   constructor(private httpClient: CommetHTTPClient) {}
 
@@ -49,31 +52,7 @@ export class FeaturesResource {
     );
   }
 
-  async check(
-    params: CheckFeatureParams,
-    options?: RequestOptions,
-  ): Promise<ApiResponse<CheckResult>> {
-    const result = await this.httpClient.get<FeatureAccess>(
-      `/features/${params.code}`,
-      { customerId: params.customerId },
-      options,
-    );
-
-    if (!result.success || !result.data) {
-      return {
-        success: false,
-        code: result.code,
-        message: result.message,
-        details: result.details,
-      };
-    }
-
-    return {
-      success: true,
-      data: { allowed: result.data.allowed },
-    };
-  }
-
+  /** Checks if the customer can consume one more unit — returns billing impact and reason if blocked. */
   async canUse(
     params: CanUseFeatureParams,
     options?: RequestOptions,
@@ -86,9 +65,13 @@ export class FeaturesResource {
   }
 
   async list(
-    customerId: CustomerID,
+    params: ListFeaturesParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<FeatureAccess[]>> {
-    return this.httpClient.get("/features", { customerId }, options);
+    return this.httpClient.get(
+      "/features",
+      { customerId: params.customerId },
+      options,
+    );
   }
 }

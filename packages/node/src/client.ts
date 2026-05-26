@@ -13,9 +13,6 @@ import type { CommetClientOptions } from "./types/common";
 import type { BillingConfig } from "./types/config";
 import { CommetHTTPClient } from "./utils/http";
 
-/**
- * Main Commet SDK client
- */
 export class Commet<TConfig = unknown> {
   private httpClient: CommetHTTPClient;
 
@@ -59,19 +56,6 @@ export class Commet<TConfig = unknown> {
     }
   }
 
-  /**
-   * Create a customer-scoped context for cleaner API usage
-   *
-   * @example
-   * ```typescript
-   * const customer = commet.customer("user_123");
-   *
-   * // All operations are now scoped to this customer
-   * const seats = await customer.features.get("team_members");
-   * await customer.seats.add("member");
-   * await customer.usage.track("api_call");
-   * ```
-   */
   customer(customerId: string): CustomerContext<TConfig> {
     return new CustomerContext<TConfig>(customerId, {
       features: this.features,

@@ -1,4 +1,5 @@
 import type {
+  ApiErrorDetail,
   ApiResponse,
   CommetClientOptions,
   RequestOptions,
@@ -210,43 +211,47 @@ export class CommetHTTPClient {
           );
         }
 
-        // Type guard for error response
-        const isErrorResponse = (
-          data: unknown,
-        ): data is {
-          message?: string;
-          code?: string;
-          details?: unknown;
-        } => {
-          return typeof data === "object" && data !== null;
+        const parsed =
+          typeof responseData === "object" && responseData !== null
+            ? (responseData as Record<string, unknown>)
+            : {};
+        const errorObj =
+          typeof parsed.error === "object" && parsed.error !== null
+            ? (parsed.error as Record<string, unknown>)
+            : {};
+
+        const errorDetail: ApiErrorDetail = {
+          type: (errorObj.type as string) ?? "api_error",
+          code: (errorObj.code as string) ?? "unknown",
+          message:
+            (errorObj.message as string) ??
+            `Request failed with status ${response.status}`,
+          param: errorObj.param as string | undefined,
+          details: errorObj.details,
+          doc_url: errorObj.doc_url as string | undefined,
         };
 
-        const errorData = isErrorResponse(responseData) ? responseData : {};
-
-        // Handle validation errors (new normalized shape)
         if (
-          errorData.code === "validation_error" &&
-          Array.isArray(errorData.details)
+          errorDetail.code === "validation_error" &&
+          Array.isArray(errorDetail.details)
         ) {
           const errors: Record<string, string[]> = {};
-          for (const detail of errorData.details as Array<{
+          for (const detail of errorDetail.details as Array<{
             field: string;
             message: string;
           }>) {
             if (!errors[detail.field]) errors[detail.field] = [];
             errors[detail.field].push(detail.message);
           }
-          throw new CommetValidationError(
-            errorData.message || "Validation failed",
-            errors,
-          );
+          throw new CommetValidationError(errorDetail.message, errors);
         }
 
         throw new CommetAPIError(
-          errorData.message || `Request failed with status ${response.status}`,
+          errorDetail.message,
           response.status,
-          errorData.code,
-          errorData.details,
+          errorDetail.code,
+          errorDetail.details,
+          errorDetail,
         );
       }
 
