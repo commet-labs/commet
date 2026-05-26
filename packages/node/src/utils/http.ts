@@ -46,10 +46,16 @@ export class CommetHTTPClient {
 
   async get<T = unknown>(
     endpoint: string,
-    params?: Record<string, unknown>,
+    params?: Record<string, unknown> | object,
     options?: RequestOptions,
   ): Promise<ApiResponse<T>> {
-    return this.request("GET", endpoint, undefined, options, params);
+    return this.request(
+      "GET",
+      endpoint,
+      undefined,
+      options,
+      params as Record<string, unknown>,
+    );
   }
 
   async post<T = unknown>(

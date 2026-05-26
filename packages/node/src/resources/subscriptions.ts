@@ -191,6 +191,98 @@ export interface ChangePlanResult {
   checkoutUrl?: string;
 }
 
+export interface ListSubscriptionsParams extends Record<string, unknown> {
+  customerId?: string;
+  status?: SubscriptionStatus;
+  limit?: number;
+  cursor?: string;
+}
+
+export interface SubscriptionListItem {
+  id: string;
+  object: "subscription";
+  livemode: boolean;
+  customerId: string;
+  planId: string;
+  planName: string;
+  name: string;
+  status: SubscriptionStatus;
+  startDate: string;
+  endDate: string;
+  billingDayOfMonth: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PreviewChangeParams {
+  id: string;
+  planId?: string;
+  billingInterval?: BillingInterval;
+}
+
+export interface PreviewChangeResult {
+  currentPlanCredit: number;
+  newPlanCharge: number;
+  estimatedTotal: number;
+  effectiveDate: string;
+  daysRemaining: number;
+  totalDays: number;
+  isUpgrade: boolean;
+}
+
+export interface ActivateAddonParams {
+  id: string;
+  addonId: string;
+}
+
+export interface ActivateAddonResult {
+  addonId: string;
+  status: string;
+  proratedCharge: number;
+}
+
+export interface DeactivateAddonParams {
+  id: string;
+  addonId: string;
+}
+
+export interface DeactivateAddonResult {
+  id: string;
+  status: string;
+  deactivatedAt: string;
+}
+
+export interface AdjustBalanceParams {
+  id: string;
+  amount: number;
+  reason?: string;
+  type?: "balance" | "credits";
+}
+
+export interface AdjustBalanceResult {
+  amount: number;
+  newBalance: number;
+  reason: string | null;
+}
+
+export interface TopupBalanceParams {
+  id: string;
+  amount: number;
+}
+
+export interface TopupBalanceResult {
+  amount: number;
+}
+
+export interface PurchaseCreditsParams {
+  id: string;
+  creditPackId: string;
+}
+
+export interface PurchaseCreditsResult {
+  credits: number;
+}
+
 /** Each customer can only have one active subscription at a time. */
 export class SubscriptionsResource {
   constructor(private httpClient: CommetHTTPClient) {}
@@ -243,5 +335,79 @@ export class SubscriptionsResource {
       body,
       options,
     );
+  }
+
+  async list(
+    params?: ListSubscriptionsParams,
+  ): Promise<ApiResponse<SubscriptionListItem[]>> {
+    return this.httpClient.get("/subscriptions", params);
+  }
+
+  /** Dry-run: returns proration details without applying the change. */
+  async previewChange(
+    params: PreviewChangeParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<PreviewChangeResult>> {
+    const { id, ...body } = params;
+    return this.httpClient.post(
+      `/subscriptions/${id}/preview-change`,
+      body,
+      options,
+    );
+  }
+
+  /** Prorated charge for the current billing period. */
+  async activateAddon(
+    params: ActivateAddonParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<ActivateAddonResult>> {
+    const { id, ...body } = params;
+    return this.httpClient.post(`/subscriptions/${id}/addons`, body, options);
+  }
+
+  async deactivateAddon(
+    params: DeactivateAddonParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<DeactivateAddonResult>> {
+    const { id, addonId } = params;
+    return this.httpClient.delete(
+      `/subscriptions/${id}/addons/${addonId}`,
+      undefined,
+      options,
+    );
+  }
+
+  /** Positive amount adds, negative subtracts. */
+  async adjustBalance(
+    params: AdjustBalanceParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<AdjustBalanceResult>> {
+    const { id, ...body } = params;
+    return this.httpClient.post(
+      `/subscriptions/${id}/balance/adjust`,
+      body,
+      options,
+    );
+  }
+
+  /** Charges the customer's payment method. */
+  async topupBalance(
+    params: TopupBalanceParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<TopupBalanceResult>> {
+    const { id, ...body } = params;
+    return this.httpClient.post(
+      `/subscriptions/${id}/balance/topup`,
+      body,
+      options,
+    );
+  }
+
+  async purchaseCredits(
+    params: PurchaseCreditsParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<PurchaseCreditsResult>> {
+    const { id, ...body } = params;
+    return this.httpClient.post(`/subscriptions/${id}/credits`, body, options);
   }
 }

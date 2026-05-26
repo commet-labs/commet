@@ -1,30 +1,39 @@
-import { CustomerContext } from "./customer";
 import { AddonsResource } from "./resources/addons";
+import { ApiKeysResource } from "./resources/api-keys";
 import { CreditPacksResource } from "./resources/credit-packs";
 import { CustomersResource } from "./resources/customers";
 import { FeaturesResource } from "./resources/features";
+import { InvoicesResource } from "./resources/invoices";
+import { PlanGroupsResource } from "./resources/plan-groups";
 import { PlansResource } from "./resources/plans";
 import { PortalResource } from "./resources/portal";
+import { PromoCodesResource } from "./resources/promo-codes";
 import { SeatsResource } from "./resources/seats";
 import { SubscriptionsResource } from "./resources/subscriptions";
+import { TransactionsResource } from "./resources/transactions";
 import { UsageResource } from "./resources/usage";
 import { Webhooks } from "./resources/webhooks";
 import type { CommetClientOptions } from "./types/common";
 import type { BillingConfig } from "./types/config";
 import { CommetHTTPClient } from "./utils/http";
 
-export class Commet<TConfig = unknown> {
+export class Commet<_TConfig = unknown> {
   private httpClient: CommetHTTPClient;
 
   public readonly addons: AddonsResource;
-  public readonly customers: CustomersResource;
+  public readonly apiKeys: ApiKeysResource;
   public readonly creditPacks: CreditPacksResource;
+  public readonly customers: CustomersResource;
+  public readonly features: FeaturesResource;
+  public readonly invoices: InvoicesResource;
+  public readonly planGroups: PlanGroupsResource;
   public readonly plans: PlansResource;
-  public readonly usage: UsageResource;
+  public readonly portal: PortalResource;
+  public readonly promoCodes: PromoCodesResource;
   public readonly seats: SeatsResource;
   public readonly subscriptions: SubscriptionsResource;
-  public readonly portal: PortalResource;
-  public readonly features: FeaturesResource;
+  public readonly transactions: TransactionsResource;
+  public readonly usage: UsageResource;
   public readonly webhooks: Webhooks;
 
   constructor(config: CommetClientOptions) {
@@ -40,30 +49,20 @@ export class Commet<TConfig = unknown> {
 
     this.httpClient = new CommetHTTPClient(config);
     this.addons = new AddonsResource(this.httpClient);
-    this.customers = new CustomersResource(this.httpClient);
+    this.apiKeys = new ApiKeysResource(this.httpClient);
     this.creditPacks = new CreditPacksResource(this.httpClient);
+    this.customers = new CustomersResource(this.httpClient);
+    this.features = new FeaturesResource(this.httpClient);
+    this.invoices = new InvoicesResource(this.httpClient);
+    this.planGroups = new PlanGroupsResource(this.httpClient);
     this.plans = new PlansResource(this.httpClient);
-    this.usage = new UsageResource(this.httpClient);
+    this.portal = new PortalResource(this.httpClient);
+    this.promoCodes = new PromoCodesResource(this.httpClient);
     this.seats = new SeatsResource(this.httpClient);
     this.subscriptions = new SubscriptionsResource(this.httpClient);
-    this.portal = new PortalResource(this.httpClient);
-    this.features = new FeaturesResource(this.httpClient);
-    this.webhooks = new Webhooks();
-
-    if (config.debug) {
-      console.log("[Commet SDK] Initialized");
-      console.log("API Key:", `${config.apiKey.substring(0, 12)}...`);
-    }
-  }
-
-  customer(customerId: string): CustomerContext<TConfig> {
-    return new CustomerContext<TConfig>(customerId, {
-      features: this.features,
-      seats: this.seats,
-      usage: this.usage,
-      subscriptions: this.subscriptions,
-      portal: this.portal,
-    });
+    this.transactions = new TransactionsResource(this.httpClient);
+    this.usage = new UsageResource(this.httpClient);
+    this.webhooks = new Webhooks(this.httpClient);
   }
 }
 

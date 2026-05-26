@@ -38,6 +38,38 @@ export interface CanUseResult {
   reason?: string;
 }
 
+export interface Feature {
+  id: string;
+  object: "feature";
+  livemode: boolean;
+  name: string;
+  code: string;
+  type: "boolean" | "usage" | "seats";
+  description: string | null;
+  unitName: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateFeatureParams {
+  code: string;
+  name: string;
+  type: "boolean" | "usage" | "seats";
+  description?: string;
+  unitName?: string;
+}
+
+export interface UpdateFeatureParams {
+  code: string;
+  name?: string;
+  description?: string;
+  unitName?: string;
+}
+
+export interface DeleteFeatureParams {
+  code: string;
+}
+
 export class FeaturesResource {
   constructor(private httpClient: CommetHTTPClient) {}
 
@@ -71,6 +103,34 @@ export class FeaturesResource {
     return this.httpClient.get(
       "/features",
       { customerId: params.customerId },
+      options,
+    );
+  }
+
+  async create(
+    params: CreateFeatureParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<Feature>> {
+    return this.httpClient.post("/features/manage", params, options);
+  }
+
+  async update(
+    params: UpdateFeatureParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<Feature>> {
+    const { code, ...body } = params;
+    return this.httpClient.put(`/features/${code}/manage`, body, options);
+  }
+
+  /** Fails if feature is attached to active plans or has an active addon. */
+  async delete(
+    params: DeleteFeatureParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<{ id: string; deleted: true }>> {
+    const { code } = params;
+    return this.httpClient.delete(
+      `/features/${code}/manage`,
+      undefined,
       options,
     );
   }
