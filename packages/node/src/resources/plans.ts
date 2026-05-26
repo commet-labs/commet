@@ -105,16 +105,31 @@ export interface PlanManage {
   updatedAt: string;
 }
 
-export interface PlanFeatureManage {
+interface PlanFeatureManageBase {
   planId: string;
   featureId: string;
   enabled: boolean;
   includedAmount: number | null;
   unlimited: boolean;
   overageEnabled: boolean;
-  overageUnitPrice: number | null;
   creditsPerUnit: number | null;
 }
+
+export interface FixedPricingFeatureManage extends PlanFeatureManageBase {
+  pricingMode: "fixed";
+  overageUnitPrice: number | null;
+  margin: null;
+}
+
+export interface AiModelPricingFeatureManage extends PlanFeatureManageBase {
+  pricingMode: "ai_model";
+  margin: number;
+  overageUnitPrice: null;
+}
+
+export type PlanFeatureManage =
+  | FixedPricingFeatureManage
+  | AiModelPricingFeatureManage;
 
 export interface PlanPriceManage {
   id: string;
@@ -127,6 +142,10 @@ export interface PlanPriceManage {
   trialDays: number;
   includedBalance: number | null;
   includedCredits: number | null;
+  introOfferEnabled: boolean;
+  introOfferDiscountType: "percentage" | "amount" | null;
+  introOfferDiscountValue: number | null;
+  introOfferDurationCycles: number | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -175,27 +194,54 @@ export interface SetVisibilityParams {
   isPublic: boolean;
 }
 
-export interface AddPlanFeatureParams {
+interface AddPlanFeatureBase {
   planId: string;
   featureId: string;
   enabled?: boolean;
   includedAmount?: number;
   unlimited?: boolean;
   overageEnabled?: boolean;
-  overageUnitPrice?: number;
-  creditsPerUnit?: number;
+  creditsPerUnit?: number | null;
 }
 
-export interface UpdatePlanFeatureParams {
+export interface AddFixedPricingFeatureParams extends AddPlanFeatureBase {
+  pricingMode?: "fixed";
+  overageUnitPrice?: number;
+}
+
+export interface AddAiModelPricingFeatureParams extends AddPlanFeatureBase {
+  pricingMode: "ai_model";
+  margin: number;
+}
+
+export type AddPlanFeatureParams =
+  | AddFixedPricingFeatureParams
+  | AddAiModelPricingFeatureParams;
+
+interface UpdatePlanFeatureBase {
   planId: string;
   featureId: string;
   enabled?: boolean;
   includedAmount?: number;
   unlimited?: boolean;
   overageEnabled?: boolean;
-  overageUnitPrice?: number;
-  creditsPerUnit?: number;
+  creditsPerUnit?: number | null;
 }
+
+export interface UpdateFixedPricingFeatureParams extends UpdatePlanFeatureBase {
+  pricingMode?: "fixed";
+  overageUnitPrice?: number;
+}
+
+export interface UpdateAiModelPricingFeatureParams
+  extends UpdatePlanFeatureBase {
+  pricingMode: "ai_model";
+  margin?: number;
+}
+
+export type UpdatePlanFeatureParams =
+  | UpdateFixedPricingFeatureParams
+  | UpdateAiModelPricingFeatureParams;
 
 export interface RemovePlanFeatureParams {
   planId: string;
@@ -210,6 +256,10 @@ export interface AddPlanPriceParams {
   isDefault?: boolean;
   includedBalance?: number;
   includedCredits?: number;
+  introOfferEnabled?: boolean;
+  introOfferDiscountType?: "percentage" | "amount";
+  introOfferDiscountValue?: number;
+  introOfferDurationCycles?: number;
 }
 
 export interface UpdatePlanPriceParams {
@@ -220,6 +270,10 @@ export interface UpdatePlanPriceParams {
   trialDays?: number;
   includedBalance?: number;
   includedCredits?: number;
+  introOfferEnabled?: boolean;
+  introOfferDiscountType?: "percentage" | "amount" | null;
+  introOfferDiscountValue?: number | null;
+  introOfferDurationCycles?: number | null;
 }
 
 export interface DeletePlanPriceParams {

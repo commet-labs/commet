@@ -2,11 +2,19 @@ export { Commet, createCommet } from "./client";
 export type {
   ActiveAddon,
   Addon,
+  BalanceAddon,
+  BooleanAddon,
   CreateAddonParams,
+  CreateBalanceAddonParams,
+  CreateBooleanAddonParams,
+  CreateCreditsAddonParams,
+  CreateMeteredAddonParams,
+  CreditsAddon,
   DeleteAddonParams,
   GetAddonParams,
   ListActiveAddonsParams,
   ListAddonsParams,
+  MeteredAddon,
   UpdateAddonParams,
 } from "./resources/addons";
 export type {
@@ -71,8 +79,11 @@ export type {
   UpdatePlanGroupParams,
 } from "./resources/plan-groups";
 export type {
+  AddAiModelPricingFeatureParams,
+  AddFixedPricingFeatureParams,
   AddPlanFeatureParams,
   AddPlanPriceParams,
+  AiModelPricingFeatureManage,
   BillingInterval,
   CreatePlanParams,
   DeletePlanParams,
@@ -80,6 +91,7 @@ export type {
   DeleteRegionalPricesParams,
   DeleteResult,
   FeatureType,
+  FixedPricingFeatureManage,
   ListPlansParams,
   Plan,
   PlanDetail,

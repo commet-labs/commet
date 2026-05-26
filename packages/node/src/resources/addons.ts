@@ -18,7 +18,7 @@ export interface ListActiveAddonsParams {
   customerId: CustomerID;
 }
 
-export interface Addon {
+interface AddonBase {
   id: string;
   object: "addon";
   livemode: boolean;
@@ -26,15 +26,41 @@ export interface Addon {
   slug: string;
   description: string | null;
   basePrice: number;
-  consumptionModel: string | null;
   featureCode: string;
   featureName: string;
-  includedUnits: number | null;
-  overageRate: number | null;
-  creditCost: number | null;
   createdAt: string;
   updatedAt: string;
 }
+
+export interface BooleanAddon extends AddonBase {
+  consumptionModel: "boolean";
+  includedUnits: null;
+  overageRate: null;
+  creditCost: null;
+}
+
+export interface MeteredAddon extends AddonBase {
+  consumptionModel: "metered";
+  includedUnits: number;
+  overageRate: number;
+  creditCost: null;
+}
+
+export interface CreditsAddon extends AddonBase {
+  consumptionModel: "credits";
+  includedUnits: null;
+  overageRate: null;
+  creditCost: number;
+}
+
+export interface BalanceAddon extends AddonBase {
+  consumptionModel: "balance";
+  includedUnits: null;
+  overageRate: number;
+  creditCost: null;
+}
+
+export type Addon = BooleanAddon | MeteredAddon | CreditsAddon | BalanceAddon;
 
 export interface ListAddonsParams {
   limit?: number;
@@ -45,16 +71,38 @@ export interface GetAddonParams {
   id: string;
 }
 
-export interface CreateAddonParams {
+interface CreateAddonBase {
   name: string;
   description?: string;
   basePrice: number;
   featureId: string;
-  consumptionModel?: string;
-  includedUnits?: number;
-  overageRate?: number;
-  creditCost?: number;
 }
+
+export interface CreateBooleanAddonParams extends CreateAddonBase {
+  consumptionModel: "boolean";
+}
+
+export interface CreateMeteredAddonParams extends CreateAddonBase {
+  consumptionModel: "metered";
+  includedUnits: number;
+  overageRate: number;
+}
+
+export interface CreateCreditsAddonParams extends CreateAddonBase {
+  consumptionModel: "credits";
+  creditCost: number;
+}
+
+export interface CreateBalanceAddonParams extends CreateAddonBase {
+  consumptionModel: "balance";
+  overageRate: number;
+}
+
+export type CreateAddonParams =
+  | CreateBooleanAddonParams
+  | CreateMeteredAddonParams
+  | CreateCreditsAddonParams
+  | CreateBalanceAddonParams;
 
 export interface UpdateAddonParams {
   id: string;
