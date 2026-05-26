@@ -80,6 +80,8 @@ export class CommetHTTPClient {
     return options?.apiVersion ?? this.config.apiVersion ?? API_VERSION;
   }
 
+  private static readonly BODY_METHODS = new Set(["POST", "PUT", "PATCH"]);
+
   private async request<T = unknown>(
     method: string,
     endpoint: string,
@@ -88,6 +90,16 @@ export class CommetHTTPClient {
     params?: Record<string, unknown>,
   ): Promise<ApiResponse<T>> {
     const url = this.buildURL(endpoint, params);
+
+    // Generate idempotency key once before retries — all attempts reuse the same key
+    if (
+      CommetHTTPClient.BODY_METHODS.has(method) &&
+      this.retryConfig.maxRetries > 0 &&
+      !options?.idempotencyKey
+    ) {
+      options = { ...options, idempotencyKey: this.generateIdempotencyKey() };
+    }
+
     return this.executeRequest(method, url, data, options);
   }
 
@@ -123,8 +135,6 @@ export class CommetHTTPClient {
 
       if (options?.idempotencyKey) {
         headers["Idempotency-Key"] = options.idempotencyKey;
-      } else if (method === "POST" && data) {
-        headers["Idempotency-Key"] = this.generateIdempotencyKey();
       }
 
       const requestConfig: RequestInit = {
@@ -336,12 +346,8 @@ export class CommetHTTPClient {
     return finalUrl;
   }
 
-  /**
-   * Generate idempotency key
-   */
   private generateIdempotencyKey(): string {
-    // Generate UUID-like key for idempotency
-    return `sdk_${Date.now()}_${Math.random().toString(36).substring(2)}`;
+    return `commet-node-retry-${crypto.randomUUID()}`;
   }
 
   /**
