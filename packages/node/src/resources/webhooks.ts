@@ -26,7 +26,6 @@ export interface WebhookData {
   publicId?: string;
   subscriptionId?: string;
   customerId?: string;
-  externalId?: string;
   /**
    * Subscription status. Present on `subscription.*` events.
    * Grant access when this is `"active"` or `"trialing"`.

@@ -11,7 +11,6 @@ export interface Customer {
   object: "customer";
   livemode: boolean;
   organizationId: string;
-  externalId?: string;
   fullName?: string;
   domain?: string;
   website?: string;
@@ -36,7 +35,7 @@ export interface CustomerAddress {
 
 export interface CreateParams {
   email: string; // billingEmail - the only required field
-  id?: string; // Your user ID — stored as externalId, used to identify the customer in all SDK methods
+  id?: string;
   fullName?: string;
   domain?: string;
   website?: string;
@@ -89,7 +88,7 @@ export class CustomersResource {
       "/customers",
       {
         billingEmail: params.email,
-        externalId: params.id,
+        id: params.id,
         fullName: params.fullName,
         domain: params.domain,
         website: params.website,
@@ -109,7 +108,7 @@ export class CustomersResource {
   ): Promise<ApiResponse<BatchResult>> {
     const customers = params.customers.map((c) => ({
       billingEmail: c.email,
-      externalId: c.id,
+      id: c.id,
       fullName: c.fullName,
       domain: c.domain,
       website: c.website,
