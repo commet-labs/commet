@@ -27,7 +27,9 @@ export async function getBillingDataAction(): Promise<{
       return { success: false, error: "Please sign in to view billing." };
     }
 
-    const subscriptionResult = await commet.subscriptions.get(user.id);
+    const subscriptionResult = await commet.subscriptions.getActive({
+      customerId: user.id,
+    });
 
     let subscription: BillingSubscription | null = null;
 

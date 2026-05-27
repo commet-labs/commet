@@ -43,7 +43,9 @@ function formatFeature(feature: PlanFeature): string {
 export default async function PricingPage() {
   const user = await getUser();
   if (user) {
-    const subscriptionResult = await commet.subscriptions.get(user.id);
+    const subscriptionResult = await commet.subscriptions.getActive({
+      customerId: user.id,
+    });
     if (subscriptionResult.success && subscriptionResult.data) {
       const subscription = subscriptionResult.data;
       if (

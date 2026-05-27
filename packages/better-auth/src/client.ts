@@ -164,7 +164,7 @@ export const commetClient = () => {
            * Add seats of a specific type
            */
           add: async (
-            data: { seatType: string; count: number },
+            data: { featureCode: string; count: number },
             fetchOptions?: BetterFetchOption,
           ) => {
             return $fetch("/commet/seats/add", {
@@ -178,7 +178,7 @@ export const commetClient = () => {
            * Remove seats of a specific type
            */
           remove: async (
-            data: { seatType: string; count: number },
+            data: { featureCode: string; count: number },
             fetchOptions?: BetterFetchOption,
           ) => {
             return $fetch("/commet/seats/remove", {
@@ -192,7 +192,7 @@ export const commetClient = () => {
            * Set seats to a specific count
            */
           set: async (
-            data: { seatType: string; count: number },
+            data: { featureCode: string; count: number },
             fetchOptions?: BetterFetchOption,
           ) => {
             return $fetch("/commet/seats/set", {

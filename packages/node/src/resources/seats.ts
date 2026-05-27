@@ -24,13 +24,13 @@ export interface SeatBalance {
 export interface AddSeatsParams {
   customerId: CustomerID;
   featureCode: string;
-  count: number;
+  count?: number;
 }
 
 export interface RemoveSeatsParams {
   customerId: CustomerID;
   featureCode: string;
-  count: number;
+  count?: number;
 }
 
 export interface SetSeatsParams {
@@ -66,7 +66,7 @@ export class SeatsResource {
       {
         customerId: params.customerId,
         featureCode: params.featureCode,
-        count: params.count,
+        count: params.count ?? 1,
       },
       options,
     );
@@ -82,7 +82,7 @@ export class SeatsResource {
       {
         customerId: params.customerId,
         featureCode: params.featureCode,
-        count: params.count,
+        count: params.count ?? 1,
       },
       options,
     );

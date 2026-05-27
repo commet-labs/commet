@@ -28,7 +28,9 @@ export async function getBillingDataAction(): Promise<{
     }
 
     // Get subscription from Commet
-    const subscriptionResult = await commet.subscriptions.get(user.id);
+    const subscriptionResult = await commet.subscriptions.getActive({
+      customerId: user.id,
+    });
 
     let subscription: BillingSubscription | null = null;
 

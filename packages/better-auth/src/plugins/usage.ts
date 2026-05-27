@@ -55,7 +55,7 @@ export const usage =
 
             if (!result.success) {
               throw new APIError("INTERNAL_SERVER_ERROR", {
-                message: result.message || "Failed to track usage",
+                message: result.error?.message || "Failed to track usage",
               });
             }
 

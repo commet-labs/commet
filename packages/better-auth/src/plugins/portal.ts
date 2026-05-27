@@ -45,7 +45,8 @@ export const portal =
             if (!portalAccess.success || !portalAccess.data) {
               throw new APIError("INTERNAL_SERVER_ERROR", {
                 message:
-                  portalAccess.message || "Failed to generate portal URL",
+                  portalAccess.error?.message ||
+                  "Failed to generate portal URL",
               });
             }
 

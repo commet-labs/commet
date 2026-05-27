@@ -36,11 +36,11 @@ export const features =
           }
 
           try {
-            const result = await commet.features.list(userId);
+            const result = await commet.features.list({ customerId: userId });
 
             if (!result.success) {
               throw new APIError("INTERNAL_SERVER_ERROR", {
-                message: result.message || "Failed to list features",
+                message: result.error?.message || "Failed to list features",
               });
             }
 
@@ -93,7 +93,7 @@ export const features =
 
             if (!result.success) {
               throw new APIError("INTERNAL_SERVER_ERROR", {
-                message: result.message || "Failed to get feature",
+                message: result.error?.message || "Failed to get feature",
               });
             }
 
@@ -139,14 +139,14 @@ export const features =
           }
 
           try {
-            const result = await commet.features.check({
+            const result = await commet.features.canUse({
               customerId: userId,
               code,
             });
 
             if (!result.success) {
               throw new APIError("INTERNAL_SERVER_ERROR", {
-                message: result.message || "Failed to check feature",
+                message: result.error?.message || "Failed to check feature",
               });
             }
 
@@ -199,7 +199,8 @@ export const features =
 
             if (!result.success) {
               throw new APIError("INTERNAL_SERVER_ERROR", {
-                message: result.message || "Failed to check feature usage",
+                message:
+                  result.error?.message || "Failed to check feature usage",
               });
             }
 

@@ -9,7 +9,7 @@ import { z } from "zod";
 export type SeatsConfig = Record<string, never>;
 
 const SeatOperationSchema = z.object({
-  seatType: z.string(),
+  featureCode: z.string(),
   count: z.number().min(1),
 });
 
@@ -53,7 +53,7 @@ export const seats =
 
             if (!result.success) {
               throw new APIError("INTERNAL_SERVER_ERROR", {
-                message: result.message || "Failed to list seats",
+                message: result.error?.message || "Failed to list seats",
               });
             }
 
@@ -96,7 +96,7 @@ export const seats =
             const result = await commet.seats.add(
               {
                 customerId: userId,
-                seatType: ctx.body.seatType,
+                featureCode: ctx.body.featureCode,
                 count: ctx.body.count,
               },
               {},
@@ -104,7 +104,7 @@ export const seats =
 
             if (!result.success) {
               throw new APIError("INTERNAL_SERVER_ERROR", {
-                message: result.message || "Failed to add seats",
+                message: result.error?.message || "Failed to add seats",
               });
             }
 
@@ -145,7 +145,7 @@ export const seats =
             const result = await commet.seats.remove(
               {
                 customerId: userId,
-                seatType: ctx.body.seatType,
+                featureCode: ctx.body.featureCode,
                 count: ctx.body.count,
               },
               {},
@@ -153,7 +153,7 @@ export const seats =
 
             if (!result.success) {
               throw new APIError("INTERNAL_SERVER_ERROR", {
-                message: result.message || "Failed to remove seats",
+                message: result.error?.message || "Failed to remove seats",
               });
             }
 
@@ -196,7 +196,7 @@ export const seats =
             const result = await commet.seats.set(
               {
                 customerId: userId,
-                seatType: ctx.body.seatType,
+                featureCode: ctx.body.featureCode,
                 count: ctx.body.count,
               },
               {},
@@ -204,7 +204,7 @@ export const seats =
 
             if (!result.success) {
               throw new APIError("INTERNAL_SERVER_ERROR", {
-                message: result.message || "Failed to set seats",
+                message: result.error?.message || "Failed to set seats",
               });
             }
 
@@ -252,7 +252,7 @@ export const seats =
 
             if (!result.success) {
               throw new APIError("INTERNAL_SERVER_ERROR", {
-                message: result.message || "Failed to set all seats",
+                message: result.error?.message || "Failed to set all seats",
               });
             }
 

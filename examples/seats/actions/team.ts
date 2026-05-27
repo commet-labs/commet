@@ -53,9 +53,10 @@ export async function inviteMemberAction(
       return { success: false, error: "Not authenticated" };
     }
 
-    const customer = commet.customer(user.id);
-
-    const canAdd = await customer.features.canUse("member");
+    const canAdd = await commet.features.canUse({
+      customerId: user.id,
+      code: "member",
+    });
     if (!canAdd.success || !canAdd.data?.allowed) {
       return {
         success: false,
@@ -107,7 +108,11 @@ export async function inviteMemberAction(
     }
 
     try {
-      await customer.seats.add("member");
+      await commet.seats.add({
+        customerId: user.id,
+        featureCode: "member",
+        count: 1,
+      });
     } catch (error) {
       console.error("Failed to report seat to Commet:", error);
     }
@@ -176,9 +181,12 @@ export async function removeMemberAction(
       })
       .where(eq(member.id, memberId));
 
-    const customer = commet.customer(user.id);
     try {
-      await customer.seats.remove("member");
+      await commet.seats.remove({
+        customerId: user.id,
+        featureCode: "member",
+        count: 1,
+      });
     } catch (error) {
       console.error("Failed to report seat removal to Commet:", error);
     }
@@ -208,9 +216,9 @@ export async function checkSubscriptionStatusAction(): Promise<SubscriptionStatu
     const user = await getUser();
     if (!user) return defaultStatus;
 
-    const customer = commet.customer(user.id);
-
-    const result = await customer.subscription.get();
+    const result = await commet.subscriptions.getActive({
+      customerId: user.id,
+    });
     if (!result.success || !result.data) {
       return defaultStatus;
     }
@@ -219,7 +227,10 @@ export async function checkSubscriptionStatusAction(): Promise<SubscriptionStatu
     const isActive =
       subscription.status === "active" || subscription.status === "trialing";
 
-    const seatResult = await customer.features.get("member");
+    const seatResult = await commet.features.get({
+      customerId: user.id,
+      code: "member",
+    });
 
     return {
       isPaid: isActive,
