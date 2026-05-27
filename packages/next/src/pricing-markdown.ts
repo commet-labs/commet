@@ -41,7 +41,7 @@ export const PricingMarkdown = ({
       const plansResult = await commet.plans.list();
 
       if (!plansResult.success || !plansResult.data) {
-        throw new Error(plansResult.message ?? "Failed to fetch plans");
+        throw new Error(plansResult.error?.message ?? "Failed to fetch plans");
       }
 
       const publicPlans = plansResult.data.filter((plan) => plan.isPublic);

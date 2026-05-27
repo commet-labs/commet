@@ -26,7 +26,7 @@ export interface WebhooksConfig {
    * onSubscriptionActivated: async (payload) => {
    *   await db.update(users)
    *     .set({ isPaid: true })
-   *     .where(eq(users.id, payload.data.externalId));
+   *     .where(eq(users.id, payload.data.customerId));
    * }
    * ```
    */
@@ -45,7 +45,7 @@ export interface WebhooksConfig {
    * onSubscriptionCanceled: async (payload) => {
    *   await db.update(users)
    *     .set({ isPaid: false })
-   *     .where(eq(users.id, payload.data.externalId));
+   *     .where(eq(users.id, payload.data.customerId));
    * }
    * ```
    */
@@ -100,7 +100,7 @@ export interface WebhooksConfig {
    * onSubscriptionPlanChanged: async (payload) => {
    *   await db.update(users)
    *     .set({ planId: payload.data.currentPlan.id })
-   *     .where(eq(users.id, payload.data.externalId));
+   *     .where(eq(users.id, payload.data.customerId));
    * }
    * ```
    */

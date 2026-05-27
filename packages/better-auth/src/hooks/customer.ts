@@ -103,16 +103,15 @@ export const onUserUpdate =
     }
 
     try {
-      // Find customer by externalId and update
       const existingCustomers = await options.client.customers.list({
-        externalId: user.id,
+        search: user.email,
       });
 
       const existingCustomer = existingCustomers.data?.[0];
 
       if (existingCustomer) {
         await options.client.customers.update({
-          customerId: existingCustomer.id,
+          id: existingCustomer.id,
           email: user.email,
           fullName: user.name ?? undefined,
         });

@@ -1,4 +1,6 @@
 import crypto from "node:crypto";
+import type { ApiResponse, RequestOptions } from "../types/common";
+import type { CommetHTTPClient } from "../utils/http";
 import type { SubscriptionStatus } from "./subscriptions";
 
 /**
@@ -24,7 +26,6 @@ export interface WebhookData {
   publicId?: string;
   subscriptionId?: string;
   customerId?: string;
-  externalId?: string;
   /**
    * Subscription status. Present on `subscription.*` events.
    * Grant access when this is `"active"` or `"trialing"`.
@@ -65,43 +66,49 @@ export interface VerifyAndParseParams {
   secret: string;
 }
 
-/**
- * Webhooks resource for signature verification
- */
+export interface WebhookEndpoint {
+  id: string;
+  object: "webhook_endpoint";
+  livemode: boolean;
+  url: string;
+  events: string[];
+  description: string | null;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface WebhookEndpointCreated extends WebhookEndpoint {
+  secretKey: string;
+}
+
+export interface WebhookTestResult {
+  success: boolean;
+  deliveredAt: string;
+}
+
+export interface ListWebhooksParams {
+  limit?: number;
+  cursor?: string;
+}
+
+export interface CreateWebhookParams {
+  url: string;
+  events: string[];
+  description?: string;
+}
+
+export interface DeleteWebhookParams {
+  id: string;
+}
+
+export interface TestWebhookParams {
+  id: string;
+}
+
 export class Webhooks {
-  /**
-   * Verify HMAC-SHA256 webhook signature
-   *
-   * Use this method to verify that webhooks are authentically from Commet.
-   * The signature is included in the `X-Commet-Signature` header.
-   *
-   * @param payload - Raw request body as string (IMPORTANT: Do not parse JSON first)
-   * @param signature - Value from X-Commet-Signature header
-   * @param secret - Your webhook secret from Commet dashboard
-   * @returns true if signature is valid, false otherwise
-   *
-   * @example
-   * ```typescript
-   * // Next.js API route example
-   * export async function POST(request: Request) {
-   *   const rawBody = await request.text();
-   *   const signature = request.headers.get('x-commet-signature');
-   *
-   *   const isValid = commet.webhooks.verify(
-   *     rawBody,
-   *     signature,
-   *     process.env.COMMET_WEBHOOK_SECRET
-   *   );
-   *
-   *   if (!isValid) {
-   *     return new Response('Invalid signature', { status: 401 });
-   *   }
-   *
-   *   const payload = JSON.parse(rawBody);
-   *   // Handle webhook event...
-   * }
-   * ```
-   */
+  constructor(private httpClient?: CommetHTTPClient) {}
+
+  /** HMAC-SHA256 verification. Payload must be the raw request body string, not parsed JSON. */
   verify(params: VerifyParams): boolean {
     const { payload, signature, secret } = params;
 
@@ -123,36 +130,12 @@ export class Webhooks {
     }
   }
 
-  /**
-   * Generate HMAC-SHA256 signature (internal use)
-   * @internal
-   */
   private generateSignature(params: GenerateSignatureParams): string {
     const { payload, secret } = params;
     return crypto.createHmac("sha256", secret).update(payload).digest("hex");
   }
 
-  /**
-   * Parse and verify webhook payload in one step
-   *
-   * @example
-   * ```typescript
-   * const payload = commet.webhooks.verifyAndParse({
-   *   rawBody,
-   *   signature,
-   *   secret: process.env.COMMET_WEBHOOK_SECRET
-   * });
-   *
-   * if (!payload) {
-   *   return new Response('Invalid signature', { status: 401 });
-   * }
-   *
-   * // payload is typed and validated
-   * if (payload.event === 'subscription.activated') {
-   *   // Handle activation...
-   * }
-   * ```
-   */
+  /** Verifies signature and parses JSON in one step. Returns null if invalid. */
   verifyAndParse(params: VerifyAndParseParams): WebhookPayload | null {
     const { rawBody, signature, secret } = params;
 
@@ -165,5 +148,36 @@ export class Webhooks {
     } catch {
       return null;
     }
+  }
+
+  async list(
+    params?: ListWebhooksParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<WebhookEndpoint[]>> {
+    return this.httpClient!.get("/webhooks", params, options);
+  }
+
+  /** Response includes `secretKey` which is only returned once. */
+  async create(
+    params: CreateWebhookParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<WebhookEndpointCreated>> {
+    return this.httpClient!.post("/webhooks", params, options);
+  }
+
+  async delete(
+    params: DeleteWebhookParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<{ id: string; deleted: true }>> {
+    const { id } = params;
+    return this.httpClient!.delete(`/webhooks/${id}`, undefined, options);
+  }
+
+  async test(
+    params: TestWebhookParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<WebhookTestResult>> {
+    const { id } = params;
+    return this.httpClient!.post(`/webhooks/${id}/test`, undefined, options);
   }
 }

@@ -7,19 +7,21 @@ export type CommetClientOptions = {
   telemetry?: boolean;
 };
 
-/** @deprecated Use CommetClientOptions */
-export type CommetConfig = CommetClientOptions;
-
-// API Response types
 export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
-  code?: string;
-  message?: string;
-  details?: unknown;
-  // Pagination fields (optional, included for list endpoints)
+  error?: ApiErrorDetail;
   hasMore?: boolean;
   nextCursor?: string;
+}
+
+export interface ApiErrorDetail {
+  type: string;
+  code: string;
+  message: string;
+  param?: string;
+  details?: unknown;
+  doc_url?: string;
 }
 
 export interface PaginatedResponse<T> {
@@ -48,14 +50,22 @@ export class CommetError extends Error {
 }
 
 export class CommetAPIError extends CommetError {
+  public type?: string;
+  public param?: string;
+  public docUrl?: string;
+
   constructor(
     message: string,
     public statusCode: number,
     public code?: string,
     public details?: unknown,
+    errorDetail?: ApiErrorDetail,
   ) {
     super(message, code, statusCode, details);
     this.name = "CommetAPIError";
+    this.type = errorDetail?.type;
+    this.param = errorDetail?.param;
+    this.docUrl = errorDetail?.doc_url;
   }
 }
 

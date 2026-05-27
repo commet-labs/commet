@@ -3,11 +3,11 @@ import type { CommetHTTPClient } from "../utils/http";
 
 export interface SeatEvent {
   id: string;
+  object: "seat";
+  livemode: boolean;
   organizationId: string;
   customerId: CustomerID;
   featureCode: string;
-  /** @deprecated Use featureCode */
-  seatType: string;
   eventType: "add" | "remove" | "set";
   quantity: number;
   previousBalance?: number;
@@ -21,98 +21,90 @@ export interface SeatBalance {
   asOf: string;
 }
 
-export interface AddParams {
+export interface AddSeatsParams {
   customerId: CustomerID;
-  featureCode?: string;
-  /** @deprecated Use featureCode instead */
-  seatType?: string;
+  featureCode: string;
+  count?: number;
+}
+
+export interface RemoveSeatsParams {
+  customerId: CustomerID;
+  featureCode: string;
+  count?: number;
+}
+
+export interface SetSeatsParams {
+  customerId: CustomerID;
+  featureCode: string;
   count: number;
 }
 
-export interface RemoveParams {
-  customerId: CustomerID;
-  featureCode?: string;
-  /** @deprecated Use featureCode instead */
-  seatType?: string;
-  count: number;
-}
-
-export interface SetParams {
-  customerId: CustomerID;
-  featureCode?: string;
-  /** @deprecated Use featureCode instead */
-  seatType?: string;
-  count: number;
-}
-
-export interface SetAllParams {
+export interface SetAllSeatsParams {
   customerId: CustomerID;
   seats: Record<string, number>;
 }
 
 export interface GetBalanceParams {
   customerId: CustomerID;
-  featureCode?: string;
-  /** @deprecated Use featureCode instead */
-  seatType?: string;
+  featureCode: string;
 }
 
 export interface GetAllBalancesParams {
   customerId: CustomerID;
 }
 
-function resolveCode(params: {
-  featureCode?: string;
-  seatType?: string;
-}): string {
-  const code = params.featureCode ?? params.seatType;
-  if (!code) {
-    throw new Error("Either featureCode or seatType must be provided");
-  }
-  return code;
-}
-
 export class SeatsResource {
   constructor(private httpClient: CommetHTTPClient) {}
 
+  /** Prorates charges for the current billing period. */
   async add(
-    params: AddParams,
+    params: AddSeatsParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<SeatEvent>> {
-    const code = resolveCode(params);
     return this.httpClient.post(
       "/seats",
-      { customerId: params.customerId, seatType: code, count: params.count },
+      {
+        customerId: params.customerId,
+        featureCode: params.featureCode,
+        count: params.count ?? 1,
+      },
       options,
     );
   }
 
+  /** Removal takes effect at the end of the billing period. */
   async remove(
-    params: RemoveParams,
+    params: RemoveSeatsParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<SeatEvent>> {
-    const code = resolveCode(params);
     return this.httpClient.delete(
       "/seats",
-      { customerId: params.customerId, seatType: code, count: params.count },
+      {
+        customerId: params.customerId,
+        featureCode: params.featureCode,
+        count: params.count ?? 1,
+      },
       options,
     );
   }
 
   async set(
-    params: SetParams,
+    params: SetSeatsParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<SeatEvent>> {
-    const code = resolveCode(params);
     return this.httpClient.put(
       "/seats",
-      { customerId: params.customerId, seatType: code, count: params.count },
+      {
+        customerId: params.customerId,
+        featureCode: params.featureCode,
+        count: params.count,
+      },
       options,
     );
   }
 
   async setAll(
-    params: SetAllParams,
+    params: SetAllSeatsParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<SeatEvent[]>> {
     return this.httpClient.put("/seats/bulk", params, options);
@@ -121,10 +113,9 @@ export class SeatsResource {
   async getBalance(
     params: GetBalanceParams,
   ): Promise<ApiResponse<SeatBalance>> {
-    const code = resolveCode(params);
     return this.httpClient.get("/seats/balance", {
       customerId: params.customerId,
-      seatType: code,
+      featureCode: params.featureCode,
     });
   }
 

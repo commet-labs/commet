@@ -15,7 +15,9 @@ export async function createCheckoutSession({
     redirect(`/sign-up?redirect=checkout&planCode=${planCode}`);
   }
 
-  const existing = await commet.subscriptions.get(user.id);
+  const existing = await commet.subscriptions.getActive({
+    customerId: user.id,
+  });
 
   if (existing.success && existing.data) {
     const status = existing.data.status;
@@ -36,7 +38,9 @@ export async function createCheckoutSession({
   });
 
   if (!result.success || !result.data?.checkoutUrl) {
-    throw new Error(result.message || "Failed to create checkout session");
+    throw new Error(
+      result.error?.message || "Failed to create checkout session",
+    );
   }
 
   redirect(result.data.checkoutUrl);
@@ -55,7 +59,9 @@ export async function getCheckoutUrl({
     throw new Error("User not authenticated");
   }
 
-  const existing = await commet.subscriptions.get(user.id);
+  const existing = await commet.subscriptions.getActive({
+    customerId: user.id,
+  });
 
   if (existing.success && existing.data) {
     const status = existing.data.status;
@@ -76,7 +82,9 @@ export async function getCheckoutUrl({
   });
 
   if (!result.success || !result.data?.checkoutUrl) {
-    throw new Error(result.message || "Failed to create checkout session");
+    throw new Error(
+      result.error?.message || "Failed to create checkout session",
+    );
   }
 
   return result.data.checkoutUrl;

@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       feature: featureCode,
       cost: "-",
-      status: result.message || "Failed — balance may be exhausted",
+      status: result.error?.message || "Failed — balance may be exhausted",
     });
   }
 

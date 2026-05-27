@@ -1,73 +1,174 @@
-/**
- * Commet SDK - Billing and usage tracking for SaaS
- */
 export { Commet, createCommet } from "./client";
-export { CustomerContext } from "./customer";
-// Addons
 export type {
   ActiveAddon,
-  GetActiveAddonsParams,
+  Addon,
+  BalanceAddon,
+  BooleanAddon,
+  CreateAddonParams,
+  CreateBalanceAddonParams,
+  CreateBooleanAddonParams,
+  CreateCreditsAddonParams,
+  CreateMeteredAddonParams,
+  CreditsAddon,
+  DeleteAddonParams,
+  GetAddonParams,
+  ListActiveAddonsParams,
+  ListAddonsParams,
+  MeteredAddon,
+  UpdateAddonParams,
 } from "./resources/addons";
-// Credit Packs
-export type { CreditPack } from "./resources/credit-packs";
-// Customers
+export type {
+  ApiKey,
+  ApiKeyCreated,
+  CreateApiKeyParams,
+  DeleteApiKeyParams,
+  ListApiKeysParams,
+} from "./resources/api-keys";
+export type {
+  CreateCreditPackParams,
+  CreditPack,
+  CreditPackDetail,
+  DeleteCreditPackParams,
+  UpdateCreditPackParams,
+} from "./resources/credit-packs";
 export type {
   BatchResult as CustomersBatchResult,
   CreateParams as CreateCustomerParams,
   Customer,
   CustomerAddress,
+  GetCustomerParams,
   ListCustomersParams,
   UpdateParams as UpdateCustomerParams,
 } from "./resources/customers";
-// Features
 export type {
   CanUseFeatureParams,
   CanUseResult,
-  CheckFeatureParams,
-  CheckResult,
+  CreateFeatureParams,
+  DeleteFeatureParams,
+  Feature,
   FeatureAccess,
   GetFeatureParams,
+  ListFeaturesParams,
+  UpdateFeatureParams,
 } from "./resources/features";
-// Plans
 export type {
+  CreateAdjustmentParams,
+  CreateAdjustmentResult,
+  GetDownloadUrlParams,
+  GetInvoiceParams,
+  InvoiceDetail,
+  InvoiceDownloadResult,
+  InvoiceLineItem,
+  InvoiceListItem,
+  InvoiceSendResult,
+  InvoiceStatusResult,
+  ListInvoicesParams,
+  SendInvoiceParams,
+  UpdateInvoiceStatusParams,
+} from "./resources/invoices";
+export type {
+  AddPlanToGroupParams,
+  CreatePlanGroupParams,
+  DeletePlanGroupParams,
+  GetPlanGroupParams,
+  ListPlanGroupsParams,
+  PlanGroup,
+  PlanGroupDetail,
+  RemovePlanFromGroupParams,
+  ReorderPlansParams,
+  UpdatePlanGroupParams,
+} from "./resources/plan-groups";
+export type {
+  AddAiModelPricingFeatureParams,
+  AddFixedPricingFeatureParams,
+  AddPlanFeatureParams,
+  AddPlanPriceParams,
+  AiModelPricingFeatureManage,
   BillingInterval,
+  CreatePlanParams,
+  DeletePlanParams,
+  DeletePlanPriceParams,
+  DeleteRegionalPricesParams,
+  DeleteResult,
   FeatureType,
+  FixedPricingFeatureManage,
   ListPlansParams,
   Plan,
   PlanDetail,
   PlanFeature,
+  PlanFeatureManage,
   PlanID,
+  PlanManage,
   PlanPrice,
+  PlanPriceManage,
+  RegionalPriceResult,
+  RemovePlanFeatureParams,
+  RemoveResult,
+  SetDefaultPriceParams,
+  SetRegionalPricesParams,
+  SetVisibilityParams,
+  UpdatePlanFeatureParams,
+  UpdatePlanParams,
+  UpdatePlanPriceParams,
 } from "./resources/plans";
-// Portal
 export type { GetUrlParams, PortalAccess } from "./resources/portal";
-// Seats
 export type {
-  AddParams as AddSeatsParams,
+  CreatePromoCodeParams,
+  GetPromoCodeParams,
+  ListPromoCodesParams,
+  PromoCode,
+  PromoCodeDetail,
+  UpdatePromoCodeParams,
+} from "./resources/promo-codes";
+export type {
+  AddSeatsParams,
   GetAllBalancesParams,
   GetBalanceParams,
-  RemoveParams as RemoveSeatsParams,
+  RemoveSeatsParams,
   SeatBalance,
   SeatEvent,
-  SetAllParams as SetAllSeatsParams,
-  SetParams as SetSeatsParams,
+  SetAllSeatsParams,
+  SetSeatsParams,
 } from "./resources/seats";
-// Subscriptions
 export type {
+  ActivateAddonParams,
+  ActivateAddonResult,
   ActiveSubscription,
+  AdjustBalanceParams,
+  AdjustBalanceResult,
   CancellationSummary,
   CancelParams,
   ChangePlanParams,
   ChangePlanResult,
   CreatedSubscription,
   CreateSubscriptionParams,
+  DeactivateAddonParams,
+  DeactivateAddonResult,
   DiscountSummary,
   FeatureSummary,
+  GetActiveParams,
+  ListSubscriptionsParams,
+  PreviewChangeParams,
+  PreviewChangeResult,
+  PurchaseCreditsParams,
+  PurchaseCreditsResult,
   Subscription,
+  SubscriptionListItem,
   SubscriptionStatus,
+  TopupBalanceParams,
+  TopupBalanceResult,
   UncancelParams,
 } from "./resources/subscriptions";
-// Usage
+export type {
+  GetTransactionParams,
+  ListTransactionsParams,
+  RefundTransactionParams,
+  RetryTransactionParams,
+  TransactionDetail,
+  TransactionListItem,
+  TransactionRefundResult,
+  TransactionRetryResult,
+} from "./resources/transactions";
 export type {
   CheckUsageParams,
   TrackModelTokensParams,
@@ -78,17 +179,22 @@ export type {
   UsageEventProperty,
 } from "./resources/usage";
 export type {
+  CreateWebhookParams,
+  DeleteWebhookParams,
+  ListWebhooksParams,
+  TestWebhookParams,
   WebhookData,
+  WebhookEndpoint,
+  WebhookEndpointCreated,
   WebhookEvent,
   WebhookPayload,
+  WebhookTestResult,
 } from "./resources/webhooks";
-// Webhooks
 export { Webhooks } from "./resources/webhooks";
-// Type exports
 export type {
+  ApiErrorDetail,
   ApiResponse,
   CommetClientOptions,
-  CommetConfig,
   Currency,
   CustomerID,
   EventID,
@@ -100,7 +206,6 @@ export type {
   ResolvedSeatCode,
   ResolvedUsageCode,
 } from "./types/common";
-// Error exports
 export {
   CommetAPIError,
   CommetError,
@@ -117,11 +222,9 @@ export type {
   PlanFeatureValue,
   PriceDef,
 } from "./types/config";
-// Config
 export { defineConfig } from "./types/config";
 export { registerIntegration } from "./utils/telemetry";
 export { API_VERSION, SDK_VERSION } from "./version";
 
-// Default export
 import { Commet } from "./client";
 export default Commet;

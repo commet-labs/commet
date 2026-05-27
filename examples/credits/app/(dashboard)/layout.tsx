@@ -13,7 +13,9 @@ export default async function DashboardLayout({
     redirect("/sign-in");
   }
 
-  const subscription = await commet.subscriptions.get(user.id);
+  const subscription = await commet.subscriptions.getActive({
+    customerId: user.id,
+  });
 
   if (!subscription.success || !subscription.data) {
     redirect("/pricing");

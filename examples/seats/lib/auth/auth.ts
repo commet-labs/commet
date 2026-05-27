@@ -64,7 +64,7 @@ export const auth = betterAuth({
 
               await commet.seats.set({
                 customerId: user.id,
-                seatType: "member",
+                featureCode: "member",
                 count: 1,
               });
             }

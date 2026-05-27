@@ -54,6 +54,8 @@ export type ConsumptionModel = "metered" | "credits" | "balance";
 
 export interface ActiveSubscription {
   id: string;
+  object: "subscription";
+  livemode: boolean;
   customerId: string;
   plan: {
     id: string;
@@ -87,6 +89,8 @@ export interface ActiveSubscription {
 
 export interface CreatedSubscription {
   id: string;
+  object: "subscription";
+  livemode: boolean;
   customerId: string;
   planId: string;
   planName: string;
@@ -109,6 +113,8 @@ export interface CreatedSubscription {
 
 export interface Subscription {
   id: string;
+  object: "subscription";
+  livemode: boolean;
   customerId: string;
   planId: string;
   planName: string;
@@ -142,18 +148,22 @@ export type CreateSubscriptionParams = PlanIdentifier & {
   successUrl?: string;
 };
 
+export interface GetActiveParams {
+  customerId: string;
+}
+
 export interface CancelParams {
-  subscriptionId: string;
+  id: string;
   reason?: string;
   immediate?: boolean;
 }
 
 export interface UncancelParams {
-  subscriptionId: string;
+  id: string;
 }
 
 export interface ChangePlanParams {
-  subscriptionId: string;
+  id: string;
   newPlanId?: string;
   newBillingInterval?: BillingInterval;
 }
@@ -181,27 +191,103 @@ export interface ChangePlanResult {
   checkoutUrl?: string;
 }
 
-/**
- * Subscription resource for managing subscriptions (plan-first model)
- *
- * Each customer can only have ONE active subscription at a time.
- */
+export interface ListSubscriptionsParams extends Record<string, unknown> {
+  customerId?: string;
+  status?: SubscriptionStatus;
+  limit?: number;
+  cursor?: string;
+}
+
+export interface SubscriptionListItem {
+  id: string;
+  object: "subscription";
+  livemode: boolean;
+  customerId: string;
+  planId: string;
+  planName: string;
+  name: string;
+  status: SubscriptionStatus;
+  startDate: string;
+  endDate: string;
+  billingDayOfMonth: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PreviewChangeParams {
+  id: string;
+  planId?: string;
+  billingInterval?: BillingInterval;
+}
+
+export interface PreviewChangeResult {
+  currentPlanCredit: number;
+  newPlanCharge: number;
+  estimatedTotal: number;
+  effectiveDate: string;
+  daysRemaining: number;
+  totalDays: number;
+  isUpgrade: boolean;
+}
+
+export interface ActivateAddonParams {
+  id: string;
+  addonId: string;
+}
+
+export interface ActivateAddonResult {
+  addonId: string;
+  status: string;
+  proratedCharge: number;
+}
+
+export interface DeactivateAddonParams {
+  id: string;
+  addonId: string;
+}
+
+export interface DeactivateAddonResult {
+  id: string;
+  status: string;
+  deactivatedAt: string;
+}
+
+export interface AdjustBalanceParams {
+  id: string;
+  amount: number;
+  reason?: string;
+  type?: "balance" | "credits";
+}
+
+export interface AdjustBalanceResult {
+  amount: number;
+  newBalance: number;
+  reason: string | null;
+}
+
+export interface TopupBalanceParams {
+  id: string;
+  amount: number;
+}
+
+export interface TopupBalanceResult {
+  amount: number;
+}
+
+export interface PurchaseCreditsParams {
+  id: string;
+  creditPackId: string;
+}
+
+export interface PurchaseCreditsResult {
+  credits: number;
+}
+
+/** Each customer can only have one active subscription at a time. */
 export class SubscriptionsResource {
   constructor(private httpClient: CommetHTTPClient) {}
 
-  /**
-   * Create a subscription with a plan
-   *
-   * @example
-   * ```typescript
-   * await commet.subscriptions.create({
-   *   externalId: 'user_123',
-   *   planCode: 'pro', // autocomplete works after `commet pull`
-   *   billingInterval: 'yearly',
-   *   initialSeats: { editor: 5 }
-   * });
-   * ```
-   */
+  /** Returns a `checkoutUrl` when payment is required before activation. */
   async create(
     params: CreateSubscriptionParams,
     options?: RequestOptions,
@@ -209,88 +295,119 @@ export class SubscriptionsResource {
     return this.httpClient.post("/subscriptions", params, options);
   }
 
-  /**
-   * Get the active subscription for a customer
-   *
-   * @example
-   * ```typescript
-   * const sub = await commet.subscriptions.get('user_123');
-   * ```
-   */
-  async get(
-    customerId: string,
+  async getActive(
+    params: GetActiveParams,
   ): Promise<ApiResponse<ActiveSubscription | null>> {
-    return this.httpClient.get("/subscriptions/active", { customerId });
+    return this.httpClient.get("/subscriptions/active", {
+      customerId: params.customerId,
+    });
   }
 
-  /**
-   * Cancel a subscription
-   *
-   * @example
-   * ```typescript
-   * await commet.subscriptions.cancel({
-   *   subscriptionId: 'sub_xxx',
-   *   reason: 'switched_to_competitor'
-   * });
-   * ```
-   */
+  /** Schedules cancellation at period end by default. Set `immediate: true` to cancel now. */
   async cancel(
     params: CancelParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<Subscription>> {
-    return this.httpClient.post(
-      `/subscriptions/${params.subscriptionId}/cancel`,
-      params || {},
-      options,
-    );
+    const { id, ...body } = params;
+    return this.httpClient.post(`/subscriptions/${id}/cancel`, body, options);
   }
 
-  /**
-   * Revert a scheduled cancellation
-   *
-   * Only works on subscriptions with a pending cancellation (canceledAt is set
-   * but status is not yet "canceled"). Cannot revert already-canceled subscriptions.
-   *
-   * @example
-   * ```typescript
-   * await commet.subscriptions.uncancel({
-   *   subscriptionId: 'sub_xxx',
-   * });
-   * ```
-   */
+  /** Only works on subscriptions with a pending cancellation — cannot revert already-canceled. */
   async uncancel(
     params: UncancelParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<Subscription>> {
     return this.httpClient.post(
-      `/subscriptions/${params.subscriptionId}/uncancel`,
+      `/subscriptions/${params.id}/uncancel`,
       {},
       options,
     );
   }
 
-  /**
-   * Change the plan of a subscription (upgrade/downgrade)
-   *
-   * Upgrades execute immediately. Downgrades are scheduled for end of period.
-   *
-   * @example
-   * ```typescript
-   * await commet.subscriptions.changePlan({
-   *   subscriptionId: 'sub_xxx',
-   *   newPlanId: 'pln_xxx',
-   * });
-   * ```
-   */
+  /** Upgrades execute immediately with proration. Downgrades are scheduled for end of period. */
   async changePlan(
     params: ChangePlanParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<ChangePlanResult>> {
-    const { subscriptionId, ...body } = params;
+    const { id, ...body } = params;
     return this.httpClient.post(
-      `/subscriptions/${subscriptionId}/change-plan`,
+      `/subscriptions/${id}/change-plan`,
       body,
       options,
     );
+  }
+
+  async list(
+    params?: ListSubscriptionsParams,
+  ): Promise<ApiResponse<SubscriptionListItem[]>> {
+    return this.httpClient.get("/subscriptions", params);
+  }
+
+  /** Dry-run: returns proration details without applying the change. */
+  async previewChange(
+    params: PreviewChangeParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<PreviewChangeResult>> {
+    const { id, ...body } = params;
+    return this.httpClient.post(
+      `/subscriptions/${id}/preview-change`,
+      body,
+      options,
+    );
+  }
+
+  /** Prorated charge for the current billing period. */
+  async activateAddon(
+    params: ActivateAddonParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<ActivateAddonResult>> {
+    const { id, ...body } = params;
+    return this.httpClient.post(`/subscriptions/${id}/addons`, body, options);
+  }
+
+  async deactivateAddon(
+    params: DeactivateAddonParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<DeactivateAddonResult>> {
+    const { id, addonId } = params;
+    return this.httpClient.delete(
+      `/subscriptions/${id}/addons/${addonId}`,
+      undefined,
+      options,
+    );
+  }
+
+  /** Positive amount adds, negative subtracts. */
+  async adjustBalance(
+    params: AdjustBalanceParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<AdjustBalanceResult>> {
+    const { id, ...body } = params;
+    return this.httpClient.post(
+      `/subscriptions/${id}/balance/adjust`,
+      body,
+      options,
+    );
+  }
+
+  /** Charges the customer's payment method. */
+  async topupBalance(
+    params: TopupBalanceParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<TopupBalanceResult>> {
+    const { id, ...body } = params;
+    return this.httpClient.post(
+      `/subscriptions/${id}/balance/topup`,
+      body,
+      options,
+    );
+  }
+
+  async purchaseCredits(
+    params: PurchaseCreditsParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<PurchaseCreditsResult>> {
+    const { id, ...body } = params;
+    return this.httpClient.post(`/subscriptions/${id}/credits`, body, options);
   }
 }

@@ -45,12 +45,15 @@ export const subscriptions =
           }
 
           try {
-            const subscription = await commet.subscriptions.get(userId);
+            const subscription = await commet.subscriptions.getActive({
+              customerId: userId,
+            });
 
             if (!subscription.success) {
               throw new APIError("INTERNAL_SERVER_ERROR", {
                 message:
-                  subscription.message || "Failed to retrieve subscription",
+                  subscription.error?.message ||
+                  "Failed to retrieve subscription",
               });
             }
 
@@ -91,7 +94,9 @@ export const subscriptions =
 
           try {
             // First get the current subscription
-            const currentSub = await commet.subscriptions.get(userId);
+            const currentSub = await commet.subscriptions.getActive({
+              customerId: userId,
+            });
 
             if (!currentSub.success || !currentSub.data) {
               throw new APIError("BAD_REQUEST", {
@@ -100,14 +105,15 @@ export const subscriptions =
             }
 
             const result = await commet.subscriptions.cancel({
-              subscriptionId: currentSub.data.id,
+              id: currentSub.data.id,
               reason: ctx.body?.reason,
               immediate: ctx.body?.immediate,
             });
 
             if (!result.success) {
               throw new APIError("INTERNAL_SERVER_ERROR", {
-                message: result.message || "Failed to cancel subscription",
+                message:
+                  result.error?.message || "Failed to cancel subscription",
               });
             }
 

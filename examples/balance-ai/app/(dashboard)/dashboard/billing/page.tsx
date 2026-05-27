@@ -27,7 +27,9 @@ export default async function BillingPage() {
   const user = await getUser();
   if (!user) return null;
 
-  const subscriptionResult = await commet.subscriptions.get(user.id);
+  const subscriptionResult = await commet.subscriptions.getActive({
+    customerId: user.id,
+  });
   const subscription =
     subscriptionResult.success && subscriptionResult.data
       ? subscriptionResult.data

@@ -8,6 +8,8 @@ import type { CommetHTTPClient } from "../utils/http";
 
 export interface UsageEvent {
   id: EventID;
+  object: "usage_event";
+  livemode: boolean;
   organizationId: string;
   customerId: CustomerID;
   feature: string;
@@ -83,6 +85,7 @@ export interface UsageCheckResult {
 export class UsageResource {
   constructor(private httpClient: CommetHTTPClient) {}
 
+  /** Deducts from balance/credits if the plan uses consumption. Duplicate `idempotencyKey` is rejected. */
   async track(
     params: TrackParams,
     options?: RequestOptions,
@@ -117,21 +120,7 @@ export class UsageResource {
     return this.httpClient.post("/usage/events", eventData, options);
   }
 
-  /**
-   * Check if a usage event would be allowed before tracking it
-   *
-   * @example
-   * ```typescript
-   * const { data } = await commet.usage.check({
-   *   customerId: 'cus_xxx',
-   *   featureCode: 'api_calls',
-   *   quantity: 1,
-   * });
-   * if (data.allowed) {
-   *   // proceed with the operation
-   * }
-   * ```
-   */
+  /** Dry-run: checks if a usage event would be allowed without actually tracking it. */
   async check(
     params: CheckUsageParams,
     options?: RequestOptions,
