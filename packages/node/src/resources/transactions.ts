@@ -6,13 +6,9 @@ export interface TransactionListItem {
   object: "transaction";
   livemode: boolean;
   invoiceId: string;
-  provider: string;
   grossAmount: number;
   subtotal: number;
   taxAmount: number;
-  providerFee: number;
-  commetFee: number;
-  orgNetAmount: number;
   currency: string;
   status: string;
   customerEmail: string;
@@ -23,10 +19,6 @@ export interface TransactionListItem {
 }
 
 export interface TransactionDetail extends TransactionListItem {
-  providerChargeId: string | null;
-  providerPaymentIntentId: string | null;
-  providerNetAmount: number;
-  presentmentAmount: number | null;
   availableAt: string | null;
 }
 
