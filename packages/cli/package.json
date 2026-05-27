@@ -27,7 +27,7 @@
   "author": "Commet Team",
   "license": "MIT",
   "dependencies": {
-    "@inquirer/prompts": "8.4.3",
+    "@inquirer/prompts": "8.5.0",
     "ably": "^2.21.0",
     "chalk": "5.6.2",
     "commander": "14.0.3",
