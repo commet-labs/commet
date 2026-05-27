@@ -111,7 +111,7 @@ export const onUserUpdate =
 
       if (existingCustomer) {
         await options.client.customers.update({
-          customerId: existingCustomer.id,
+          id: existingCustomer.id,
           email: user.email,
           fullName: user.name ?? undefined,
         });
