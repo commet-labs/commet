@@ -8,7 +8,6 @@ export interface SeatEvent {
   organizationId: string;
   customerId: CustomerID;
   featureCode: string;
-  seatType: string;
   eventType: "add" | "remove" | "set";
   quantity: number;
   previousBalance?: number;
@@ -66,7 +65,7 @@ export class SeatsResource {
       "/seats",
       {
         customerId: params.customerId,
-        seatType: params.featureCode,
+        featureCode: params.featureCode,
         count: params.count,
       },
       options,
@@ -82,7 +81,7 @@ export class SeatsResource {
       "/seats",
       {
         customerId: params.customerId,
-        seatType: params.featureCode,
+        featureCode: params.featureCode,
         count: params.count,
       },
       options,
@@ -97,7 +96,7 @@ export class SeatsResource {
       "/seats",
       {
         customerId: params.customerId,
-        seatType: params.featureCode,
+        featureCode: params.featureCode,
         count: params.count,
       },
       options,
@@ -116,7 +115,7 @@ export class SeatsResource {
   ): Promise<ApiResponse<SeatBalance>> {
     return this.httpClient.get("/seats/balance", {
       customerId: params.customerId,
-      seatType: params.featureCode,
+      featureCode: params.featureCode,
     });
   }
 
