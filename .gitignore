@@ -50,3 +50,4 @@ npm-debug.log*
 .idea
 
 .react-email
+.commet/

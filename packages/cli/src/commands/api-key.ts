@@ -34,11 +34,24 @@ Examples:
   $ commet api-key --output agent     JSON output with the key
 
 Then use it in CI:
-  $ COMMET_API_KEY=sk_... commet push --yes
+  $ COMMET_API_KEY=ck_... commet push --yes
 `,
   )
   .action(async (options: ApiKeyOptions) => {
     const agentMode = isAgentMode(options);
+
+    if (agentMode) {
+      console.log(
+        JSON.stringify({
+          deprecated: true,
+          replacement: "commet api-keys create",
+        }),
+      );
+    } else {
+      console.log(
+        chalk.yellow("⚠ Deprecated: use 'commet api-keys create' instead"),
+      );
+    }
 
     if (process.env.COMMET_API_KEY) {
       exitWithError({

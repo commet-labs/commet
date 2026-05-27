@@ -13,6 +13,11 @@ import { orgsCommand } from "./commands/orgs";
 import { pullCommand } from "./commands/pull";
 import { pushCommand } from "./commands/push";
 import {
+  createResourceCommand,
+  generateResourceSchema,
+} from "./commands/resources/factory";
+import { resourceDefinitions } from "./commands/resources/registry";
+import {
   authExists,
   loadProjectConfig,
   projectConfigExists,
@@ -48,7 +53,7 @@ Workflow:
 For agents and CI:
   $ commet                       JSON capabilities when piped (no args)
   $ commet pull --output agent --yes   Structured output, no prompts
-  $ COMMET_API_KEY=sk_... commet push --yes   CI pipeline
+  $ COMMET_API_KEY=ck_... commet push --yes   CI pipeline
 
 Run commet <command> --help for detailed usage and examples.
 `,
@@ -63,6 +68,10 @@ program.addCommand(pushCommand);
 program.addCommand(pullCommand);
 program.addCommand(listenCommand);
 program.addCommand(apiKeyCommand);
+
+for (const def of resourceDefinitions) {
+  program.addCommand(createResourceCommand(def));
+}
 
 program
   .enablePositionalOptions()
@@ -165,7 +174,7 @@ function printAgentInfo() {
         description: "Push commet.config.ts to remote",
         usage: "commet push --output agent --yes",
         preview: "commet push --output agent --dry-run",
-        ci: "COMMET_API_KEY=sk_... commet push --yes",
+        ci: "COMMET_API_KEY=ck_... commet push --yes",
       },
       orgs: {
         description: "List available organizations",
@@ -199,6 +208,7 @@ function printAgentInfo() {
         usage: "commet logout",
       },
     },
+    resources: generateResourceSchema(resourceDefinitions),
   };
 
   console.log(JSON.stringify(output, null, 2));
@@ -256,6 +266,11 @@ function printDefaultScreen() {
   console.log(dim("\n  Project"));
   console.log(`    ${cmd("link")}${dim("Link / switch organization")}`);
   console.log(`    ${cmd("orgs")}${dim("List organizations")}`);
+
+  console.log(dim("\n  Resources (SDK)"));
+  for (const def of resourceDefinitions) {
+    console.log(`    ${cmd(def.name)}${dim(def.description)}`);
+  }
 
   console.log(dim("\n  Setup"));
   console.log(`    ${cmd("create")}${dim("Scaffold a new Commet app")}`);

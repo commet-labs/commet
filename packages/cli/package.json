@@ -35,7 +35,8 @@
     "jsonc-parser": "3.3.1",
     "open": "11.0.0",
     "ora": "9.4.0",
-    "tar": "^7.5.13"
+    "tar": "^7.5.13",
+    "@commet/node": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "24.12.4",

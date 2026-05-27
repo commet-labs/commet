@@ -52,7 +52,7 @@ Examples:
   $ commet push --dry-run        Preview what would change on remote
   $ commet push --yes            Push without confirmation
   $ commet push --output agent --yes   Agent/CI — structured JSON, no prompts
-  $ COMMET_API_KEY=sk_... commet push --yes   CI pipeline
+  $ COMMET_API_KEY=ck_... commet push --yes   CI pipeline
 `,
   )
   .action(async (options: PushOptions) => {

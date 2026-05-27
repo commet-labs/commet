@@ -14,6 +14,7 @@ interface ProjectConfig {
   orgId: string;
   orgName: string;
   mode: "live" | "sandbox";
+  apiKey?: string;
 }
 
 // Get paths

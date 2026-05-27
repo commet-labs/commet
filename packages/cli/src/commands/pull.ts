@@ -81,7 +81,7 @@ Examples:
   $ commet pull --dry-run        Preview changes without applying
   $ commet pull --yes            Apply without confirmation
   $ commet pull --output agent --yes   Agent/CI — structured JSON, no prompts
-  $ COMMET_API_KEY=sk_... commet pull --yes   CI pipeline
+  $ COMMET_API_KEY=ck_... commet pull --yes   CI pipeline
 `,
   )
   .action(async (options: PullOptions) => {
