@@ -1,5 +1,46 @@
 # @commet/node
 
+## 5.0.0
+
+### Major Changes
+
+- 7b62b9c: Pin API version to 2026-05-25 with breaking type changes.
+
+  **Breaking changes:**
+
+  - Remove `externalId` from `Customer` response type and all request params — use `customerId` on resources, `id` on customer create
+  - Remove `seatType` from `SeatEvent` — use `featureCode`
+  - Remove `CustomerContext` — all methods now take `customerId` as a direct param
+  - Remove `features.check()` — use `canUse()` instead
+  - Rename `subscriptions.get()` to `getActive()`
+  - Remove envelope fields (`object`, `livemode`) from response types for 2026-05-25 clients
+  - Remove `provider`, `providerFee`, `commetFee`, `orgNetAmount` from `TransactionListItem`
+  - Remove `providerChargeId`, `providerPaymentIntentId`, `providerNetAmount`, `presentmentAmount` from `TransactionDetail`
+  - `seats.add()` and `seats.remove()` — `count` is now optional, defaults to 1
+
+  **New resources:**
+
+  - `apiKeys` — list, create, delete
+  - `invoices` — list, get, createAdjustment, getDownloadUrl, send, updateStatus
+  - `transactions` — list, get, refund, retry
+  - `promoCodes` — list, get, create, update
+  - `planGroups` — list, get, create, update, delete, addPlan, removePlan, reorderPlans
+
+  **New methods on existing resources:**
+
+  - `subscriptions` — list, previewChange, activateAddon, deactivateAddon, adjustBalance, topupBalance, purchaseCredits
+  - `plans` — full admin CRUD (create, update, delete, features, prices, visibility, regional pricing)
+  - `features` — create, update, delete
+  - `addons` — list, get, create, update, delete
+  - `creditPacks` — create, update, delete
+  - `webhooks` — list, create, delete, test
+
+  **HTTP client improvements:**
+
+  - Idempotency keys auto-generated for POST/PUT/PATCH when retries > 0
+  - Enhanced error parsing with `type`, `param`, `doc_url` fields
+  - Debug mode via `debug: true` constructor option
+
 ## 4.6.0
 
 ### Minor Changes
