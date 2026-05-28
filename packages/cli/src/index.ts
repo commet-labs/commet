@@ -67,7 +67,7 @@ program.addCommand(orgsCommand);
 program.addCommand(pushCommand);
 program.addCommand(pullCommand);
 program.addCommand(listenCommand);
-program.addCommand(apiKeyCommand);
+program.addCommand(apiKeyCommand, { hidden: true });
 
 for (const def of resourceDefinitions) {
   program.addCommand(createResourceCommand(def));
@@ -194,10 +194,6 @@ function printAgentInfo() {
         description: "Scaffold a new Commet app from template",
         usage: "commet create [name] -t <template> --org <slug> -y",
       },
-      "api-key": {
-        description: "Generate API key for CI",
-        usage: "commet api-key --output agent",
-      },
       login: {
         description:
           "Authenticate via browser. Requires a human — opens a device-code flow.",
@@ -274,7 +270,6 @@ function printDefaultScreen() {
 
   console.log(dim("\n  Setup"));
   console.log(`    ${cmd("create")}${dim("Scaffold a new Commet app")}`);
-  console.log(`    ${cmd("api-key")}${dim("Generate API key for CI")}`);
   console.log(`    ${cmd("login")}${dim("Authenticate")}`);
   console.log(`    ${cmd("logout")}${dim("Log out")}`);
 
