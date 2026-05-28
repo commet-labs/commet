@@ -59,7 +59,7 @@ await commet.subscriptions.create({
 });
 
 // Track usage events
-await commet.usage.create({
+await commet.usage.track({
   feature: 'api_call',
   value: 1,
   customerId: 'cus_123'
@@ -68,12 +68,12 @@ await commet.usage.create({
 // Manage seats
 await commet.seats.add({
   customerId: 'cus_123',
-  seatType: 'admin',
+  featureCode: 'admin',
   count: 5
 });
 
 // Check feature access
-const feature = await commet.features.check({
+const feature = await commet.features.get({
   externalId: 'user_123',
   code: 'api_calls'
 });

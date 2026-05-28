@@ -243,19 +243,19 @@ const { data: seats } = await authClient.seats.list();
 
 // Add seats
 await authClient.seats.add({
-  seatType: "editor",
+  featureCode: "editor",
   count: 5
 });
 
 // Remove seats
 await authClient.seats.remove({
-  seatType: "editor",
+  featureCode: "editor",
   count: 2
 });
 
 // Set specific count
 await authClient.seats.set({
-  seatType: "editor",
+  featureCode: "editor",
   count: 10
 });
 

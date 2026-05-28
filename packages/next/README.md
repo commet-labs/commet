@@ -94,7 +94,7 @@ Then link to it from your dashboard:
 Webhooks are optional in Commet. You can always query the current state directly using [`@commet/node`](https://www.npmjs.com/package/@commet/node):
 
 ```typescript
-const subscription = await commet.subscriptions.get({ externalId: userId });
+const subscription = await commet.subscriptions.getActive({ customerId: userId });
 const features = await commet.features.list({ externalId: userId });
 ```
 
