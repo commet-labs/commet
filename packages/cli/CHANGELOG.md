@@ -1,5 +1,11 @@
 # commet
 
+## 2.2.1
+
+### Patch Changes
+
+- ef37c57: Remove deprecated `api-key` command from CLI help and agent info. Running `commet api-key` now shows a deprecation notice pointing to `commet api-keys create`.
+
 ## 2.2.0
 
 ### Minor Changes
