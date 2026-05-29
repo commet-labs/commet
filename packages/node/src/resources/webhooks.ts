@@ -10,6 +10,8 @@ export interface WebhookPayload {
   event: WebhookEvent;
   timestamp: string;
   organizationId: string;
+  mode: "live" | "sandbox";
+  apiVersion: string;
   data: WebhookData;
 }
 
@@ -22,7 +24,6 @@ export interface WebhookPayload {
  * granting access.
  */
 export interface WebhookData {
-  id?: string;
   publicId?: string;
   subscriptionId?: string;
   customerId?: string;
@@ -68,7 +69,7 @@ export interface VerifyAndParseParams {
 
 export interface WebhookEndpoint {
   id: string;
-  object: "webhook_endpoint";
+  object: "webhook";
   livemode: boolean;
   url: string;
   events: string[];
@@ -83,6 +84,7 @@ export interface WebhookEndpointCreated extends WebhookEndpoint {
 
 export interface WebhookTestResult {
   success: boolean;
+  deliveryId: string;
   deliveredAt: string;
 }
 
