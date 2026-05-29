@@ -183,6 +183,7 @@ export type {
   DeleteWebhookParams,
   ListWebhooksParams,
   TestWebhookParams,
+  UpdateWebhookParams,
   WebhookData,
   WebhookEndpoint,
   WebhookEndpointCreated,
