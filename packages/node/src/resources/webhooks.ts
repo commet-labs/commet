@@ -75,7 +75,6 @@ export interface WebhookEndpoint {
   events: string[];
   description: string | null;
   isActive: boolean;
-  /** API version this endpoint is pinned to. `null` means it inherits the account version. */
   apiVersion: string | null;
   createdAt: string;
 }
@@ -99,7 +98,6 @@ export interface CreateWebhookParams {
   url: string;
   events: string[];
   description?: string;
-  /** Pin this endpoint to an API version. Defaults to the version of the request that creates it. */
   apiVersion?: string;
 }
 
@@ -176,7 +174,6 @@ export class Webhooks {
     return this.httpClient!.get("/webhooks", params, options);
   }
 
-  /** Response includes `secretKey` which is only returned once. */
   async create(
     params: CreateWebhookParams,
     options?: RequestOptions,
@@ -192,7 +189,6 @@ export class Webhooks {
     return this.httpClient!.get(`/webhooks/${id}`, undefined, options);
   }
 
-  /** Update an existing webhook endpoint. Only the provided fields change. */
   async update(
     params: UpdateWebhookParams,
     options?: RequestOptions,
