@@ -181,6 +181,7 @@ export type {
 export type {
   CreateWebhookParams,
   DeleteWebhookParams,
+  GetWebhookParams,
   ListWebhooksParams,
   TestWebhookParams,
   UpdateWebhookParams,

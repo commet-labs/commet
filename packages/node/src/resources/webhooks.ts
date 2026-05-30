@@ -103,6 +103,10 @@ export interface CreateWebhookParams {
   apiVersion?: string;
 }
 
+export interface GetWebhookParams {
+  id: string;
+}
+
 export interface UpdateWebhookParams {
   id: string;
   url?: string;
@@ -178,6 +182,14 @@ export class Webhooks {
     options?: RequestOptions,
   ): Promise<ApiResponse<WebhookEndpointCreated>> {
     return this.httpClient!.post("/webhooks", params, options);
+  }
+
+  async get(
+    params: GetWebhookParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<WebhookEndpoint>> {
+    const { id } = params;
+    return this.httpClient!.get(`/webhooks/${id}`, undefined, options);
   }
 
   /** Update an existing webhook endpoint. Only the provided fields change. */
