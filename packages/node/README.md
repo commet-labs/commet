@@ -72,6 +72,19 @@ await commet.seats.add({
   count: 5
 });
 
+// Track durable quota (e.g. projects, tasks)
+await commet.quota.add({
+  customerId: 'cus_123',
+  featureCode: 'projects',
+  count: 5
+});
+
+// Read the current quota allowance (held vs included)
+const projects = await commet.quota.get({
+  customerId: 'cus_123',
+  featureCode: 'projects'
+});
+
 // Check feature access
 const feature = await commet.features.get({
   externalId: 'user_123',

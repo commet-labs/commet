@@ -8,6 +8,7 @@ import { PlanGroupsResource } from "./resources/plan-groups";
 import { PlansResource } from "./resources/plans";
 import { PortalResource } from "./resources/portal";
 import { PromoCodesResource } from "./resources/promo-codes";
+import { QuotaResource } from "./resources/quota";
 import { SeatsResource } from "./resources/seats";
 import { SubscriptionsResource } from "./resources/subscriptions";
 import { TransactionsResource } from "./resources/transactions";
@@ -30,6 +31,7 @@ export class Commet<_TConfig = unknown> {
   public readonly plans: PlansResource;
   public readonly portal: PortalResource;
   public readonly promoCodes: PromoCodesResource;
+  public readonly quota: QuotaResource;
   public readonly seats: SeatsResource;
   public readonly subscriptions: SubscriptionsResource;
   public readonly transactions: TransactionsResource;
@@ -58,6 +60,7 @@ export class Commet<_TConfig = unknown> {
     this.plans = new PlansResource(this.httpClient);
     this.portal = new PortalResource(this.httpClient);
     this.promoCodes = new PromoCodesResource(this.httpClient);
+    this.quota = new QuotaResource(this.httpClient);
     this.seats = new SeatsResource(this.httpClient);
     this.subscriptions = new SubscriptionsResource(this.httpClient);
     this.transactions = new TransactionsResource(this.httpClient);
