@@ -10,6 +10,8 @@ export interface WebhookPayload {
   event: WebhookEvent;
   timestamp: string;
   organizationId: string;
+  mode: "live" | "sandbox";
+  apiVersion: string;
   data: WebhookData;
 }
 
@@ -22,7 +24,6 @@ export interface WebhookPayload {
  * granting access.
  */
 export interface WebhookData {
-  id?: string;
   publicId?: string;
   subscriptionId?: string;
   customerId?: string;
@@ -68,12 +69,13 @@ export interface VerifyAndParseParams {
 
 export interface WebhookEndpoint {
   id: string;
-  object: "webhook_endpoint";
+  object: "webhook";
   livemode: boolean;
   url: string;
   events: string[];
   description: string | null;
   isActive: boolean;
+  apiVersion: string | null;
   createdAt: string;
 }
 
@@ -83,6 +85,7 @@ export interface WebhookEndpointCreated extends WebhookEndpoint {
 
 export interface WebhookTestResult {
   success: boolean;
+  deliveryId: string;
   deliveredAt: string;
 }
 
@@ -95,6 +98,20 @@ export interface CreateWebhookParams {
   url: string;
   events: string[];
   description?: string;
+  apiVersion?: string;
+}
+
+export interface GetWebhookParams {
+  id: string;
+}
+
+export interface UpdateWebhookParams {
+  id: string;
+  url?: string;
+  events?: string[];
+  description?: string | null;
+  isActive?: boolean;
+  apiVersion?: string;
 }
 
 export interface DeleteWebhookParams {
@@ -157,12 +174,27 @@ export class Webhooks {
     return this.httpClient!.get("/webhooks", params, options);
   }
 
-  /** Response includes `secretKey` which is only returned once. */
   async create(
     params: CreateWebhookParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<WebhookEndpointCreated>> {
     return this.httpClient!.post("/webhooks", params, options);
+  }
+
+  async get(
+    params: GetWebhookParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<WebhookEndpoint>> {
+    const { id } = params;
+    return this.httpClient!.get(`/webhooks/${id}`, undefined, options);
+  }
+
+  async update(
+    params: UpdateWebhookParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<WebhookEndpoint>> {
+    const { id, ...body } = params;
+    return this.httpClient!.put(`/webhooks/${id}`, body, options);
   }
 
   async delete(

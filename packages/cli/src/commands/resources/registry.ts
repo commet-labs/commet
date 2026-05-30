@@ -1731,6 +1731,63 @@ const webhooksResource: ResourceDef = {
           description: "Webhook description",
           sdkKey: "description",
         },
+        {
+          flag: "--api-version <version>",
+          description: "Pin the endpoint to an API version",
+          sdkKey: "apiVersion",
+        },
+      ],
+    },
+    get: {
+      method: "get",
+      description: "Get a webhook endpoint",
+      params: [
+        {
+          flag: "--id <id>",
+          description: "Webhook endpoint ID",
+          required: true,
+          sdkKey: "id",
+        },
+      ],
+    },
+    update: {
+      method: "update",
+      description: "Update a webhook endpoint",
+      params: [
+        {
+          flag: "--id <id>",
+          description: "Webhook endpoint ID",
+          required: true,
+          sdkKey: "id",
+        },
+        {
+          flag: "--url <url>",
+          description: "Webhook URL",
+          sdkKey: "url",
+        },
+        {
+          flag: "--events <json>",
+          description:
+            'Events to subscribe to (JSON array: ["subscription.created"])',
+          parse: parseJson,
+          sdkKey: "events",
+        },
+        {
+          flag: "--description <desc>",
+          description: "Webhook description",
+          sdkKey: "description",
+        },
+        {
+          flag: "--is-active <bool>",
+          description: "Whether the endpoint is active",
+          parse: parseBool,
+          sdkKey: "isActive",
+        },
+        {
+          flag: "--api-version <version>",
+          description: "Pin the endpoint to an API version",
+          sdkKey: "apiVersion",
+        },
       ],
     },
     delete: {

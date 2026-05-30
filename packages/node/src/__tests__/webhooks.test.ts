@@ -14,7 +14,7 @@ describe("Webhooks", () => {
     timestamp: "2026-04-11T12:00:00Z",
     organizationId: "org_123",
     data: {
-      id: "sub_abc",
+      subscriptionId: "sub_abc",
       customerId: "cus_456",
       status: "active",
     },

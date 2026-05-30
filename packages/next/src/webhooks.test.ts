@@ -5,23 +5,26 @@ import { Webhooks } from "./webhooks";
 
 // Mock @commet/node
 vi.mock("@commet/node", () => ({
-  Webhooks: vi.fn().mockImplementation(() => ({
-    verify: vi.fn().mockReturnValue(true),
-  })),
+  Webhooks: vi.fn(),
 }));
 
 const mockCommetWebhooks = vi.mocked(CommetWebhooks);
+
+// Must stay a real function (not an arrow) so vitest can call it with `new CommetWebhooks()`.
+function webhooksMock(verifyResult: boolean) {
+  // biome-ignore lint/complexity/useArrowFunction: a constructable function is required here
+  return function () {
+    return {
+      verify: vi.fn().mockReturnValue(verifyResult),
+    } as unknown as InstanceType<typeof CommetWebhooks>;
+  };
+}
 
 describe("Webhooks", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Reset the mock to return true by default
-    mockCommetWebhooks.mockImplementation(
-      () =>
-        ({
-          verify: vi.fn().mockReturnValue(true),
-        }) as unknown as InstanceType<typeof CommetWebhooks>,
-    );
+    mockCommetWebhooks.mockImplementation(webhooksMock(true));
   });
 
   describe("signature verification", () => {
@@ -61,12 +64,7 @@ describe("Webhooks", () => {
 
     it("should return 403 for invalid signatures", async () => {
       // Mock verify to return false
-      mockCommetWebhooks.mockImplementation(
-        () =>
-          ({
-            verify: vi.fn().mockReturnValue(false),
-          }) as unknown as InstanceType<typeof CommetWebhooks>,
-      );
+      mockCommetWebhooks.mockImplementation(webhooksMock(false));
 
       const mockHandler = vi.fn();
       const webhookHandler = Webhooks({
@@ -96,12 +94,7 @@ describe("Webhooks", () => {
 
     it("should handle missing signature header", async () => {
       // Mock verify to return false for null signature
-      mockCommetWebhooks.mockImplementation(
-        () =>
-          ({
-            verify: vi.fn().mockReturnValue(false),
-          }) as unknown as InstanceType<typeof CommetWebhooks>,
-      );
+      mockCommetWebhooks.mockImplementation(webhooksMock(false));
 
       const webhookHandler = Webhooks({
         webhookSecret: "secret_123",
