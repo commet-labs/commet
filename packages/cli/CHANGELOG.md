@@ -1,5 +1,14 @@
 # commet
 
+## 2.2.2
+
+### Patch Changes
+
+- 5638668: Add `webhooks get` and `webhooks update` commands, and a `--api-version` flag to `webhooks create` to pin an endpoint to an API version.
+- Updated dependencies [5149270]
+- Updated dependencies [5b172c0]
+  - @commet/node@5.1.0
+
 ## 2.2.1
 
 ### Patch Changes
