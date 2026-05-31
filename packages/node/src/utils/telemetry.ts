@@ -5,6 +5,8 @@ interface RequestMetrics {
   durationMs: number;
 }
 
+type ExecutionContext = "test" | "ci";
+
 interface ClientInfo {
   sdk: string;
   sdkVersion: string;
@@ -15,6 +17,7 @@ interface ClientInfo {
   runtime: string;
   runtimeVersion: string;
   integrations: string[];
+  execution_context?: ExecutionContext;
 }
 
 const registeredIntegrations: Set<string> = new Set();
@@ -33,12 +36,35 @@ function detectRuntime(): { name: string; version: string } {
   return { name: "node", version: process.versions.node };
 }
 
+function detectExecutionContext(): ExecutionContext | undefined {
+  const g = globalThis as Record<string, unknown>;
+  if (g.__vitest_worker__ !== undefined || g.jest !== undefined) {
+    return "test";
+  }
+  if (typeof process === "undefined" || !process.env) return undefined;
+  const env = process.env;
+  if (
+    env.VITEST ||
+    env.JEST_WORKER_ID ||
+    env.BUN_TEST ||
+    env.NODE_ENV === "test" ||
+    env.npm_lifecycle_event === "test"
+  ) {
+    return "test";
+  }
+  if (env.CI || env.GITHUB_ACTIONS || env.GITLAB_CI || env.CIRCLECI) {
+    return "ci";
+  }
+  return undefined;
+}
+
 let cachedClientInfo: string | null = null;
 let cachedUserAgent: string | null = null;
 
 function collectClientInfo(): ClientInfo {
   const runtime = detectRuntime();
-  return {
+  const executionContext = detectExecutionContext();
+  const info: ClientInfo = {
     sdk: "commet-node",
     sdkVersion: SDK_VERSION,
     lang: "node",
@@ -49,6 +75,10 @@ function collectClientInfo(): ClientInfo {
     runtimeVersion: runtime.version,
     integrations: [...registeredIntegrations],
   };
+  if (executionContext) {
+    info.execution_context = executionContext;
+  }
+  return info;
 }
 
 export function getClientInfoHeader(): string {
