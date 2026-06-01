@@ -9,7 +9,8 @@ function jsonResponse(body: unknown, status = 200): Response {
 }
 
 function lastBody(): Record<string, unknown> {
-  const call = vi.mocked(fetch).mock.calls.at(-1);
+  const calls = vi.mocked(fetch).mock.calls;
+  const call = calls[calls.length - 1];
   return JSON.parse((call?.[1] as RequestInit).body as string);
 }
 
