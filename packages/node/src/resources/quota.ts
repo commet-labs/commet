@@ -13,15 +13,11 @@ export interface QuotaEvent {
 
 export interface QuotaAllowance {
   featureCode: string;
-  /** Units currently held — the durable balance. */
   current: number;
-  /** Units included in the customer's plan. */
   included: number;
-  /** `included - current`, or `null` when the feature is unlimited. */
   remaining: number | null;
   unlimited: boolean;
   overageEnabled: boolean;
-  /** Timestamp of the latest balance change, or `null` if the balance was never set. */
   asOf: string | null;
 }
 
@@ -55,7 +51,6 @@ export interface GetAllQuotaParams {
 export class QuotaResource {
   constructor(private httpClient: CommetHTTPClient) {}
 
-  /** Increments the durable quota balance. Defaults to 1. */
   async add(
     params: AddQuotaParams,
     options?: RequestOptions,
@@ -71,7 +66,6 @@ export class QuotaResource {
     );
   }
 
-  /** Sets the durable quota balance to an exact value. */
   async set(
     params: SetQuotaParams,
     options?: RequestOptions,
@@ -87,11 +81,6 @@ export class QuotaResource {
     );
   }
 
-  /**
-   * Decrements the durable quota balance. Defaults to 1.
-   * Rejects with a `CommetAPIError` (`code: "insufficient_balance"`, status 400)
-   * if the balance would go negative.
-   */
   async remove(
     params: RemoveQuotaParams,
     options?: RequestOptions,
@@ -107,7 +96,6 @@ export class QuotaResource {
     );
   }
 
-  /** Returns the current allowance (held vs included) for a single quota feature. */
   async get(params: GetQuotaParams): Promise<ApiResponse<QuotaAllowance>> {
     return this.httpClient.get("/usage/quota", {
       customerId: params.customerId,
@@ -115,7 +103,6 @@ export class QuotaResource {
     });
   }
 
-  /** Returns the current allowance for every quota feature in the customer's plan. */
   async getAll(
     params: GetAllQuotaParams,
   ): Promise<ApiResponse<QuotaAllowance[]>> {
