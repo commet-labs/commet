@@ -38,7 +38,7 @@ describe("CommetHTTPClient", () => {
       await client.get("/customers");
 
       expect(fetch).toHaveBeenCalledWith(
-        "https://commet.co/api/customers",
+        "https://commet.co/api/v1/customers",
         expect.any(Object),
       );
     });
@@ -83,7 +83,7 @@ describe("CommetHTTPClient", () => {
       await client.get("customers");
 
       expect(fetch).toHaveBeenCalledWith(
-        "https://commet.co/api/customers",
+        "https://commet.co/api/v1/customers",
         expect.any(Object),
       );
     });
@@ -122,7 +122,7 @@ describe("CommetHTTPClient", () => {
 
       const requestInit = vi.mocked(fetch).mock.calls[0][1] as RequestInit;
       const headers = requestInit.headers as Record<string, string>;
-      expect(headers["Idempotency-Key"]).toMatch(/^sdk_/);
+      expect(headers["Idempotency-Key"]).toMatch(/^commet-node-retry-/);
     });
   });
 
@@ -147,7 +147,10 @@ describe("CommetHTTPClient", () => {
     it("includes statusCode and code on API error", async () => {
       const client = createClient({ retries: 0 });
       vi.mocked(fetch).mockResolvedValueOnce(
-        jsonResponse({ message: "Forbidden", code: "forbidden" }, 403),
+        jsonResponse(
+          { error: { message: "Forbidden", code: "forbidden" } },
+          403,
+        ),
       );
 
       try {
@@ -167,13 +170,15 @@ describe("CommetHTTPClient", () => {
       vi.mocked(fetch).mockResolvedValueOnce(
         jsonResponse(
           {
-            message: "Validation failed",
-            code: "validation_error",
-            details: [
-              { field: "email", message: "is required" },
-              { field: "email", message: "must be valid" },
-              { field: "name", message: "is too short" },
-            ],
+            error: {
+              message: "Validation failed",
+              code: "validation_error",
+              details: [
+                { field: "email", message: "is required" },
+                { field: "email", message: "must be valid" },
+                { field: "name", message: "is too short" },
+              ],
+            },
           },
           422,
         ),
