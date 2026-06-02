@@ -94,7 +94,10 @@ export default async function PricingPage() {
             const defaultPrice =
               plan.prices.find((p) => p.isDefault) || plan.prices[0];
             const highlighted = index === popularIndex;
-            const overage = plan.features
+            const visibleFeatures = plan.features.filter(
+              (feature) => feature.enabled !== false,
+            );
+            const overage = visibleFeatures
               .map(formatOverage)
               .find((line): line is string => line !== null);
 
@@ -111,7 +114,7 @@ export default async function PricingPage() {
                   period={mapPeriod(defaultPrice?.billingInterval)}
                 />
                 <PlanCardFeatures className="flex-1">
-                  {plan.features.map((feature) => {
+                  {visibleFeatures.map((feature) => {
                     const label = formatIncluded(feature);
                     return label ? (
                       <PlanCardFeature key={feature.code}>

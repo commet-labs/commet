@@ -1,11 +1,13 @@
 import { ListChecks } from "lucide-react";
-import Link from "next/link";
-import { getTaskQuotaStatusAction } from "@/actions/tasks";
+import { getTaskQuotaStatusAction, getTasksAction } from "@/actions/tasks";
+import { AddTaskButton } from "@/components/billing/add-task-button";
 import { NoActivePlanNotice } from "@/components/billing/no-active-plan-notice";
+import { TaskList } from "@/components/billing/task-list";
 import { TaskUsageBar } from "@/components/billing/task-usage-bar";
 import { Button } from "@/components/ui/button";
 import {
   Card,
+  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
@@ -13,7 +15,10 @@ import {
 } from "@/components/ui/card";
 
 export default async function DashboardPage() {
-  const status = await getTaskQuotaStatusAction();
+  const [status, tasks] = await Promise.all([
+    getTaskQuotaStatusAction(),
+    getTasksAction(),
+  ]);
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-6">
@@ -36,6 +41,23 @@ export default async function DashboardPage() {
               <CardDescription>
                 How much of your quota you are using.
               </CardDescription>
+              <CardAction>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  nativeButton={false}
+                  // biome-ignore lint/a11y/useAnchorContent: renders children via Button
+                  render={
+                    <a
+                      href="/api/commet/portal"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    />
+                  }
+                >
+                  Manage subscription
+                </Button>
+              </CardAction>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
               <TaskUsageBar status={status} />
@@ -62,34 +84,25 @@ export default async function DashboardPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Quick actions</CardTitle>
-              <CardDescription>Manage your tasks and billing.</CardDescription>
+              <CardTitle>Add a task</CardTitle>
+              <CardDescription>
+                Each task counts against your quota; deleting one frees it up.
+              </CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-col gap-3">
-              <Button
-                variant="outline"
-                nativeButton={false}
-                render={<Link href="/dashboard/tasks" />}
-                className="justify-start"
-              >
+            <CardContent>
+              <AddTaskButton />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
                 <ListChecks className="size-4" />
-                Manage tasks
-              </Button>
-              <Button
-                variant="outline"
-                nativeButton={false}
-                // biome-ignore lint/a11y/useAnchorContent: renders children via Button
-                render={
-                  <a
-                    href="/api/commet/portal"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  />
-                }
-                className="justify-start"
-              >
-                Open Billing Portal
-              </Button>
+                Tasks ({tasks.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <TaskList tasks={tasks} />
             </CardContent>
           </Card>
         </>

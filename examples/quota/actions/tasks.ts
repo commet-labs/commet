@@ -48,9 +48,10 @@ export async function getTasksAction(): Promise<Task[]> {
     .orderBy(desc(task.createdAt));
 }
 
-export async function createTaskAction(
-  title: string,
-): Promise<{ success: boolean; error?: string }> {
+export async function createTaskAction(): Promise<{
+  success: boolean;
+  error?: string;
+}> {
   try {
     const user = await getUser();
     if (!user) {
@@ -61,6 +62,12 @@ export async function createTaskAction(
     if (!ownedWorkspace) {
       return { success: false, error: "Workspace not found" };
     }
+
+    const existingTasks = await db
+      .select({ id: task.id })
+      .from(task)
+      .where(eq(task.workspaceId, ownedWorkspace.id));
+    const title = `Task ${existingTasks.length + 1}`;
 
     const [newTask] = await db
       .insert(task)
