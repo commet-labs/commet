@@ -9,13 +9,13 @@ type ExecutionContext = "test" | "ci";
 
 interface ClientInfo {
   sdk: string;
-  sdkVersion: string;
+  sdk_version: string;
   lang: string;
-  langVersion: string;
+  lang_version: string;
   platform: string;
   arch: string;
   runtime: string;
-  runtimeVersion: string;
+  runtime_version: string;
   integrations: string[];
   execution_context?: ExecutionContext;
 }
@@ -66,13 +66,13 @@ function collectClientInfo(): ClientInfo {
   const executionContext = detectExecutionContext();
   const info: ClientInfo = {
     sdk: "commet-node",
-    sdkVersion: SDK_VERSION,
+    sdk_version: SDK_VERSION,
     lang: "node",
-    langVersion: process.versions.node,
+    lang_version: process.versions.node,
     platform: process.platform,
     arch: process.arch,
     runtime: runtime.name,
-    runtimeVersion: runtime.version,
+    runtime_version: runtime.version,
     integrations: [...registeredIntegrations],
   };
   if (executionContext) {
