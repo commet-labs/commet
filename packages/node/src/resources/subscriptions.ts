@@ -1,6 +1,6 @@
 import type { ApiResponse, RequestOptions } from "../types/common";
 import type { CommetHTTPClient } from "../utils/http";
-import type { BillingInterval } from "./plans";
+import type { BillingInterval, FeatureType } from "./plans";
 
 export type SubscriptionStatus =
   | "draft"
@@ -15,7 +15,7 @@ export type SubscriptionStatus =
 export interface FeatureSummary {
   code: string;
   name: string;
-  type: "boolean" | "usage" | "seats";
+  type: FeatureType;
   enabled?: boolean;
   usage?: {
     current: number;

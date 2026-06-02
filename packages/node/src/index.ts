@@ -121,6 +121,15 @@ export type {
   UpdatePromoCodeParams,
 } from "./resources/promo-codes";
 export type {
+  AddQuotaParams,
+  GetAllQuotaParams,
+  GetQuotaParams,
+  QuotaAllowance,
+  QuotaEvent,
+  RemoveQuotaParams,
+  SetQuotaParams,
+} from "./resources/quota";
+export type {
   AddSeatsParams,
   GetAllBalancesParams,
   GetBalanceParams,

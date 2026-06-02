@@ -1,5 +1,6 @@
 import type { ApiResponse, CustomerID, RequestOptions } from "../types/common";
 import type { CommetHTTPClient } from "../utils/http";
+import type { FeatureType } from "./plans";
 
 export interface GetFeatureParams {
   customerId: CustomerID;
@@ -20,7 +21,7 @@ export interface FeatureAccess {
   livemode: boolean;
   code: string;
   name: string;
-  type: "boolean" | "usage" | "seats";
+  type: FeatureType;
   allowed: boolean;
   enabled?: boolean;
   current?: number;
@@ -28,6 +29,7 @@ export interface FeatureAccess {
   remaining?: number;
   overage?: number;
   overageUnitPrice?: number;
+  billedQuantity?: number;
   unlimited?: boolean;
   overageEnabled?: boolean;
 }
@@ -44,7 +46,7 @@ export interface Feature {
   livemode: boolean;
   name: string;
   code: string;
-  type: "boolean" | "usage" | "seats";
+  type: FeatureType;
   description: string | null;
   unitName: string | null;
   createdAt: string;
@@ -54,7 +56,7 @@ export interface Feature {
 export interface CreateFeatureParams {
   code: string;
   name: string;
-  type: "boolean" | "usage" | "seats";
+  type: FeatureType;
   description?: string;
   unitName?: string;
 }

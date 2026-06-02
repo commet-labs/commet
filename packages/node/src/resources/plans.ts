@@ -8,7 +8,7 @@ export type BillingInterval =
   | "quarterly"
   | "yearly"
   | "one_time";
-export type FeatureType = "boolean" | "usage" | "seats";
+export type FeatureType = "boolean" | "usage" | "seats" | "quota";
 
 export interface PlanPrice {
   billingInterval: BillingInterval;
