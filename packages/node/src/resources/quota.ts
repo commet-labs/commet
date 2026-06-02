@@ -16,6 +16,7 @@ export interface QuotaAllowance {
   current: number;
   included: number;
   remaining: number | null;
+  billedQuantity?: number;
   unlimited: boolean;
   overageEnabled: boolean;
   asOf: string | null;

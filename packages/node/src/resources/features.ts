@@ -29,6 +29,7 @@ export interface FeatureAccess {
   remaining?: number;
   overage?: number;
   overageUnitPrice?: number;
+  billedQuantity?: number;
   unlimited?: boolean;
   overageEnabled?: boolean;
 }
