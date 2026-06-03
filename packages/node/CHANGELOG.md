@@ -1,5 +1,11 @@
 # @commet/node
 
+## 5.4.0
+
+### Minor Changes
+
+- c701f18: Add `customIntroOffer` to `subscriptions.create` to pre-apply a custom introductory offer (discountType, discountValue, durationCycles) when assigning a plan, overriding the plan's configured intro offer.
+
 ## 5.3.0
 
 ### Minor Changes
