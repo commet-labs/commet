@@ -1,5 +1,11 @@
 # @commet/node
 
+## 5.3.0
+
+### Minor Changes
+
+- 326ff6c: Add `successUrl` to `subscriptions.changePlan()`. When a free→paid plan change routes through checkout, the caller can now pass where to redirect after the payment completes.
+
 ## 5.2.0
 
 ### Minor Changes
