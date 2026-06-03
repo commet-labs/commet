@@ -1,5 +1,13 @@
 # @commet/node
 
+## 5.2.0
+
+### Minor Changes
+
+- d8c151a: Add `quota` resource for durable balance tracking (the `quota` feature type). `quota.add`, `quota.set` and `quota.remove` mutate the balance; `quota.get` and `quota.getAll` read the current allowance (units held vs included in the plan, remaining, and whether overage is enabled). `quota` is now a recognized `FeatureType`, so `features.get` and `features.list` return access (current, included, overage and overage price) for quota features too.
+
+  `QuotaAllowance` and `FeatureAccess` also expose `billedQuantity`: the period high-water-mark the customer is billed for (peak units reached, locked in until renewal even if usage drops). Use it instead of `current` to show the effective billed limit.
+
 ## 5.1.0
 
 ### Minor Changes
