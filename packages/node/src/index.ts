@@ -151,6 +151,7 @@ export type {
   ChangePlanResult,
   CreatedSubscription,
   CreateSubscriptionParams,
+  CustomIntroOffer,
   DeactivateAddonParams,
   DeactivateAddonResult,
   DiscountSummary,

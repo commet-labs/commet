@@ -137,6 +137,12 @@ type PlanIdentifier =
   | { planCode: string; planId?: never }
   | { planCode?: never; planId: string };
 
+export interface CustomIntroOffer {
+  discountType: "percentage" | "amount";
+  discountValue: number;
+  durationCycles: number;
+}
+
 export type CreateSubscriptionParams = PlanIdentifier & {
   customerId: string;
 } & {
@@ -146,6 +152,7 @@ export type CreateSubscriptionParams = PlanIdentifier & {
   name?: string;
   startDate?: string;
   successUrl?: string;
+  customIntroOffer?: CustomIntroOffer;
 };
 
 export interface GetActiveParams {

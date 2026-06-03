@@ -44,4 +44,29 @@ describe("Subscriptions — successUrl on the wire", () => {
     expect(body).not.toHaveProperty("id");
     expect(url).toContain("/subscriptions/sub_1/change-plan");
   });
+
+  it("create sends customIntroOffer with camelCase keys", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      jsonResponse({ success: true, data: { id: "sub_1" } }),
+    );
+    const client = new Commet({ apiKey: "ck_test_123" });
+
+    await client.subscriptions.create({
+      customerId: "cus_1",
+      planId: "plan_pro",
+      customIntroOffer: {
+        discountType: "percentage",
+        discountValue: 2500,
+        durationCycles: 3,
+      },
+    });
+
+    const { url, body } = lastRequest();
+    expect(url).toContain("/subscriptions");
+    expect(body.customIntroOffer).toEqual({
+      discountType: "percentage",
+      discountValue: 2500,
+      durationCycles: 3,
+    });
+  });
 });
