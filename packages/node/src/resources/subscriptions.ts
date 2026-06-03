@@ -166,6 +166,8 @@ export interface ChangePlanParams {
   id: string;
   newPlanId?: string;
   newBillingInterval?: BillingInterval;
+  /** Where to redirect after checkout when a free→paid change requires payment. */
+  successUrl?: string;
 }
 
 export interface ChangePlanResult {
