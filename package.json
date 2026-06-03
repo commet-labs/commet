@@ -20,7 +20,7 @@
     "@biomejs/biome": "2.4.16",
     "@changesets/cli": "2.31.0",
     "@types/node": "24.12.4",
-    "turbo": "2.9.15",
+    "turbo": "2.9.16",
     "typescript": "6.0.2"
   },
   "packageManager": "pnpm@10.28.0",
