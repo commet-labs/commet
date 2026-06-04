@@ -134,9 +134,13 @@ Examples:
     );
 
     if (startResult.error || !startResult.data) {
+      const sessionExpired = startResult.error?.code === "http_401";
       exitWithError({
-        code: "listen_failed",
-        message: "Failed to start listen session",
+        code: startResult.error?.code ?? "listen_failed",
+        message: sessionExpired
+          ? "Your session expired"
+          : (startResult.error?.message ?? "Failed to start listen session"),
+        action: sessionExpired ? "commet login" : undefined,
       });
     }
 
