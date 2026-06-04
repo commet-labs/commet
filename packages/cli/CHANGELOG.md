@@ -1,5 +1,11 @@
 # commet
 
+## 2.2.7
+
+### Patch Changes
+
+- 38546f7: `commet listen` now shows a clear "Your session expired" message and suggests running `commet login` when the session is no longer valid, instead of a generic "Failed to start listen session" error.
+
 ## 2.2.6
 
 ### Patch Changes
