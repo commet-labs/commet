@@ -1,5 +1,6 @@
 import type { BillingInterval, Plan, PlanFeature } from "@commet/node";
 import { redirect } from "next/navigation";
+import { checkoutAction } from "@/actions/checkout";
 import { getPlansAction } from "@/actions/plans";
 import {
   PlanCard,
@@ -10,9 +11,8 @@ import {
   PlanCardPrice,
   PlanCardTitle,
 } from "@/components/ui/plan-card";
-import { checkoutAction } from "@/actions/checkout";
-import { RATE_SCALE } from "@/lib/billing";
 import { getUser } from "@/lib/auth/session";
+import { RATE_SCALE } from "@/lib/billing";
 import { commet } from "@/lib/commet";
 
 function planPriceCents(plan: Plan): number {

@@ -1,6 +1,13 @@
 import type { ApiResponse, RequestOptions } from "../types/common";
 import type { CommetHTTPClient } from "../utils/http";
 
+export type TransactionStatus =
+  | "pending"
+  | "succeeded"
+  | "failed"
+  | "refunded"
+  | "disputed";
+
 export interface TransactionListItem {
   id: string;
   object: "transaction";
@@ -10,7 +17,7 @@ export interface TransactionListItem {
   subtotal: number;
   taxAmount: number;
   currency: string;
-  status: string;
+  status: TransactionStatus;
   customerEmail: string;
   customerName: string | null;
   paidAt: string | null;
@@ -24,17 +31,17 @@ export interface TransactionDetail extends TransactionListItem {
 
 export interface TransactionRefundResult {
   id: string;
-  status: string;
+  status: "refunded";
 }
 
 export interface TransactionRetryResult {
   id: string;
-  status: string;
+  status: "processing";
   retryInvoiceNumber: string;
 }
 
 export interface ListTransactionsParams {
-  status?: string;
+  status?: TransactionStatus;
   customerEmail?: string;
   limit?: number;
   cursor?: string;

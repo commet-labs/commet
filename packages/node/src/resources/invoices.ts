@@ -1,8 +1,34 @@
 import type { ApiResponse, RequestOptions } from "../types/common";
 import type { CommetHTTPClient } from "../utils/http";
+import type { DiscountType } from "./plans";
+
+export type InvoiceStatus =
+  | "draft"
+  | "upcoming"
+  | "outstanding"
+  | "paid"
+  | "void"
+  | "uncollectible";
+export type InvoiceType =
+  | "recurring"
+  | "overage"
+  | "plan_change"
+  | "adjustment"
+  | "credit_purchase"
+  | "balance_topup"
+  | "addon_activation";
+export type InvoiceLineType =
+  | "plan_base"
+  | "feature_overage"
+  | "feature_seats"
+  | "feature_quota"
+  | "discount"
+  | "credit"
+  | "addon_base";
+export type ChargeType = "standard" | "advance" | "true_up";
 
 export interface InvoiceLineItem {
-  lineType: string;
+  lineType: InvoiceLineType;
   featureName: string | null;
   description: string | null;
   quantity: number;
@@ -11,10 +37,10 @@ export interface InvoiceLineItem {
   includedAmount: number | null;
   usedAmount: number | null;
   overageAmount: number | null;
-  discountType: string | null;
+  discountType: DiscountType | null;
   discountValue: number | null;
   discountName: string | null;
-  chargeType: string | null;
+  chargeType: ChargeType | null;
 }
 
 export interface InvoiceListItem {
@@ -24,8 +50,8 @@ export interface InvoiceListItem {
   customerId: string;
   subscriptionId: string | null;
   invoiceNumber: string;
-  status: string;
-  invoiceType: string;
+  status: InvoiceStatus;
+  invoiceType: InvoiceType;
   currency: string;
   subtotal: number;
   discountAmount: number;
@@ -61,7 +87,7 @@ export interface InvoiceSendResult {
 
 export interface InvoiceStatusResult {
   id: string;
-  status: string;
+  status: "paid" | "void";
   updatedAt: string;
 }
 
@@ -71,8 +97,8 @@ export interface CreateAdjustmentResult {
   livemode: boolean;
   customerId: string;
   invoiceNumber: string;
-  status: string;
-  invoiceType: string;
+  status: "outstanding" | "paid";
+  invoiceType: InvoiceType;
   currency: string;
   subtotal: number;
   taxAmount: number;
@@ -87,7 +113,7 @@ export interface CreateAdjustmentResult {
 
 export interface ListInvoicesParams {
   customerId?: string;
-  status?: string;
+  status?: InvoiceStatus;
   subscriptionId?: string;
   limit?: number;
   cursor?: string;
@@ -114,7 +140,7 @@ export interface SendInvoiceParams {
 
 export interface UpdateInvoiceStatusParams {
   id: string;
-  status: string;
+  status: "paid" | "void";
 }
 
 export class InvoicesResource {

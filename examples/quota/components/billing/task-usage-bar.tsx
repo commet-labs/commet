@@ -19,9 +19,10 @@ export function TaskUsageBar({ status }: { status: TaskQuotaStatus }) {
   const extra = isOverPlan ? billed - included : 0;
   const remaining = unlimited ? null : Math.max(0, included - used);
   const usedPct = billed > 0 ? (used / billed) * 100 : 0;
-  const includedPct = !unlimited && used <= included && included > 0
-    ? (used / included) * 100
-    : usedPct;
+  const includedPct =
+    !unlimited && used <= included && included > 0
+      ? (used / included) * 100
+      : usedPct;
 
   const barColor = isCurrentlyOver
     ? "bg-destructive"

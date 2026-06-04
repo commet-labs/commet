@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
+import { handlePostSignupCheckout } from "@/actions/checkout";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,7 +15,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signIn } from "@/lib/auth/auth-client";
-import { handlePostSignupCheckout } from "@/actions/checkout";
 
 function SignInContent() {
   const router = useRouter();

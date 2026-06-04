@@ -1,6 +1,6 @@
 import type { ApiResponse, RequestOptions } from "../types/common";
 import type { CommetHTTPClient } from "../utils/http";
-import type { BillingInterval, FeatureType } from "./plans";
+import type { BillingInterval, ConsumptionModel, FeatureType } from "./plans";
 
 export type SubscriptionStatus =
   | "draft"
@@ -49,8 +49,6 @@ export interface DiscountSummary {
   name: string | null;
   endsAt: string | null;
 }
-
-export type ConsumptionModel = "metered" | "credits" | "balance";
 
 export interface ActiveSubscription {
   id: string;

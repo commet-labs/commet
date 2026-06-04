@@ -1,5 +1,12 @@
 import type { ApiResponse, CustomerID, RequestOptions } from "../types/common";
 import type { CommetHTTPClient } from "../utils/http";
+import type { FeatureType } from "./plans";
+
+export type AddonConsumptionModel =
+  | "boolean"
+  | "metered"
+  | "credits"
+  | "balance";
 
 export interface ActiveAddon {
   object: "addon";
@@ -9,8 +16,8 @@ export interface ActiveAddon {
   basePrice: number;
   featureCode: string;
   featureName: string;
-  featureType: string;
-  consumptionModel: string | null;
+  featureType: FeatureType;
+  consumptionModel: AddonConsumptionModel | null;
   activatedAt: string;
 }
 

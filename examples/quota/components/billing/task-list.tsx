@@ -5,8 +5,8 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { deleteTaskAction } from "@/actions/tasks";
 import { Button } from "@/components/ui/button";
-import { enqueueMutation } from "@/lib/mutation-queue";
 import type { Task } from "@/lib/db/schema";
+import { enqueueMutation } from "@/lib/mutation-queue";
 
 interface TaskListProps {
   tasks: Task[];

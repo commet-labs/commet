@@ -5,6 +5,12 @@ import type {
   RequestOptions,
 } from "../types/common";
 import type { CommetHTTPClient } from "../utils/http";
+import type { ConsumptionModel } from "./plans";
+
+export type UsageCheckDenialReason =
+  | "included_limit_reached"
+  | "insufficient_credits"
+  | "insufficient_balance";
 
 export interface UsageEvent {
   id: EventID;
@@ -59,7 +65,7 @@ export interface CheckUsageParams {
 
 export interface UsageCheckResult {
   allowed: boolean;
-  consumptionModel: string;
+  consumptionModel: ConsumptionModel;
   feature: string;
   quantity: number;
   current?: number;
@@ -78,7 +84,7 @@ export interface UsageCheckResult {
   currentBalance?: number;
   blockOnExhaustion?: boolean;
   currency?: string;
-  reason?: string;
+  reason?: UsageCheckDenialReason;
   message?: string;
 }
 

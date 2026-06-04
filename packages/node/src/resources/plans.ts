@@ -9,6 +9,8 @@ export type BillingInterval =
   | "yearly"
   | "one_time";
 export type FeatureType = "boolean" | "usage" | "seats" | "quota";
+export type ConsumptionModel = "metered" | "credits" | "balance";
+export type DiscountType = "percentage" | "amount";
 
 export interface PlanPrice {
   billingInterval: BillingInterval;
@@ -52,7 +54,7 @@ export interface PlanDetailPrice {
   trialDays: number;
   introOffer: {
     enabled: boolean;
-    discountType: "percentage" | "amount" | null;
+    discountType: DiscountType | null;
     discountValue: number | null;
     durationCycles: number | null;
   } | null;
@@ -93,7 +95,7 @@ export interface PlanManage {
   name: string;
   code: string;
   description: string | null;
-  consumptionModel: string | null;
+  consumptionModel: ConsumptionModel | null;
   isPublic: boolean;
   isDefault: boolean;
   isFree: boolean;
@@ -143,7 +145,7 @@ export interface PlanPriceManage {
   includedBalance: number | null;
   includedCredits: number | null;
   introOfferEnabled: boolean;
-  introOfferDiscountType: "percentage" | "amount" | null;
+  introOfferDiscountType: DiscountType | null;
   introOfferDiscountValue: number | null;
   introOfferDurationCycles: number | null;
   createdAt: string;
@@ -169,7 +171,7 @@ export interface CreatePlanParams {
   name: string;
   code: string;
   description?: string;
-  consumptionModel?: "metered" | "credits" | "balance";
+  consumptionModel?: ConsumptionModel;
   isPublic?: boolean;
   isFree?: boolean;
   blockOnExhaustion?: boolean;

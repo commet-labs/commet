@@ -29,8 +29,8 @@ export function NoActivePlanNotice({
         {pendingPayment ? (
           <Button
             nativeButton={false}
-            // biome-ignore lint/a11y/useAnchorContent: renders children via Button
             render={
+              // biome-ignore lint/a11y/useAnchorContent: renders children via Button
               <a
                 href="/api/commet/portal"
                 target="_blank"

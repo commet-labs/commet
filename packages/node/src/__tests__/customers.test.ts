@@ -54,10 +54,7 @@ describe("Customers — id (external_id) on the wire", () => {
     const client = new Commet({ apiKey: "ck_test_123" });
 
     await client.customers.createBatch({
-      customers: [
-        { email: "a@b.com", id: "ext_a" },
-        { email: "b@b.com" },
-      ],
+      customers: [{ email: "a@b.com", id: "ext_a" }, { email: "b@b.com" }],
     });
 
     const customers = lastBody().customers as Array<Record<string, unknown>>;

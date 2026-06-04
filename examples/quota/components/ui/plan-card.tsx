@@ -187,23 +187,22 @@ const PlanCardAction = React.forwardRef<HTMLButtonElement, PlanCardActionProps>(
 );
 PlanCardAction.displayName = "PlanCardAction";
 
+export type {
+  PlanCardActionProps,
+  PlanCardBadgeProps,
+  PlanCardFeatureProps,
+  PlanCardPriceProps,
+  PlanCardProps,
+};
 export {
   PlanCard,
-  PlanCardHeader,
-  PlanCardBadge,
-  PlanCardTitle,
-  PlanCardDescription,
-  PlanCardPrice,
-  PlanCardFeatures,
-  PlanCardFeature,
   PlanCardAction,
+  PlanCardBadge,
+  PlanCardDescription,
+  PlanCardFeature,
+  PlanCardFeatures,
+  PlanCardHeader,
+  PlanCardPrice,
+  PlanCardTitle,
   planCardVariants,
-};
-
-export type {
-  PlanCardProps,
-  PlanCardBadgeProps,
-  PlanCardPriceProps,
-  PlanCardFeatureProps,
-  PlanCardActionProps,
 };
