@@ -1,5 +1,12 @@
 # commet
 
+## 2.2.6
+
+### Patch Changes
+
+- Updated dependencies [f17426a]
+  - @commet/node@5.5.0
+
 ## 2.2.5
 
 ### Patch Changes
