@@ -1,9 +1,10 @@
 "use server";
 
+import { CommetAPIError } from "@commet/node";
 import { and, desc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { RATE_SCALE } from "@/lib/billing";
 import { getUser } from "@/lib/auth/session";
+import { RATE_SCALE } from "@/lib/billing";
 import { commet } from "@/lib/commet";
 import { db } from "@/lib/db/drizzle";
 import { type Task, task, workspace } from "@/lib/db/schema";
@@ -213,12 +214,7 @@ export async function getTaskQuotaStatusAction(): Promise<TaskQuotaStatus> {
       overagePricePerTask: overageRate ? overageRate / RATE_SCALE : undefined,
     };
   } catch (error) {
-    if (
-      error &&
-      typeof error === "object" &&
-      "statusCode" in error &&
-      error.statusCode === 429
-    ) {
+    if (error instanceof CommetAPIError && error.statusCode === 429) {
       console.warn("Rate limit reached - expected with frequent refreshes");
       return defaultStatus;
     }
