@@ -5,17 +5,27 @@ function formatCount(count: number): string {
 }
 
 export function TaskUsageBar({ status }: { status: TaskQuotaStatus }) {
-  const { used, included, unlimited, overageEnabled, overagePricePerTask } =
-    status;
+  const {
+    used,
+    included,
+    billed,
+    unlimited,
+    overageEnabled,
+    overagePricePerTask,
+  } = status;
 
-  const isOverage = !unlimited && used > included;
-  const overage = isOverage ? used - included : 0;
+  const isOverPlan = !unlimited && billed > included;
+  const isCurrentlyOver = !unlimited && used > included;
+  const extra = isOverPlan ? billed - included : 0;
   const remaining = unlimited ? null : Math.max(0, included - used);
-  const usedPct = included > 0 ? (used / included) * 100 : 0;
+  const usedPct = billed > 0 ? (used / billed) * 100 : 0;
+  const includedPct = !unlimited && used <= included && included > 0
+    ? (used / included) * 100
+    : usedPct;
 
-  const barColor = isOverage
+  const barColor = isCurrentlyOver
     ? "bg-destructive"
-    : usedPct >= 80
+    : includedPct >= 90
       ? "bg-amber-500"
       : "bg-primary";
 
@@ -23,21 +33,24 @@ export function TaskUsageBar({ status }: { status: TaskQuotaStatus }) {
     <div className="flex flex-col gap-3">
       <div className="flex items-end justify-between">
         <div>
-          <span className="text-2xl font-semibold tabular-nums">
+          <span className="text-lg font-semibold tabular-nums">
             {formatCount(used)}
           </span>
           {!unlimited && (
             <span className="text-sm font-medium text-muted-foreground">
               {" "}
-              of {formatCount(included)} used
+              of {formatCount(billed)}
+              {isOverPlan
+                ? ` (${included.toLocaleString()} included + ${extra.toLocaleString()} extra)`
+                : ""}
             </span>
           )}
         </div>
         {unlimited ? (
           <span className="text-sm font-medium text-foreground">Unlimited</span>
-        ) : isOverage ? (
+        ) : isOverPlan ? (
           <span className="text-sm font-medium text-destructive">
-            {formatCount(overage)} over your plan
+            {formatCount(extra)} over your plan
           </span>
         ) : (
           <span className="text-sm font-medium text-muted-foreground">
@@ -55,14 +68,19 @@ export function TaskUsageBar({ status }: { status: TaskQuotaStatus }) {
         </div>
       )}
 
-      {isOverage && overageEnabled && overagePricePerTask ? (
-        <p className="text-xs font-medium text-destructive">
-          {`Extra tasks billed at $${overagePricePerTask.toFixed(2)}/task · +$${(overage * overagePricePerTask).toFixed(2)}/mo`}
-        </p>
+      {isOverPlan && overageEnabled && overagePricePerTask ? (
+        <div className="flex flex-col gap-1">
+          <p className="text-xs font-medium text-destructive">
+            {`Extra tasks are billed at $${overagePricePerTask.toFixed(2)}/task, prorated from when you went over.`}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            You're billed for the rest of this period — removing tasks now won't
+            refund it.
+          </p>
+        </div>
       ) : overageEnabled && overagePricePerTask ? (
         <p className="text-xs text-muted-foreground">
-          Over your plan, extra tasks are ${overagePricePerTask.toFixed(2)}
-          /task.
+          {`Over your plan, extra tasks are $${overagePricePerTask.toFixed(2)}/task — billed from when you exceed, with no refund if you remove them.`}
         </p>
       ) : null}
     </div>

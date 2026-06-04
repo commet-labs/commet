@@ -5,6 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { deleteTaskAction } from "@/actions/tasks";
 import { Button } from "@/components/ui/button";
+import { enqueueMutation } from "@/lib/mutation-queue";
 import type { Task } from "@/lib/db/schema";
 
 interface TaskListProps {
@@ -17,7 +18,7 @@ function TaskRow({ task }: { task: Task }) {
   async function handleDelete() {
     setIsDeleting(true);
     try {
-      const result = await deleteTaskAction(task.id);
+      const result = await enqueueMutation(() => deleteTaskAction(task.id));
       if (!result.success) {
         toast.error(result.error || "Failed to delete task");
       } else {

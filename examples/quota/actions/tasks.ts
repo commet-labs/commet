@@ -2,15 +2,13 @@
 
 import { and, desc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { RATE_SCALE } from "@/lib/billing";
 import { getUser } from "@/lib/auth/session";
 import { commet } from "@/lib/commet";
 import { db } from "@/lib/db/drizzle";
 import { type Task, task, workspace } from "@/lib/db/schema";
 
 const TASKS_FEATURE_CODE = "tasks";
-
-// Commet stores unit prices in rate scale (10000 = $1.00).
-const RATE_SCALE = 10000;
 
 export interface TaskQuotaStatus {
   isPaid: boolean;
@@ -20,6 +18,7 @@ export interface TaskQuotaStatus {
   daysRemaining?: number;
   used: number;
   included: number;
+  billed: number;
   unlimited: boolean;
   overageEnabled: boolean;
   overagePricePerTask?: number;
@@ -171,6 +170,7 @@ export async function getTaskQuotaStatusAction(): Promise<TaskQuotaStatus> {
     isPaid: false,
     used: 0,
     included: 0,
+    billed: 0,
     unlimited: false,
     overageEnabled: false,
   };
@@ -213,6 +213,7 @@ export async function getTaskQuotaStatusAction(): Promise<TaskQuotaStatus> {
       daysRemaining: subscription.currentPeriod.daysRemaining,
       used: access?.current ?? 0,
       included: access?.included ?? 0,
+      billed: access?.billedQuantity ?? access?.included ?? 0,
       unlimited: access?.unlimited ?? false,
       overageEnabled: access?.overageEnabled ?? false,
       overagePricePerTask: overageRate ? overageRate / RATE_SCALE : undefined,

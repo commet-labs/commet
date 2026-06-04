@@ -5,6 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { createTaskAction } from "@/actions/tasks";
 import { Button } from "@/components/ui/button";
+import { enqueueMutation } from "@/lib/mutation-queue";
 
 export function AddTaskButton() {
   const [isLoading, setIsLoading] = useState(false);
@@ -12,7 +13,7 @@ export function AddTaskButton() {
   async function handleAdd() {
     setIsLoading(true);
     try {
-      const result = await createTaskAction();
+      const result = await enqueueMutation(() => createTaskAction());
       if (result.success) {
         toast.success("Task added");
       } else {

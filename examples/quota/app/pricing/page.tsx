@@ -10,11 +10,10 @@ import {
   PlanCardPrice,
   PlanCardTitle,
 } from "@/components/ui/plan-card";
+import { checkoutAction } from "@/actions/checkout";
+import { RATE_SCALE } from "@/lib/billing";
 import { getUser } from "@/lib/auth/session";
 import { commet } from "@/lib/commet";
-import { checkoutAction } from "@/actions/checkout";
-
-const RATE_SCALE = 10000;
 
 function planPriceCents(plan: Plan): number {
   const price = plan.prices.find((p) => p.isDefault) || plan.prices[0];
