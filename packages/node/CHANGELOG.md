@@ -1,5 +1,11 @@
 # @commet/node
 
+## 5.5.0
+
+### Minor Changes
+
+- f17426a: Expose enum union types for status/type fields (InvoiceStatus, InvoiceType, TransactionStatus, ConsumptionModel, etc.) that were previously typed as `string`, for better autocomplete and type-safety.
+
 ## 5.4.0
 
 ### Minor Changes
