@@ -34,8 +34,8 @@ export default async function BillingPage() {
   ]);
   const subscription = billingResult.data?.subscription;
   const taskOverage =
-    !quotaStatus.unlimited && quotaStatus.used > quotaStatus.included
-      ? quotaStatus.used - quotaStatus.included
+    !quotaStatus.unlimited && quotaStatus.billed > quotaStatus.included
+      ? quotaStatus.billed - quotaStatus.included
       : 0;
 
   return (

@@ -78,14 +78,11 @@ export async function createTaskAction(): Promise<{
     }
 
     try {
-      const result = await commet.quota.add({
+      await commet.quota.add({
         customerId: user.id,
         featureCode: TASKS_FEATURE_CODE,
         count: 1,
       });
-      if (!result.success) {
-        throw new Error(result.error?.message ?? "Failed to reserve a task");
-      }
     } catch (error) {
       await db.delete(task).where(eq(task.id, newTask.id));
       return {
@@ -135,14 +132,11 @@ export async function deleteTaskAction(
     await db.delete(task).where(eq(task.id, taskId));
 
     try {
-      const result = await commet.quota.remove({
+      await commet.quota.remove({
         customerId: user.id,
         featureCode: TASKS_FEATURE_CODE,
         count: 1,
       });
-      if (!result.success) {
-        throw new Error(result.error?.message ?? "Failed to release the task");
-      }
     } catch (error) {
       await db.insert(task).values(taskToDelete);
       return {
@@ -213,7 +207,7 @@ export async function getTaskQuotaStatusAction(): Promise<TaskQuotaStatus> {
       daysRemaining: subscription.currentPeriod.daysRemaining,
       used: access?.current ?? 0,
       included: access?.included ?? 0,
-      billed: access?.billedQuantity ?? access?.included ?? 0,
+      billed: access?.billedQuantity ?? 0,
       unlimited: access?.unlimited ?? false,
       overageEnabled: access?.overageEnabled ?? false,
       overagePricePerTask: overageRate ? overageRate / RATE_SCALE : undefined,
