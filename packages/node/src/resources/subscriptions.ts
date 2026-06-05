@@ -228,6 +228,7 @@ export interface PreviewChangeParams {
 }
 
 export interface PreviewChangeResult {
+  currency: string;
   currentPlanCredit: number;
   newPlanCharge: number;
   estimatedTotal: number;
