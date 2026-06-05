@@ -75,6 +75,7 @@ export interface ActiveSubscription {
   credits: CreditsSummary | null;
   balance: BalanceSummary | null;
   cancellation: CancellationSummary | null;
+  cancelAtPeriodEnd: boolean;
   discount: DiscountSummary | null;
   startDate: string;
   endDate: string | null;
