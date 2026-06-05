@@ -1,5 +1,11 @@
 # @commet/node
 
+## 5.5.1
+
+### Patch Changes
+
+- de7f9e8: Expose `currency` on `PreviewChangeResult` so plan-change previews report the currency their amounts are denominated in.
+
 ## 5.5.0
 
 ### Minor Changes
