@@ -365,6 +365,49 @@ export interface InvoiceStatus {
   livemode: boolean;
 }
 
+export interface Payout {
+  id: string;
+  status: "pending" | "in_transit" | "paid" | "failed" | "canceled";
+  amount: number;
+  fee: number;
+  netAmount: number;
+  currency: string;
+  description: string | null;
+  providerTransferId: string;
+  /** @format date-time */
+  createdAt: string;
+  object: "payout";
+  livemode: boolean;
+}
+
+export interface PayoutBankAccount {
+  id: string;
+  providerExternalAccountId: string | null;
+  holderName: string;
+  last4: string;
+  bankName: string | null;
+  country: string;
+  currency: string;
+  accountType: "checking" | "savings" | null;
+  isDefault: boolean;
+  status: "active" | "errored";
+  /** @format date-time */
+  createdAt: string;
+  object: "payout_bank_account";
+  livemode: boolean;
+}
+
+export interface PayoutVerification {
+  providerAccountId: string;
+  status: "pending_verification" | "verified" | "restricted" | "disabled";
+  transfersEnabled: boolean;
+  alreadyExists?: boolean;
+  businessType?: "individual" | "company";
+  country?: string;
+  object: "payout_account";
+  livemode: boolean;
+}
+
 export interface Plan {
   id: string;
   name: string;
@@ -723,6 +766,23 @@ export interface SubscriptionAddon {
   status: "active";
   proratedCharge: number;
   object: "subscription";
+  livemode: boolean;
+}
+
+export interface TestClock {
+  simulatedTime: string | null;
+  isActive: boolean;
+  /** @format date-time */
+  now: string;
+  object: "test_clock";
+  livemode: boolean;
+}
+
+export interface TestClockBilling {
+  customersFound: number;
+  enqueued: number;
+  failed: number;
+  object: "test_clock";
   livemode: boolean;
 }
 

@@ -44,6 +44,11 @@ export type {
   UpdateInvoiceStatusParams,
 } from "./resources/invoices";
 export type {
+  AddPayoutBankAccountParams,
+  CompletePayoutVerificationParams,
+  RequestPayoutParams,
+} from "./resources/payouts";
+export type {
   AddPlanToGroupParams,
   CreatePlanGroupParams,
   DeletePlanGroupParams,
@@ -108,6 +113,7 @@ export type {
   TopupBalanceParams,
   UncancelSubscriptionParams,
 } from "./resources/subscriptions";
+export type { AdvanceTestClockParams } from "./resources/test-clock";
 export type {
   GetTransactionParams,
   ListTransactionsParams,
@@ -207,6 +213,9 @@ export type {
   Invoice,
   InvoiceDownload,
   InvoiceStatus,
+  Payout,
+  PayoutBankAccount,
+  PayoutVerification,
   Plan,
   PlanChange,
   PlanFeature,
@@ -227,6 +236,8 @@ export type {
   SentInvoice,
   Subscription,
   SubscriptionAddon,
+  TestClock,
+  TestClockBilling,
   Transaction,
   TransactionRefund,
   TransactionRetry,
