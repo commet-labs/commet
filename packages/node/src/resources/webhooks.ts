@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import type { ApiResponse, RequestOptions } from "../types/common";
+import type { SubscriptionStatus } from "../types/enums";
 import type { CommetHTTPClient } from "../utils/http";
-import type { SubscriptionStatus } from "./subscriptions";
 
 /**
  * Webhook payload structure from Commet

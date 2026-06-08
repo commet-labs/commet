@@ -4,8 +4,8 @@ import type {
   EventID,
   RequestOptions,
 } from "../types/common";
+import type { ConsumptionModel } from "../types/enums";
 import type { CommetHTTPClient } from "../utils/http";
-import type { ConsumptionModel } from "./plans";
 
 export type UsageCheckDenialReason =
   | "included_limit_reached"

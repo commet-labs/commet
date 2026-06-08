@@ -18,7 +18,7 @@ function quotaResource(client: ReturnType<typeof createMockClient>) {
 
 describe("QuotaResource", () => {
   describe("add", () => {
-    it("posts to /usage/quota with count defaulting to 1", async () => {
+    it("posts to /usage/quota, omitting count so the server default applies", async () => {
       const client = createMockClient();
       await quotaResource(client).add({
         customerId: "cus_1",
@@ -27,7 +27,7 @@ describe("QuotaResource", () => {
 
       expect(client.post).toHaveBeenCalledWith(
         "/usage/quota",
-        { customerId: "cus_1", featureCode: "projects", count: 1 },
+        { customerId: "cus_1", featureCode: "projects" },
         undefined,
       );
     });
@@ -65,7 +65,7 @@ describe("QuotaResource", () => {
   });
 
   describe("remove", () => {
-    it("deletes from /usage/quota with count defaulting to 1", async () => {
+    it("deletes from /usage/quota, omitting count so the server default applies", async () => {
       const client = createMockClient();
       await quotaResource(client).remove({
         customerId: "cus_1",
@@ -74,7 +74,7 @@ describe("QuotaResource", () => {
 
       expect(client.delete).toHaveBeenCalledWith(
         "/usage/quota",
-        { customerId: "cus_1", featureCode: "projects", count: 1 },
+        { customerId: "cus_1", featureCode: "projects" },
         undefined,
       );
     });
@@ -121,10 +121,11 @@ describe("QuotaResource", () => {
         featureCode: "projects",
       });
 
-      expect(client.get).toHaveBeenCalledWith("/usage/quota", {
-        customerId: "cus_1",
-        featureCode: "projects",
-      });
+      expect(client.get).toHaveBeenCalledWith(
+        "/usage/quota",
+        { customerId: "cus_1", featureCode: "projects" },
+        undefined,
+      );
       expect(result.data).toEqual(allowance);
     });
   });
@@ -149,9 +150,11 @@ describe("QuotaResource", () => {
         customerId: "cus_1",
       });
 
-      expect(client.get).toHaveBeenCalledWith("/usage/quota/all", {
-        customerId: "cus_1",
-      });
+      expect(client.get).toHaveBeenCalledWith(
+        "/usage/quota/all",
+        { customerId: "cus_1" },
+        undefined,
+      );
       expect(result.data).toEqual(allowances);
     });
   });
