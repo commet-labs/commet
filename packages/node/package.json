@@ -24,6 +24,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "clean": "rm -rf .turbo node_modules dist"
   },
   "keywords": [
@@ -37,9 +38,9 @@
   ],
   "author": "Commet Team",
   "license": "MIT",
-  "dependencies": {},
   "devDependencies": {
     "@types/node": "24.12.4",
+    "@vitest/coverage-v8": "4.1.7",
     "tsup": "8.5.1",
     "typescript": "5.9.3",
     "vitest": "4.1.7"
