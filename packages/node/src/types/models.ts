@@ -121,13 +121,7 @@ export interface CreatedInvoice {
   id: string;
   customerId: string;
   invoiceNumber: string;
-  status:
-    | "draft"
-    | "upcoming"
-    | "outstanding"
-    | "paid"
-    | "void"
-    | "uncollectible";
+  status: "draft" | "outstanding" | "paid" | "void" | "uncollectible";
   invoiceType: InvoiceType;
   currency: string;
   subtotal: number;
@@ -301,13 +295,7 @@ export interface Invoice {
   customerId: string;
   subscriptionId: string | null;
   invoiceNumber: string;
-  status:
-    | "draft"
-    | "upcoming"
-    | "outstanding"
-    | "paid"
-    | "void"
-    | "uncollectible";
+  status: "draft" | "outstanding" | "paid" | "void" | "uncollectible";
   invoiceType: InvoiceType;
   currency: string;
   subtotal: number;
@@ -370,13 +358,7 @@ export interface InvoiceDownload {
 
 export interface InvoiceStatus {
   id: string;
-  status:
-    | "draft"
-    | "upcoming"
-    | "outstanding"
-    | "paid"
-    | "void"
-    | "uncollectible";
+  status: "draft" | "outstanding" | "paid" | "void" | "uncollectible";
   /** @format date-time */
   updatedAt: string;
   object: "invoice";

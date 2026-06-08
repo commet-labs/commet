@@ -5,10 +5,8 @@ export type SubscriptionStatus =
   | "pending_payment"
   | "trialing"
   | "active"
-  | "paused"
   | "past_due"
-  | "canceled"
-  | "expired";
+  | "canceled";
 
 export type BillingInterval =
   | "weekly"

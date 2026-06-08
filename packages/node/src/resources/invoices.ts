@@ -12,13 +12,7 @@ import type { CommetHTTPClient } from "../utils/http";
 
 export interface ListInvoicesParams {
   customerId?: string;
-  status?:
-    | "draft"
-    | "upcoming"
-    | "outstanding"
-    | "paid"
-    | "void"
-    | "uncollectible";
+  status?: "draft" | "outstanding" | "paid" | "void" | "uncollectible";
   subscriptionId?: string;
   /** @format date-time */
   cursor?: string;
