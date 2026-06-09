@@ -1,6 +1,6 @@
 {
   "name": "commet",
-  "version": "2.2.8",
+  "version": "2.2.9",
   "description": "Commet CLI - Manage your billing platform from the command line",
   "bin": {
     "commet": "./bin/commet"

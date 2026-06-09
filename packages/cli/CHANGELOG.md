@@ -1,5 +1,13 @@
 # commet
 
+## 2.2.9
+
+### Patch Changes
+
+- Updated dependencies [3d75493]
+- Updated dependencies [3bbdf3e]
+  - @commet/node@6.0.0
+
 ## 2.2.8
 
 ### Patch Changes
