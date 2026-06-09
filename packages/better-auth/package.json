@@ -58,8 +58,8 @@
   },
   "devDependencies": {
     "@commet/node": "workspace:*",
-    "@types/node": "24.12.4",
-    "better-auth": "1.6.11",
+    "@types/node": "24.13.1",
+    "better-auth": "1.6.15",
     "better-call": "1.3.5",
     "tsup": "8.5.1",
     "typescript": "5.9.3",
