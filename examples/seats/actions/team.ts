@@ -237,7 +237,7 @@ export async function checkSubscriptionStatusAction(): Promise<SubscriptionStatu
       subscriptionId: subscription.id,
       status: subscription.status,
       planName: subscription.plan.name,
-      daysRemaining: subscription.currentPeriod.daysRemaining,
+      daysRemaining: subscription.currentPeriod?.daysRemaining,
       seatsUsed: seatResult.data?.current ?? 0,
       seatsIncluded: seatResult.data?.included ?? 0,
       seatOveragePrice: seatResult.data?.overageUnitPrice,

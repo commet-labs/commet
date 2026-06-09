@@ -13,7 +13,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-function formatPrice(cents: number): string {
+function formatPrice(cents: number | undefined): string {
+  if (cents === undefined) return "—";
   return `$${(cents / 100).toFixed(2)}`;
 }
 

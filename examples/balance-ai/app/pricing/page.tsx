@@ -61,7 +61,7 @@ export default async function PricingPage() {
       ) : (
         <div className="grid w-full max-w-2xl gap-6 md:grid-cols-2">
           {plans.map((plan) => {
-            const monthlyPrice = plan.prices.find(
+            const monthlyPrice = plan.prices?.find(
               (p) => p.billingInterval === "monthly",
             );
 
@@ -83,7 +83,7 @@ export default async function PricingPage() {
                     )}
                   </div>
                   <ul className="flex flex-col gap-2 text-sm">
-                    {plan.features.map((feature) => (
+                    {plan.features?.map((feature) => (
                       <li
                         key={feature.code}
                         className="flex items-center gap-2"
