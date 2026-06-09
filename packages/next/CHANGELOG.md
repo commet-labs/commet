@@ -1,5 +1,14 @@
 # @commet/next
 
+## 1.0.7
+
+### Patch Changes
+
+- 3d75493: Adapt `PricingMarkdown` to the regenerated `@commet/node` models: nested `overage` object on plan features and optional `features` / `prices` on `Plan`.
+- Updated dependencies [3d75493]
+- Updated dependencies [3bbdf3e]
+  - @commet/node@6.0.0
+
 ## 1.0.6
 
 ### Patch Changes

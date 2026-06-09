@@ -1,5 +1,13 @@
 # @commet/ai-sdk
 
+## 4.0.0
+
+### Patch Changes
+
+- Updated dependencies [3d75493]
+- Updated dependencies [3bbdf3e]
+  - @commet/node@6.0.0
+
 ## 3.0.0
 
 ### Major Changes
