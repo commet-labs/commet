@@ -2,13 +2,18 @@
 "@commet/node": major
 ---
 
-Generate the SDK resource and type layer from the OpenAPI contract (2026-06-07).
+Adds the Payouts and Test Clock APIs and two new lookup methods. Includes breaking changes to intro offers, customer email, and a few exported type names — migration below.
 
-Resources, request/response models, and enums are now emitted by the codegen tool from the API contract instead of being hand-written, so the SDK stays in sync with the API by construction. The hand-written core is preserved: client, usage batching, webhook signature verification, errors, and `defineConfig`.
+**What's new**
 
-Breaking changes (SDK surface aligned to the contract):
+- **Payouts** — manage payouts to your bank account: `payouts.addBankAccount()` registers a destination account, `payouts.request()` moves available balance to it, and `payouts.completeVerification()` finishes bank verification.
+- **Test Clock** — simulate the passage of time in sandbox to exercise billing without waiting: `testClock.advance()` moves the clock forward, `testClock.processBilling()` runs whatever billing comes due, and `testClock.get()` reads the current clock.
+- **`subscriptions.get(id)`** — fetch a single subscription by ID, alongside the existing `subscriptions.getActive()`.
+- **`plans.setRegionalPricing()`** — set per-region pricing for a plan.
 
-- `subscriptions.create`: the intro offer parameter is renamed `customIntroOffer` → `introOffer`, and the subscription model exposes a nested `introOffer` object instead of the flat `introOfferEndsAt` / `introOfferDiscountType` / `introOfferDiscountValue` fields.
-- Exported type renames: `CreateParams` / `UpdateParams` → `CreateCustomerParams` / `UpdateCustomerParams`; the `CreateAddonParams` union is replaced by a single interface.
-- `quota.add` / `quota.remove` no longer default `count` to 1 client-side; the server applies the contract default (`default: 1`).
-- Customer email is sent on the wire as `email` (the `billingEmail` rename landed in API version 2026-06-06).
+**Breaking changes**
+
+- **Intro offers on `subscriptions.create()`** — the `customIntroOffer` parameter is now `introOffer`, a nested object `{ discountType, discountValue, durationCycles }`. The flat `introOfferEndsAt` / `introOfferDiscountType` / `introOfferDiscountValue` fields were removed from the subscription object; read intro-offer config from the plan price (`plan.prices[].introOffer`).
+- **Customer email** — `billingEmail` is now `email` on the customer create/update params and the customer object. Rename it in your calls.
+- **Exported type renames** — `CreateParams` / `UpdateParams` are now `CreateCustomerParams` / `UpdateCustomerParams`, and `CreateAddonParams` is a single interface instead of a union. Update your imports.
+- **`quota.add()` / `quota.remove()`** — `count` no longer defaults to `1`. Pass it explicitly.
