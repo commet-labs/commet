@@ -1,136 +1,34 @@
 import type { ApiResponse, RequestOptions } from "../types/common";
+import type {
+  CreatedInvoice,
+  Invoice,
+  InvoiceDownload,
+  InvoiceStatus,
+  SentInvoice,
+} from "../types/models";
 import type { CommetHTTPClient } from "../utils/http";
-import type { DiscountType } from "./plans";
-
-export type InvoiceStatus =
-  | "draft"
-  | "upcoming"
-  | "outstanding"
-  | "paid"
-  | "void"
-  | "uncollectible";
-export type InvoiceType =
-  | "recurring"
-  | "overage"
-  | "plan_change"
-  | "adjustment"
-  | "credit_purchase"
-  | "balance_topup"
-  | "addon_activation";
-export type InvoiceLineType =
-  | "plan_base"
-  | "feature_overage"
-  | "feature_seats"
-  | "feature_quota"
-  | "discount"
-  | "credit"
-  | "addon_base";
-export type ChargeType = "standard" | "advance" | "true_up";
-
-export interface InvoiceLineItem {
-  lineType: InvoiceLineType;
-  featureName: string | null;
-  description: string | null;
-  quantity: number;
-  unitAmount: number;
-  amount: number;
-  includedAmount: number | null;
-  usedAmount: number | null;
-  overageAmount: number | null;
-  discountType: DiscountType | null;
-  discountValue: number | null;
-  discountName: string | null;
-  chargeType: ChargeType | null;
-}
-
-export interface InvoiceListItem {
-  id: string;
-  object: "invoice";
-  livemode: boolean;
-  customerId: string;
-  subscriptionId: string | null;
-  invoiceNumber: string;
-  status: InvoiceStatus;
-  invoiceType: InvoiceType;
-  currency: string;
-  subtotal: number;
-  discountAmount: number;
-  taxAmount: number;
-  total: number;
-  periodStart: string | null;
-  periodEnd: string | null;
-  issueDate: string;
-  dueDate: string | null;
-  memo: string | null;
-  metadata: Record<string, unknown> | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface InvoiceDetail extends InvoiceListItem {
-  creditApplied: number;
-  planName: string | null;
-  poNumber: string | null;
-  reference: string | null;
-  lineItems: InvoiceLineItem[];
-}
-
-export interface InvoiceDownloadResult {
-  url: string;
-  expiresAt: string;
-}
-
-export interface InvoiceSendResult {
-  sent: boolean;
-  sentAt: string;
-}
-
-export interface InvoiceStatusResult {
-  id: string;
-  status: "paid" | "void";
-  updatedAt: string;
-}
-
-export interface CreateAdjustmentResult {
-  id: string;
-  object: "invoice";
-  livemode: boolean;
-  customerId: string;
-  invoiceNumber: string;
-  status: "outstanding" | "paid";
-  invoiceType: InvoiceType;
-  currency: string;
-  subtotal: number;
-  taxAmount: number;
-  total: number;
-  issueDate: string;
-  dueDate: string | null;
-  memo: string | null;
-  metadata: Record<string, unknown> | null;
-  createdAt: string;
-  updatedAt: string;
-}
 
 export interface ListInvoicesParams {
   customerId?: string;
-  status?: InvoiceStatus;
+  status?: "draft" | "outstanding" | "paid" | "void" | "uncollectible";
   subscriptionId?: string;
-  limit?: number;
+  /** @format date-time */
   cursor?: string;
+  limit?: number;
 }
 
 export interface GetInvoiceParams {
   id: string;
 }
 
-export interface CreateAdjustmentParams {
+export interface CreateAdjustmentInvoiceParams {
   customerId: string;
   amount: number;
-  description?: string;
+  description: string;
   metadata?: Record<string, unknown>;
 }
 
-export interface GetDownloadUrlParams {
+export interface DownloadInvoiceParams {
   id: string;
 }
 
@@ -146,44 +44,55 @@ export interface UpdateInvoiceStatusParams {
 export class InvoicesResource {
   constructor(private httpClient: CommetHTTPClient) {}
 
+  /** List invoices with cursor-based pagination. Filter by customer, status, or subscription. */
   async list(
     params?: ListInvoicesParams,
-  ): Promise<ApiResponse<InvoiceListItem[]>> {
-    return this.httpClient.get("/invoices", params);
-  }
-
-  async get(params: GetInvoiceParams): Promise<ApiResponse<InvoiceDetail>> {
-    return this.httpClient.get(`/invoices/${params.id}`);
-  }
-
-  /** Negative amount creates a credit. */
-  async createAdjustment(
-    params: CreateAdjustmentParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<CreateAdjustmentResult>> {
+  ): Promise<ApiResponse<Array<Invoice>>> {
+    return this.httpClient.get("/invoices", params, options);
+  }
+
+  /** Retrieve a single invoice by its public ID, including line items. */
+  async get(
+    params: GetInvoiceParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<Invoice>> {
+    const { id } = params;
+    return this.httpClient.get(`/invoices/${id}`, undefined, options);
+  }
+
+  /** Create a one-off adjustment invoice. Use a negative amount for a credit. */
+  async createAdjustment(
+    params: CreateAdjustmentInvoiceParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<CreatedInvoice>> {
     return this.httpClient.post("/invoices", params, options);
   }
 
-  /** Signed URL, expires after 7 days. */
+  /** Generate a signed URL to download the invoice as a PDF. The URL expires after 7 days. */
   async getDownloadUrl(
-    params: GetDownloadUrlParams,
-  ): Promise<ApiResponse<InvoiceDownloadResult>> {
-    return this.httpClient.get(`/invoices/${params.id}/download`);
+    params: DownloadInvoiceParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<InvoiceDownload>> {
+    const { id } = params;
+    return this.httpClient.get(`/invoices/${id}/download`, undefined, options);
   }
 
+  /** Send the invoice to the customer via email. */
   async send(
     params: SendInvoiceParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<InvoiceSendResult>> {
-    return this.httpClient.post(`/invoices/${params.id}/send`, {}, options);
+  ): Promise<ApiResponse<SentInvoice>> {
+    const { id } = params;
+    return this.httpClient.post(`/invoices/${id}/send`, {}, options);
   }
 
-  /** Only outstanding invoices can be changed to paid or void. */
+  /** Mark an outstanding invoice as "paid" or "void". Cannot change the status of already paid or voided invoices. */
   async updateStatus(
     params: UpdateInvoiceStatusParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<InvoiceStatusResult>> {
-    const { id, ...body } = params;
-    return this.httpClient.put(`/invoices/${id}/status`, body, options);
+  ): Promise<ApiResponse<InvoiceStatus>> {
+    const { id, ...rest } = params;
+    return this.httpClient.put(`/invoices/${id}/status`, rest, options);
   }
 }

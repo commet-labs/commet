@@ -11,7 +11,8 @@ import {
 import { getUser } from "@/lib/auth/session";
 import { commet } from "@/lib/commet";
 
-function formatPrice(cents: number): string {
+function formatPrice(cents: number | undefined): string {
+  if (cents === undefined) return "—";
   return `$${(cents / 100).toFixed(2)}`;
 }
 
@@ -82,7 +83,7 @@ export default async function BillingPage() {
                 <span className="text-sm text-muted-foreground">Price</span>
                 <span className="text-sm font-medium">
                   {formatPrice(subscription.plan.basePrice)} /{" "}
-                  {formatBillingInterval(subscription.plan.billingInterval)}
+                  {formatBillingInterval(subscription.billingInterval)}
                 </span>
               </div>
             </>

@@ -24,14 +24,12 @@ export const onBeforeUserCreate =
         });
       }
 
-      // Check if customer already exists by email
+      // Check if a customer already exists for this user (by external id)
       const existingCustomers = await options.client.customers.list({
-        search: user.email,
+        externalId: user.id,
       });
 
-      const existingCustomer = existingCustomers.data?.find(
-        (c) => c.billingEmail === user.email,
-      );
+      const existingCustomer = existingCustomers.data?.[0];
 
       // Skip creation if customer already exists
       if (!existingCustomer) {
@@ -39,7 +37,6 @@ export const onBeforeUserCreate =
           email: user.email,
           id: user.id,
           fullName: customParams.fullName ?? user.name,
-          domain: customParams.domain,
           metadata: customParams.metadata,
         });
       }
@@ -104,7 +101,7 @@ export const onUserUpdate =
 
     try {
       const existingCustomers = await options.client.customers.list({
-        search: user.email,
+        externalId: user.id,
       });
 
       const existingCustomer = existingCustomers.data?.[0];

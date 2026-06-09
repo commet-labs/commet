@@ -1,44 +1,11 @@
 import type { ApiResponse, RequestOptions } from "../types/common";
+import type { TransactionStatus } from "../types/enums";
+import type {
+  Transaction,
+  TransactionRefund,
+  TransactionRetry,
+} from "../types/models";
 import type { CommetHTTPClient } from "../utils/http";
-
-export type TransactionStatus =
-  | "pending"
-  | "succeeded"
-  | "failed"
-  | "refunded"
-  | "disputed";
-
-export interface TransactionListItem {
-  id: string;
-  object: "transaction";
-  livemode: boolean;
-  invoiceId: string;
-  grossAmount: number;
-  subtotal: number;
-  taxAmount: number;
-  currency: string;
-  status: TransactionStatus;
-  customerEmail: string;
-  customerName: string | null;
-  paidAt: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface TransactionDetail extends TransactionListItem {
-  availableAt: string | null;
-}
-
-export interface TransactionRefundResult {
-  id: string;
-  status: "refunded";
-}
-
-export interface TransactionRetryResult {
-  id: string;
-  status: "processing";
-  retryInvoiceNumber: string;
-}
 
 export interface ListTransactionsParams {
   status?: TransactionStatus;
@@ -62,39 +29,38 @@ export interface RetryTransactionParams {
 export class TransactionsResource {
   constructor(private httpClient: CommetHTTPClient) {}
 
+  /** List payment transactions with cursor-based pagination. Filter by status or customer email. */
   async list(
     params?: ListTransactionsParams,
-  ): Promise<ApiResponse<TransactionListItem[]>> {
-    return this.httpClient.get("/transactions", params);
+    options?: RequestOptions,
+  ): Promise<ApiResponse<Array<Transaction>>> {
+    return this.httpClient.get("/transactions", params, options);
   }
 
+  /** Retrieve a single payment transaction by its public ID, including provider details. */
   async get(
     params: GetTransactionParams,
-  ): Promise<ApiResponse<TransactionDetail>> {
-    return this.httpClient.get(`/transactions/${params.id}`);
+    options?: RequestOptions,
+  ): Promise<ApiResponse<Transaction>> {
+    const { id } = params;
+    return this.httpClient.get(`/transactions/${id}`, undefined, options);
   }
 
-  /** Full refund only. */
+  /** Issue a full refund for a payment transaction. */
   async refund(
     params: RefundTransactionParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<TransactionRefundResult>> {
-    return this.httpClient.post(
-      `/transactions/${params.id}/refund`,
-      {},
-      options,
-    );
+  ): Promise<ApiResponse<TransactionRefund>> {
+    const { id } = params;
+    return this.httpClient.post(`/transactions/${id}/refund`, {}, options);
   }
 
-  /** Creates a new invoice and initiates a new payment attempt. */
+  /** Retry a failed payment transaction. Creates a new invoice and initiates a new payment attempt. */
   async retry(
     params: RetryTransactionParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<TransactionRetryResult>> {
-    return this.httpClient.post(
-      `/transactions/${params.id}/retry`,
-      {},
-      options,
-    );
+  ): Promise<ApiResponse<TransactionRetry>> {
+    const { id } = params;
+    return this.httpClient.post(`/transactions/${id}/retry`, {}, options);
   }
 }

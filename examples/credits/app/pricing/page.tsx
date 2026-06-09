@@ -1,4 +1,7 @@
-import type { BillingInterval, PlanFeature } from "@commet/node";
+import type { BillingInterval, Plan } from "@commet/node";
+
+type PlanFeatureItem = NonNullable<Plan["features"]>[number];
+
 import { Check } from "lucide-react";
 import { redirect } from "next/navigation";
 import { getPlansAction } from "@/actions/plans";
@@ -27,14 +30,14 @@ function formatBillingInterval(interval: BillingInterval): string {
   return interval;
 }
 
-function formatFeature(feature: PlanFeature): string {
+function formatFeature(feature: PlanFeatureItem): string {
   if (feature.type === "boolean" && feature.enabled) {
     return feature.name;
   }
-  if (feature.type === "usage" && feature.includedAmount !== undefined) {
+  if (feature.type === "usage" && feature.includedAmount !== null) {
     return `${feature.includedAmount.toLocaleString()} ${feature.name} included`;
   }
-  if (feature.type === "seats" && feature.includedAmount !== undefined) {
+  if (feature.type === "seats" && feature.includedAmount !== null) {
     return `${feature.includedAmount} ${feature.name}`;
   }
   return feature.name;
@@ -83,7 +86,7 @@ export default async function PricingPage() {
         <div className="grid w-full max-w-2xl gap-6 md:grid-cols-2">
           {plans.map((plan) => {
             const defaultPrice =
-              plan.prices.find((p) => p.isDefault) || plan.prices[0];
+              plan.prices?.find((p) => p.isDefault) || plan.prices?.[0];
 
             return (
               <Card key={plan.id}>
@@ -108,7 +111,7 @@ export default async function PricingPage() {
                     )}
                   </div>
                   <ul className="flex flex-col gap-2 text-sm">
-                    {plan.features.map((feature) => (
+                    {plan.features?.map((feature) => (
                       <li
                         key={feature.code}
                         className="flex items-center gap-2"

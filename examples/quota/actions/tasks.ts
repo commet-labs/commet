@@ -205,7 +205,7 @@ export async function getTaskQuotaStatusAction(): Promise<TaskQuotaStatus> {
       subscriptionId: subscription.id,
       status: subscription.status,
       planName: subscription.plan.name,
-      daysRemaining: subscription.currentPeriod.daysRemaining,
+      daysRemaining: subscription.currentPeriod?.daysRemaining,
       used: access?.current ?? 0,
       included: access?.included ?? 0,
       billed: access?.billedQuantity ?? 0,

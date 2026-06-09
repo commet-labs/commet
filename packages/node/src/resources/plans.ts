@@ -1,170 +1,29 @@
-import type { ApiResponse, ListParams, RequestOptions } from "../types/common";
+import type { ApiResponse, RequestOptions } from "../types/common";
+import type {
+  BillingInterval,
+  ConsumptionModel,
+  DiscountType,
+} from "../types/enums";
+import type {
+  DefaultPlanPrice,
+  DeletedObject,
+  DeletedPlanRegionalPricing,
+  Plan,
+  PlanFeature,
+  PlanPrice,
+  PlanRegionalPricing,
+  PlanRegionalPricingResult,
+  PlanVisibility,
+  RemovedPlanFeature,
+} from "../types/models";
 import type { CommetHTTPClient } from "../utils/http";
 
-export type PlanID = `plan_${string}`;
-export type BillingInterval =
-  | "weekly"
-  | "monthly"
-  | "quarterly"
-  | "yearly"
-  | "one_time";
-export type FeatureType = "boolean" | "usage" | "seats" | "quota";
-export type ConsumptionModel = "metered" | "credits" | "balance";
-export type DiscountType = "percentage" | "amount";
-
-export interface PlanPrice {
-  billingInterval: BillingInterval;
-  price: number; // in cents
-  isDefault: boolean;
-  trialDays: number;
+export interface ListPlansParams {
+  includePrivate?: "true" | "false";
 }
 
-export interface PlanFeature {
-  code: string;
-  name: string;
-  type: FeatureType;
-  unitName: string | null;
-  enabled?: boolean;
-  includedAmount?: number;
-  unlimited?: boolean;
-  overageEnabled?: boolean;
-  overageUnitPrice?: number;
-}
-
-export interface Plan {
-  id: PlanID;
-  object: "plan";
-  livemode: boolean;
-  code: string;
-  name: string;
-  description: string | null;
-  isPublic: boolean;
-  isFree: boolean;
-  isDefault: boolean;
-  sortOrder: number;
-  prices: PlanPrice[];
-  features: PlanFeature[];
-  createdAt: string;
-}
-
-export interface PlanDetailPrice {
-  billingInterval: BillingInterval;
-  price: number;
-  isDefault: boolean;
-  trialDays: number;
-  introOffer: {
-    enabled: boolean;
-    discountType: DiscountType | null;
-    discountValue: number | null;
-    durationCycles: number | null;
-  } | null;
-}
-
-export interface PlanDetailFeature extends PlanFeature {
-  overage: {
-    enabled: boolean;
-    model: "per_unit" | null;
-    unitPrice: number | null;
-  } | null;
-}
-
-export interface PlanDetail {
-  id: PlanID;
-  object: "plan";
-  livemode: boolean;
-  code: string;
-  name: string;
-  description: string | null;
-  isPublic: boolean;
-  isDefault: boolean;
-  sortOrder: number;
-  prices: PlanDetailPrice[];
-  features: PlanDetailFeature[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface ListPlansParams extends ListParams {
-  includePrivate?: boolean;
-}
-
-export interface PlanManage {
+export interface GetPlanParams {
   id: string;
-  object: "plan";
-  livemode: boolean;
-  name: string;
-  code: string;
-  description: string | null;
-  consumptionModel: ConsumptionModel | null;
-  isPublic: boolean;
-  isDefault: boolean;
-  isFree: boolean;
-  blockOnExhaustion: boolean;
-  sortOrder: number;
-  planGroupId: string | null;
-  metadata: Record<string, unknown> | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface PlanFeatureManageBase {
-  planId: string;
-  featureId: string;
-  enabled: boolean;
-  includedAmount: number | null;
-  unlimited: boolean;
-  overageEnabled: boolean;
-  creditsPerUnit: number | null;
-}
-
-export interface FixedPricingFeatureManage extends PlanFeatureManageBase {
-  pricingMode: "fixed";
-  overageUnitPrice: number | null;
-  margin: null;
-}
-
-export interface AiModelPricingFeatureManage extends PlanFeatureManageBase {
-  pricingMode: "ai_model";
-  margin: number;
-  overageUnitPrice: null;
-}
-
-export type PlanFeatureManage =
-  | FixedPricingFeatureManage
-  | AiModelPricingFeatureManage;
-
-export interface PlanPriceManage {
-  id: string;
-  object: "plan_price";
-  livemode: boolean;
-  planId: string;
-  billingInterval: BillingInterval;
-  price: number;
-  isDefault: boolean;
-  trialDays: number;
-  includedBalance: number | null;
-  includedCredits: number | null;
-  introOfferEnabled: boolean;
-  introOfferDiscountType: DiscountType | null;
-  introOfferDiscountValue: number | null;
-  introOfferDurationCycles: number | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface RegionalPriceResult {
-  priceId: string;
-  overrides: Array<{ currency: string; price: number }>;
-}
-
-export interface DeleteResult {
-  id: string;
-  deleted: true;
-}
-
-export interface RemoveResult {
-  id: string;
-  removed: true;
 }
 
 export interface CreatePlanParams {
@@ -182,7 +41,7 @@ export interface CreatePlanParams {
 export interface UpdatePlanParams {
   id: string;
   name?: string;
-  description?: string;
+  description?: string | null;
   metadata?: Record<string, unknown>;
   isPublic?: boolean;
 }
@@ -191,254 +50,305 @@ export interface DeletePlanParams {
   id: string;
 }
 
-export interface SetVisibilityParams {
+export interface SetPlanVisibilityParams {
   id: string;
   isPublic: boolean;
 }
 
-interface AddPlanFeatureBase {
-  planId: string;
+export interface AddPlanFeatureParams {
+  id: string;
   featureId: string;
   enabled?: boolean;
   includedAmount?: number;
   unlimited?: boolean;
-  overageEnabled?: boolean;
+  overage?: {
+    enabled: boolean;
+    unitPrice: number;
+  };
   creditsPerUnit?: number | null;
+  pricingMode?: "fixed" | "ai_model";
+  margin?: number | null;
 }
 
-export interface AddFixedPricingFeatureParams extends AddPlanFeatureBase {
-  pricingMode?: "fixed";
-  overageUnitPrice?: number;
-}
-
-export interface AddAiModelPricingFeatureParams extends AddPlanFeatureBase {
-  pricingMode: "ai_model";
-  margin: number;
-}
-
-export type AddPlanFeatureParams =
-  | AddFixedPricingFeatureParams
-  | AddAiModelPricingFeatureParams;
-
-interface UpdatePlanFeatureBase {
-  planId: string;
+export interface UpdatePlanFeatureParams {
+  id: string;
   featureId: string;
   enabled?: boolean;
   includedAmount?: number;
   unlimited?: boolean;
-  overageEnabled?: boolean;
+  overage?: {
+    enabled?: boolean;
+    unitPrice?: number;
+  };
   creditsPerUnit?: number | null;
 }
-
-export interface UpdateFixedPricingFeatureParams extends UpdatePlanFeatureBase {
-  pricingMode?: "fixed";
-  overageUnitPrice?: number;
-}
-
-export interface UpdateAiModelPricingFeatureParams
-  extends UpdatePlanFeatureBase {
-  pricingMode: "ai_model";
-  margin?: number;
-}
-
-export type UpdatePlanFeatureParams =
-  | UpdateFixedPricingFeatureParams
-  | UpdateAiModelPricingFeatureParams;
 
 export interface RemovePlanFeatureParams {
-  planId: string;
+  id: string;
   featureId: string;
 }
 
 export interface AddPlanPriceParams {
-  planId: string;
+  id: string;
   billingInterval: BillingInterval;
   price: number;
   trialDays?: number;
   isDefault?: boolean;
-  includedBalance?: number;
-  includedCredits?: number;
-  introOfferEnabled?: boolean;
-  introOfferDiscountType?: "percentage" | "amount";
-  introOfferDiscountValue?: number;
-  introOfferDurationCycles?: number;
+  includedBalance?: number | null;
+  includedCredits?: number | null;
+  introOffer?: {
+    enabled: boolean;
+    discountType?: DiscountType | null;
+    discountValue?: number | null;
+    durationCycles?: number | null;
+  };
 }
 
 export interface UpdatePlanPriceParams {
-  planId: string;
+  id: string;
   priceId: string;
   price?: number;
   isDefault?: boolean;
   trialDays?: number;
-  includedBalance?: number;
-  includedCredits?: number;
-  introOfferEnabled?: boolean;
-  introOfferDiscountType?: "percentage" | "amount" | null;
-  introOfferDiscountValue?: number | null;
-  introOfferDurationCycles?: number | null;
+  includedBalance?: number | null;
+  includedCredits?: number | null;
+  introOffer?: {
+    enabled?: boolean;
+    discountType?: DiscountType | null;
+    discountValue?: number | null;
+    durationCycles?: number | null;
+  };
 }
 
 export interface DeletePlanPriceParams {
-  planId: string;
+  id: string;
   priceId: string;
 }
 
-export interface SetDefaultPriceParams {
-  planId: string;
+export interface SetDefaultPlanPriceParams {
+  id: string;
   priceId: string;
 }
 
-export interface SetRegionalPricesParams {
-  planId: string;
+export interface UpsertRegionalPricesParams {
+  id: string;
   priceId: string;
-  overrides: Array<{ currency: string; price: number }>;
+  overrides: Array<{
+    currency: string;
+    price: number;
+    includedBalance?: number;
+  }>;
+}
+
+export interface SetPlanRegionalPricingParams {
+  id: string;
+  currency:
+    | "ars"
+    | "brl"
+    | "clp"
+    | "cop"
+    | "pen"
+    | "uyu"
+    | "pyg"
+    | "bob"
+    | "mxn"
+    | "cad"
+    | "eur"
+    | "jpy"
+    | "cny"
+    | "krw"
+    | "hkd"
+    | "sgd"
+    | "twd"
+    | "inr"
+    | "thb";
+  exchangeRate: number;
+  prices?: Array<{
+    priceId: string;
+    price: number;
+    includedBalance?: number;
+  }>;
+  features?: Array<{
+    featureId: string;
+    overageUnitPrice: number;
+  }>;
+  introOffers?: Array<{
+    priceId: string;
+    discountType: DiscountType;
+    discountValue: number;
+    durationCycles: number;
+  }>;
 }
 
 export interface DeleteRegionalPricesParams {
-  planId: string;
+  id: string;
   priceId: string;
 }
 
 export class PlansResource {
   constructor(private httpClient: CommetHTTPClient) {}
 
-  async list(params?: ListPlansParams): Promise<ApiResponse<Plan[]>> {
-    return this.httpClient.get("/plans", params);
+  /** List all plans with their prices and features. Optionally include private plans. */
+  async list(
+    params?: ListPlansParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<Array<Plan>>> {
+    return this.httpClient.get("/plans", params, options);
   }
 
-  async get(params: { id: string }): Promise<ApiResponse<PlanDetail>> {
-    return this.httpClient.get(`/plans/${params.id}`);
+  /** Get detailed plan information by code or ID. */
+  async get(
+    params: GetPlanParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<Plan>> {
+    const { id } = params;
+    return this.httpClient.get(`/plans/${id}`, undefined, options);
   }
 
+  /** Create a new plan with optional consumption model, visibility, and plan group assignment. */
   async create(
     params: CreatePlanParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<PlanManage>> {
+  ): Promise<ApiResponse<Plan>> {
     return this.httpClient.post("/plans/manage", params, options);
   }
 
+  /** Update a plan's name, description, visibility, or metadata. */
   async update(
     params: UpdatePlanParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<PlanManage>> {
-    const { id, ...body } = params;
-    return this.httpClient.put(`/plans/${id}/manage`, body, options);
+  ): Promise<ApiResponse<Plan>> {
+    const { id, ...rest } = params;
+    return this.httpClient.put(`/plans/${id}/manage`, rest, options);
   }
 
+  /** Soft-delete a plan. */
   async delete(
     params: DeletePlanParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<DeleteResult>> {
-    return this.httpClient.delete(
-      `/plans/${params.id}/manage`,
-      undefined,
-      options,
-    );
+  ): Promise<ApiResponse<DeletedObject>> {
+    const { id } = params;
+    return this.httpClient.delete(`/plans/${id}/manage`, undefined, options);
   }
 
+  /** Toggle a plan between public and private. */
   async setVisibility(
-    params: SetVisibilityParams,
+    params: SetPlanVisibilityParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<PlanManage>> {
-    const { id, ...body } = params;
-    return this.httpClient.put(`/plans/${id}/visibility`, body, options);
+  ): Promise<ApiResponse<PlanVisibility>> {
+    const { id, ...rest } = params;
+    return this.httpClient.put(`/plans/${id}/visibility`, rest, options);
   }
 
+  /** Attach a feature to a plan with limits, overage, and credits configuration. */
   async addFeature(
     params: AddPlanFeatureParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<PlanFeatureManage>> {
-    const { planId, ...body } = params;
-    return this.httpClient.post(`/plans/${planId}/features`, body, options);
+  ): Promise<ApiResponse<PlanFeature>> {
+    const { id, ...rest } = params;
+    return this.httpClient.post(`/plans/${id}/features`, rest, options);
   }
 
+  /** Update limits, overage, or enabled status of a feature on a plan. */
   async updateFeature(
     params: UpdatePlanFeatureParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<PlanFeatureManage>> {
-    const { planId, featureId, ...body } = params;
+  ): Promise<ApiResponse<PlanFeature>> {
+    const { id, featureId, ...rest } = params;
     return this.httpClient.put(
-      `/plans/${planId}/features/${featureId}`,
-      body,
+      `/plans/${id}/features/${featureId}`,
+      rest,
       options,
     );
   }
 
+  /** Detach a feature from a plan. */
   async removeFeature(
     params: RemovePlanFeatureParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<RemoveResult>> {
-    const { planId, featureId } = params;
+  ): Promise<ApiResponse<RemovedPlanFeature>> {
+    const { id, featureId } = params;
     return this.httpClient.delete(
-      `/plans/${planId}/features/${featureId}`,
+      `/plans/${id}/features/${featureId}`,
       undefined,
       options,
     );
   }
 
+  /** Add a billing interval price to a plan with optional trial days and included balance/credits. */
   async addPrice(
     params: AddPlanPriceParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<PlanPriceManage>> {
-    const { planId, ...body } = params;
-    return this.httpClient.post(`/plans/${planId}/prices`, body, options);
+  ): Promise<ApiResponse<PlanPrice>> {
+    const { id, ...rest } = params;
+    return this.httpClient.post(`/plans/${id}/prices`, rest, options);
   }
 
+  /** Update an existing price on a plan. */
   async updatePrice(
     params: UpdatePlanPriceParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<PlanPriceManage>> {
-    const { planId, priceId, ...body } = params;
-    return this.httpClient.put(
-      `/plans/${planId}/prices/${priceId}`,
-      body,
-      options,
-    );
+  ): Promise<ApiResponse<PlanPrice>> {
+    const { id, priceId, ...rest } = params;
+    return this.httpClient.put(`/plans/${id}/prices/${priceId}`, rest, options);
   }
 
+  /** Remove a price from a plan. */
   async deletePrice(
     params: DeletePlanPriceParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<DeleteResult>> {
-    const { planId, priceId } = params;
+  ): Promise<ApiResponse<DeletedObject>> {
+    const { id, priceId } = params;
     return this.httpClient.delete(
-      `/plans/${planId}/prices/${priceId}`,
+      `/plans/${id}/prices/${priceId}`,
       undefined,
       options,
     );
   }
 
+  /** Set a specific price as the default for its plan. Unsets previous default. */
   async setDefaultPrice(
-    params: SetDefaultPriceParams,
+    params: SetDefaultPlanPriceParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<PlanPriceManage>> {
-    const { planId, priceId } = params;
+  ): Promise<ApiResponse<DefaultPlanPrice>> {
+    const { id, priceId } = params;
     return this.httpClient.put(
-      `/plans/${planId}/prices/${priceId}/default`,
+      `/plans/${id}/prices/${priceId}/default`,
       {},
       options,
     );
   }
 
+  /** Create or update regional currency price overrides for a plan price. */
   async setRegionalPrices(
-    params: SetRegionalPricesParams,
+    params: UpsertRegionalPricesParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<RegionalPriceResult>> {
-    const { planId, priceId, ...body } = params;
+  ): Promise<ApiResponse<PlanRegionalPricing>> {
+    const { id, priceId, ...rest } = params;
     return this.httpClient.put(
-      `/plans/${planId}/prices/${priceId}/regional`,
-      body,
+      `/plans/${id}/prices/${priceId}/regional`,
+      rest,
       options,
     );
   }
 
+  /** Configure a plan's regional pricing for one currency. Sending only currency and exchangeRate derives every regional value (base price, included balance, feature overage, intro offer) from the USD value at that rate. Optional per-price and per-feature overrides are stored as manual values. */
+  async setRegionalPricing(
+    params: SetPlanRegionalPricingParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<PlanRegionalPricingResult>> {
+    const { id, ...rest } = params;
+    return this.httpClient.put(`/plans/${id}/regional`, rest, options);
+  }
+
+  /** Remove all regional currency overrides for a plan price. */
   async deleteRegionalPrices(
     params: DeleteRegionalPricesParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<DeleteResult>> {
-    const { planId, priceId } = params;
+  ): Promise<ApiResponse<DeletedPlanRegionalPricing>> {
+    const { id, priceId } = params;
     return this.httpClient.delete(
-      `/plans/${planId}/prices/${priceId}/regional`,
+      `/plans/${id}/prices/${priceId}/regional`,
       undefined,
       options,
     );

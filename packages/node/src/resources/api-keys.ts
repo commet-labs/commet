@@ -1,24 +1,11 @@
 import type { ApiResponse, RequestOptions } from "../types/common";
+import type { ApiKey, CreatedApiKey, DeletedObject } from "../types/models";
 import type { CommetHTTPClient } from "../utils/http";
 
-export interface ApiKey {
-  id: string;
-  object: "api_key";
-  livemode: boolean;
-  name: string;
-  prefix: string;
-  expiresAt: string | null;
-  lastUsedAt: string | null;
-  createdAt: string;
-}
-
-export interface ApiKeyCreated extends ApiKey {
-  apiKey: string;
-}
-
 export interface ListApiKeysParams {
-  limit?: number;
+  /** @format date-time */
   cursor?: string;
+  limit?: number;
 }
 
 export interface CreateApiKeyParams {
@@ -33,22 +20,28 @@ export interface DeleteApiKeyParams {
 export class ApiKeysResource {
   constructor(private httpClient: CommetHTTPClient) {}
 
-  async list(params?: ListApiKeysParams): Promise<ApiResponse<ApiKey[]>> {
-    return this.httpClient.get("/api-keys", params);
+  /** List API keys with cursor-based pagination. Keys are returned without the full secret. */
+  async list(
+    params?: ListApiKeysParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<Array<ApiKey>>> {
+    return this.httpClient.get("/api-keys", params, options);
   }
 
-  /** Response includes full `apiKey` which is only returned once. */
+  /** Create a new API key. The full key is only returned once in the response. */
   async create(
     params: CreateApiKeyParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<ApiKeyCreated>> {
+  ): Promise<ApiResponse<CreatedApiKey>> {
     return this.httpClient.post("/api-keys", params, options);
   }
 
+  /** Permanently revoke and delete an API key. */
   async delete(
     params: DeleteApiKeyParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<void>> {
-    return this.httpClient.delete(`/api-keys/${params.id}`, undefined, options);
+  ): Promise<ApiResponse<DeletedObject>> {
+    const { id } = params;
+    return this.httpClient.delete(`/api-keys/${id}`, undefined, options);
   }
 }

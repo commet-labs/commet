@@ -1,20 +1,12 @@
 import type { ApiResponse, RequestOptions } from "../types/common";
+import type {
+  AddedPlanToGroup,
+  DeletedObject,
+  PlanGroup,
+  RemovedPlanFromGroup,
+  ReorderedPlans,
+} from "../types/models";
 import type { CommetHTTPClient } from "../utils/http";
-
-export interface PlanGroup {
-  id: string;
-  object: "plan_group";
-  livemode: boolean;
-  name: string;
-  description: string | null;
-  isPublic: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface PlanGroupDetail extends PlanGroup {
-  plans: Array<{ id: string; code: string; name: string; sortOrder: number }>;
-}
 
 export interface ListPlanGroupsParams {
   limit?: number;
@@ -34,7 +26,7 @@ export interface CreatePlanGroupParams {
 export interface UpdatePlanGroupParams {
   id: string;
   name?: string;
-  description?: string;
+  description?: string | null;
   isPublic?: boolean;
 }
 
@@ -53,22 +45,32 @@ export interface RemovePlanFromGroupParams {
   planId: string;
 }
 
-export interface ReorderPlansParams {
+export interface ReorderPlansInGroupParams {
   id: string;
-  planIds: string[];
+  planIds: Array<string>;
 }
 
 export class PlanGroupsResource {
   constructor(private httpClient: CommetHTTPClient) {}
 
-  async list(params?: ListPlanGroupsParams): Promise<ApiResponse<PlanGroup[]>> {
-    return this.httpClient.get("/plan-groups", params);
+  /** List plan groups with cursor-based pagination. */
+  async list(
+    params?: ListPlanGroupsParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<Array<PlanGroup>>> {
+    return this.httpClient.get("/plan-groups", params, options);
   }
 
-  async get(params: GetPlanGroupParams): Promise<ApiResponse<PlanGroupDetail>> {
-    return this.httpClient.get(`/plan-groups/${params.id}`);
+  /** Retrieve a plan group by ID, including its plans ordered by sortOrder. */
+  async get(
+    params: GetPlanGroupParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<PlanGroup>> {
+    const { id } = params;
+    return this.httpClient.get(`/plan-groups/${id}`, undefined, options);
   }
 
+  /** Create a new plan group for organizing plans. */
   async create(
     params: CreatePlanGroupParams,
     options?: RequestOptions,
@@ -76,38 +78,38 @@ export class PlanGroupsResource {
     return this.httpClient.post("/plan-groups", params, options);
   }
 
+  /** Update a plan group's name, description, or visibility. */
   async update(
     params: UpdatePlanGroupParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<PlanGroup>> {
-    const { id, ...body } = params;
-    return this.httpClient.put(`/plan-groups/${id}`, body, options);
+    const { id, ...rest } = params;
+    return this.httpClient.put(`/plan-groups/${id}`, rest, options);
   }
 
-  /** Plans in the group are unlinked, not deleted. */
+  /** Delete a plan group. Plans in the group are unlinked, not deleted. */
   async delete(
     params: DeletePlanGroupParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<void>> {
-    return this.httpClient.delete(
-      `/plan-groups/${params.id}`,
-      undefined,
-      options,
-    );
+  ): Promise<ApiResponse<DeletedObject>> {
+    const { id } = params;
+    return this.httpClient.delete(`/plan-groups/${id}`, undefined, options);
   }
 
+  /** Add an existing plan to a plan group with optional sort order. */
   async addPlan(
     params: AddPlanToGroupParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<PlanGroupDetail>> {
-    const { id, ...body } = params;
-    return this.httpClient.post(`/plan-groups/${id}/plans`, body, options);
+  ): Promise<ApiResponse<AddedPlanToGroup>> {
+    const { id, ...rest } = params;
+    return this.httpClient.post(`/plan-groups/${id}/plans`, rest, options);
   }
 
+  /** Remove a plan from a plan group. */
   async removePlan(
     params: RemovePlanFromGroupParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<void>> {
+  ): Promise<ApiResponse<RemovedPlanFromGroup>> {
     const { id, planId } = params;
     return this.httpClient.delete(
       `/plan-groups/${id}/plans/${planId}`,
@@ -116,14 +118,15 @@ export class PlanGroupsResource {
     );
   }
 
+  /** Set the display order of plans within a group. All plan IDs in the group must be provided. */
   async reorderPlans(
-    params: ReorderPlansParams,
+    params: ReorderPlansInGroupParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<PlanGroupDetail>> {
-    const { id, ...body } = params;
+  ): Promise<ApiResponse<ReorderedPlans>> {
+    const { id, ...rest } = params;
     return this.httpClient.put(
       `/plan-groups/${id}/plans/reorder`,
-      body,
+      rest,
       options,
     );
   }

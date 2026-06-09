@@ -45,7 +45,7 @@ describe("Subscriptions — successUrl on the wire", () => {
     expect(url).toContain("/subscriptions/sub_1/change-plan");
   });
 
-  it("create sends customIntroOffer with camelCase keys", async () => {
+  it("create sends introOffer with camelCase keys", async () => {
     vi.mocked(fetch).mockResolvedValueOnce(
       jsonResponse({ success: true, data: { id: "sub_1" } }),
     );
@@ -54,7 +54,7 @@ describe("Subscriptions — successUrl on the wire", () => {
     await client.subscriptions.create({
       customerId: "cus_1",
       planId: "plan_pro",
-      customIntroOffer: {
+      introOffer: {
         discountType: "percentage",
         discountValue: 2500,
         durationCycles: 3,
@@ -63,7 +63,7 @@ describe("Subscriptions — successUrl on the wire", () => {
 
     const { url, body } = lastRequest();
     expect(url).toContain("/subscriptions");
-    expect(body.customIntroOffer).toEqual({
+    expect(body.introOffer).toEqual({
       discountType: "percentage",
       discountValue: 2500,
       durationCycles: 3,

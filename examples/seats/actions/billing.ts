@@ -7,7 +7,7 @@ import { commet } from "@/lib/commet";
 export interface BillingSubscription {
   id: string;
   planName: string;
-  planPrice: number;
+  planPrice?: number;
   billingInterval: BillingInterval | null;
   status: string;
 }
@@ -39,7 +39,7 @@ export async function getBillingDataAction(): Promise<{
         id: sub.id,
         planName: sub.plan.name,
         planPrice: sub.plan.basePrice,
-        billingInterval: sub.plan.billingInterval,
+        billingInterval: sub.billingInterval,
         status: sub.status,
       };
     }

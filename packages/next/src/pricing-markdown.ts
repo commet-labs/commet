@@ -1,11 +1,8 @@
-import type {
-  BillingInterval,
-  CreditPack,
-  Plan,
-  PlanFeature,
-} from "@commet/node";
+import type { BillingInterval, CreditPack, Plan } from "@commet/node";
 import { Commet } from "@commet/node";
 import { type NextRequest, NextResponse } from "next/server";
+
+type PlanFeature = NonNullable<Plan["features"]>[number];
 
 export interface PricingMarkdownConfig {
   apiKey: string;
@@ -130,7 +127,7 @@ function renderPlansTable(
     const cols = [plan.name, priceCell];
 
     const featuresByCode = new Map(
-      plan.features.map((feature) => [feature.code, feature]),
+      (plan.features ?? []).map((feature) => [feature.code, feature]),
     );
 
     for (const { code } of usageFeatures) {
@@ -150,8 +147,8 @@ function renderPlansTable(
       cols.push(included ? formatNumber(included) : "—");
 
       const overagePrice =
-        feature.overageEnabled && feature.overageUnitPrice !== undefined
-          ? formatRatePrice(feature.overageUnitPrice)
+        feature.overage?.enabled && feature.overage.unitPrice !== null
+          ? formatRatePrice(feature.overage.unitPrice)
           : "—";
       cols.push(overagePrice);
     }
@@ -169,10 +166,10 @@ function renderPlansTable(
   const footnotes: string[] = [];
 
   const trialPlans = plans.filter((plan) =>
-    plan.prices.some((price) => price.trialDays > 0),
+    (plan.prices ?? []).some((price) => price.trialDays > 0),
   );
   for (const plan of trialPlans) {
-    const trialPrice = plan.prices.find((price) => price.trialDays > 0)!;
+    const trialPrice = (plan.prices ?? []).find((price) => price.trialDays > 0)!;
     footnotes.push(
       `*${plan.name} plan includes a ${trialPrice.trialDays}-day free trial.*`,
     );
@@ -196,10 +193,10 @@ function renderPriceCell(
   if (plan.isFree) return "Free";
 
   const prices = filterIntervals
-    ? plan.prices.filter((price) =>
+    ? (plan.prices ?? []).filter((price) =>
         filterIntervals.includes(price.billingInterval),
       )
-    : plan.prices;
+    : (plan.prices ?? []);
 
   if (prices.length === 0) return "—";
 
@@ -214,7 +211,7 @@ function renderPriceCell(
 function renderFeatures(plans: Plan[]): string | null {
   const allBooleanCodes = new Set<string>();
   for (const plan of plans) {
-    for (const feature of plan.features) {
+    for (const feature of plan.features ?? []) {
       if (feature.type === "boolean") {
         allBooleanCodes.add(feature.code);
       }
@@ -226,7 +223,7 @@ function renderFeatures(plans: Plan[]): string | null {
   const enabledOnAll = new Set<string>();
   for (const code of allBooleanCodes) {
     const enabledOnEveryPlan = plans.every((plan) => {
-      const feature = plan.features.find((f) => f.code === code);
+      const feature = (plan.features ?? []).find((f) => f.code === code);
       return feature?.enabled;
     });
     if (enabledOnEveryPlan) {
@@ -236,7 +233,7 @@ function renderFeatures(plans: Plan[]): string | null {
 
   const perPlanLines: string[] = [];
   for (const plan of plans) {
-    const uniqueFeatures = plan.features
+    const uniqueFeatures = (plan.features ?? [])
       .filter(
         (feature) =>
           feature.type === "boolean" &&
@@ -250,7 +247,7 @@ function renderFeatures(plans: Plan[]): string | null {
     }
   }
 
-  const commonFeatures = plans[0]?.features
+  const commonFeatures = (plans[0]?.features ?? [])
     .filter(
       (feature) => feature.type === "boolean" && enabledOnAll.has(feature.code),
     )
@@ -291,7 +288,7 @@ interface UsageFeatureColumn {
 function collectUsageFeatures(plans: Plan[]): UsageFeatureColumn[] {
   const seen = new Map<string, UsageFeatureColumn>();
   for (const plan of plans) {
-    for (const feature of plan.features) {
+    for (const feature of plan.features ?? []) {
       if (
         (feature.type === "usage" || feature.type === "seats") &&
         !seen.has(feature.code) &&
@@ -311,8 +308,8 @@ function collectUsageFeatures(plans: Plan[]): UsageFeatureColumn[] {
 function hasUsageData(feature: PlanFeature): boolean {
   return (
     feature.unlimited === true ||
-    (feature.includedAmount !== undefined && feature.includedAmount > 0) ||
-    (feature.overageEnabled === true && feature.overageUnitPrice !== undefined)
+    (feature.includedAmount !== null && feature.includedAmount > 0) ||
+    (feature.overage?.enabled === true && feature.overage.unitPrice !== null)
   );
 }
 

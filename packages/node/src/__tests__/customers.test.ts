@@ -33,7 +33,7 @@ describe("Customers — id (external_id) on the wire", () => {
 
     const body = lastBody();
     expect(body.id).toBe("ext_123");
-    expect(body.billingEmail).toBe("a@b.com");
+    expect(body.email).toBe("a@b.com");
   });
 
   it("create without id omits it", async () => {

@@ -1,0 +1,95 @@
+import type { ApiResponse, RequestOptions } from "../types/common";
+import type {
+  Payout,
+  PayoutBankAccount,
+  PayoutVerification,
+} from "../types/models";
+import type { CommetHTTPClient } from "../utils/http";
+
+export interface AddPayoutBankAccountParams {
+  accountNumber: string;
+  accountHolderName: string;
+  routingNumber?: string;
+  accountType?: "checking" | "savings";
+  setDefault?: boolean;
+}
+
+export interface RequestPayoutParams {
+  amount: number;
+  description?: string;
+}
+
+export interface CompletePayoutVerificationParams {
+  email: string;
+  businessType: "individual" | "company";
+  businessUrl: string;
+  documentUrl: string;
+  bank: {
+    accountNumber: string;
+    accountHolderName: string;
+    routingNumber?: string;
+    accountType?: "checking" | "savings";
+  };
+  individual?: {
+    firstName: string;
+    lastName: string;
+    phone: string;
+    dateOfBirth: string;
+    ssnLast4?: string;
+    idNumber?: string;
+    address: {
+      line1: string;
+      line2?: string;
+      city: string;
+      state?: string;
+      postalCode: string;
+      country: string;
+    };
+  };
+  company?: {
+    name: string;
+    taxId: string;
+    address: {
+      line1: string;
+      line2?: string;
+      city: string;
+      state?: string;
+      postalCode: string;
+      country: string;
+    };
+    representative: {
+      firstName: string;
+      lastName: string;
+      phone?: string;
+      email?: string;
+    };
+  };
+}
+
+export class PayoutsResource {
+  constructor(private httpClient: CommetHTTPClient) {}
+
+  /** Add an additional destination bank account to the organization's existing payout account. Country and currency are resolved from the organization. The full account number is never returned — only `last4`. */
+  async addBankAccount(
+    params: AddPayoutBankAccountParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<PayoutBankAccount>> {
+    return this.httpClient.post("/payouts/bank-accounts", params, options);
+  }
+
+  /** Withdraw available balance to the organization's verified payout account. `amount` is in cents (USD, minimum 1000 = $10). The payout is created in `pending` and settles to `paid` asynchronously as provider webhooks arrive. */
+  async request(
+    params: RequestPayoutParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<Payout>> {
+    return this.httpClient.post("/payouts", params, options);
+  }
+
+  /** Provision the organization's payout account in a single call with the full KYC + bank payload. Uploads the identity document, persists the destination bank, and creates the connected account through the org's payout provider. The account starts `pending_verification` and flips to `verified` via the provider's webhook. Idempotent: returns the existing account if the org already has one. */
+  async completeVerification(
+    params: CompletePayoutVerificationParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<PayoutVerification>> {
+    return this.httpClient.post("/payouts/verification", params, options);
+  }
+}

@@ -1,4 +1,7 @@
-import type { BillingInterval, Plan, PlanFeature } from "@commet/node";
+import type { BillingInterval, Plan } from "@commet/node";
+
+type PlanFeatureItem = NonNullable<Plan["features"]>[number];
+
 import { redirect } from "next/navigation";
 import { checkoutAction } from "@/actions/checkout";
 import { getPlansAction } from "@/actions/plans";
@@ -16,7 +19,7 @@ import { RATE_SCALE } from "@/lib/billing";
 import { commet } from "@/lib/commet";
 
 function planPriceCents(plan: Plan): number {
-  const price = plan.prices.find((p) => p.isDefault) || plan.prices[0];
+  const price = plan.prices?.find((p) => p.isDefault) || plan.prices?.[0];
   return price?.price ?? 0;
 }
 
@@ -24,21 +27,21 @@ function mapPeriod(interval?: BillingInterval): "month" | "year" | "once" {
   return interval === "yearly" ? "year" : "month";
 }
 
-function formatIncluded(feature: PlanFeature): string | null {
+function formatIncluded(feature: PlanFeatureItem): string | null {
   if (feature.type === "boolean") {
     return feature.enabled ? feature.name : null;
   }
-  if (feature.includedAmount !== undefined) {
+  if (feature.includedAmount !== null) {
     return `${feature.includedAmount.toLocaleString()} ${feature.unitName ?? feature.name} included`;
   }
   return feature.name;
 }
 
-function formatOverage(feature: PlanFeature): string | null {
-  if (!feature.overageEnabled || feature.overageUnitPrice === undefined) {
+function formatOverage(feature: PlanFeatureItem): string | null {
+  if (!feature.overage?.enabled || feature.overage.unitPrice === null) {
     return null;
   }
-  const price = (feature.overageUnitPrice / RATE_SCALE).toFixed(2);
+  const price = (feature.overage.unitPrice / RATE_SCALE).toFixed(2);
   const unit = feature.unitName ?? "unit";
   const singularUnit = unit.endsWith("s") ? unit.slice(0, -1) : unit;
   return `Then $${price} per additional ${singularUnit}`;
@@ -91,9 +94,9 @@ export default async function PricingPage() {
         <div className="grid w-full max-w-5xl items-stretch gap-6 md:grid-cols-3">
           {plans.map((plan, index) => {
             const defaultPrice =
-              plan.prices.find((p) => p.isDefault) || plan.prices[0];
+              plan.prices?.find((p) => p.isDefault) || plan.prices?.[0];
             const highlighted = index === popularIndex;
-            const visibleFeatures = plan.features.filter(
+            const visibleFeatures = (plan.features ?? []).filter(
               (feature) => feature.enabled !== false,
             );
             const overage = visibleFeatures

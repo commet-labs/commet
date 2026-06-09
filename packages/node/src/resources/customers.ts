@@ -1,152 +1,117 @@
-import type {
-  ApiResponse,
-  ListParams as BaseListParams,
-  CustomerID,
-  RequestOptions,
-} from "../types/common";
+import type { ApiResponse, RequestOptions } from "../types/common";
+import type { Timezone } from "../types/enums";
+import type { Customer, CustomerBatch } from "../types/models";
 import type { CommetHTTPClient } from "../utils/http";
 
-export interface Customer {
-  id: CustomerID;
-  object: "customer";
-  livemode: boolean;
-  organizationId: string;
-  fullName?: string;
-  domain?: string;
-  website?: string;
-  billingEmail: string;
-  timezone?: string;
-  language?: string;
-  industry?: string;
-  employeeCount?: string;
-  metadata?: Record<string, unknown>;
-  createdAt: string;
-  updatedAt: string;
+export interface ListCustomersParams {
+  externalId?: string;
+  limit?: number;
+  cursor?: string;
 }
 
-export interface CustomerAddress {
-  line1: string;
-  line2?: string;
-  city: string;
-  state?: string;
-  postalCode: string;
-  country: string; // ISO-2
-}
-
-export interface CreateParams {
-  email: string; // billingEmail - the only required field
+export interface CreateCustomerParams {
   id?: string;
+  externalId?: string;
   fullName?: string;
-  domain?: string;
-  website?: string;
-  timezone?: string;
-  language?: string;
-  industry?: string;
+  address?: {
+    line1: string;
+    line2?: string;
+    city: string;
+    state?: string;
+    postalCode: string;
+    country: string;
+    region?: string;
+  };
+  addressId?: string;
+  email: string;
+  timezone?: Timezone;
   metadata?: Record<string, unknown>;
-  address?: CustomerAddress;
 }
 
 export interface GetCustomerParams {
-  id: CustomerID;
+  id: string;
 }
 
-export interface UpdateParams {
-  id: CustomerID;
+export interface UpdateCustomerParams {
+  id: string;
   email?: string;
   fullName?: string;
-  domain?: string;
-  website?: string;
-  timezone?: string;
-  language?: string;
-  industry?: string;
+  externalId?: string;
+  timezone?: Timezone;
   metadata?: Record<string, unknown>;
-  address?: CustomerAddress;
+  address?: {
+    line1: string;
+    line2?: string;
+    city: string;
+    state?: string;
+    postalCode: string;
+    country: string;
+    region?: string;
+  };
 }
 
-export interface ListCustomersParams extends BaseListParams {
-  search?: string;
-}
-
-export interface BatchResult {
-  successful: Customer[];
-  failed: Array<{
-    index: number;
-    error: string;
-    data: CreateParams;
+export interface BatchCreateCustomersParams {
+  customers: Array<{
+    email: string;
+    id?: string;
+    externalId?: string;
+    fullName?: string;
+    timezone?: Timezone;
+    metadata?: Record<string, unknown>;
+    address?: {
+      line1: string;
+      line2?: string;
+      city: string;
+      state?: string;
+      postalCode: string;
+      country: string;
+      region?: string;
+    };
   }>;
 }
 
 export class CustomersResource {
   constructor(private httpClient: CommetHTTPClient) {}
 
-  /** Idempotent when `id` is provided — returns existing customer instead of duplicating. */
+  /** List customers with cursor-based pagination. */
+  async list(
+    params?: ListCustomersParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<Array<Customer>>> {
+    return this.httpClient.get("/customers", params, options);
+  }
+
+  /** Create a new customer. Idempotent when customerId is provided. */
   async create(
-    params: CreateParams,
+    params: CreateCustomerParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<Customer>> {
-    return this.httpClient.post(
-      "/customers",
-      {
-        billingEmail: params.email,
-        id: params.id,
-        fullName: params.fullName,
-        domain: params.domain,
-        website: params.website,
-        timezone: params.timezone,
-        language: params.language,
-        industry: params.industry,
-        metadata: params.metadata,
-        address: params.address,
-      },
-      options,
-    );
+    return this.httpClient.post("/customers", params, options);
   }
 
-  async createBatch(
-    params: { customers: CreateParams[] },
+  /** Retrieve a customer by their public ID, including subscription status and metadata. */
+  async get(
+    params: GetCustomerParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<BatchResult>> {
-    const customers = params.customers.map((c) => ({
-      billingEmail: c.email,
-      id: c.id,
-      fullName: c.fullName,
-      domain: c.domain,
-      website: c.website,
-      timezone: c.timezone,
-      language: c.language,
-      industry: c.industry,
-      metadata: c.metadata,
-      address: c.address,
-    }));
-    return this.httpClient.post("/customers/batch", { customers }, options);
+  ): Promise<ApiResponse<Customer>> {
+    const { id } = params;
+    return this.httpClient.get(`/customers/${id}`, undefined, options);
   }
 
-  async get(params: GetCustomerParams): Promise<ApiResponse<Customer>> {
-    return this.httpClient.get(`/customers/${params.id}`);
-  }
-
+  /** Update a customer's name, external ID, or metadata. */
   async update(
-    params: UpdateParams,
+    params: UpdateCustomerParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<Customer>> {
-    return this.httpClient.put(
-      `/customers/${params.id}`,
-      {
-        billingEmail: params.email,
-        fullName: params.fullName,
-        domain: params.domain,
-        website: params.website,
-        timezone: params.timezone,
-        language: params.language,
-        industry: params.industry,
-        metadata: params.metadata,
-        address: params.address,
-      },
-      options,
-    );
+    const { id, ...rest } = params;
+    return this.httpClient.put(`/customers/${id}`, rest, options);
   }
 
-  async list(params?: ListCustomersParams): Promise<ApiResponse<Customer[]>> {
-    return this.httpClient.get("/customers", params as Record<string, unknown>);
+  /** Create up to 100 customers in a single request. */
+  async createBatch(
+    params: BatchCreateCustomersParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<CustomerBatch>> {
+    return this.httpClient.post("/customers/batch", params, options);
   }
 }
