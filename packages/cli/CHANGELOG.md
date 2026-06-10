@@ -1,5 +1,32 @@
 # commet
 
+## 3.0.0
+
+### Major Changes
+
+- 14fddc3: **Breaking:** The `features` command now manages the feature catalog: `commet features list` returns every feature definition in your organization and `commet features get --code <code>` fetches one. Checking a customer's access moved to the new `feature-access` command group:
+
+  - `commet feature-access list --customer-id <id>`
+  - `commet feature-access get --customer-id <id> --code <code>`
+  - `commet feature-access can-use --customer-id <id> --code <code>`
+
+  Existing invocations of `commet features get --customer-id <id>` and `commet features can-use` no longer work — use the `feature-access` equivalents above.
+
+  `commet pull` / `commet push` continue to read the catalog through `features.list()`; config sync behavior is unchanged.
+
+### Minor Changes
+
+- dff3b60: Three new resource command groups complete the CLI's coverage of the @commet/node SDK surface:
+
+  - `commet payouts` — `request --amount <n>`, `add-bank-account --account-number <number> --account-holder-name <name>`, `complete-verification --email <email> --business-type <type> --business-url <url> --document-url <url> --bank <json>`
+  - `commet test-clock` — `get`, `advance --advance-days <n> | --frozen-time <ts>`, `process-billing` (sandbox only)
+  - `commet quota` — `add`, `set`, `remove`, `get`, `get-all` for customer quota allowances by feature code
+
+### Patch Changes
+
+- Updated dependencies [14fddc3]
+  - @commet/node@7.0.0
+
 ## 2.2.9
 
 ### Patch Changes
