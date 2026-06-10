@@ -48,12 +48,12 @@ const commet = new Commet({
 // Create a customer
 const customer = await commet.customers.create({
   fullName: 'Acme Corp',
-  billingEmail: 'billing@acme.com'
+  email: 'billing@acme.com'
 });
 
 // Subscribe them to a plan
 await commet.subscriptions.create({
-  externalId: 'user_123',
+  customerId: 'cus_123',
   planCode: 'pro', // autocomplete works after `commet pull`
   billingInterval: 'yearly',
 });
@@ -86,14 +86,14 @@ const projects = await commet.quota.get({
 });
 
 // Check feature access
-const feature = await commet.features.get({
-  externalId: 'user_123',
+const access = await commet.featureAccess.canUse({
+  customerId: 'cus_123',
   code: 'api_calls'
 });
 
 // Generate customer portal link
 const portal = await commet.portal.getUrl({
-  externalId: 'user_123'
+  customerId: 'cus_123'
 });
 ```
 

@@ -408,7 +408,7 @@ describe("Addons — consumptionModel enum + active listing", () => {
     await client().addons.listActive({ customerId: "cus_1" });
 
     const { url, init } = lastCall();
-    expect(url).toContain("/addons/active");
+    expect(url).toContain("/active-addons");
     expect(init.method).toBe("GET");
     expect(lastQuery().get("customerId")).toBe("cus_1");
   });
@@ -444,16 +444,19 @@ describe("Addons — consumptionModel enum + active listing", () => {
   });
 });
 
-describe("Features — canUse query injection + access parsing", () => {
+describe("FeatureAccess — canUse query injection + access parsing", () => {
   it("canUse() injects action=canUse into the query and puts code in the path", async () => {
     vi.mocked(fetch).mockResolvedValueOnce(
       jsonResponse({ success: true, data: { allowed: true } }),
     );
 
-    await client().features.canUse({ code: "api_calls", customerId: "cus_1" });
+    await client().featureAccess.canUse({
+      code: "api_calls",
+      customerId: "cus_1",
+    });
 
     const { url, init } = lastCall();
-    expect(url).toContain("/features/api_calls");
+    expect(url).toContain("/feature-access/api_calls");
     expect(init.method).toBe("GET");
     const q = lastQuery();
     expect(q.get("customerId")).toBe("cus_1");
@@ -467,7 +470,7 @@ describe("Features — canUse query injection + access parsing", () => {
       jsonResponse({ success: true, data: { allowed: false } }),
     );
 
-    await client().features.get({
+    await client().featureAccess.get({
       code: "api_calls",
       customerId: "cus_1",
       action: "check",
@@ -498,7 +501,7 @@ describe("Features — canUse query injection + access parsing", () => {
     );
 
     const data = unwrap(
-      await client().features.canUse({
+      await client().featureAccess.canUse({
         code: "api_calls",
         customerId: "cus_1",
       }),

@@ -18,7 +18,7 @@ Full billing integration between [Better Auth](https://www.better-auth.com) and 
 ## Installation
 
 ```bash
-pnpm add @commet/better-auth@^1.0.0 @commet/node@^1.0.0 better-auth
+pnpm add @commet/better-auth @commet/node better-auth
 ```
 
 ## Preparation
@@ -101,7 +101,7 @@ export const authClient = createAuthClient({
 // Always query current state - no webhooks needed!
 const { data: subscription } = await authClient.subscription.get();
 const { data: features } = await authClient.features.list();
-const { data: canUse } = await authClient.features.canUse({ code: "api_calls" });
+const { data: canUse } = await authClient.features.canUse("api_calls");
 ```
 
 Webhooks are only useful if you want to:
@@ -124,7 +124,6 @@ commet({
   // Optional: Customize customer creation parameters
   getCustomerCreateParams: ({ user }) => ({
     fullName: user.name,
-    domain: "example.com",
     metadata: { plan: "starter" }
   }),
   
@@ -201,17 +200,17 @@ await authClient.subscription.cancel({
 const { data: features } = await authClient.features.list();
 
 // Get specific feature
-const { data: feature } = await authClient.features.get({ code: "team_members" });
+const { data: feature } = await authClient.features.get("team_members");
 console.log(feature?.current, feature?.included, feature?.remaining);
 
 // Check if feature is enabled (boolean)
-const { data: check } = await authClient.features.check({ code: "custom_branding" });
+const { data: check } = await authClient.features.check("custom_branding");
 if (!check?.allowed) {
   redirect("/upgrade");
 }
 
 // Check if user can use one more unit
-const { data: canUse } = await authClient.features.canUse({ code: "api_calls" });
+const { data: canUse } = await authClient.features.canUse("api_calls");
 if (!canUse?.allowed) {
   return { error: "Limit reached. Please upgrade." };
 }
@@ -261,10 +260,8 @@ await authClient.seats.set({
 
 // Set all seat types at once
 await authClient.seats.setAll({
-  seats: {
-    editor: 10,
-    viewer: 50
-  }
+  editor: 10,
+  viewer: 50
 });
 ```
 

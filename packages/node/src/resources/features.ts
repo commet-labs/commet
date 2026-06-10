@@ -1,26 +1,10 @@
 import type { ApiResponse, RequestOptions } from "../types/common";
 import type { FeatureType } from "../types/enums";
-import type {
-  DeletedObject,
-  Feature,
-  FeatureAccess,
-  FeatureLookup,
-} from "../types/models";
+import type { DeletedObject, Feature } from "../types/models";
 import type { CommetHTTPClient } from "../utils/http";
 
-export interface ListFeaturesParams {
-  customerId: string;
-}
-
-export interface GetFeatureAccessParams {
+export interface GetFeatureParams {
   code: string;
-  customerId: string;
-  action?: string;
-}
-
-export interface CanUseFeatureParams {
-  code: string;
-  customerId: string;
 }
 
 export interface CreateFeatureParams {
@@ -45,34 +29,18 @@ export interface DeleteFeatureParams {
 export class FeaturesResource {
   constructor(private httpClient: CommetHTTPClient) {}
 
-  /** List all features for a customer's active subscription. */
-  async list(
-    params: ListFeaturesParams,
-    options?: RequestOptions,
-  ): Promise<ApiResponse<Array<FeatureAccess>>> {
-    return this.httpClient.get("/features", params, options);
+  /** List every feature defined in the organization. This is the organization's feature catalog (definitions), not a customer's feature access. */
+  async list(): Promise<ApiResponse<Array<Feature>>> {
+    return this.httpClient.get("/features");
   }
 
-  /** Get feature access details. Use action=canUse to check if customer can consume one more unit. */
+  /** Get a single feature definition by code from the organization's feature catalog. */
   async get(
-    params: GetFeatureAccessParams,
+    params: GetFeatureParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<FeatureLookup>> {
-    const { code, ...rest } = params;
-    return this.httpClient.get(`/features/${code}`, rest, options);
-  }
-
-  /** Get feature access details. Use action=canUse to check if customer can consume one more unit. */
-  async canUse(
-    params: CanUseFeatureParams,
-    options?: RequestOptions,
-  ): Promise<ApiResponse<FeatureLookup>> {
-    const { code, ...rest } = params;
-    return this.httpClient.get(
-      `/features/${code}`,
-      { ...rest, action: "canUse" },
-      options,
-    );
+  ): Promise<ApiResponse<Feature>> {
+    const { code } = params;
+    return this.httpClient.get(`/features/${code}`, undefined, options);
   }
 
   /** Create a new feature. Code must be lowercase alphanumeric with underscores. */

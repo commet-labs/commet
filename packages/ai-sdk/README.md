@@ -67,7 +67,7 @@ const result = streamText({
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
 | `commet` | `Commet` | Yes | Commet SDK instance |
-| `feature` | `GeneratedFeatureCode` | Yes | Feature code to track usage against |
+| `feature` | `string` | Yes | Feature code to track usage against |
 | `customerId` | `string` | Yes | Commet customer ID (`cus_*`) or external ID |
 | `idempotencyKey` | `string` | No | Prevent duplicate tracking for retries |
 | `onTrackingError` | `(error: Error) => void` | No | Custom error handler. Defaults to `console.warn` |
@@ -85,7 +85,7 @@ Tracking runs in the stream's `flush` phase — it completes before the HTTP con
 ## Requirements
 
 - `ai` >= 6.0.0
-- `@commet/node` >= 1.6.0
+- `@commet/node` >= 7.0.0
 
 ## Documentation
 

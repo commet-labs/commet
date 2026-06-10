@@ -53,7 +53,7 @@ export async function inviteMemberAction(
       return { success: false, error: "Not authenticated" };
     }
 
-    const canAdd = await commet.features.canUse({
+    const canAdd = await commet.featureAccess.canUse({
       customerId: user.id,
       code: "member",
     });
@@ -227,7 +227,7 @@ export async function checkSubscriptionStatusAction(): Promise<SubscriptionStatu
     const isActive =
       subscription.status === "active" || subscription.status === "trialing";
 
-    const seatResult = await commet.features.get({
+    const seatResult = await commet.featureAccess.get({
       customerId: user.id,
       code: "member",
     });

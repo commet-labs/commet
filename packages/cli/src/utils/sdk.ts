@@ -1,4 +1,4 @@
-import { Commet } from "@commet/node";
+import { Commet, type Feature, type Plan } from "@commet/node";
 import { loadProjectConfig } from "./config";
 import { exitWithError } from "./output";
 
@@ -19,4 +19,33 @@ export function createSdkClient(): Commet {
       "No API key found. Set COMMET_API_KEY env var, or run `commet link` to auto-generate one.",
     action: "commet link",
   });
+}
+
+export async function fetchRemoteState(
+  commet: Commet,
+): Promise<
+  | { features: Feature[]; plans: Plan[] }
+  | { error: { code: string; message: string } }
+> {
+  const featuresResponse = await commet.features.list();
+  if (!featuresResponse.success || !featuresResponse.data) {
+    return {
+      error: {
+        code: "fetch_features_failed",
+        message: featuresResponse.error?.message ?? "Failed to fetch features",
+      },
+    };
+  }
+
+  const plansResponse = await commet.plans.list({ includePrivate: "true" });
+  if (!plansResponse.success || !plansResponse.data) {
+    return {
+      error: {
+        code: "fetch_plans_failed",
+        message: plansResponse.error?.message ?? "Failed to fetch plans",
+      },
+    };
+  }
+
+  return { features: featuresResponse.data, plans: plansResponse.data };
 }

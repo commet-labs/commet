@@ -95,7 +95,7 @@ Webhooks are optional in Commet. You can always query the current state directly
 
 ```typescript
 const subscription = await commet.subscriptions.getActive({ customerId: userId });
-const features = await commet.features.list({ externalId: userId });
+const features = await commet.featureAccess.list({ customerId: userId });
 ```
 
 Webhooks are useful when you want to react immediately to changes — send emails, update your database, revoke access, etc.

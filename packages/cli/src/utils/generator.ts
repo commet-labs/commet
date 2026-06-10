@@ -1,35 +1,4 @@
-interface Feature {
-  code: string;
-  name: string;
-  description?: string | null;
-  type: string;
-  unitName?: string | null;
-}
-
-interface Plan {
-  code: string;
-  name: string;
-  description?: string | null;
-  consumptionModel?: string | null;
-  defaultInterval?: string | null;
-  isFree?: boolean;
-  isPublic?: boolean;
-  sortOrder?: number;
-  prices?: Array<{
-    billingInterval: string;
-    price: number;
-    trialDays?: number | null;
-    isDefault?: boolean;
-  }>;
-  features?: Array<{
-    featureCode: string;
-    enabled?: boolean | null;
-    includedAmount?: number | null;
-    unlimited?: boolean | null;
-    overageEnabled?: boolean | null;
-    overageUnitPrice?: number | null;
-  }>;
-}
+import type { Feature, Plan } from "@commet/node";
 
 export function generateConfigFile(features: Feature[], plans: Plan[]): string {
   const lines: string[] = [];
@@ -61,7 +30,6 @@ export function generateConfigFile(features: Feature[], plans: Plan[]): string {
 
     const prices = p.prices ?? [];
     const defaultInterval =
-      p.defaultInterval ??
       prices.find((pr) => pr.isDefault)?.billingInterval ??
       prices[0]?.billingInterval;
     if (defaultInterval)
@@ -86,22 +54,23 @@ export function generateConfigFile(features: Feature[], plans: Plan[]): string {
     if (planFeatures.length > 0) {
       lines.push("      features: {");
       for (const pf of planFeatures) {
-        const featureDef = features.find((f) => f.code === pf.featureCode);
-        const isBoolean = featureDef?.type === "boolean";
+        const isSimpleBoolean =
+          pf.includedAmount == null && !pf.unlimited && !pf.overage?.enabled;
 
-        if (isBoolean) {
-          lines.push(`        ${pf.featureCode}: ${pf.enabled ?? true},`);
+        if (isSimpleBoolean) {
+          lines.push(`        ${pf.code}: ${pf.enabled},`);
         } else {
           const parts: string[] = [];
-          if (pf.includedAmount) parts.push(`included: ${pf.includedAmount}`);
+          if (pf.includedAmount != null)
+            parts.push(`included: ${pf.includedAmount}`);
           if (pf.unlimited) parts.push("unlimited: true");
-          if (pf.overageEnabled && pf.overageUnitPrice) {
-            parts.push(`overage: { unitPrice: ${pf.overageUnitPrice} }`);
+          if (pf.overage?.enabled && pf.overage.unitPrice != null) {
+            parts.push(`overage: { unitPrice: ${pf.overage.unitPrice} }`);
           }
           if (parts.length > 0) {
-            lines.push(`        ${pf.featureCode}: { ${parts.join(", ")} },`);
+            lines.push(`        ${pf.code}: { ${parts.join(", ")} },`);
           } else {
-            lines.push(`        ${pf.featureCode}: {},`);
+            lines.push(`        ${pf.code}: {},`);
           }
         }
       }

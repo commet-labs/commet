@@ -1,5 +1,6 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
+import type { BillingConfig } from "@commet/node";
 import { createJiti } from "jiti";
 
 const CONFIG_NAMES = [
@@ -7,44 +8,6 @@ const CONFIG_NAMES = [
   "commet.config.js",
   "commet.config.mjs",
 ];
-
-export interface LoadedConfig {
-  features: Record<
-    string,
-    {
-      name: string;
-      type: "boolean" | "usage" | "seats";
-      unitName?: string;
-      description?: string;
-    }
-  >;
-  plans: Record<
-    string,
-    {
-      name: string;
-      description?: string;
-      consumptionModel?: "metered" | "credits" | "balance";
-      defaultInterval?: string;
-      isFree?: boolean;
-      isPublic?: boolean;
-      sortOrder?: number;
-      prices: Array<{
-        interval: string;
-        amount: number;
-        trialDays?: number;
-      }>;
-      features?: Record<
-        string,
-        | boolean
-        | {
-            included?: number;
-            unlimited?: boolean;
-            overage?: { unitPrice: number };
-          }
-      >;
-    }
-  >;
-}
 
 export function findConfigFile(cwd: string): string | null {
   for (const name of CONFIG_NAMES) {
@@ -58,7 +21,7 @@ export function findConfigFile(cwd: string): string | null {
 
 export async function loadBillingConfig(
   cwd: string,
-): Promise<{ config: LoadedConfig; configPath: string }> {
+): Promise<{ config: BillingConfig; configPath: string }> {
   const configPath = findConfigFile(cwd);
   if (!configPath) {
     throw new Error(
@@ -80,7 +43,7 @@ export async function loadBillingConfig(
     );
   }
 
-  const config = moduleRecord.default as LoadedConfig;
+  const config = moduleRecord.default as BillingConfig;
 
   validateConfig(config, configPath);
 
@@ -96,7 +59,7 @@ const VALID_INTERVALS = new Set([
   "one_time",
 ]);
 
-function validateConfig(config: LoadedConfig, configPath: string): void {
+function validateConfig(config: BillingConfig, configPath: string): void {
   if (!config || typeof config !== "object") {
     throw new Error(`${configPath}: config must be an object`);
   }

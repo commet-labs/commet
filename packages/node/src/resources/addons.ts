@@ -3,7 +3,7 @@ import type { ActiveAddon, Addon, DeletedObject } from "../types/models";
 import type { CommetHTTPClient } from "../utils/http";
 
 export interface ListActiveAddonsParams {
-  customerId?: string;
+  customerId: string;
 }
 
 export interface ListAddonsParams {
@@ -44,10 +44,10 @@ export class AddonsResource {
 
   /** List all active add-ons for a customer's subscription. */
   async listActive(
-    params?: ListActiveAddonsParams,
+    params: ListActiveAddonsParams,
     options?: RequestOptions,
   ): Promise<ApiResponse<Array<ActiveAddon>>> {
-    return this.httpClient.get("/addons/active", params, options);
+    return this.httpClient.get("/active-addons", params, options);
   }
 
   /** List all add-ons with cursor-based pagination. */

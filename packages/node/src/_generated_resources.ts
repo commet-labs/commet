@@ -2,6 +2,7 @@ import { AddonsResource } from "./resources/addons";
 import { ApiKeysResource } from "./resources/api-keys";
 import { CreditPacksResource } from "./resources/credit-packs";
 import { CustomersResource } from "./resources/customers";
+import { FeatureAccessResource } from "./resources/feature-access";
 import { FeaturesResource } from "./resources/features";
 import { InvoicesResource } from "./resources/invoices";
 import { PayoutsResource } from "./resources/payouts";
@@ -21,6 +22,7 @@ export class GeneratedResources {
   public apiKeys!: ApiKeysResource;
   public creditPacks!: CreditPacksResource;
   public customers!: CustomersResource;
+  public featureAccess!: FeatureAccessResource;
   public features!: FeaturesResource;
   public invoices!: InvoicesResource;
   public payouts!: PayoutsResource;
@@ -39,6 +41,7 @@ export class GeneratedResources {
     this.apiKeys = new ApiKeysResource(http);
     this.creditPacks = new CreditPacksResource(http);
     this.customers = new CustomersResource(http);
+    this.featureAccess = new FeatureAccessResource(http);
     this.features = new FeaturesResource(http);
     this.invoices = new InvoicesResource(http);
     this.payouts = new PayoutsResource(http);

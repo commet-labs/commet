@@ -1011,54 +1011,23 @@ const plansResource: ResourceDef = {
 
 const featuresResource: ResourceDef = {
   name: "features",
-  description: "Manage features and check feature access",
+  description: "Manage the feature catalog",
   sdkProperty: "features",
   actions: {
-    get: {
-      method: "get",
-      description: "Get feature access for a customer",
-      params: [
-        {
-          flag: "--customer-id <id>",
-          description: "Customer ID",
-          required: true,
-          sdkKey: "customerId",
-        },
-        {
-          flag: "--code <code>",
-          description: "Feature code",
-          required: true,
-          sdkKey: "code",
-        },
-      ],
-    },
-    "can-use": {
-      method: "canUse",
-      description: "Check if a customer can use a feature",
-      params: [
-        {
-          flag: "--customer-id <id>",
-          description: "Customer ID",
-          required: true,
-          sdkKey: "customerId",
-        },
-        {
-          flag: "--code <code>",
-          description: "Feature code",
-          required: true,
-          sdkKey: "code",
-        },
-      ],
-    },
     list: {
       method: "list",
-      description: "List features for a customer",
+      description: "List every feature in the organization catalog",
+      params: [],
+    },
+    get: {
+      method: "get",
+      description: "Get a feature definition from the catalog by code",
       params: [
         {
-          flag: "--customer-id <id>",
-          description: "Customer ID",
+          flag: "--code <code>",
+          description: "Feature code",
           required: true,
-          sdkKey: "customerId",
+          sdkKey: "code",
         },
       ],
     },
@@ -1127,6 +1096,62 @@ const featuresResource: ResourceDef = {
       method: "delete",
       description: "Delete a feature",
       params: [
+        {
+          flag: "--code <code>",
+          description: "Feature code",
+          required: true,
+          sdkKey: "code",
+        },
+      ],
+    },
+  },
+};
+
+const featureAccessResource: ResourceDef = {
+  name: "feature-access",
+  description: "Check a customer's feature access and usage",
+  sdkProperty: "featureAccess",
+  actions: {
+    list: {
+      method: "list",
+      description: "List feature access for a customer",
+      params: [
+        {
+          flag: "--customer-id <id>",
+          description: "Customer ID",
+          required: true,
+          sdkKey: "customerId",
+        },
+      ],
+    },
+    get: {
+      method: "get",
+      description: "Get feature access details for a customer",
+      params: [
+        {
+          flag: "--customer-id <id>",
+          description: "Customer ID",
+          required: true,
+          sdkKey: "customerId",
+        },
+        {
+          flag: "--code <code>",
+          description: "Feature code",
+          required: true,
+          sdkKey: "code",
+        },
+      ],
+    },
+    "can-use": {
+      method: "canUse",
+      description: "Check if a customer can use one more unit of a feature",
+      params: [
+        {
+          flag: "--customer-id <id>",
+          description: "Customer ID",
+          required: true,
+          sdkKey: "customerId",
+        },
         {
           flag: "--code <code>",
           description: "Feature code",
@@ -2348,11 +2373,296 @@ const planGroupsResource: ResourceDef = {
   },
 };
 
+const payoutsResource: ResourceDef = {
+  name: "payouts",
+  description: "Manage payouts",
+  sdkProperty: "payouts",
+  actions: {
+    request: {
+      method: "request",
+      description: "Request a payout of available balance",
+      params: [
+        {
+          flag: "--amount <n>",
+          description: "Amount in cents (USD, minimum 1000)",
+          required: true,
+          parse: parseNumber,
+          sdkKey: "amount",
+        },
+        {
+          flag: "--description <desc>",
+          description: "Payout description",
+          sdkKey: "description",
+        },
+      ],
+    },
+    "add-bank-account": {
+      method: "addBankAccount",
+      description: "Add a destination bank account to the payout account",
+      params: [
+        {
+          flag: "--account-number <number>",
+          description: "Bank account number",
+          required: true,
+          sdkKey: "accountNumber",
+        },
+        {
+          flag: "--account-holder-name <name>",
+          description: "Account holder name",
+          required: true,
+          sdkKey: "accountHolderName",
+        },
+        {
+          flag: "--routing-number <number>",
+          description: "Routing number",
+          sdkKey: "routingNumber",
+        },
+        {
+          flag: "--account-type <type>",
+          description: "Account type: checking or savings",
+          sdkKey: "accountType",
+        },
+        {
+          flag: "--set-default <bool>",
+          description: "Set as default bank account",
+          parse: parseBool,
+          sdkKey: "setDefault",
+        },
+      ],
+    },
+    "complete-verification": {
+      method: "completeVerification",
+      description: "Provision the payout account with the full KYC payload",
+      params: [
+        {
+          flag: "--email <email>",
+          description: "Contact email",
+          required: true,
+          sdkKey: "email",
+        },
+        {
+          flag: "--business-type <type>",
+          description: "Business type: individual or company",
+          required: true,
+          sdkKey: "businessType",
+        },
+        {
+          flag: "--business-url <url>",
+          description: "Business website URL",
+          required: true,
+          sdkKey: "businessUrl",
+        },
+        {
+          flag: "--document-url <url>",
+          description: "Identity document URL",
+          required: true,
+          sdkKey: "documentUrl",
+        },
+        {
+          flag: "--bank <json>",
+          description:
+            "Bank account (JSON: {accountNumber, accountHolderName, ...})",
+          required: true,
+          parse: parseJson,
+          sdkKey: "bank",
+        },
+        {
+          flag: "--individual <json>",
+          description: "Individual KYC details (JSON, individual businesses)",
+          parse: parseJson,
+          sdkKey: "individual",
+        },
+        {
+          flag: "--company <json>",
+          description: "Company KYC details (JSON, company businesses)",
+          parse: parseJson,
+          sdkKey: "company",
+        },
+      ],
+    },
+  },
+};
+
+const testClockResource: ResourceDef = {
+  name: "test-clock",
+  description: "Control the sandbox test clock",
+  sdkProperty: "testClock",
+  actions: {
+    get: {
+      method: "get",
+      description: "Get the current test clock state (sandbox only)",
+      params: [],
+    },
+    advance: {
+      method: "advance",
+      description: "Move the test clock forward (sandbox only)",
+      params: [
+        {
+          flag: "--advance-days <n>",
+          description: "Days to move the clock forward",
+          parse: parseNumber,
+          sdkKey: "advanceDays",
+        },
+        {
+          flag: "--frozen-time <ts>",
+          description: "Absolute instant to move to (ISO 8601)",
+          sdkKey: "frozenTime",
+        },
+      ],
+    },
+    "process-billing": {
+      method: "processBilling",
+      description:
+        "Enqueue billing cycles for customers due at the simulated time (sandbox only)",
+      params: [],
+    },
+  },
+};
+
+const quotaResource: ResourceDef = {
+  name: "quota",
+  description: "Manage quota allowances",
+  sdkProperty: "quota",
+  actions: {
+    add: {
+      method: "add",
+      description: "Add to a customer's quota allowance for a feature",
+      params: [
+        {
+          flag: "--feature-code <code>",
+          description: "Feature code",
+          required: true,
+          sdkKey: "featureCode",
+        },
+        {
+          flag: "--customer-id <id>",
+          description: "Customer ID (provide this or --external-id)",
+          sdkKey: "customerId",
+        },
+        {
+          flag: "--external-id <id>",
+          description: "Customer external ID (provide this or --customer-id)",
+          sdkKey: "externalId",
+        },
+        {
+          flag: "--count <n>",
+          description: "Amount to add (defaults to 1)",
+          parse: parseNumber,
+          sdkKey: "count",
+        },
+        {
+          flag: "--idempotency-key <key>",
+          description: "Idempotency key for deduplication",
+          sdkKey: "idempotencyKey",
+        },
+      ],
+    },
+    set: {
+      method: "set",
+      description: "Set a customer's quota allowance to an exact value",
+      params: [
+        {
+          flag: "--feature-code <code>",
+          description: "Feature code",
+          required: true,
+          sdkKey: "featureCode",
+        },
+        {
+          flag: "--count <n>",
+          description: "Exact allowance value",
+          required: true,
+          parse: parseNumber,
+          sdkKey: "count",
+        },
+        {
+          flag: "--customer-id <id>",
+          description: "Customer ID (provide this or --external-id)",
+          sdkKey: "customerId",
+        },
+        {
+          flag: "--external-id <id>",
+          description: "Customer external ID (provide this or --customer-id)",
+          sdkKey: "externalId",
+        },
+        {
+          flag: "--idempotency-key <key>",
+          description: "Idempotency key for deduplication",
+          sdkKey: "idempotencyKey",
+        },
+      ],
+    },
+    remove: {
+      method: "remove",
+      description: "Remove from a customer's quota allowance for a feature",
+      params: [
+        {
+          flag: "--feature-code <code>",
+          description: "Feature code",
+          required: true,
+          sdkKey: "featureCode",
+        },
+        {
+          flag: "--customer-id <id>",
+          description: "Customer ID (provide this or --external-id)",
+          sdkKey: "customerId",
+        },
+        {
+          flag: "--external-id <id>",
+          description: "Customer external ID (provide this or --customer-id)",
+          sdkKey: "externalId",
+        },
+        {
+          flag: "--count <n>",
+          description: "Amount to remove (defaults to 1)",
+          parse: parseNumber,
+          sdkKey: "count",
+        },
+        {
+          flag: "--idempotency-key <key>",
+          description: "Idempotency key for deduplication",
+          sdkKey: "idempotencyKey",
+        },
+      ],
+    },
+    get: {
+      method: "get",
+      description: "Get the quota allowance for a specific feature",
+      params: [
+        {
+          flag: "--customer-id <id>",
+          description: "Customer ID",
+          required: true,
+          sdkKey: "customerId",
+        },
+        {
+          flag: "--feature-code <code>",
+          description: "Feature code",
+          required: true,
+          sdkKey: "featureCode",
+        },
+      ],
+    },
+    "get-all": {
+      method: "getAll",
+      description: "Get all quota allowances for a customer",
+      params: [
+        {
+          flag: "--customer-id <id>",
+          description: "Customer ID",
+          required: true,
+          sdkKey: "customerId",
+        },
+      ],
+    },
+  },
+};
+
 export const resourceDefinitions: ResourceDef[] = [
   customersResource,
   subscriptionsResource,
   plansResource,
   featuresResource,
+  featureAccessResource,
   seatsResource,
   usageResource,
   portalResource,
@@ -2364,4 +2674,7 @@ export const resourceDefinitions: ResourceDef[] = [
   transactionsResource,
   promoCodesResource,
   planGroupsResource,
+  payoutsResource,
+  testClockResource,
+  quotaResource,
 ];

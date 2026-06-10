@@ -22,7 +22,7 @@ export default async function DashboardPage() {
 
   const results = await Promise.all(
     FEATURE_CODES.map((code) =>
-      commet.features.canUse({ customerId: user!.id, code }),
+      commet.featureAccess.canUse({ customerId: user!.id, code }),
     ),
   );
 

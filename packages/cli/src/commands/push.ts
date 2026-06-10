@@ -4,14 +4,9 @@ import { Command } from "commander";
 import ora from "ora";
 import { apiRequest, BASE_URL } from "../utils/api";
 import { loadBillingConfig } from "../utils/config-loader";
-import { computeDiff, formatDiff, type RemoteState } from "../utils/diff";
+import { computeDiff, formatDiff } from "../utils/diff";
 import { isAgentMode, requireOrgContext } from "../utils/output";
-
-interface ConfigResponse {
-  success: boolean;
-  features: RemoteState["features"];
-  plans: RemoteState["plans"];
-}
+import { createSdkClient, fetchRemoteState } from "../utils/sdk";
 
 interface PushResponse {
   success: boolean;
@@ -89,29 +84,22 @@ Examples:
       ? null
       : ora("Fetching remote state...").start();
 
-    const orgQuery = orgId === "__from_api_key__" ? "" : `?orgId=${orgId}`;
-    const remoteResult = await apiRequest<ConfigResponse>(
-      `${BASE_URL}/api/cli/pull${orgQuery}`,
-    );
+    const commet = createSdkClient();
+    const remoteState = await fetchRemoteState(commet);
 
-    if (remoteResult.error || !remoteResult.data) {
+    if ("error" in remoteState) {
       if (agentMode) {
-        console.log(JSON.stringify({ error: remoteResult.error }));
+        console.log(JSON.stringify({ error: remoteState.error }));
       } else {
         fetchSpinner?.fail("Failed to fetch remote state");
-        console.error(chalk.red("Error:"), remoteResult.error?.message);
+        console.error(chalk.red("Error:"), remoteState.error.message);
       }
       process.exit(1);
     }
 
     fetchSpinner?.succeed("Remote state fetched");
 
-    const remote: RemoteState = {
-      features: remoteResult.data.features,
-      plans: remoteResult.data.plans,
-    };
-
-    const diff = computeDiff(config, remote);
+    const diff = computeDiff(config, remoteState);
 
     if (agentMode) {
       if (options.dryRun) {

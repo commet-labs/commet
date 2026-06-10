@@ -739,6 +739,14 @@ export interface Subscription {
     effectiveAt: string;
   } | null;
   cancelAtPeriodEnd: boolean;
+  scheduledPlanChange: {
+    changeType: "plan_downgrade" | "interval_change";
+    newPlanId: string | null;
+    newPlanName: string | null;
+    newBillingInterval: string | null;
+    /** @format date-time */
+    scheduledFor: string;
+  } | null;
   discount: {
     type: DiscountType;
     value: number;
