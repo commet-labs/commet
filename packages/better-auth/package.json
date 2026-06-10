@@ -1,6 +1,6 @@
 {
   "name": "@commet/better-auth",
-  "version": "6.0.0",
+  "version": "7.0.0",
   "description": "Better Auth plugin for Commet integration",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
