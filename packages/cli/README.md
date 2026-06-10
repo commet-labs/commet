@@ -46,12 +46,12 @@ const commet = new Commet({ apiKey: '...' });
 
 await commet.usage.track({
   feature: 'api_calls', // Autocomplete works!
-  externalId: 'user_123'
+  customerId: 'cus_123'
 });
 
 await commet.subscriptions.create({
   planCode: 'pro', // Autocomplete with your plans!
-  externalId: 'user_123'
+  customerId: 'cus_123'
 });
 ```
 
@@ -61,11 +61,13 @@ await commet.subscriptions.create({
 commet login           # Authenticate with Commet
 commet logout          # Remove credentials
 commet link            # Link project to organization
-commet pull            # Generate TypeScript types
-commet info            # Show project status
-commet list features   # List features
-commet list seats      # List seat types
-commet list plans      # List plans
+commet orgs            # List your organizations
+commet pull            # Fetch billing config and generate commet.config.ts
+commet push            # Push commet.config.ts to Commet
+commet listen <url>    # Forward webhook events to your local server
+commet features list   # List the feature catalog
+commet plans list      # List plans
+commet customers list  # List customers
 ```
 
 ## Documentation
