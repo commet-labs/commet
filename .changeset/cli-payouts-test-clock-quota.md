@@ -1,5 +1,5 @@
 ---
-"commet": patch
+"commet": minor
 ---
 
 Three new resource command groups complete the CLI's coverage of the @commet/node SDK surface:
