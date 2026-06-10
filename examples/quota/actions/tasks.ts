@@ -193,7 +193,7 @@ export async function getTaskQuotaStatusAction(): Promise<TaskQuotaStatus> {
       };
     }
 
-    const feature = await commet.features.get({
+    const feature = await commet.featureAccess.get({
       customerId: user.id,
       code: TASKS_FEATURE_CODE,
     });

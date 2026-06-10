@@ -1011,54 +1011,23 @@ const plansResource: ResourceDef = {
 
 const featuresResource: ResourceDef = {
   name: "features",
-  description: "Manage features and check feature access",
+  description: "Manage the feature catalog",
   sdkProperty: "features",
   actions: {
-    get: {
-      method: "get",
-      description: "Get feature access for a customer",
-      params: [
-        {
-          flag: "--customer-id <id>",
-          description: "Customer ID",
-          required: true,
-          sdkKey: "customerId",
-        },
-        {
-          flag: "--code <code>",
-          description: "Feature code",
-          required: true,
-          sdkKey: "code",
-        },
-      ],
-    },
-    "can-use": {
-      method: "canUse",
-      description: "Check if a customer can use a feature",
-      params: [
-        {
-          flag: "--customer-id <id>",
-          description: "Customer ID",
-          required: true,
-          sdkKey: "customerId",
-        },
-        {
-          flag: "--code <code>",
-          description: "Feature code",
-          required: true,
-          sdkKey: "code",
-        },
-      ],
-    },
     list: {
       method: "list",
-      description: "List features for a customer",
+      description: "List every feature in the organization catalog",
+      params: [],
+    },
+    get: {
+      method: "get",
+      description: "Get a feature definition from the catalog by code",
       params: [
         {
-          flag: "--customer-id <id>",
-          description: "Customer ID",
+          flag: "--code <code>",
+          description: "Feature code",
           required: true,
-          sdkKey: "customerId",
+          sdkKey: "code",
         },
       ],
     },
@@ -1127,6 +1096,62 @@ const featuresResource: ResourceDef = {
       method: "delete",
       description: "Delete a feature",
       params: [
+        {
+          flag: "--code <code>",
+          description: "Feature code",
+          required: true,
+          sdkKey: "code",
+        },
+      ],
+    },
+  },
+};
+
+const featureAccessResource: ResourceDef = {
+  name: "feature-access",
+  description: "Check a customer's feature access and usage",
+  sdkProperty: "featureAccess",
+  actions: {
+    list: {
+      method: "list",
+      description: "List feature access for a customer",
+      params: [
+        {
+          flag: "--customer-id <id>",
+          description: "Customer ID",
+          required: true,
+          sdkKey: "customerId",
+        },
+      ],
+    },
+    get: {
+      method: "get",
+      description: "Get feature access details for a customer",
+      params: [
+        {
+          flag: "--customer-id <id>",
+          description: "Customer ID",
+          required: true,
+          sdkKey: "customerId",
+        },
+        {
+          flag: "--code <code>",
+          description: "Feature code",
+          required: true,
+          sdkKey: "code",
+        },
+      ],
+    },
+    "can-use": {
+      method: "canUse",
+      description: "Check if a customer can use one more unit of a feature",
+      params: [
+        {
+          flag: "--customer-id <id>",
+          description: "Customer ID",
+          required: true,
+          sdkKey: "customerId",
+        },
         {
           flag: "--code <code>",
           description: "Feature code",
@@ -2353,6 +2378,7 @@ export const resourceDefinitions: ResourceDef[] = [
   subscriptionsResource,
   plansResource,
   featuresResource,
+  featureAccessResource,
   seatsResource,
   usageResource,
   portalResource,

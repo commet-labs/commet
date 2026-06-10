@@ -27,10 +27,13 @@ export type {
 } from "./resources/customers";
 export type {
   CanUseFeatureParams,
+  GetFeatureAccessParams,
+  ListFeatureAccessParams,
+} from "./resources/feature-access";
+export type {
   CreateFeatureParams,
   DeleteFeatureParams,
-  GetFeatureAccessParams,
-  ListFeaturesParams,
+  GetFeatureParams,
   UpdateFeatureParams,
 } from "./resources/features";
 export type {

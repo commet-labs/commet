@@ -1,41 +1,19 @@
+import type { BillingConfig, Feature, Plan } from "@commet/node";
 import chalk from "chalk";
-import type { LoadedConfig } from "./config-loader";
 
-export interface RemoteFeature {
+type SdkPlanPrice = NonNullable<Plan["prices"]>[number];
+type SdkPlanFeature = NonNullable<Plan["features"]>[number];
+
+type RemoteFeature = Pick<Feature, "code" | "name" | "type" | "unitName">;
+type RemotePlanPrice = Pick<SdkPlanPrice, "billingInterval" | "price"> &
+  Partial<Pick<SdkPlanPrice, "isDefault">>;
+type RemotePlanFeature = Pick<SdkPlanFeature, "code">;
+
+interface RemotePlan {
   code: string;
   name: string;
-  type: string;
-  description?: string | null;
-  unitName?: string | null;
-}
-
-export interface RemotePlanPrice {
-  billingInterval: string;
-  price: number;
-  trialDays?: number | null;
-  isDefault?: boolean;
-}
-
-export interface RemotePlanFeature {
-  featureCode: string;
-  enabled?: boolean | null;
-  includedAmount?: number | null;
-  unlimited?: boolean | null;
-  overageEnabled?: boolean | null;
-  overageUnitPrice?: number | null;
-}
-
-export interface RemotePlan {
-  code: string;
-  name: string;
-  description?: string | null;
-  consumptionModel?: string | null;
-  defaultInterval?: string | null;
-  isFree?: boolean;
-  isPublic?: boolean;
-  sortOrder?: number;
-  prices: RemotePlanPrice[];
-  features: RemotePlanFeature[];
+  prices?: RemotePlanPrice[];
+  features?: RemotePlanFeature[];
 }
 
 export interface RemoteState {
@@ -68,7 +46,7 @@ export interface ConfigDiff {
 }
 
 export function computeDiff(
-  config: LoadedConfig,
+  config: BillingConfig,
   remote: RemoteState,
 ): ConfigDiff {
   const remoteFeatureMap = new Map(remote.features.map((f) => [f.code, f]));
@@ -124,10 +102,9 @@ export function computeDiff(
       changes.push(`name: "${remotePlan.name}" → "${localPlan.name}"`);
     }
 
+    const remotePrices = remotePlan.prices ?? [];
     const remoteDefaultInterval =
-      remotePlan.defaultInterval ??
-      remotePlan.prices.find((p) => p.isDefault)?.billingInterval ??
-      null;
+      remotePrices.find((p) => p.isDefault)?.billingInterval ?? null;
     if (
       localPlan.defaultInterval &&
       remoteDefaultInterval !== localPlan.defaultInterval
@@ -139,7 +116,7 @@ export function computeDiff(
 
     const localPriceMap = new Map(localPlan.prices.map((p) => [p.interval, p]));
     const remotePriceMap = new Map(
-      remotePlan.prices.map((p) => [p.billingInterval, p]),
+      remotePrices.map((p) => [p.billingInterval, p]),
     );
 
     for (const [interval, localPrice] of localPriceMap) {
@@ -157,7 +134,7 @@ export function computeDiff(
 
     if (localPlan.features) {
       const remotePlanFeatureMap = new Map(
-        remotePlan.features.map((f) => [f.featureCode, f]),
+        (remotePlan.features ?? []).map((f) => [f.code, f]),
       );
       for (const featureCode of Object.keys(localPlan.features)) {
         if (!remotePlanFeatureMap.has(featureCode)) {

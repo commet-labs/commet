@@ -1,65 +1,44 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
+import type { BillingConfig, Feature, FeatureDef } from "@commet/node";
 import { confirm } from "@inquirer/prompts";
 import chalk from "chalk";
 import { Command } from "commander";
 import ora from "ora";
-import { apiRequest, BASE_URL } from "../utils/api";
-import {
-  findConfigFile,
-  type LoadedConfig,
-  loadBillingConfig,
-} from "../utils/config-loader";
+import { findConfigFile, loadBillingConfig } from "../utils/config-loader";
 import { computeDiff, formatDiff, type RemoteState } from "../utils/diff";
 import { generateConfigFile } from "../utils/generator";
 import { isAgentMode, requireOrgContext } from "../utils/output";
-
-interface Feature {
-  id: string;
-  publicId: string;
-  code: string;
-  name: string;
-  description?: string | null;
-  type: "boolean" | "usage" | "seats";
-  unitName?: string | null;
-}
-
-interface Plan {
-  id: string;
-  publicId: string;
-  code: string;
-  name: string;
-  description?: string | null;
-  consumptionModel?: "metered" | "credits" | "balance" | null;
-  isFree?: boolean;
-  isPublic?: boolean;
-  sortOrder?: number;
-  prices?: Array<{
-    billingInterval: string;
-    price: number;
-    trialDays?: number | null;
-    isDefault?: boolean;
-  }>;
-  features?: Array<{
-    featureCode: string;
-    enabled?: boolean | null;
-    includedAmount?: number | null;
-    unlimited?: boolean | null;
-    overageEnabled?: boolean | null;
-    overageUnitPrice?: number | null;
-  }>;
-}
-
-interface ConfigResponse {
-  success: boolean;
-  features: Feature[];
-  plans: Plan[];
-}
+import { createSdkClient, fetchRemoteState } from "../utils/sdk";
 
 interface PullOptions {
   yes?: boolean;
   dryRun?: boolean;
   output?: string;
+}
+
+function toFeatureDef(feature: Feature): FeatureDef {
+  if (feature.type === "boolean") {
+    return {
+      name: feature.name,
+      type: "boolean",
+      ...(feature.description ? { description: feature.description } : {}),
+    };
+  }
+  if (feature.type === "seats") {
+    return {
+      name: feature.name,
+      type: "seats",
+      ...(feature.unitName ? { unitName: feature.unitName } : {}),
+      ...(feature.description ? { description: feature.description } : {}),
+    };
+  }
+  return {
+    name: feature.name,
+    type: "usage",
+    ...(feature.unitName ? { unitName: feature.unitName } : {}),
+    ...(feature.description ? { description: feature.description } : {}),
+  };
 }
 
 export const pullCommand = new Command("pull")
@@ -86,30 +65,28 @@ Examples:
   )
   .action(async (options: PullOptions) => {
     const agentMode = isAgentMode(options);
-    const { orgId } = requireOrgContext();
+    requireOrgContext();
 
     const spinner = agentMode
       ? null
       : ora("Fetching config from remote...").start();
 
-    const orgQuery = orgId === "__from_api_key__" ? "" : `?orgId=${orgId}`;
-    const result = await apiRequest<ConfigResponse>(
-      `${BASE_URL}/api/cli/pull${orgQuery}`,
-    );
+    const commet = createSdkClient();
+    const remoteState = await fetchRemoteState(commet);
 
-    if (result.error || !result.data) {
+    if ("error" in remoteState) {
       if (agentMode) {
-        console.log(JSON.stringify({ error: result.error }));
+        console.log(JSON.stringify({ error: remoteState.error }));
       } else {
         spinner?.fail("Failed to fetch config");
-        console.error(chalk.red("Error:"), result.error?.message);
+        console.error(chalk.red("Error:"), remoteState.error.message);
       }
       process.exit(1);
     }
 
     spinner?.succeed("Remote state fetched");
 
-    const { features, plans } = result.data;
+    const { features, plans } = remoteState;
     const configContent = generateConfigFile(features, plans);
     const outputPath = path.resolve(process.cwd(), "commet.config.ts");
 
@@ -205,17 +182,9 @@ Examples:
 
     const localConfig = localLoaded.config;
 
-    const remoteAsConfig: LoadedConfig = {
+    const remoteAsConfig: BillingConfig = {
       features: Object.fromEntries(
-        features.map((f) => [
-          f.code,
-          {
-            name: f.name,
-            type: f.type,
-            ...(f.unitName ? { unitName: f.unitName } : {}),
-            ...(f.description ? { description: f.description } : {}),
-          },
-        ]),
+        features.map((f) => [f.code, toFeatureDef(f)]),
       ),
       plans: Object.fromEntries(
         plans.map((p) => [
@@ -251,24 +220,20 @@ Examples:
         code,
         name: f.name,
         type: f.type,
-        description: f.description ?? null,
-        unitName: f.unitName ?? null,
+        unitName: "unitName" in f ? (f.unitName ?? null) : null,
       })),
       plans: Object.entries(localConfig.plans).map(([code, p]) => ({
         code,
         name: p.name,
-        description: p.description ?? null,
-        consumptionModel: p.consumptionModel ?? null,
-        defaultInterval: p.defaultInterval ?? null,
-        isFree: p.isFree,
-        isPublic: p.isPublic,
-        sortOrder: p.sortOrder,
         prices: p.prices.map((pr) => ({
           billingInterval: pr.interval,
           price: pr.amount,
-          trialDays: pr.trialDays ?? null,
         })),
-        features: [],
+        features: p.features
+          ? Object.keys(p.features).map((featureCode) => ({
+              code: featureCode,
+            }))
+          : [],
       })),
     };
 

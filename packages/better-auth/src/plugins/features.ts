@@ -36,7 +36,9 @@ export const features =
           }
 
           try {
-            const result = await commet.features.list({ customerId: userId });
+            const result = await commet.featureAccess.list({
+              customerId: userId,
+            });
 
             if (!result.success) {
               throw new APIError("INTERNAL_SERVER_ERROR", {
@@ -86,7 +88,7 @@ export const features =
           }
 
           try {
-            const result = await commet.features.get({
+            const result = await commet.featureAccess.get({
               customerId: userId,
               code,
             });
@@ -139,7 +141,7 @@ export const features =
           }
 
           try {
-            const result = await commet.features.canUse({
+            const result = await commet.featureAccess.canUse({
               customerId: userId,
               code,
             });
@@ -192,7 +194,7 @@ export const features =
           }
 
           try {
-            const result = await commet.features.canUse({
+            const result = await commet.featureAccess.canUse({
               customerId: userId,
               code,
             });
