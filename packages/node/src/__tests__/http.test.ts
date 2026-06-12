@@ -227,7 +227,7 @@ describe("CommetHTTPClient", () => {
   });
 
   describe("retry logic", () => {
-    const retryableStatuses = [408, 429, 500, 502, 503, 504];
+    const retryableStatuses = [408, 500, 502, 503, 504];
     const nonRetryableStatuses = [400, 401, 403, 404, 422];
 
     for (const status of retryableStatuses) {
@@ -259,6 +259,67 @@ describe("CommetHTTPClient", () => {
         expect(fetch).toHaveBeenCalledTimes(1);
       });
     }
+
+    it("waits the Retry-After header duration instead of the backoff delay", async () => {
+      const client = createClient({ retries: 2 });
+
+      vi.mocked(fetch)
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({ message: "rate limited" }), {
+            status: 429,
+            headers: {
+              "Content-Type": "application/json",
+              "Retry-After": "7",
+            },
+          }),
+        )
+        .mockResolvedValueOnce(
+          jsonResponse({ success: true, data: { id: "1" } }),
+        );
+
+      const promise = client.get("/test");
+      await vi.advanceTimersByTimeAsync(6_900);
+      expect(fetch).toHaveBeenCalledTimes(1);
+      await vi.advanceTimersByTimeAsync(200);
+      const result = await promise;
+      expect(result.success).toBe(true);
+      expect(fetch).toHaveBeenCalledTimes(2);
+    });
+
+    it("caps the Retry-After wait at 30 seconds", async () => {
+      const client = createClient({ retries: 1 });
+
+      vi.mocked(fetch)
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({ message: "rate limited" }), {
+            status: 429,
+            headers: {
+              "Content-Type": "application/json",
+              "Retry-After": "3600",
+            },
+          }),
+        )
+        .mockResolvedValueOnce(
+          jsonResponse({ success: true, data: { id: "1" } }),
+        );
+
+      const promise = client.get("/test");
+      await vi.advanceTimersByTimeAsync(30_100);
+      const result = await promise;
+      expect(result.success).toBe(true);
+      expect(fetch).toHaveBeenCalledTimes(2);
+    });
+
+    it("does not retry a 429 without a valid Retry-After header", async () => {
+      const client = createClient({ retries: 3 });
+
+      vi.mocked(fetch).mockResolvedValueOnce(
+        jsonResponse({ message: "rate limited", code: "rate_limited" }, 429),
+      );
+
+      await expect(client.get("/test")).rejects.toThrow(CommetAPIError);
+      expect(fetch).toHaveBeenCalledTimes(1);
+    });
 
     it("respects max retries and then throws", async () => {
       const client = createClient({ retries: 2 });

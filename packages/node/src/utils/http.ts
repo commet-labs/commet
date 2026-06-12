@@ -28,6 +28,10 @@ const DEFAULT_RETRY_CONFIG: RetryConfig = {
   retryableStatusCodes: [408, 429, 500, 502, 503, 504],
 };
 
+// Upper bound for server-provided Retry-After waits, so a misbehaving proxy
+// cannot stall the client indefinitely.
+const RETRY_AFTER_CAP_MS = 30000;
+
 export class CommetHTTPClient {
   private config: CommetClientOptions;
   private retryConfig: RetryConfig;
@@ -204,19 +208,18 @@ export class CommetHTTPClient {
           attempt <= this.retryConfig.maxRetries &&
           this.retryConfig.retryableStatusCodes.includes(response.status)
         ) {
-          const delay = Math.min(
-            this.retryConfig.baseDelay * 2 ** (attempt - 1),
-            this.retryConfig.maxDelay,
-          );
+          const delay = this.retryDelayMs(attempt, response);
 
-          if (this.config.debug) {
-            console.log(
-              `[Commet SDK] Retrying in ${delay}ms (attempt ${attempt}/${this.retryConfig.maxRetries})`,
-            );
+          if (delay !== null) {
+            if (this.config.debug) {
+              console.log(
+                `[Commet SDK] Retrying in ${delay}ms (attempt ${attempt}/${this.retryConfig.maxRetries})`,
+              );
+            }
+
+            await this.sleep(delay);
+            return this.executeRequest(method, url, data, options, attempt + 1);
           }
-
-          await this.sleep(delay);
-          return this.executeRequest(method, url, data, options, attempt + 1);
         }
 
         // Log error response for debugging
@@ -297,10 +300,7 @@ export class CommetHTTPClient {
 
       if (isNetworkError || isTimeoutError || isTimeoutErrorModern) {
         if (attempt <= this.retryConfig.maxRetries) {
-          const delay = Math.min(
-            this.retryConfig.baseDelay * 2 ** (attempt - 1),
-            this.retryConfig.maxDelay,
-          );
+          const delay = this.backoffDelayMs(attempt);
 
           if (this.config.debug) {
             console.log(`[Commet SDK] Network error, retrying in ${delay}ms`);
@@ -350,6 +350,28 @@ export class CommetHTTPClient {
     }
 
     return finalUrl;
+  }
+
+  // 429 retries wait exactly what the rate limiter reports in Retry-After
+  // (seconds until the window resets); a 429 without the header did not come
+  // from the rate limiter, so it is not retried (returns null). Exponential
+  // backoff only applies to statuses that carry no server-provided wait.
+  private retryDelayMs(attempt: number, response: Response): number | null {
+    if (response.status === 429) {
+      const retryAfterSeconds = Number(response.headers.get("retry-after"));
+      if (Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0) {
+        return Math.min(retryAfterSeconds * 1000, RETRY_AFTER_CAP_MS);
+      }
+      return null;
+    }
+    return this.backoffDelayMs(attempt);
+  }
+
+  private backoffDelayMs(attempt: number): number {
+    return Math.min(
+      this.retryConfig.baseDelay * 2 ** (attempt - 1),
+      this.retryConfig.maxDelay,
+    );
   }
 
   private generateIdempotencyKey(): string {
