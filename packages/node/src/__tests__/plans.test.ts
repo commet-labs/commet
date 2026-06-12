@@ -229,7 +229,9 @@ describe("Plans — wire serialization of nested pricing", () => {
       const url = new URL(String(calls[calls.length - 1]?.[0]));
       expect(url.pathname).toContain("/plans");
       expect(url.searchParams.get("includePrivate")).toBe("true");
-      expect((calls[calls.length - 1]?.[1] as RequestInit).body).toBeUndefined();
+      expect(
+        (calls[calls.length - 1]?.[1] as RequestInit).body,
+      ).toBeUndefined();
     });
 
     it("parses a plan with nested prices[].introOffer and regionalPrices", async () => {

@@ -169,7 +169,9 @@ function renderPlansTable(
     (plan.prices ?? []).some((price) => price.trialDays > 0),
   );
   for (const plan of trialPlans) {
-    const trialPrice = (plan.prices ?? []).find((price) => price.trialDays > 0)!;
+    const trialPrice = (plan.prices ?? []).find(
+      (price) => price.trialDays > 0,
+    )!;
     footnotes.push(
       `*${plan.name} plan includes a ${trialPrice.trialDays}-day free trial.*`,
     );

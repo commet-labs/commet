@@ -119,7 +119,10 @@ describe("Payouts — wire serialization", () => {
   describe("request", () => {
     it("sends amount (cents) and omits description when not provided", async () => {
       vi.mocked(fetch).mockResolvedValueOnce(
-        jsonResponse({ success: true, data: { id: "po_1", status: "pending" } }),
+        jsonResponse({
+          success: true,
+          data: { id: "po_1", status: "pending" },
+        }),
       );
 
       await client().payouts.request({ amount: 1000 });
