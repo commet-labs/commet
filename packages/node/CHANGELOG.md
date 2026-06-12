@@ -1,5 +1,11 @@
 # @commet/node
 
+## 7.1.0
+
+### Minor Changes
+
+- 9cbc23f: Rate-limited (429) requests now retry by waiting exactly the `Retry-After` duration reported by the server (capped at 30s) instead of blind exponential backoff. A 429 without a valid `Retry-After` header is no longer retried.
+
 ## 7.0.0
 
 ### Major Changes
