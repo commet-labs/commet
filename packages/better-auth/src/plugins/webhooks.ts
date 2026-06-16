@@ -122,17 +122,16 @@ export const webhooks = (config: WebhooksConfig) => (commet: Commet) => {
         }
 
         try {
-          const legacyPayload = payload as unknown as WebhookPayload;
           const handlerKey = EVENT_HANDLER_MAP[payload.event];
           if (handlerKey) {
             const handler = config[handlerKey] as WebhookHandler | undefined;
             if (handler) {
-              await handler(legacyPayload);
+              await handler(payload);
             }
           }
 
           if (config.onPayload) {
-            await config.onPayload(legacyPayload);
+            await config.onPayload(payload);
           }
 
           return ctx.json({ received: true });

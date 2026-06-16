@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 import { describe, expect, expectTypeOf, it } from "vitest";
-import { Webhooks } from "../resources/webhooks";
+import { type WebhookPayload, Webhooks } from "../resources/webhooks";
 import type { CustomerStateChangedData } from "../types/webhook-events";
 import type {
   WebhookFeatureAccess,
@@ -111,11 +111,10 @@ describe("Webhooks", () => {
       });
 
       expect(result).not.toBeNull();
+      expectTypeOf(result).toEqualTypeOf<WebhookPayload | null>();
       expect(result?.event).toBe("subscription.activated");
       expect(result?.organizationId).toBe("org_123");
-      if (result?.event === "subscription.activated") {
-        expect(result.data.customerId).toBe("cus_456");
-      }
+      expect(result?.data.customerId).toBe("cus_456");
     });
 
     it("returns null for invalid signature", () => {
@@ -180,40 +179,44 @@ describe("Webhooks", () => {
       },
     });
 
-    it("narrows data per event in a switch", () => {
-      const result = webhooks.verifyAndParse({
+    it("verifyAndParse stays wide; on() delivers the typed, narrowed data", async () => {
+      const dispatcher = new Webhooks();
+      let received: CustomerStateChangedData | undefined;
+      dispatcher.on("customer.state_changed", (data, payload) => {
+        expectTypeOf(data).toEqualTypeOf<CustomerStateChangedData>();
+        expectTypeOf(data.features).toEqualTypeOf<WebhookFeatureAccess[]>();
+        expectTypeOf(data.plan).toEqualTypeOf<WebhookPlanRef | null>();
+        expectTypeOf(payload.data).toEqualTypeOf<CustomerStateChangedData>();
+        received = data;
+      });
+
+      const result = await dispatcher.process({
         rawBody: stateChangedPayload,
         signature: signPayload(stateChangedPayload, secret),
         secret,
       });
 
+      expectTypeOf(result).toEqualTypeOf<WebhookPayload | null>();
       expect(result?.event).toBe("customer.state_changed");
-      if (result?.event === "customer.state_changed") {
-        expectTypeOf(result.data).toEqualTypeOf<CustomerStateChangedData>();
-        expectTypeOf(result.data.features).toEqualTypeOf<
-          WebhookFeatureAccess[]
-        >();
-        expectTypeOf(result.data.plan).toEqualTypeOf<WebhookPlanRef | null>();
-        expect(result.data.features[0]?.code).toBe("api_calls");
-        expect(result.data.plan?.name).toBe("Pro");
-      }
+      expect(received?.features[0]?.code).toBe("api_calls");
+      expect(received?.plan?.name).toBe("Pro");
     });
 
-    it("dispatches to a typed handler via on/process", async () => {
+    it("process returns null and skips handlers on invalid signature", async () => {
       const dispatcher = new Webhooks();
-      let receivedFeatures: WebhookFeatureAccess[] | undefined;
-      dispatcher.on("customer.state_changed", (data) => {
-        receivedFeatures = data.features;
+      let called = false;
+      dispatcher.on("customer.state_changed", () => {
+        called = true;
       });
 
-      const payload = await dispatcher.process({
+      const result = await dispatcher.process({
         rawBody: stateChangedPayload,
-        signature: signPayload(stateChangedPayload, secret),
+        signature: "deadbeef".repeat(8),
         secret,
       });
 
-      expect(payload?.event).toBe("customer.state_changed");
-      expect(receivedFeatures?.[0]?.code).toBe("api_calls");
+      expect(result).toBeNull();
+      expect(called).toBe(false);
     });
   });
 });

@@ -136,7 +136,7 @@ export class Webhooks {
     return crypto.createHmac("sha256", secret).update(payload).digest("hex");
   }
 
-  verifyAndParse(params: VerifyAndParseParams): WebhookEventPayload | null {
+  verifyAndParse(params: VerifyAndParseParams): WebhookPayload | null {
     const { rawBody, signature, secret } = params;
 
     if (!this.verify({ payload: rawBody, signature, secret })) {
@@ -144,7 +144,7 @@ export class Webhooks {
     }
 
     try {
-      return JSON.parse(params.rawBody) as WebhookEventPayload;
+      return JSON.parse(params.rawBody) as WebhookPayload;
     } catch {
       return null;
     }
@@ -158,9 +158,7 @@ export class Webhooks {
     return this;
   }
 
-  async process(
-    params: VerifyAndParseParams,
-  ): Promise<WebhookEventPayload | null> {
+  async process(params: VerifyAndParseParams): Promise<WebhookPayload | null> {
     const payload = this.verifyAndParse(params);
     if (!payload) return null;
     const handler = this.eventHandlers.get(payload.event);
