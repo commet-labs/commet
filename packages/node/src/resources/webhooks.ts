@@ -8,6 +8,9 @@ import type {
 } from "../types/webhook-events";
 import type { CommetHTTPClient } from "../utils/http";
 
+/**
+ * Webhook payload structure from Commet
+ */
 export interface WebhookPayload {
   event: WebhookEvent;
   timestamp: string;
@@ -17,10 +20,22 @@ export interface WebhookPayload {
   data: WebhookData;
 }
 
+/**
+ * Webhook data structure (subscription-related fields).
+ *
+ * The `status` field is present on `subscription.*` events. Grant access only
+ * when it is `"active"` or `"trialing"`. `"pending_payment"` means the first
+ * charge has not been confirmed yet — wait for `subscription.activated` before
+ * granting access.
+ */
 export interface WebhookData {
   publicId?: string;
   subscriptionId?: string;
   customerId?: string;
+  /**
+   * Subscription status. Present on `subscription.*` events.
+   * Grant access when this is `"active"` or `"trialing"`.
+   */
   status?: SubscriptionStatus;
   name?: string;
   canceledAt?: string;
