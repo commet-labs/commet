@@ -1,11 +1,13 @@
 import crypto from "node:crypto";
 import type { ApiResponse, RequestOptions } from "../types/common";
 import type { SubscriptionStatus } from "../types/enums";
+import type {
+  WebhookEvent,
+  WebhookEventDataMap,
+  WebhookEventPayload,
+} from "../types/webhook-events";
 import type { CommetHTTPClient } from "../utils/http";
 
-/**
- * Webhook payload structure from Commet
- */
 export interface WebhookPayload {
   event: WebhookEvent;
   timestamp: string;
@@ -15,40 +17,20 @@ export interface WebhookPayload {
   data: WebhookData;
 }
 
-/**
- * Webhook data structure (subscription-related fields).
- *
- * The `status` field is present on `subscription.*` events. Grant access only
- * when it is `"active"` or `"trialing"`. `"pending_payment"` means the first
- * charge has not been confirmed yet — wait for `subscription.activated` before
- * granting access.
- */
 export interface WebhookData {
   publicId?: string;
   subscriptionId?: string;
   customerId?: string;
-  /**
-   * Subscription status. Present on `subscription.*` events.
-   * Grant access when this is `"active"` or `"trialing"`.
-   */
   status?: SubscriptionStatus;
   name?: string;
   canceledAt?: string;
   [key: string]: unknown;
 }
 
-/**
- * Supported webhook events
- */
-export type WebhookEvent =
-  | "subscription.created"
-  | "subscription.activated"
-  | "subscription.canceled"
-  | "subscription.updated"
-  | "subscription.plan_changed"
-  | "payment.received"
-  | "payment.failed"
-  | "invoice.created";
+export type WebhookEventHandler<E extends WebhookEvent> = (
+  data: WebhookEventDataMap[E],
+  payload: Extract<WebhookEventPayload, { event: E }>,
+) => void | Promise<void>;
 
 export interface VerifyParams {
   payload: string;
@@ -123,9 +105,13 @@ export interface TestWebhookParams {
 }
 
 export class Webhooks {
+  private readonly eventHandlers = new Map<
+    WebhookEvent,
+    WebhookEventHandler<WebhookEvent>
+  >();
+
   constructor(private httpClient?: CommetHTTPClient) {}
 
-  /** HMAC-SHA256 verification. Payload must be the raw request body string, not parsed JSON. */
   verify(params: VerifyParams): boolean {
     const { payload, signature, secret } = params;
 
@@ -135,14 +121,12 @@ export class Webhooks {
 
     try {
       const expectedSignature = this.generateSignature({ payload, secret });
-
-      // Use timing-safe comparison to prevent timing attacks
       return crypto.timingSafeEqual(
         Buffer.from(signature, "hex"),
         Buffer.from(expectedSignature, "hex"),
       );
     } catch (_error) {
-      // timingSafeEqual throws if lengths don't match
+      // timingSafeEqual throws when the two buffers differ in length
       return false;
     }
   }
@@ -152,8 +136,7 @@ export class Webhooks {
     return crypto.createHmac("sha256", secret).update(payload).digest("hex");
   }
 
-  /** Verifies signature and parses JSON in one step. Returns null if invalid. */
-  verifyAndParse(params: VerifyAndParseParams): WebhookPayload | null {
+  verifyAndParse(params: VerifyAndParseParams): WebhookEventPayload | null {
     const { rawBody, signature, secret } = params;
 
     if (!this.verify({ payload: rawBody, signature, secret })) {
@@ -161,10 +144,28 @@ export class Webhooks {
     }
 
     try {
-      return JSON.parse(params.rawBody) as WebhookPayload;
+      return JSON.parse(params.rawBody) as WebhookEventPayload;
     } catch {
       return null;
     }
+  }
+
+  on<E extends WebhookEvent>(event: E, handler: WebhookEventHandler<E>): this {
+    this.eventHandlers.set(
+      event,
+      handler as unknown as WebhookEventHandler<WebhookEvent>,
+    );
+    return this;
+  }
+
+  async process(
+    params: VerifyAndParseParams,
+  ): Promise<WebhookEventPayload | null> {
+    const payload = this.verifyAndParse(params);
+    if (!payload) return null;
+    const handler = this.eventHandlers.get(payload.event);
+    if (handler) await handler(payload.data as never, payload as never);
+    return payload;
   }
 
   async list(

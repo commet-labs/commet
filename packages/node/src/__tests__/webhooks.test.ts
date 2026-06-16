@@ -1,6 +1,11 @@
 import crypto from "node:crypto";
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 import { Webhooks } from "../resources/webhooks";
+import type { CustomerStateChangedData } from "../types/webhook-events";
+import type {
+  WebhookFeatureAccess,
+  WebhookPlanRef,
+} from "../types/webhook-shared";
 
 function signPayload(payload: string, secret: string): string {
   return crypto.createHmac("sha256", secret).update(payload).digest("hex");
@@ -108,7 +113,9 @@ describe("Webhooks", () => {
       expect(result).not.toBeNull();
       expect(result?.event).toBe("subscription.activated");
       expect(result?.organizationId).toBe("org_123");
-      expect(result?.data.customerId).toBe("cus_456");
+      if (result?.event === "subscription.activated") {
+        expect(result.data.customerId).toBe("cus_456");
+      }
     });
 
     it("returns null for invalid signature", () => {
@@ -132,6 +139,81 @@ describe("Webhooks", () => {
       });
 
       expect(result).toBeNull();
+    });
+  });
+
+  describe("event narrowing and dispatch", () => {
+    const stateChangedPayload = JSON.stringify({
+      event: "customer.state_changed",
+      timestamp: "2026-04-11T12:00:00Z",
+      organizationId: "org_123",
+      mode: "live",
+      apiVersion: "2026-06-10",
+      data: {
+        customerId: "cus_456",
+        trigger: "subscription_activated",
+        status: "active",
+        subscriptionId: "sub_abc",
+        plan: { id: "plan_pro", name: "Pro" },
+        billingInterval: "monthly",
+        consumptionModel: "metered",
+        features: [
+          {
+            code: "api_calls",
+            name: "API Calls",
+            type: "usage",
+            allowed: true,
+            enabled: null,
+            current: 120,
+            included: 1000,
+            remaining: 880,
+            overageQuantity: 0,
+            overageUnitPrice: 50,
+            unlimited: false,
+            overageEnabled: true,
+            billedQuantity: null,
+          },
+        ],
+        seats: [],
+        credits: null,
+        balance: null,
+      },
+    });
+
+    it("narrows data per event in a switch", () => {
+      const result = webhooks.verifyAndParse({
+        rawBody: stateChangedPayload,
+        signature: signPayload(stateChangedPayload, secret),
+        secret,
+      });
+
+      expect(result?.event).toBe("customer.state_changed");
+      if (result?.event === "customer.state_changed") {
+        expectTypeOf(result.data).toEqualTypeOf<CustomerStateChangedData>();
+        expectTypeOf(result.data.features).toEqualTypeOf<
+          WebhookFeatureAccess[]
+        >();
+        expectTypeOf(result.data.plan).toEqualTypeOf<WebhookPlanRef | null>();
+        expect(result.data.features[0]?.code).toBe("api_calls");
+        expect(result.data.plan?.name).toBe("Pro");
+      }
+    });
+
+    it("dispatches to a typed handler via on/process", async () => {
+      const dispatcher = new Webhooks();
+      let receivedFeatures: WebhookFeatureAccess[] | undefined;
+      dispatcher.on("customer.state_changed", (data) => {
+        receivedFeatures = data.features;
+      });
+
+      const payload = await dispatcher.process({
+        rawBody: stateChangedPayload,
+        signature: signPayload(stateChangedPayload, secret),
+        secret,
+      });
+
+      expect(payload?.event).toBe("customer.state_changed");
+      expect(receivedFeatures?.[0]?.code).toBe("api_calls");
     });
   });
 });

@@ -59,7 +59,7 @@ export interface WebhooksConfig {
 /**
  * Map event types to their handler keys.
  */
-const EVENT_HANDLER_MAP: Record<WebhookEvent, keyof WebhooksConfig> = {
+const EVENT_HANDLER_MAP: Partial<Record<WebhookEvent, keyof WebhooksConfig>> = {
   "subscription.created": "onSubscriptionCreated",
   "subscription.activated": "onSubscriptionActivated",
   "subscription.canceled": "onSubscriptionCanceled",
@@ -122,18 +122,17 @@ export const webhooks = (config: WebhooksConfig) => (commet: Commet) => {
         }
 
         try {
-          // Call specific event handler if configured
+          const legacyPayload = payload as unknown as WebhookPayload;
           const handlerKey = EVENT_HANDLER_MAP[payload.event];
           if (handlerKey) {
             const handler = config[handlerKey] as WebhookHandler | undefined;
             if (handler) {
-              await handler(payload);
+              await handler(legacyPayload);
             }
           }
 
-          // Always call onPayload if configured (catch-all)
           if (config.onPayload) {
-            await config.onPayload(payload);
+            await config.onPayload(legacyPayload);
           }
 
           return ctx.json({ received: true });
