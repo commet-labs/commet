@@ -39,11 +39,11 @@
   "author": "Commet Team",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "24.13.1",
-    "@vitest/coverage-v8": "4.1.8",
+    "@types/node": "24.13.2",
+    "@vitest/coverage-v8": "4.1.9",
     "tsup": "8.5.1",
     "typescript": "5.9.3",
-    "vitest": "4.1.8"
+    "vitest": "4.1.9"
   },
   "peerDependencies": {
     "typescript": ">=5.0.0"
