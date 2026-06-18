@@ -1,5 +1,11 @@
 # @commet/node
 
+## 7.2.0
+
+### Minor Changes
+
+- bb5f27e: Add the `payments` resource for one-time payments and payment links (`create`, `charge`, `get`, `list`, `cancel`), plus subscription recovery methods: `subscriptions.reactivate`, `subscriptions.createRecoveryLink`, and `subscriptions.updatePaymentMethod`.
+
 ## 7.1.0
 
 ### Minor Changes
