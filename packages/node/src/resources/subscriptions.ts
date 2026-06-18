@@ -10,8 +10,11 @@ import type {
   CanceledSubscription,
   CreditGrant,
   DeletedSubscriptionAddon,
+  PaymentMethodUpdateCheckout,
   PlanChange,
   PreviewChange,
+  ReactivatedSubscription,
+  RecoveryLink,
   Subscription,
   SubscriptionAddon,
   UncanceledSubscription,
@@ -57,6 +60,19 @@ export interface CancelSubscriptionParams {
 
 export interface UncancelSubscriptionParams {
   id: string;
+}
+
+export interface ReactivateSubscriptionParams {
+  id: string;
+}
+
+export interface CreateSubscriptionRecoveryLinkParams {
+  id: string;
+}
+
+export interface UpdatePaymentMethodParams {
+  id: string;
+  successUrl?: string;
 }
 
 export interface ChangePlanParams {
@@ -151,6 +167,41 @@ export class SubscriptionsResource {
   ): Promise<ApiResponse<UncanceledSubscription>> {
     const { id } = params;
     return this.httpClient.post(`/subscriptions/${id}/uncancel`, {}, options);
+  }
+
+  /** Retries the outstanding renewal charge for a past_due subscription. On a successful charge the subscription recovers to active and a payment.recovered webhook is delivered; a declined charge returns an error and the subscription stays past_due. */
+  async reactivate(
+    params: ReactivateSubscriptionParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<ReactivatedSubscription>> {
+    const { id } = params;
+    return this.httpClient.post(`/subscriptions/${id}/reactivate`, {}, options);
+  }
+
+  /** Generates a hosted, signed recovery link that lets the customer pay the outstanding renewal charge for a past_due subscription. Unlike reactivate, which charges server-to-server, this returns a link the merchant can deliver through their own email, SMS, or dashboard. The link carries a self-contained signed token and stays valid until the charge is paid or the subscription is no longer past due. */
+  async createRecoveryLink(
+    params: CreateSubscriptionRecoveryLinkParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<RecoveryLink>> {
+    const { id } = params;
+    return this.httpClient.post(
+      `/subscriptions/${id}/recovery-link`,
+      {},
+      options,
+    );
+  }
+
+  /** Creates a hosted checkout session for the customer to update the subscription's default payment method. */
+  async updatePaymentMethod(
+    params: UpdatePaymentMethodParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<PaymentMethodUpdateCheckout>> {
+    const { id, ...rest } = params;
+    return this.httpClient.post(
+      `/subscriptions/${id}/payment-method/update`,
+      rest,
+      options,
+    );
   }
 
   /** Upgrade, downgrade, or change billing interval. */

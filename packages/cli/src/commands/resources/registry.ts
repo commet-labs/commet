@@ -296,6 +296,50 @@ const subscriptionsResource: ResourceDef = {
         },
       ],
     },
+    reactivate: {
+      method: "reactivate",
+      description:
+        "Retry the outstanding renewal charge for a past_due subscription",
+      params: [
+        {
+          flag: "--id <id>",
+          description: "Subscription ID",
+          required: true,
+          sdkKey: "id",
+        },
+      ],
+    },
+    "create-recovery-link": {
+      method: "createRecoveryLink",
+      description:
+        "Generate a hosted recovery link for a past_due subscription",
+      params: [
+        {
+          flag: "--id <id>",
+          description: "Subscription ID",
+          required: true,
+          sdkKey: "id",
+        },
+      ],
+    },
+    "update-payment-method": {
+      method: "updatePaymentMethod",
+      description:
+        "Create a hosted checkout to update the subscription's payment method",
+      params: [
+        {
+          flag: "--id <id>",
+          description: "Subscription ID",
+          required: true,
+          sdkKey: "id",
+        },
+        {
+          flag: "--success-url <url>",
+          description: "Redirect URL after the payment method is updated",
+          sdkKey: "successUrl",
+        },
+      ],
+    },
     "change-plan": {
       method: "changePlan",
       description: "Change subscription plan",
@@ -2373,6 +2417,139 @@ const planGroupsResource: ResourceDef = {
   },
 };
 
+const paymentsResource: ResourceDef = {
+  name: "payments",
+  description: "Manage one-time payments and payment links",
+  sdkProperty: "payments",
+  actions: {
+    create: {
+      method: "create",
+      description:
+        "Create a hosted payment link the customer opens to pay with any card",
+      params: [
+        {
+          flag: "--amount <n>",
+          description: "Amount in cents",
+          required: true,
+          parse: parseNumber,
+          sdkKey: "amount",
+        },
+        {
+          flag: "--currency <currency>",
+          description: "Currency code (e.g. USD)",
+          required: true,
+          sdkKey: "currency",
+        },
+        {
+          flag: "--description <desc>",
+          description: "Payment description",
+          required: true,
+          sdkKey: "description",
+        },
+        {
+          flag: "--customer-id <id>",
+          description: "Customer ID",
+          sdkKey: "customerId",
+        },
+        {
+          flag: "--success-url <url>",
+          description: "Redirect URL after successful payment",
+          sdkKey: "successUrl",
+        },
+        {
+          flag: "--metadata <json>",
+          description: "Metadata (JSON)",
+          parse: parseJson,
+          sdkKey: "metadata",
+        },
+      ],
+    },
+    charge: {
+      method: "charge",
+      description: "Charge a customer's vaulted payment method off-session",
+      params: [
+        {
+          flag: "--customer-id <id>",
+          description: "Customer ID",
+          required: true,
+          sdkKey: "customerId",
+        },
+        {
+          flag: "--amount <n>",
+          description: "Amount in cents",
+          required: true,
+          parse: parseNumber,
+          sdkKey: "amount",
+        },
+        {
+          flag: "--currency <currency>",
+          description: "Currency code (e.g. USD)",
+          required: true,
+          sdkKey: "currency",
+        },
+        {
+          flag: "--description <desc>",
+          description: "Payment description",
+          required: true,
+          sdkKey: "description",
+        },
+        {
+          flag: "--metadata <json>",
+          description: "Metadata (JSON)",
+          parse: parseJson,
+          sdkKey: "metadata",
+        },
+      ],
+    },
+    get: {
+      method: "get",
+      description: "Get a payment by ID",
+      params: [
+        {
+          flag: "--id <id>",
+          description: "Payment ID",
+          required: true,
+          sdkKey: "id",
+        },
+      ],
+    },
+    list: {
+      method: "list",
+      description: "List payments",
+      params: [
+        {
+          flag: "--customer-id <id>",
+          description: "Filter by customer ID",
+          sdkKey: "customerId",
+        },
+        {
+          flag: "--limit <n>",
+          description: "Max results",
+          parse: parseNumber,
+          sdkKey: "limit",
+        },
+        {
+          flag: "--cursor <cursor>",
+          description: "Pagination cursor",
+          sdkKey: "cursor",
+        },
+      ],
+    },
+    cancel: {
+      method: "cancel",
+      description: "Cancel a pending payment link",
+      params: [
+        {
+          flag: "--id <id>",
+          description: "Payment ID",
+          required: true,
+          sdkKey: "id",
+        },
+      ],
+    },
+  },
+};
+
 const payoutsResource: ResourceDef = {
   name: "payouts",
   description: "Manage payouts",
@@ -2674,6 +2851,7 @@ export const resourceDefinitions: ResourceDef[] = [
   transactionsResource,
   promoCodesResource,
   planGroupsResource,
+  paymentsResource,
   payoutsResource,
   testClockResource,
   quotaResource,
