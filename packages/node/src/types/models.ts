@@ -328,7 +328,8 @@ export interface Invoice {
       | "promo_code_discount"
       | "credit"
       | "balance_overage"
-      | "addon_base";
+      | "addon_base"
+      | "one_time";
     featureName: string | null;
     description: string;
     quantity: number;
@@ -360,6 +361,40 @@ export interface InvoiceStatus {
   /** @format date-time */
   updatedAt: string;
   object: "invoice";
+  livemode: boolean;
+}
+
+export interface Payment {
+  id: string;
+  customerId: string | null;
+  kind: "link" | "charge";
+  status:
+    | "pending"
+    | "processing"
+    | "succeeded"
+    | "requires_action"
+    | "failed"
+    | "canceled";
+  provider: "stripe" | "commet";
+  amountSubtotal: number;
+  taxAmount: number;
+  amountTotal: number;
+  currency: string;
+  description: string;
+  metadata: Record<string, unknown> | null;
+  url: string | null;
+  expiresAt: string | null;
+  /** @format date-time */
+  createdAt: string;
+  /** @format date-time */
+  updatedAt: string;
+  object: "payment";
+  livemode: boolean;
+}
+
+export interface PaymentMethodUpdateCheckout {
+  checkoutUrl: string;
+  object: "subscription";
   livemode: boolean;
 }
 
@@ -505,6 +540,15 @@ export interface PlanChange {
     remainingCreditBalance: number;
   };
   invoiceId?: string;
+  seatLimitWarning?: {
+    featureCode: string;
+    featureName: string;
+    currentSeats: number;
+    included: number;
+    newPlanName: string;
+    /** @format date-time */
+    effectiveDate: string;
+  };
   object: "subscription";
   livemode: boolean;
 }
@@ -630,6 +674,20 @@ export interface PromoCode {
   /** @format date-time */
   updatedAt: string;
   object: "promo_code";
+  livemode: boolean;
+}
+
+export interface ReactivatedSubscription {
+  id: string;
+  retryInitiated: boolean;
+  object: "subscription";
+  livemode: boolean;
+}
+
+export interface RecoveryLink {
+  url: string;
+  token: string;
+  object: "subscription";
   livemode: boolean;
 }
 
@@ -822,7 +880,6 @@ export interface TransactionRefund {
 export interface TransactionRetry {
   id: string;
   status: "processing";
-  retryInvoiceNumber: string;
   object: "transaction";
   livemode: boolean;
 }

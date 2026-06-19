@@ -12,6 +12,7 @@ import type {
 export type WebhookEvent =
   | "subscription.created"
   | "subscription.activated"
+  | "subscription.reactivated"
   | "subscription.canceled"
   | "subscription.updated"
   | "subscription.plan_changed"
@@ -29,9 +30,14 @@ export type WebhookEvent =
   | "payment.received"
   | "payment.failed"
   | "payment.recovered"
+  | "payment.retry_failed"
   | "payment.refunded"
   | "payment.disputed"
   | "payment.dispute_resolved"
+  | "payment_link.created"
+  | "payment_link.completed"
+  | "payment_link.failed"
+  | "payment_link.canceled"
   | "invoice.created"
   | "invoice.upcoming"
   | "invoice.overdue"
@@ -94,6 +100,30 @@ export interface SubscriptionActivatedData {
   /** Optional custom name for the subscription. */
   name: string | null;
   /** The invoice ID for this payment. */
+  invoiceId: string;
+  /** The human-readable invoice number. */
+  invoiceNumber: string;
+  /** Invoice total in cents (100 = $1.00). */
+  invoiceTotal: number;
+  /** The invoice currency code. */
+  invoiceCurrency: string;
+}
+
+/** Fired when a canceled subscription is reactivated and its reactivation charge succeeds. The subscription returns to active with a fresh invoice and a billing period anchored to the reactivation date. */
+export interface SubscriptionReactivatedData {
+  /** The subscription ID. */
+  subscriptionId: string;
+  /** The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId. */
+  customerId: string;
+  /** Current status. Always "active" for this event. */
+  status: string;
+  /** ISO 8601 start of the new billing period, anchored to the reactivation date. */
+  currentPeriodStart: string | null;
+  /** ISO 8601 end of the new billing period. */
+  currentPeriodEnd: string | null;
+  /** Optional custom name for the subscription. */
+  name: string | null;
+  /** The fresh reactivation invoice ID. */
   invoiceId: string;
   /** The human-readable invoice number. */
   invoiceNumber: string;
@@ -385,6 +415,20 @@ export interface PaymentRecoveredData {
   subscriptionId: string | null;
 }
 
+/** Fired after all dunning retries are exhausted and the subscription is canceled. Use it to close the recovery loop opened by payment.failed. */
+export interface PaymentRetryFailedData {
+  /** The invoice whose retries were exhausted. */
+  invoiceId: string;
+  /** The human-readable invoice number. */
+  invoiceNumber: string;
+  /** The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId. */
+  customerId: string;
+  /** The subscription ID. */
+  subscriptionId: string;
+  /** Terminal dunning reason, usually the last processor decline code or "dunning_exhausted". */
+  reason: string;
+}
+
 /** Fired when a payment is refunded, fully or partially. A full refund of a subscription invoice also cancels the subscription immediately (subscription.canceled fires with reason refund); partial refunds leave the subscription untouched. */
 export interface PaymentRefundedData {
   /** The refunded payment transaction ID. */
@@ -443,6 +487,80 @@ export interface PaymentDisputeResolvedData {
   disputeReason: string | null;
   /** The resolution: "won" or "lost". */
   outcome: string;
+}
+
+/** Fired when a payment link is created. The link is pending — the customer has not paid yet. Do NOT fulfill here; wait for payment_link.completed. */
+export interface PaymentLinkCreatedData {
+  /** The payment link ID. */
+  paymentId: string;
+  /** The link status. Always "pending" for this event. */
+  status: string;
+  /** The total amount to collect in cents (100 = $1.00). */
+  amount: number;
+  /** The payment currency code. */
+  currency: string;
+  /** The payment description shown to the customer. */
+  description: string;
+  /** The customer ID, or null when the link is not tied to a customer. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId. */
+  customerId: string | null;
+}
+
+/** Fired when a payment link is paid. The charge settled and a one-time invoice was generated. Fulfill the purchase on this event. */
+export interface PaymentLinkCompletedData {
+  /** The payment link ID. */
+  paymentId: string;
+  /** The link status. Always "succeeded" for this event. */
+  status: string;
+  /** The collected amount in cents (100 = $1.00). */
+  amount: number;
+  /** The payment currency code. */
+  currency: string;
+  /** The payment description shown to the customer. */
+  description: string;
+  /** The customer ID, or null when the link is not tied to a customer. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId. */
+  customerId: string | null;
+  /** The one-time invoice generated for this payment. */
+  invoiceId: string;
+  /** The human-readable invoice number. */
+  invoiceNumber: string;
+  /** The payment transaction ID for the settled charge. */
+  paymentTransactionId: string;
+}
+
+/** Fired when a payment link charge attempt is declined. The link stays open and can be paid again — a failed link is retryable. */
+export interface PaymentLinkFailedData {
+  /** The payment link ID. */
+  paymentId: string;
+  /** The link status. Always "failed" for this event. */
+  status: string;
+  /** The amount that was attempted in cents (100 = $1.00). */
+  amount: number;
+  /** The payment currency code. */
+  currency: string;
+  /** The payment description shown to the customer. */
+  description: string;
+  /** The customer ID, or null when the link is not tied to a customer. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId. */
+  customerId: string | null;
+  /** The failure code from the payment processor. */
+  failureCode: string | null;
+  /** A human-readable failure message. */
+  failureMessage: string | null;
+}
+
+/** Fired when a pending payment link is canceled before being paid. A canceled link can no longer be paid. */
+export interface PaymentLinkCanceledData {
+  /** The payment link ID. */
+  paymentId: string;
+  /** The link status. Always "canceled" for this event. */
+  status: string;
+  /** The total amount of the canceled link in cents (100 = $1.00). */
+  amount: number;
+  /** The payment currency code. */
+  currency: string;
+  /** The payment description shown to the customer. */
+  description: string;
+  /** The customer ID, or null when the link is not tied to a customer. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId. */
+  customerId: string | null;
 }
 
 /** Fired when a new invoice is generated for a subscription, typically at the start of a billing period. */
@@ -926,6 +1044,10 @@ export interface WebhookEventEnvelope<E extends WebhookEvent, D> {
 export type WebhookEventPayload =
   | WebhookEventEnvelope<"subscription.created", SubscriptionCreatedData>
   | WebhookEventEnvelope<"subscription.activated", SubscriptionActivatedData>
+  | WebhookEventEnvelope<
+      "subscription.reactivated",
+      SubscriptionReactivatedData
+    >
   | WebhookEventEnvelope<"subscription.canceled", SubscriptionCanceledData>
   | WebhookEventEnvelope<"subscription.updated", SubscriptionUpdatedData>
   | WebhookEventEnvelope<
@@ -958,9 +1080,14 @@ export type WebhookEventPayload =
   | WebhookEventEnvelope<"payment.received", PaymentReceivedData>
   | WebhookEventEnvelope<"payment.failed", PaymentFailedData>
   | WebhookEventEnvelope<"payment.recovered", PaymentRecoveredData>
+  | WebhookEventEnvelope<"payment.retry_failed", PaymentRetryFailedData>
   | WebhookEventEnvelope<"payment.refunded", PaymentRefundedData>
   | WebhookEventEnvelope<"payment.disputed", PaymentDisputedData>
   | WebhookEventEnvelope<"payment.dispute_resolved", PaymentDisputeResolvedData>
+  | WebhookEventEnvelope<"payment_link.created", PaymentLinkCreatedData>
+  | WebhookEventEnvelope<"payment_link.completed", PaymentLinkCompletedData>
+  | WebhookEventEnvelope<"payment_link.failed", PaymentLinkFailedData>
+  | WebhookEventEnvelope<"payment_link.canceled", PaymentLinkCanceledData>
   | WebhookEventEnvelope<"invoice.created", InvoiceCreatedData>
   | WebhookEventEnvelope<"invoice.upcoming", InvoiceUpcomingData>
   | WebhookEventEnvelope<"invoice.overdue", InvoiceOverdueData>
@@ -993,6 +1120,7 @@ export type WebhookEventPayload =
 export interface WebhookEventDataMap {
   "subscription.created": SubscriptionCreatedData;
   "subscription.activated": SubscriptionActivatedData;
+  "subscription.reactivated": SubscriptionReactivatedData;
   "subscription.canceled": SubscriptionCanceledData;
   "subscription.updated": SubscriptionUpdatedData;
   "subscription.plan_changed": SubscriptionPlanChangedData;
@@ -1010,9 +1138,14 @@ export interface WebhookEventDataMap {
   "payment.received": PaymentReceivedData;
   "payment.failed": PaymentFailedData;
   "payment.recovered": PaymentRecoveredData;
+  "payment.retry_failed": PaymentRetryFailedData;
   "payment.refunded": PaymentRefundedData;
   "payment.disputed": PaymentDisputedData;
   "payment.dispute_resolved": PaymentDisputeResolvedData;
+  "payment_link.created": PaymentLinkCreatedData;
+  "payment_link.completed": PaymentLinkCompletedData;
+  "payment_link.failed": PaymentLinkFailedData;
+  "payment_link.canceled": PaymentLinkCanceledData;
   "invoice.created": InvoiceCreatedData;
   "invoice.upcoming": InvoiceUpcomingData;
   "invoice.overdue": InvoiceOverdueData;

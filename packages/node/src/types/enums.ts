@@ -22,7 +22,8 @@ export type InvoiceType =
   | "adjustment"
   | "credit_purchase"
   | "balance_topup"
-  | "addon_activation";
+  | "addon_activation"
+  | "one_time_payment";
 
 export type TransactionStatus =
   | "pending"

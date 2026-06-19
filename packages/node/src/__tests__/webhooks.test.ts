@@ -1,7 +1,15 @@
 import crypto from "node:crypto";
 import { describe, expect, expectTypeOf, it } from "vitest";
 import { type WebhookPayload, Webhooks } from "../resources/webhooks";
-import type { CustomerStateChangedData } from "../types/webhook-events";
+import type {
+  CustomerStateChangedData,
+  PaymentLinkCompletedData,
+  PaymentLinkFailedData,
+  PaymentRetryFailedData,
+  SubscriptionReactivatedData,
+  WebhookEvent,
+  WebhookEventDataMap,
+} from "../types/webhook-events";
 import type {
   WebhookFeatureAccess,
   WebhookPlanRef,
@@ -10,6 +18,67 @@ import type {
 function signPayload(payload: string, secret: string): string {
   return crypto.createHmac("sha256", secret).update(payload).digest("hex");
 }
+
+const PLATFORM_WEBHOOK_EVENTS = [
+  "subscription.created",
+  "subscription.activated",
+  "subscription.reactivated",
+  "subscription.canceled",
+  "subscription.updated",
+  "subscription.plan_changed",
+  "subscription.cancellation_scheduled",
+  "subscription.cancellation_revoked",
+  "subscription.plan_change_scheduled",
+  "subscription.plan_change_revoked",
+  "subscription.past_due",
+  "trial.started",
+  "trial.converted",
+  "trial.expired",
+  "trial.will_end",
+  "trial.checkout_ready",
+  "checkout.ready",
+  "payment.received",
+  "payment.failed",
+  "payment.recovered",
+  "payment.retry_failed",
+  "payment.refunded",
+  "payment.disputed",
+  "payment.dispute_resolved",
+  "payment_link.created",
+  "payment_link.completed",
+  "payment_link.failed",
+  "payment_link.canceled",
+  "invoice.created",
+  "invoice.voided",
+  "invoice.overdue",
+  "invoice.upcoming",
+  "payment_method.attached",
+  "payment_method.updated",
+  "customer.created",
+  "customer.updated",
+  "customer.state_changed",
+  "credits.granted",
+  "credits.purchased",
+  "credits.low",
+  "credits.depleted",
+  "credits.expired",
+  "balance.topped_up",
+  "balance.low",
+  "balance.depleted",
+  "quota.threshold_reached",
+  "quota.exceeded",
+  "seats.updated",
+  "seats.limit_reached",
+  "addon.activated",
+  "addon.deactivated",
+  "usage.recorded",
+  "payout.available",
+  "payout.created",
+  "payout.paid",
+  "payout.failed",
+] as const satisfies readonly WebhookEvent[];
+
+type PlatformWebhookEvent = (typeof PLATFORM_WEBHOOK_EVENTS)[number];
 
 describe("Webhooks", () => {
   const webhooks = new Webhooks();
@@ -200,6 +269,48 @@ describe("Webhooks", () => {
       expect(result?.event).toBe("customer.state_changed");
       expect(received?.features[0]?.code).toBe("api_calls");
       expect(received?.plan?.name).toBe("Pro");
+    });
+
+    it("covers the current Platform webhook catalog", () => {
+      expect(PLATFORM_WEBHOOK_EVENTS).toHaveLength(56);
+      expectTypeOf<PlatformWebhookEvent>().toEqualTypeOf<WebhookEvent>();
+    });
+
+    it("narrows Platform payment link and recovery additions", () => {
+      const dispatcher = new Webhooks();
+
+      dispatcher.on("payment_link.completed", (data, payload) => {
+        expectTypeOf(data).toEqualTypeOf<PaymentLinkCompletedData>();
+        expectTypeOf(payload.data).toEqualTypeOf<PaymentLinkCompletedData>();
+        expectTypeOf(data.invoiceId).toEqualTypeOf<string>();
+        expectTypeOf(data.paymentTransactionId).toEqualTypeOf<string>();
+      });
+
+      dispatcher.on("payment_link.failed", (data, payload) => {
+        expectTypeOf(data).toEqualTypeOf<PaymentLinkFailedData>();
+        expectTypeOf(payload.data).toEqualTypeOf<PaymentLinkFailedData>();
+        expectTypeOf(data.failureCode).toEqualTypeOf<string | null>();
+        expectTypeOf(data.failureMessage).toEqualTypeOf<string | null>();
+      });
+
+      dispatcher.on("subscription.reactivated", (data, payload) => {
+        expectTypeOf(data).toEqualTypeOf<SubscriptionReactivatedData>();
+        expectTypeOf(payload.data).toEqualTypeOf<SubscriptionReactivatedData>();
+        expectTypeOf(data.invoiceTotal).toEqualTypeOf<number>();
+      });
+
+      dispatcher.on("payment.retry_failed", (data, payload) => {
+        expectTypeOf(data).toEqualTypeOf<PaymentRetryFailedData>();
+        expectTypeOf(payload.data).toEqualTypeOf<PaymentRetryFailedData>();
+        expectTypeOf(data.reason).toEqualTypeOf<string>();
+      });
+
+      expectTypeOf<
+        WebhookEventDataMap["payment_link.completed"]
+      >().toEqualTypeOf<PaymentLinkCompletedData>();
+      expectTypeOf<
+        WebhookEventDataMap["payment.retry_failed"]
+      >().toEqualTypeOf<PaymentRetryFailedData>();
     });
 
     it("process returns null and skips handlers on invalid signature", async () => {

@@ -1,5 +1,23 @@
 # commet
 
+## 3.1.1
+
+### Patch Changes
+
+- Updated dependencies [00e5e6b]
+  - @commet/node@7.3.0
+
+## 3.1.0
+
+### Minor Changes
+
+- bb5f27e: Add `payments` commands (`create`, `charge`, `get`, `list`, `cancel`) and subscription recovery commands (`reactivate`, `create-recovery-link`, `update-payment-method`) to the CLI.
+
+### Patch Changes
+
+- Updated dependencies [bb5f27e]
+  - @commet/node@7.2.0
+
 ## 3.0.1
 
 ### Patch Changes

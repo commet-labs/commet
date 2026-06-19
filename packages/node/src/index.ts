@@ -45,6 +45,13 @@ export type {
   UpdateInvoiceStatusParams,
 } from "./resources/invoices";
 export type {
+  CancelPaymentParams,
+  ChargePaymentParams,
+  CreatePaymentParams,
+  GetPaymentParams,
+  ListPaymentsParams,
+} from "./resources/payments";
+export type {
   AddPayoutBankAccountParams,
   CompletePayoutVerificationParams,
   RequestPayoutParams,
@@ -105,14 +112,17 @@ export type {
   CancelSubscriptionParams,
   ChangePlanParams,
   CreateSubscriptionParams,
+  CreateSubscriptionRecoveryLinkParams,
   DeactivateAddonParams,
   GetActiveSubscriptionParams,
   GetSubscriptionParams,
   ListSubscriptionsParams,
   PreviewChangePlanParams,
   PurchaseCreditsParams,
+  ReactivateSubscriptionParams,
   TopupBalanceParams,
   UncancelSubscriptionParams,
+  UpdatePaymentMethodParams,
 } from "./resources/subscriptions";
 export type { AdvanceTestClockParams } from "./resources/test-clock";
 export type {
@@ -214,6 +224,8 @@ export type {
   Invoice,
   InvoiceDownload,
   InvoiceStatus,
+  Payment,
+  PaymentMethodUpdateCheckout,
   Payout,
   PayoutBankAccount,
   PayoutVerification,
@@ -228,6 +240,8 @@ export type {
   PortalAccess,
   PreviewChange,
   PromoCode,
+  ReactivatedSubscription,
+  RecoveryLink,
   RemovedPlanFeature,
   RemovedPlanFromGroup,
   ReorderedPlans,
