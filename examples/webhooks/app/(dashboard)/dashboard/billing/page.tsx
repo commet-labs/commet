@@ -1,8 +1,4 @@
 import { ExternalLink } from "lucide-react";
-import {
-  type BillingSubscription,
-  getBillingDataAction,
-} from "@/actions/billing";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,32 +7,29 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { getUser } from "@/lib/auth/session";
+import { resolveAccessForBillingState } from "@/lib/billing/entitlements";
+import { getBillingStateForUser } from "@/lib/db/queries";
 
-function formatPrice(cents: number | undefined): string {
-  if (cents === undefined) return "—";
-  return `$${(cents / 100).toFixed(2)}`;
-}
-
-function formatBillingInterval(
-  interval: BillingSubscription["billingInterval"],
-): string {
-  if (interval === null) return "free";
-  if (interval === "weekly") return "week";
-  if (interval === "monthly") return "month";
-  if (interval === "quarterly") return "quarter";
-  return "year";
+function formatStatus(status: string): string {
+  if (status === "none") return "No subscription";
+  if (status === "past_due") return "Past due";
+  return status.charAt(0).toUpperCase() + status.slice(1);
 }
 
 export default async function BillingPage() {
-  const billingResult = await getBillingDataAction();
-  const subscription = billingResult.data?.subscription;
+  const user = await getUser();
+  const billing = await getBillingStateForUser(user!.id);
+  const access = resolveAccessForBillingState(billing);
+  const hasSubscription = access.status !== "none";
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-6">
       <div>
         <h1 className="text-lg font-semibold">Billing</h1>
         <p className="text-sm text-muted-foreground">
-          Your subscription and payment details.
+          Your subscription and payment details — synced from webhooks, no
+          Commet API call.
         </p>
       </div>
 
@@ -46,13 +39,19 @@ export default async function BillingPage() {
             <CardTitle>Subscription</CardTitle>
             <CardDescription>Your current plan and status.</CardDescription>
           </div>
-          {subscription && (
+          {hasSubscription && (
             <Button
               variant="outline"
               size="sm"
               nativeButton={false}
               // biome-ignore lint/a11y/useAnchorContent: renders children via Button
-              render={<a href="/api/commet/portal" />}
+              render={
+                <a
+                  href="/api/commet/portal"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                />
+              }
             >
               Manage billing
               <ExternalLink className="size-3" />
@@ -60,27 +59,28 @@ export default async function BillingPage() {
           )}
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
-          {subscription ? (
+          {hasSubscription ? (
             <>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Plan</span>
-                <span className="text-sm font-medium">
-                  {subscription.planName}
-                </span>
+                <span className="text-sm font-medium">{access.planLabel}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Status</span>
-                <span className="text-sm font-medium capitalize">
-                  {subscription.status}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Price</span>
                 <span className="text-sm font-medium">
-                  {formatPrice(subscription.planPrice)} /{" "}
-                  {formatBillingInterval(subscription.billingInterval)}
+                  {formatStatus(access.status)}
                 </span>
               </div>
+              {billing?.billingInterval && (
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">
+                    Billing interval
+                  </span>
+                  <span className="text-sm font-medium capitalize">
+                    {billing.billingInterval}
+                  </span>
+                </div>
+              )}
             </>
           ) : (
             <p className="text-sm text-muted-foreground">

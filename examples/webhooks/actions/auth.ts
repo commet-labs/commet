@@ -5,7 +5,9 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth/auth";
 import { getUser } from "@/lib/auth/session";
+import { hasUsableSubscription } from "@/lib/billing/entitlements";
 import { db } from "@/lib/db/drizzle";
+import { getBillingStateForUser } from "@/lib/db/queries";
 import {
   ActivityType,
   activityLogs,
@@ -40,6 +42,22 @@ async function logActivity(
     ipAddress: ipAddress || "",
   };
   await db.insert(activityLogs).values(newActivity);
+}
+
+export async function getPostAuthRedirect(fallback = "/dashboard") {
+  const currentUser = await getUser();
+  if (!currentUser) {
+    return "/sign-in";
+  }
+
+  if (fallback !== "/dashboard") {
+    return fallback;
+  }
+
+  const billing = await getBillingStateForUser(currentUser.id);
+  return hasUsableSubscription(billing?.subscriptionStatus)
+    ? "/dashboard"
+    : "/pricing";
 }
 
 export async function signOut() {

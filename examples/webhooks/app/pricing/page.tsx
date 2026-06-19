@@ -3,7 +3,6 @@ import type { BillingInterval, Plan } from "@commet/node";
 type PlanFeatureItem = NonNullable<Plan["features"]>[number];
 
 import { Check } from "lucide-react";
-import { redirect } from "next/navigation";
 import { getPlansAction } from "@/actions/plans";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,7 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { getUser } from "@/lib/auth/session";
-import { commet } from "@/lib/commet";
+import { getBillingStateForUser } from "@/lib/db/queries";
 import { checkoutAction } from "@/lib/payments/actions";
 
 function formatPrice(cents: number) {
@@ -45,26 +44,10 @@ function formatFeature(feature: PlanFeatureItem): string {
 
 export default async function PricingPage() {
   const user = await getUser();
-  if (user) {
-    const subscriptionResult = await commet.subscriptions.getActive({
-      customerId: user.id,
-    });
-    if (subscriptionResult.success && subscriptionResult.data) {
-      const subscription = subscriptionResult.data;
-      if (
-        subscription.status === "pending_payment" &&
-        subscription.checkoutUrl
-      ) {
-        redirect(subscription.checkoutUrl);
-      }
-      if (
-        subscription.status === "active" ||
-        subscription.status === "trialing"
-      ) {
-        redirect("/api/commet/portal");
-      }
-    }
-  }
+  const billing = user ? await getBillingStateForUser(user.id) : null;
+  const hasLiveSubscription =
+    billing?.subscriptionStatus === "active" ||
+    billing?.subscriptionStatus === "trialing";
 
   const plansResult = await getPlansAction();
   const plans = plansResult.data || [];
@@ -88,6 +71,9 @@ export default async function PricingPage() {
           {plans.map((plan) => {
             const defaultPrice =
               plan.prices?.find((p) => p.isDefault) || plan.prices?.[0];
+            const isCurrentPlan =
+              hasLiveSubscription &&
+              billing?.planName?.toLowerCase() === plan.name.toLowerCase();
 
             return (
               <Card key={plan.id}>
@@ -124,12 +110,26 @@ export default async function PricingPage() {
                   </ul>
                 </CardContent>
                 <CardFooter>
-                  <form action={checkoutAction} className="w-full">
-                    <input type="hidden" name="planCode" value={plan.code} />
-                    <Button type="submit" className="w-full">
-                      Get started
+                  {isCurrentPlan ? (
+                    <Button type="button" className="w-full" disabled>
+                      Current plan
                     </Button>
-                  </form>
+                  ) : hasLiveSubscription ? (
+                    <Button
+                      className="w-full"
+                      nativeButton={false}
+                      render={<a href="/api/commet/portal" />}
+                    >
+                      Manage billing
+                    </Button>
+                  ) : (
+                    <form action={checkoutAction} className="w-full">
+                      <input type="hidden" name="planCode" value={plan.code} />
+                      <Button type="submit" className="w-full">
+                        Get started
+                      </Button>
+                    </form>
+                  )}
                 </CardFooter>
               </Card>
             );

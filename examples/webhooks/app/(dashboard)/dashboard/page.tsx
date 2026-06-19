@@ -1,7 +1,5 @@
-import { Lock } from "lucide-react";
-import Link from "next/link";
+import { redirect } from "next/navigation";
 import { AutoRefresh } from "@/components/auto-refresh";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -10,23 +8,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { getUser } from "@/lib/auth/session";
-import { resolveEntitlementsForPlan } from "@/lib/billing/entitlements";
+import {
+  hasUsableSubscription,
+  resolveAccessForBillingState,
+} from "@/lib/billing/entitlements";
+import type { BillingFeature } from "@/lib/db/schema";
 import { getBillingStateForUser } from "@/lib/db/queries";
-
-const MONTHLY_CHART_BARS = [
-  { month: "Jan", height: 40 },
-  { month: "Feb", height: 65 },
-  { month: "Mar", height: 30 },
-  { month: "Apr", height: 80 },
-  { month: "May", height: 55 },
-  { month: "Jun", height: 70 },
-  { month: "Jul", height: 45 },
-  { month: "Aug", height: 90 },
-  { month: "Sep", height: 60 },
-  { month: "Oct", height: 75 },
-  { month: "Nov", height: 35 },
-  { month: "Dec", height: 85 },
-];
 
 function formatPeriodEnd(periodEnd: Date | null): string {
   if (!periodEnd) return "—";
@@ -37,12 +24,36 @@ function formatPeriodEnd(periodEnd: Date | null): string {
   });
 }
 
+function formatStatus(status: string): string {
+  if (status === "none") return "No subscription";
+  if (status === "past_due") return "Past due";
+  return status.charAt(0).toUpperCase() + status.slice(1);
+}
+
+function formatFeatureValue(feature: BillingFeature): string {
+  if (feature.unlimited) return "Unlimited";
+  if (feature.type === "boolean") return feature.enabled ? "Enabled" : "Off";
+  if (feature.type === "usage" && typeof feature.remaining === "number") {
+    return `${feature.remaining.toLocaleString()} remaining`;
+  }
+  if (typeof feature.included === "number") {
+    return feature.included.toLocaleString();
+  }
+  if (typeof feature.current === "number") {
+    return feature.current.toLocaleString();
+  }
+  return feature.allowed ? "Included" : "Not included";
+}
+
 export default async function DashboardPage() {
   const user = await getUser();
   const billing = await getBillingStateForUser(user!.id);
-  const entitlements = resolveEntitlementsForPlan(billing.planKey);
-  const analyticsUnlocked =
-    entitlements.advancedAnalytics && !billing.isPastDue;
+
+  if (!hasUsableSubscription(billing?.subscriptionStatus)) {
+    redirect("/pricing");
+  }
+
+  const access = resolveAccessForBillingState(billing);
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-6">
@@ -60,22 +71,18 @@ export default async function DashboardPage() {
           <CardHeader>
             <CardTitle>Current plan</CardTitle>
             <CardDescription>
-              Updated by subscription.activated, plan_changed and canceled.
+              Synced from the customer.state_changed snapshot.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Plan</span>
-              <span className="text-sm font-medium">
-                {billing.planName ?? "Free"}
-              </span>
+              <span className="text-sm font-medium">{access.planLabel}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Status</span>
-              <span className="text-sm font-medium capitalize">
-                {billing.isPastDue
-                  ? "Past due"
-                  : (billing.subscriptionStatus ?? "No subscription")}
+              <span className="text-sm font-medium">
+                {formatStatus(access.status)}
               </span>
             </div>
             <div className="flex items-center justify-between">
@@ -83,7 +90,7 @@ export default async function DashboardPage() {
                 Current period ends
               </span>
               <span className="text-sm font-medium">
-                {formatPeriodEnd(billing.currentPeriodEnd)}
+                {formatPeriodEnd(billing?.currentPeriodEnd ?? null)}
               </span>
             </div>
           </CardContent>
@@ -91,83 +98,43 @@ export default async function DashboardPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Project limit</CardTitle>
+            <CardTitle>Features</CardTitle>
             <CardDescription>
-              Local entitlement derived from your plan.
+              Real feature access from customer.state_changed.
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex items-baseline gap-2">
-            <span className="text-4xl font-semibold tracking-tight">
-              {entitlements.projectLimit}
-            </span>
-            <span className="text-sm text-muted-foreground">
-              {entitlements.projectLimit === 1 ? "project" : "projects"}
-            </span>
+          <CardContent className="flex flex-col gap-3">
+            {access.features.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                No feature access yet.
+              </p>
+            ) : (
+              access.features.map((feature) => (
+                <div
+                  key={feature.code}
+                  className="flex items-center justify-between"
+                >
+                  <span className="text-sm text-muted-foreground">
+                    {feature.name}
+                  </span>
+                  <span className="text-sm font-medium">
+                    {formatFeatureValue(feature)}
+                  </span>
+                </div>
+              ))
+            )}
           </CardContent>
         </Card>
       </div>
-
       <Card>
         <CardHeader>
-          <CardTitle>Advanced analytics</CardTitle>
+          <CardTitle>Usage sync</CardTitle>
           <CardDescription>
-            A premium feature gated by your local billing state.
+            Deploy this template and subscribe the endpoint to{" "}
+            <code>usage.recorded</code>. Usage changes will update this local
+            state when Commet delivers that webhook.
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="relative">
-            <div
-              className={
-                analyticsUnlocked
-                  ? "flex h-40 items-end gap-2"
-                  : "flex h-40 items-end gap-2 blur-[3px]"
-              }
-            >
-              {MONTHLY_CHART_BARS.map((bar) => (
-                <div
-                  key={bar.month}
-                  className="flex-1 bg-primary/80"
-                  style={{ height: `${bar.height}%` }}
-                />
-              ))}
-            </div>
-            {!analyticsUnlocked && (
-              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-background/60">
-                <Lock className="size-5 text-muted-foreground" />
-                {billing.isPastDue ? (
-                  <>
-                    <p className="text-sm font-medium">
-                      Paused — payment failed
-                    </p>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      nativeButton={false}
-                      // biome-ignore lint/a11y/useAnchorContent: renders children via Button
-                      render={<a href="/api/commet/portal" />}
-                    >
-                      Update payment method
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <p className="text-sm font-medium">
-                      Upgrade to Pro to unlock
-                    </p>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      nativeButton={false}
-                      render={<Link href="/pricing" />}
-                    >
-                      View plans
-                    </Button>
-                  </>
-                )}
-              </div>
-            )}
-          </div>
-        </CardContent>
       </Card>
     </div>
   );

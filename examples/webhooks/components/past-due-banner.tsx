@@ -18,7 +18,7 @@ export function PastDueBanner() {
         size="sm"
         nativeButton={false}
         // biome-ignore lint/a11y/useAnchorContent: renders children via Button
-        render={<a href="/api/commet/portal" />}
+        render={<a href="/api/commet/portal" target="_blank" rel="noopener noreferrer" />}
       >
         Update payment method
       </Button>

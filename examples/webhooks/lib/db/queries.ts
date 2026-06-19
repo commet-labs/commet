@@ -13,25 +13,16 @@ export async function getUser() {
   return getAuthUser();
 }
 
-export const FREE_BILLING_STATE = {
-  planKey: "free",
-  planName: null,
-  subscriptionId: null,
-  subscriptionStatus: null,
-  isPastDue: false,
-  currentPeriodEnd: null,
-} as const;
-
 export async function getBillingStateForUser(
   userId: string,
-): Promise<Omit<BillingState, "userId" | "updatedAt">> {
+): Promise<BillingState | null> {
   const [stateRow] = await db
     .select()
     .from(billingState)
     .where(eq(billingState.userId, userId))
     .limit(1);
 
-  return stateRow ?? FREE_BILLING_STATE;
+  return stateRow ?? null;
 }
 
 export async function getRecentWebhookEvents() {

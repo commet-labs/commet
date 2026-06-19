@@ -9,6 +9,22 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+export interface BillingFeature {
+  code: string;
+  name: string;
+  type: string;
+  allowed: boolean;
+  enabled: boolean | null;
+  current: number | null;
+  included: number | null;
+  remaining: number | null;
+  overageQuantity: number | null;
+  overageUnitPrice: number | null;
+  unlimited: boolean | null;
+  overageEnabled: boolean | null;
+  billedQuantity: number | null;
+}
+
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
@@ -71,11 +87,11 @@ export const billingState = pgTable("billing_state", {
   userId: text("user_id")
     .primaryKey()
     .references(() => user.id, { onDelete: "cascade" }),
-  planKey: text("plan_key").notNull().default("free"),
   planName: text("plan_name"),
   subscriptionId: text("subscription_id"),
   subscriptionStatus: text("subscription_status"),
-  isPastDue: boolean("is_past_due").notNull().default(false),
+  billingInterval: text("billing_interval"),
+  features: jsonb("features").$type<BillingFeature[]>().notNull().default([]),
   currentPeriodEnd: timestamp("current_period_end"),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

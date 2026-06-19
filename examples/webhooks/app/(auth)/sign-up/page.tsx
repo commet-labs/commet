@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
+import { getPostAuthRedirect } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -56,7 +57,7 @@ function SignUpContent() {
       return;
     }
 
-    router.push(redirect);
+    router.push(await getPostAuthRedirect(redirect));
   }
 
   const signInHref = planCode

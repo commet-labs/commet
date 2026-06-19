@@ -1,6 +1,8 @@
 import { ArrowRight, Bell, Mail, Webhook } from "lucide-react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { getUser } from "@/lib/auth/session";
 
 function FeatureCard({
   icon: Icon,
@@ -20,7 +22,13 @@ function FeatureCard({
   );
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  const user = await getUser();
+
+  if (user) {
+    redirect("/dashboard");
+  }
+
   return (
     <div className="flex flex-1 flex-col">
       <main className="flex flex-1 flex-col items-center justify-center gap-16 px-4 py-20">

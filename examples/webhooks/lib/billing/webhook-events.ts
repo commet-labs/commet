@@ -2,12 +2,13 @@ import type { WebhookPayload } from "@commet/node";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db/drizzle";
 import { user, webhookEvents } from "@/lib/db/schema";
+import { readExternalUserId } from "./sync";
 
 export async function recordWebhookEvent(payload: WebhookPayload) {
-  const externalUserId = payload.data.externalId;
+  const externalUserId = readExternalUserId(payload.data);
   let localUserId: string | null = null;
 
-  if (typeof externalUserId === "string" && externalUserId.length > 0) {
+  if (externalUserId) {
     const [localUser] = await db
       .select({ id: user.id })
       .from(user)

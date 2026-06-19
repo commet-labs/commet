@@ -107,6 +107,16 @@ export interface WebhooksConfig {
   onSubscriptionPlanChanged?: (payload: WebhookPayload) => Promise<void>;
 
   /**
+   * Handles the `customer.state_changed` webhook event
+   *
+   * Fired whenever the customer's billing state changes — activation, plan
+   * change, cancellation or past due. Carries the full current snapshot (plan,
+   * status, features, seats, credits, balance), so a single handler can keep
+   * local state in sync. Inspect `data.trigger` to react to a specific transition.
+   */
+  onCustomerStateChanged?: (payload: WebhookPayload) => Promise<void>;
+
+  /**
    * Handles the `payment.received` webhook event
    *
    * Fired when a payment is successfully processed for a subscription.
@@ -124,6 +134,23 @@ export interface WebhooksConfig {
    * @param payload - The webhook payload containing payment data
    */
   onPaymentFailed?: (payload: WebhookPayload) => Promise<void>;
+
+  /**
+   * Handles the `payment.recovered` webhook event
+   *
+   * Fired when a previously failed payment finally succeeds and the subscription
+   * leaves `past_due`. Use this to restore access — the state snapshot is not
+   * re-emitted on recovery.
+   */
+  onPaymentRecovered?: (payload: WebhookPayload) => Promise<void>;
+
+  /**
+   * Handles the `usage.recorded` webhook event
+   *
+   * Fired for every processed usage event. This can be high volume, so only use
+   * it when you need to mirror live usage locally.
+   */
+  onUsageRecorded?: (payload: WebhookPayload) => Promise<void>;
 
   /**
    * Handles the `invoice.created` webhook event
