@@ -5,6 +5,7 @@ import { CustomersResource } from "./resources/customers";
 import { FeatureAccessResource } from "./resources/feature-access";
 import { FeaturesResource } from "./resources/features";
 import { InvoicesResource } from "./resources/invoices";
+import { PaymentsResource } from "./resources/payments";
 import { PayoutsResource } from "./resources/payouts";
 import { PlanGroupsResource } from "./resources/plan-groups";
 import { PlansResource } from "./resources/plans";
@@ -25,6 +26,7 @@ export class GeneratedResources {
   public featureAccess!: FeatureAccessResource;
   public features!: FeaturesResource;
   public invoices!: InvoicesResource;
+  public payments!: PaymentsResource;
   public payouts!: PayoutsResource;
   public planGroups!: PlanGroupsResource;
   public plans!: PlansResource;
@@ -44,6 +46,7 @@ export class GeneratedResources {
     this.featureAccess = new FeatureAccessResource(http);
     this.features = new FeaturesResource(http);
     this.invoices = new InvoicesResource(http);
+    this.payments = new PaymentsResource(http);
     this.payouts = new PayoutsResource(http);
     this.planGroups = new PlanGroupsResource(http);
     this.plans = new PlansResource(http);

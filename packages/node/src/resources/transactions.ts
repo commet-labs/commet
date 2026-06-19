@@ -55,7 +55,7 @@ export class TransactionsResource {
     return this.httpClient.post(`/transactions/${id}/refund`, {}, options);
   }
 
-  /** Retry a failed payment transaction. Creates a new invoice and initiates a new payment attempt. */
+  /** Retry a failed subscription renewal. Re-charges the outstanding renewal invoice through the recovery engine. */
   async retry(
     params: RetryTransactionParams,
     options?: RequestOptions,
