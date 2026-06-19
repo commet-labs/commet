@@ -688,14 +688,14 @@ importers:
         specifier: ^1.3.0
         version: 1.5.0(@date-fns/tz@1.4.1)(@types/react@19.2.17)(date-fns@4.1.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@commet/better-auth':
-        specifier: workspace:*
-        version: link:../../packages/better-auth
+        specifier: 7.0.0
+        version: 7.0.0(@commet/node@7.3.0(typescript@5.9.3))(better-auth@1.6.16(@opentelemetry/api@1.9.1)(drizzle-kit@0.31.10)(drizzle-orm@0.45.2(@opentelemetry/api@1.9.1)(kysely@0.29.2)(postgres@3.4.9))(next@16.2.9(@opentelemetry/api@1.9.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vitest@4.1.8))(better-call@1.3.6(zod@4.4.3))(zod@4.4.3)
       '@commet/next':
-        specifier: workspace:*
-        version: link:../../packages/next
+        specifier: 1.0.11
+        version: 1.0.11(next@16.2.9(@opentelemetry/api@1.9.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(typescript@5.9.3)
       '@commet/node':
-        specifier: workspace:*
-        version: link:../../packages/node
+        specifier: 7.3.0
+        version: 7.3.0(typescript@5.9.3)
       '@radix-ui/react-slot':
         specifier: 1.2.5
         version: 1.2.5(@types/react@19.2.17)(react@19.2.7)
@@ -1282,6 +1282,27 @@ packages:
 
   '@changesets/write@0.4.0':
     resolution: {integrity: sha512-CdTLvIOPiCNuH71pyDu3rA+Q0n65cmAbXnwWH84rKGiFumFzkmHNT8KHTMEchcxN+Kl8I54xGUhJ7l3E7X396Q==}
+
+  '@commet/better-auth@7.0.0':
+    resolution: {integrity: sha512-robsxoBv7JtOwFE4fyymB/FIKfJBIMUd7W7G3I3usLi+cwdjGNdT35tuLgPHIbt/1VXv/FIjKHIpv/OQ+EKKBA==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      '@commet/node': ^7.0.0
+      better-auth: '>=1.5.6'
+      better-call: '>=1.3.2'
+      zod: '>=3.24.2'
+
+  '@commet/next@1.0.11':
+    resolution: {integrity: sha512-2K2wJ8tVmI/zcTw8zNSKbf2OnS8htvVEcIqpINYtklgZZYsgDkCDF2YtxtI2hJCcuYExHrEgT/xzwVF3NSawxA==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      next: '>=16.0.0'
+
+  '@commet/node@7.3.0':
+    resolution: {integrity: sha512-dhDwy0Mm9v1x62MX01LShpsh2EIFqnPGN2yI5szHNb8629R/tPBbEPnbP+nWy/AB/HfSgBo0UXKg7kfL/AiUEg==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      typescript: '>=5.0.0'
 
   '@date-fns/tz@1.4.1':
     resolution: {integrity: sha512-P5LUNhtbj6YfI3iJjw5EL9eUAG6OitD0W3fWQcpQjDRc/QIsL0tRNuO1PcDvPccWL1fSTXXdE1ds+l95DV/OFA==}
@@ -6504,6 +6525,24 @@ snapshots:
       fs-extra: 7.0.1
       human-id: 4.1.3
       prettier: 2.8.8
+
+  '@commet/better-auth@7.0.0(@commet/node@7.3.0(typescript@5.9.3))(better-auth@1.6.16(@opentelemetry/api@1.9.1)(drizzle-kit@0.31.10)(drizzle-orm@0.45.2(@opentelemetry/api@1.9.1)(kysely@0.29.2)(postgres@3.4.9))(next@16.2.9(@opentelemetry/api@1.9.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vitest@4.1.8))(better-call@1.3.6(zod@4.4.3))(zod@4.4.3)':
+    dependencies:
+      '@commet/node': 7.3.0(typescript@5.9.3)
+      better-auth: 1.6.16(@opentelemetry/api@1.9.1)(drizzle-kit@0.31.10)(drizzle-orm@0.45.2(@opentelemetry/api@1.9.1)(kysely@0.29.2)(postgres@3.4.9))(next@16.2.9(@opentelemetry/api@1.9.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vitest@4.1.8)
+      better-call: 1.3.6(zod@4.4.3)
+      zod: 4.4.3
+
+  '@commet/next@1.0.11(next@16.2.9(@opentelemetry/api@1.9.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(typescript@5.9.3)':
+    dependencies:
+      '@commet/node': 7.3.0(typescript@5.9.3)
+      next: 16.2.9(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+    transitivePeerDependencies:
+      - typescript
+
+  '@commet/node@7.3.0(typescript@5.9.3)':
+    dependencies:
+      typescript: 5.9.3
 
   '@date-fns/tz@1.4.1':
     optional: true
