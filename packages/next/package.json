@@ -1,6 +1,6 @@
 {
   "name": "@commet/next",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Next.js integration for Commet billing platform",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
