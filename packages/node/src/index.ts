@@ -152,7 +152,7 @@ export type {
   WebhookData,
   WebhookEndpoint,
   WebhookEndpointCreated,
-  WebhookEvent,
+  WebhookEventHandler,
   WebhookPayload,
   WebhookTestResult,
 } from "./resources/webhooks";
@@ -260,6 +260,17 @@ export type {
   UsageQuota,
   UsageQuotaEvent,
 } from "./types/models";
+export type * from "./types/webhook-events";
+export type {
+  WebhookAddonRef,
+  WebhookBalance,
+  WebhookBankRef,
+  WebhookCardInfo,
+  WebhookCreditsBalance,
+  WebhookFeatureAccess,
+  WebhookPlanRef,
+  WebhookSeatSummary,
+} from "./types/webhook-shared";
 export { registerIntegration } from "./utils/telemetry";
 export { API_VERSION, SDK_VERSION } from "./version";
 
