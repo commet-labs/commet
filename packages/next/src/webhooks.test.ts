@@ -215,6 +215,81 @@ describe("Webhooks", () => {
       expect(mockHandler).toHaveBeenCalledWith(payload);
     });
 
+    it("should route customer.state_changed events", async () => {
+      const mockHandler = vi.fn().mockResolvedValue(undefined);
+      const webhookHandler = Webhooks({
+        webhookSecret: "secret_123",
+        onCustomerStateChanged: mockHandler,
+      });
+
+      const payload = {
+        event: "customer.state_changed",
+        timestamp: "2024-01-01T00:00:00Z",
+        organizationId: "org_123",
+        data: { customerId: "cus_123" },
+      };
+
+      const request = new NextRequest("https://example.com/webhooks", {
+        method: "POST",
+        body: JSON.stringify(payload),
+        headers: { "x-commet-signature": "sig" },
+      });
+
+      await webhookHandler(request);
+
+      expect(mockHandler).toHaveBeenCalledWith(payload);
+    });
+
+    it("should route payment.recovered events", async () => {
+      const mockHandler = vi.fn().mockResolvedValue(undefined);
+      const webhookHandler = Webhooks({
+        webhookSecret: "secret_123",
+        onPaymentRecovered: mockHandler,
+      });
+
+      const payload = {
+        event: "payment.recovered",
+        timestamp: "2024-01-01T00:00:00Z",
+        organizationId: "org_123",
+        data: { paymentId: "pay_123" },
+      };
+
+      const request = new NextRequest("https://example.com/webhooks", {
+        method: "POST",
+        body: JSON.stringify(payload),
+        headers: { "x-commet-signature": "sig" },
+      });
+
+      await webhookHandler(request);
+
+      expect(mockHandler).toHaveBeenCalledWith(payload);
+    });
+
+    it("should route usage.recorded events", async () => {
+      const mockHandler = vi.fn().mockResolvedValue(undefined);
+      const webhookHandler = Webhooks({
+        webhookSecret: "secret_123",
+        onUsageRecorded: mockHandler,
+      });
+
+      const payload = {
+        event: "usage.recorded",
+        timestamp: "2024-01-01T00:00:00Z",
+        organizationId: "org_123",
+        data: { customerId: "cus_123", featureCode: "api_calls", value: 1 },
+      };
+
+      const request = new NextRequest("https://example.com/webhooks", {
+        method: "POST",
+        body: JSON.stringify(payload),
+        headers: { "x-commet-signature": "sig" },
+      });
+
+      await webhookHandler(request);
+
+      expect(mockHandler).toHaveBeenCalledWith(payload);
+    });
+
     it("should not call handler for unregistered events", async () => {
       const activatedHandler = vi.fn().mockResolvedValue(undefined);
       const webhookHandler = Webhooks({
@@ -352,13 +427,12 @@ describe("Webhooks", () => {
       const response = await webhookHandler(request);
       const data = (await response.json()) as {
         received: boolean;
-        warning?: string;
+        error?: string;
       };
 
-      // Should still return 200 to prevent retries
-      expect(response.status).toBe(200);
-      expect(data.received).toBe(true);
-      expect(data.warning).toBe("Handler failed");
+      expect(response.status).toBe(500);
+      expect(data.received).toBe(false);
+      expect(data.error).toBe("Handler failed");
       expect(onError).toHaveBeenCalledWith(handlerError, payload);
     });
 
@@ -385,7 +459,7 @@ describe("Webhooks", () => {
 
       const response = await webhookHandler(request);
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(500);
     });
   });
 

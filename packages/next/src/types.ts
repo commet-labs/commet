@@ -107,6 +107,13 @@ export interface WebhooksConfig {
   onSubscriptionPlanChanged?: (payload: WebhookPayload) => Promise<void>;
 
   /**
+   * Handles the `customer.state_changed` webhook event
+   *
+   * Fired whenever a customer's billing state snapshot changes.
+   */
+  onCustomerStateChanged?: (payload: WebhookPayload) => Promise<void>;
+
+  /**
    * Handles the `payment.received` webhook event
    *
    * Fired when a payment is successfully processed for a subscription.
@@ -114,6 +121,13 @@ export interface WebhooksConfig {
    * @param payload - The webhook payload containing payment data
    */
   onPaymentReceived?: (payload: WebhookPayload) => Promise<void>;
+
+  /**
+   * Handles the `payment.recovered` webhook event
+   *
+   * Fired when a previously failed payment succeeds.
+   */
+  onPaymentRecovered?: (payload: WebhookPayload) => Promise<void>;
 
   /**
    * Handles the `payment.failed` webhook event
@@ -124,6 +138,13 @@ export interface WebhooksConfig {
    * @param payload - The webhook payload containing payment data
    */
   onPaymentFailed?: (payload: WebhookPayload) => Promise<void>;
+
+  /**
+   * Handles the `usage.recorded` webhook event
+   *
+   * Fired after usage is recorded for a customer feature.
+   */
+  onUsageRecorded?: (payload: WebhookPayload) => Promise<void>;
 
   /**
    * Handles the `invoice.created` webhook event
