@@ -17,11 +17,17 @@ export function PastDueBanner() {
         variant="outline"
         size="sm"
         nativeButton={false}
-        // biome-ignore lint/a11y/useAnchorContent: renders children via Button
-        render={<a href="/api/commet/portal" target="_blank" rel="noopener noreferrer" />}
-      >
-        Update payment method
-      </Button>
+        render={
+          <a
+            href="/api/commet/portal"
+            aria-label="Update payment method"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Update payment method
+          </a>
+        }
+      />
     </div>
   );
 }

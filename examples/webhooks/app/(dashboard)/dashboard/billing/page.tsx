@@ -44,18 +44,18 @@ export default async function BillingPage() {
               variant="outline"
               size="sm"
               nativeButton={false}
-              // biome-ignore lint/a11y/useAnchorContent: renders children via Button
               render={
                 <a
                   href="/api/commet/portal"
+                  aria-label="Manage billing"
                   target="_blank"
                   rel="noopener noreferrer"
-                />
+                >
+                  Manage billing
+                  <ExternalLink className="size-3" />
+                </a>
               }
-            >
-              Manage billing
-              <ExternalLink className="size-3" />
-            </Button>
+            />
           )}
         </CardHeader>
         <CardContent className="flex flex-col gap-3">

@@ -118,10 +118,15 @@ export default async function PricingPage() {
                     <Button
                       className="w-full"
                       nativeButton={false}
-                      render={<a href="/api/commet/portal" />}
-                    >
-                      Manage billing
-                    </Button>
+                      render={
+                        <a
+                          href="/api/commet/portal"
+                          aria-label="Manage billing"
+                        >
+                          Manage billing
+                        </a>
+                      }
+                    />
                   ) : (
                     <form action={checkoutAction} className="w-full">
                       <input type="hidden" name="planCode" value={plan.code} />

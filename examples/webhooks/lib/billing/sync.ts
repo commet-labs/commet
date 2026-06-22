@@ -11,8 +11,7 @@ export function readExternalUserId(data: WebhookData): string | null {
   ];
   return (
     candidates.find(
-      (value): value is string =>
-        typeof value === "string" && value.length > 0,
+      (value): value is string => typeof value === "string" && value.length > 0,
     ) ?? null
   );
 }
