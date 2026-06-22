@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
   if (insertResult === "processing") {
     return NextResponse.json(
       { received: false, error: "Event is already processing" },
-      { status: 500 },
+      { status: 400 },
     );
   }
 
