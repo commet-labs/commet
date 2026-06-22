@@ -47,7 +47,12 @@ function formatFeatureValue(feature: BillingFeature): string {
 
 export default async function DashboardPage() {
   const user = await getUser();
-  const billing = await getBillingStateForUser(user!.id);
+
+  if (!user) {
+    redirect("/sign-in");
+  }
+
+  const billing = await getBillingStateForUser(user.id);
 
   if (!hasUsableSubscription(billing?.subscriptionStatus)) {
     redirect("/pricing");

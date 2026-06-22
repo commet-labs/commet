@@ -1,4 +1,5 @@
 import { ExternalLink } from "lucide-react";
+import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -19,7 +20,12 @@ function formatStatus(status: string): string {
 
 export default async function BillingPage() {
   const user = await getUser();
-  const billing = await getBillingStateForUser(user!.id);
+
+  if (!user) {
+    redirect("/sign-in");
+  }
+
+  const billing = await getBillingStateForUser(user.id);
   const access = resolveAccessForBillingState(billing);
   const hasSubscription = access.status !== "none";
 

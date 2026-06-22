@@ -1,5 +1,6 @@
 import { CreditCard, Home, Lock, Tags, Webhook } from "lucide-react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { PastDueBanner } from "@/components/past-due-banner";
 import { SignOutButton } from "@/components/shared/sign-out-button";
 import { Separator } from "@/components/ui/separator";
@@ -36,7 +37,12 @@ export default async function DashboardInnerLayout({
   children: React.ReactNode;
 }) {
   const user = await getUser();
-  const billing = await getBillingStateForUser(user!.id);
+
+  if (!user) {
+    redirect("/sign-in");
+  }
+
+  const billing = await getBillingStateForUser(user.id);
   const hasPlan = hasUsableSubscription(billing?.subscriptionStatus);
 
   return (
