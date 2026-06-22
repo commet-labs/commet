@@ -14,8 +14,8 @@ import {
   type NewActivityLog,
   user,
 } from "@/lib/db/schema";
+import { safeRedirectPath } from "@/lib/redirects";
 import {
-  deleteAccountSchema,
   updateAccountSchema,
   updatePasswordSchema,
 } from "@/lib/validations/auth";
@@ -39,19 +39,20 @@ async function logActivity(
   const newActivity: NewActivityLog = {
     userId,
     action: type,
-    ipAddress: ipAddress || "",
+    ipAddress,
   };
   await db.insert(activityLogs).values(newActivity);
 }
 
 export async function getPostAuthRedirect(fallback = "/dashboard") {
+  const redirectPath = safeRedirectPath(fallback);
   const currentUser = await getUser();
   if (!currentUser) {
     return "/sign-in";
   }
 
-  if (fallback !== "/dashboard") {
-    return fallback;
+  if (redirectPath !== "/dashboard") {
+    return redirectPath;
   }
 
   const billing = await getBillingStateForUser(currentUser.id);
@@ -146,34 +147,4 @@ export async function updatePassword(
     }
     return { error: "Failed to update password" };
   }
-}
-
-export async function deleteAccount(
-  _prevState: ActionState,
-  formData: FormData,
-): Promise<ActionState> {
-  const currentUser = await getUser();
-  if (!currentUser) {
-    return { error: "Not authenticated" };
-  }
-
-  const rawData = {
-    password: formData.get("password") as string,
-  };
-
-  const result = deleteAccountSchema.safeParse(rawData);
-  if (!result.success) {
-    return {
-      error: "Validation failed",
-      fieldErrors: result.error.flatten().fieldErrors,
-    };
-  }
-
-  // Log activity before deletion
-  await logActivity(currentUser.id, ActivityType.DELETE_ACCOUNT);
-
-  // Delete user (cascade will handle related records)
-  await db.delete(user).where(eq(user.id, currentUser.id));
-
-  redirect("/sign-in");
 }

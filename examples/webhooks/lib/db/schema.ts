@@ -6,6 +6,7 @@ import {
   serial,
   text,
   timestamp,
+  uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
 
@@ -96,14 +97,22 @@ export const billingState = pgTable("billing_state", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-export const webhookEvents = pgTable("webhook_events", {
-  id: serial("id").primaryKey(),
-  event: text("event").notNull(),
-  commetCustomerId: text("commet_customer_id"),
-  userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
-  payload: jsonb("payload").notNull(),
-  receivedAt: timestamp("received_at").notNull().defaultNow(),
-});
+export const webhookEvents = pgTable(
+  "webhook_events",
+  {
+    id: serial("id").primaryKey(),
+    eventId: text("event_id"),
+    event: text("event").notNull(),
+    status: text("status").notNull().default("processing"),
+    commetCustomerId: text("commet_customer_id"),
+    userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
+    payload: jsonb("payload").notNull(),
+    processedAt: timestamp("processed_at"),
+    receivedAt: timestamp("received_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  },
+  (table) => [uniqueIndex("webhook_events_event_id_idx").on(table.eventId)],
+);
 
 export const userRelations = relations(user, ({ many, one }) => ({
   sessions: many(session),
@@ -161,6 +170,5 @@ export enum ActivityType {
   SIGN_IN = "SIGN_IN",
   SIGN_OUT = "SIGN_OUT",
   UPDATE_PASSWORD = "UPDATE_PASSWORD",
-  DELETE_ACCOUNT = "DELETE_ACCOUNT",
   UPDATE_ACCOUNT = "UPDATE_ACCOUNT",
 }

@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { env } from "@/lib/env";
 
 interface WelcomeEmailParams {
   userId: string;
@@ -13,21 +14,17 @@ export async function sendWelcomeEmail({
   userName,
   planName,
 }: WelcomeEmailParams) {
-  const resendApiKey = process.env.RESEND_API_KEY;
-  const emailFrom = process.env.EMAIL_FROM;
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
-
-  if (!resendApiKey || !emailFrom || !appUrl) {
+  if (!env.RESEND_API_KEY || !env.EMAIL_FROM) {
     console.warn(
-      "[email] RESEND_API_KEY, EMAIL_FROM or NEXT_PUBLIC_APP_URL not set — skipping welcome email",
+      "[email] RESEND_API_KEY or EMAIL_FROM not set; skipping welcome email",
     );
     return;
   }
 
-  const resend = new Resend(resendApiKey);
+  const resend = new Resend(env.RESEND_API_KEY);
   const { data, error } = await resend.emails.send(
     {
-      from: emailFrom,
+      from: env.EMAIL_FROM,
       to: [userEmail],
       subject: `Welcome to ${planName}`,
       html: `
@@ -36,7 +33,7 @@ export async function sendWelcomeEmail({
           <p style="font-size: 14px; line-height: 1.6; margin: 0 0 24px; color: #404040;">
             Your subscription is active. Advanced analytics and your new project limits are already unlocked in the dashboard.
           </p>
-          <a href="${appUrl}/dashboard" style="display: inline-block; background: #171717; color: #fafafa; font-size: 14px; font-weight: 500; padding: 10px 20px; text-decoration: none;">
+          <a href="${env.NEXT_PUBLIC_APP_URL}/dashboard" style="display: inline-block; background: #171717; color: #fafafa; font-size: 14px; font-weight: 500; padding: 10px 20px; text-decoration: none;">
             Go to dashboard
           </a>
         </div>

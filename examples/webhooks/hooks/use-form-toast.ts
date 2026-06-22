@@ -13,7 +13,6 @@ export function useFormToast(state: ActionState) {
   const prevStateRef = useRef<ActionState>(state);
 
   useEffect(() => {
-    // Only show toast when state changes
     if (state === prevStateRef.current) return;
     prevStateRef.current = state;
 

@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { getUser } from "@/lib/auth/session";
 import { commet } from "@/lib/commet";
+import { normalizePlanCode } from "@/lib/plans";
+import { buildInternalHref } from "@/lib/redirects";
 
 export async function createCheckoutSession({
   planCode,
@@ -9,10 +11,20 @@ export async function createCheckoutSession({
   planCode: string;
   successUrl?: string;
 }) {
+  const normalizedPlanCode = normalizePlanCode(planCode);
+  if (!normalizedPlanCode) {
+    redirect("/pricing?error=missing_plan");
+  }
+
   const user = await getUser();
 
   if (!user) {
-    redirect(`/sign-up?redirect=checkout&planCode=${planCode}`);
+    redirect(
+      buildInternalHref("/sign-up", {
+        redirect: "/checkout",
+        planCode: normalizedPlanCode,
+      }),
+    );
   }
 
   const existing = await commet.subscriptions.getActive({
@@ -33,7 +45,7 @@ export async function createCheckoutSession({
 
   const result = await commet.subscriptions.create({
     customerId: user.id,
-    planCode,
+    planCode: normalizedPlanCode,
     successUrl,
   });
 
@@ -53,6 +65,11 @@ export async function getCheckoutUrl({
   planCode: string;
   successUrl?: string;
 }): Promise<string> {
+  const normalizedPlanCode = normalizePlanCode(planCode);
+  if (!normalizedPlanCode) {
+    throw new Error("Missing plan code");
+  }
+
   const user = await getUser();
 
   if (!user) {
@@ -77,7 +94,7 @@ export async function getCheckoutUrl({
 
   const result = await commet.subscriptions.create({
     customerId: user.id,
-    planCode,
+    planCode: normalizedPlanCode,
     successUrl,
   });
 

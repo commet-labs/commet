@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
+import { env } from "@/lib/env";
 import { createCheckoutSession } from "@/lib/payments/commet";
+import { normalizePlanCode } from "@/lib/plans";
 
 type CheckoutPageProps = {
   searchParams: Promise<{
@@ -7,29 +9,25 @@ type CheckoutPageProps = {
   }>;
 };
 
-function normalizePlanCode(
-  planCode: string | string[] | undefined,
-): string | null {
+function readPlanCode(planCode: string | string[] | undefined): string | null {
   if (!planCode) return null;
   if (Array.isArray(planCode)) {
-    return planCode[0] ?? null;
+    return normalizePlanCode(planCode[0] ?? null);
   }
-  return planCode.trim() || null;
+  return normalizePlanCode(planCode);
 }
 
 export default async function CheckoutPage({
   searchParams,
 }: CheckoutPageProps) {
   const params = await searchParams;
-  const planCode = normalizePlanCode(params?.planCode);
+  const planCode = readPlanCode(params?.planCode);
 
   if (!planCode) {
     redirect("/pricing?error=missing_plan");
   }
 
-  // Build success URL for post-checkout redirect
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3008";
-  const successUrl = `${baseUrl}/dashboard`;
+  const successUrl = `${env.NEXT_PUBLIC_APP_URL}/dashboard`;
 
   await createCheckoutSession({ planCode, successUrl });
 }

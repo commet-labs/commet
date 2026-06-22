@@ -2,16 +2,23 @@
 
 import { redirect } from "next/navigation";
 import { getUser } from "@/lib/auth/session";
+import { env } from "@/lib/env";
 import { getCheckoutUrl } from "@/lib/payments/commet";
+import { normalizePlanCode } from "@/lib/plans";
+import { buildInternalHref } from "@/lib/redirects";
 
 export async function checkoutAction(formData: FormData) {
-  const planCode = formData.get("planCode") as string;
-  const user = await getUser();
-  if (!user) {
-    redirect(`/sign-up?planCode=${planCode}`);
+  const planCode = normalizePlanCode(formData.get("planCode"));
+  if (!planCode) {
+    redirect("/pricing?error=missing_plan");
   }
 
-  redirect(`/checkout?planCode=${planCode}`);
+  const user = await getUser();
+  if (!user) {
+    redirect(buildInternalHref("/sign-up", { planCode }));
+  }
+
+  redirect(buildInternalHref("/checkout", { planCode }));
 }
 
 export async function handlePostSignupCheckout(planCode: string) {
@@ -23,8 +30,7 @@ export async function handlePostSignupCheckout(planCode: string) {
     return { success: false, error: "User not authenticated" } as const;
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3008";
-  const successUrl = `${baseUrl}/dashboard`;
+  const successUrl = `${env.NEXT_PUBLIC_APP_URL}/dashboard`;
 
   try {
     const checkoutUrl = await getCheckoutUrl({ planCode, successUrl });

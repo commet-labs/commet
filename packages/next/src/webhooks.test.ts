@@ -352,13 +352,12 @@ describe("Webhooks", () => {
       const response = await webhookHandler(request);
       const data = (await response.json()) as {
         received: boolean;
-        warning?: string;
+        error?: string;
       };
 
-      // Should still return 200 to prevent retries
-      expect(response.status).toBe(200);
-      expect(data.received).toBe(true);
-      expect(data.warning).toBe("Handler failed");
+      expect(response.status).toBe(500);
+      expect(data.received).toBe(false);
+      expect(data.error).toBe("Handler failed");
       expect(onError).toHaveBeenCalledWith(handlerError, payload);
     });
 
@@ -385,7 +384,7 @@ describe("Webhooks", () => {
 
       const response = await webhookHandler(request);
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(500);
     });
   });
 

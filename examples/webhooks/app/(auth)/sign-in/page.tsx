@@ -16,12 +16,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signIn } from "@/lib/auth/auth-client";
 import { handlePostSignupCheckout } from "@/lib/payments/actions";
+import { normalizePlanCode } from "@/lib/plans";
+import { buildInternalHref, safeRedirectPath } from "@/lib/redirects";
 
 function SignInContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect") || "/dashboard";
-  const planCode = searchParams.get("planCode") || undefined;
+  const redirect = safeRedirectPath(searchParams.get("redirect"));
+  const planCode = normalizePlanCode(searchParams.get("planCode"));
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -60,7 +62,10 @@ function SignInContent() {
   }
 
   const signUpHref = planCode
-    ? `/sign-up?planCode=${planCode}${redirect !== "/dashboard" ? `&redirect=${redirect}` : ""}`
+    ? buildInternalHref("/sign-up", {
+        planCode,
+        redirect: redirect !== "/dashboard" ? redirect : null,
+      })
     : "/sign-up";
 
   return (

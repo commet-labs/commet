@@ -45,18 +45,13 @@ export const Webhooks = (config: WebhooksConfig) => {
     onError,
   } = config;
 
-  // Create webhook verifier instance
   const webhooks = new CommetWebhooks();
 
   return async (request: NextRequest) => {
     try {
-      // 1. Read raw request body
       const rawBody = await request.text();
-
-      // 2. Extract signature from headers
       const signature = request.headers.get("x-commet-signature");
 
-      // 3. Verify signature
       const isValid = webhooks.verify({
         payload: rawBody,
         signature,
@@ -71,7 +66,6 @@ export const Webhooks = (config: WebhooksConfig) => {
         );
       }
 
-      // 4. Parse payload
       let payload: WebhookPayload;
       try {
         payload = JSON.parse(rawBody) as WebhookPayload;
@@ -91,15 +85,12 @@ export const Webhooks = (config: WebhooksConfig) => {
         );
       }
 
-      // 5. Collect promises for parallel execution
       const promises: Promise<void>[] = [];
 
-      // Call catch-all handler if provided
       if (onPayload) {
         promises.push(onPayload(payload));
       }
 
-      // 6. Route to specific event handler
       switch (payload.event) {
         case "subscription.activated":
           if (onSubscriptionActivated) {
@@ -171,7 +162,6 @@ export const Webhooks = (config: WebhooksConfig) => {
           console.log(`[Commet Webhook] Unhandled event: ${payload.event}`);
       }
 
-      // 7. Execute all handlers in parallel
       try {
         await Promise.all(promises);
       } catch (handlerError) {
@@ -187,14 +177,12 @@ export const Webhooks = (config: WebhooksConfig) => {
             payload,
           );
         }
-        // Still return 200 to prevent retries for handler errors
         return NextResponse.json(
-          { received: true, warning: "Handler failed" },
-          { status: 200 },
+          { received: false, error: "Handler failed" },
+          { status: 500 },
         );
       }
 
-      // 8. Success response
       return NextResponse.json({ received: true }, { status: 200 });
     } catch (error) {
       console.error("[Commet Webhook] Unexpected error:", error);

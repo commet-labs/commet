@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { deleteAccount, updatePassword } from "@/actions/auth";
+import { updatePassword } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -23,26 +23,13 @@ type PasswordState = {
   fieldErrors?: Record<string, string[] | undefined>;
 };
 
-type DeleteState = {
-  password?: string;
-  error?: string;
-  success?: string;
-  fieldErrors?: Record<string, string[] | undefined>;
-};
-
 export default function SecurityPage() {
   const [passwordState, passwordAction, isPasswordPending] = useActionState<
     PasswordState,
     FormData
   >(updatePassword, {});
 
-  const [deleteState, deleteAction, isDeletePending] = useActionState<
-    DeleteState,
-    FormData
-  >(deleteAccount, {});
-
   useFormToast(passwordState);
-  useFormToast(deleteState);
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-6">
@@ -109,41 +96,6 @@ export default function SecurityPage() {
             </div>
             <Button type="submit" disabled={isPasswordPending}>
               {isPasswordPending ? "Updating..." : "Update password"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Delete Account</CardTitle>
-          <CardDescription>
-            Permanently delete your account. This action cannot be undone.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form className="flex flex-col gap-4" action={deleteAction}>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="delete-password">Confirm Password</Label>
-              <Input
-                id="delete-password"
-                name="password"
-                type="password"
-                required
-                minLength={8}
-              />
-              {deleteState.fieldErrors?.password?.[0] && (
-                <p className="text-sm text-destructive-foreground">
-                  {deleteState.fieldErrors.password[0]}
-                </p>
-              )}
-            </div>
-            <Button
-              type="submit"
-              variant="destructive"
-              disabled={isDeletePending}
-            >
-              {isDeletePending ? "Deleting..." : "Delete account"}
             </Button>
           </form>
         </CardContent>

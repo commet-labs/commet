@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { type WebhookPayload, Webhooks } from "@commet/node";
 import { type NextRequest, NextResponse } from "next/server";
 import {
@@ -7,19 +8,16 @@ import {
   restoreAccessAfterPayment,
   syncBillingStateFromSnapshot,
 } from "@/lib/billing/sync";
-import { recordWebhookEvent } from "@/lib/billing/webhook-events";
+import {
+  markWebhookEventCompleted,
+  markWebhookEventFailed,
+  recordWebhookEvent,
+} from "@/lib/billing/webhook-events";
+import { env } from "@/lib/env";
 import { sendWelcomeEmail } from "@/lib/notifications/email";
 import { notifyTeamOfNewSubscription } from "@/lib/notifications/team";
 
 export async function POST(request: NextRequest) {
-  const webhookSecret = process.env.COMMET_WEBHOOK_SECRET;
-  if (!webhookSecret) {
-    return NextResponse.json(
-      { received: false, error: "COMMET_WEBHOOK_SECRET is not set" },
-      { status: 500 },
-    );
-  }
-
   const webhooks = new Webhooks();
   const rawBody = await request.text();
   const signature = request.headers.get("x-commet-signature");
@@ -27,7 +25,7 @@ export async function POST(request: NextRequest) {
   const isValid = webhooks.verify({
     payload: rawBody,
     signature,
-    secret: webhookSecret,
+    secret: env.COMMET_WEBHOOK_SECRET,
   });
 
   if (!isValid) {
@@ -48,51 +46,64 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const handlers: Promise<void>[] = [recordWebhookEvent(payload)];
+  const eventId = createHash("sha256").update(rawBody).digest("hex");
+  const insertResult = await recordWebhookEvent({ eventId, payload });
+  if (insertResult === "completed") {
+    return NextResponse.json({ received: true, duplicate: true });
+  }
+  if (insertResult === "processing") {
+    return NextResponse.json(
+      { received: false, error: "Event is already processing" },
+      { status: 500 },
+    );
+  }
+
+  const criticalHandlers: Promise<void>[] = [];
+  const notificationHandlers: Promise<void>[] = [];
 
   switch (payload.event) {
     case "customer.state_changed":
-      handlers.push(
-        syncBillingStateFromSnapshot(payload.data).then(async () => {
-          if (payload.data.trigger !== "subscription_activated") {
-            return;
-          }
-
-          const activatedUser = await resolveActivatedUserForWelcome(
-            payload.data,
-          );
-          await Promise.all([
-            sendWelcomeEmail(activatedUser),
-            notifyTeamOfNewSubscription(activatedUser),
-          ]);
-        }),
-      );
+      criticalHandlers.push(syncBillingStateFromSnapshot(payload.data));
+      if (payload.data.trigger === "subscription_activated") {
+        notificationHandlers.push(
+          resolveActivatedUserForWelcome(payload.data).then((activatedUser) =>
+            Promise.all([
+              sendWelcomeEmail(activatedUser),
+              notifyTeamOfNewSubscription(activatedUser),
+            ]).then(() => undefined),
+          ),
+        );
+      }
       break;
 
     case "subscription.activated":
     case "subscription.reactivated":
-      handlers.push(recordCurrentPeriod(payload.data));
+      criticalHandlers.push(recordCurrentPeriod(payload.data));
       break;
 
     case "payment.received":
     case "payment.recovered":
-      handlers.push(restoreAccessAfterPayment(payload.data));
+      criticalHandlers.push(restoreAccessAfterPayment(payload.data));
       break;
 
     case "usage.recorded":
-      handlers.push(recordUsageFromEvent(payload.data));
+      criticalHandlers.push(recordUsageFromEvent(payload.data));
       break;
   }
 
   try {
-    await Promise.all(handlers);
+    await Promise.all(criticalHandlers);
   } catch (error) {
+    await markWebhookEventFailed(eventId);
     console.error("[commet-webhook] handler failed", { error, payload });
     return NextResponse.json(
-      { received: true, warning: "Handler failed" },
-      { status: 200 },
+      { received: false, error: "Handler failed" },
+      { status: 500 },
     );
   }
+
+  await markWebhookEventCompleted(eventId);
+  await Promise.allSettled(notificationHandlers);
 
   return NextResponse.json({ received: true }, { status: 200 });
 }

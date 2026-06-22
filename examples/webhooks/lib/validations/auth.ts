@@ -31,9 +31,5 @@ export const updatePasswordSchema = z
     path: ["confirmPassword"],
   });
 
-export const deleteAccountSchema = z.object({
-  password: z.string().min(8, "Password must be at least 8 characters"),
-});
-
 export type SignInInput = z.infer<typeof signInSchema>;
 export type SignUpInput = z.infer<typeof signUpSchema>;

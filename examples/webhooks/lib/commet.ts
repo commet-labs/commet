@@ -1,7 +1,6 @@
 import { Commet } from "@commet/node";
-
-const apiKey = process.env.COMMET_API_KEY || "ck_build_placeholder";
+import { env } from "@/lib/env";
 
 export const commet = new Commet({
-  apiKey,
+  apiKey: env.COMMET_API_KEY,
 });
