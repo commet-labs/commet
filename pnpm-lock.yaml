@@ -682,6 +682,103 @@ importers:
         specifier: 5.9.3
         version: 5.9.3
 
+  examples/webhooks:
+    dependencies:
+      '@base-ui/react':
+        specifier: ^1.3.0
+        version: 1.5.0(@date-fns/tz@1.4.1)(@types/react@19.2.17)(date-fns@4.1.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@commet/better-auth':
+        specifier: 7.0.0
+        version: 7.0.0(@commet/node@7.3.0(typescript@5.9.3))(better-auth@1.6.16(@opentelemetry/api@1.9.1)(drizzle-kit@0.31.10)(drizzle-orm@0.45.2(@opentelemetry/api@1.9.1)(kysely@0.29.2)(postgres@3.4.9))(next@16.2.9(@opentelemetry/api@1.9.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vitest@4.1.8))(better-call@1.3.6(zod@4.4.3))(zod@4.4.3)
+      '@commet/next':
+        specifier: 1.1.0
+        version: 1.1.0(next@16.2.9(@opentelemetry/api@1.9.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(typescript@5.9.3)
+      '@commet/node':
+        specifier: 7.3.0
+        version: 7.3.0(typescript@5.9.3)
+      '@radix-ui/react-slot':
+        specifier: 1.2.5
+        version: 1.2.5(@types/react@19.2.17)(react@19.2.7)
+      '@vercel/analytics':
+        specifier: ^2.0.1
+        version: 2.0.1(next@16.2.9(@opentelemetry/api@1.9.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)
+      better-auth:
+        specifier: 1.6.16
+        version: 1.6.16(@opentelemetry/api@1.9.1)(drizzle-kit@0.31.10)(drizzle-orm@0.45.2(@opentelemetry/api@1.9.1)(kysely@0.29.2)(postgres@3.4.9))(next@16.2.9(@opentelemetry/api@1.9.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vitest@4.1.8)
+      class-variance-authority:
+        specifier: 0.7.1
+        version: 0.7.1
+      clsx:
+        specifier: 2.1.1
+        version: 2.1.1
+      dotenv:
+        specifier: 17.4.2
+        version: 17.4.2
+      drizzle-orm:
+        specifier: 0.45.2
+        version: 0.45.2(@opentelemetry/api@1.9.1)(kysely@0.29.2)(postgres@3.4.9)
+      lucide-react:
+        specifier: 0.577.0
+        version: 0.577.0(react@19.2.7)
+      next:
+        specifier: 16.2.9
+        version: 16.2.9(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      postgres:
+        specifier: 3.4.9
+        version: 3.4.9
+      radix-ui:
+        specifier: 1.5.0
+        version: 1.5.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      react:
+        specifier: 19.2.7
+        version: 19.2.7
+      react-dom:
+        specifier: 19.2.7
+        version: 19.2.7(react@19.2.7)
+      resend:
+        specifier: 6.12.4
+        version: 6.12.4
+      server-only:
+        specifier: 0.0.1
+        version: 0.0.1
+      shadcn:
+        specifier: ^4.1.1
+        version: 4.11.0(typescript@5.9.3)
+      sonner:
+        specifier: 2.0.7
+        version: 2.0.7(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      tailwind-merge:
+        specifier: 3.6.0
+        version: 3.6.0
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@tailwindcss/postcss':
+        specifier: 4.3.0
+        version: 4.3.0
+      '@types/node':
+        specifier: 24.13.1
+        version: 24.13.1
+      '@types/react':
+        specifier: 19.2.17
+        version: 19.2.17
+      '@types/react-dom':
+        specifier: 19.2.3
+        version: 19.2.3(@types/react@19.2.17)
+      drizzle-kit:
+        specifier: 0.31.10
+        version: 0.31.10
+      tailwindcss:
+        specifier: 4.3.0
+        version: 4.3.0
+      tw-animate-css:
+        specifier: 1.4.0
+        version: 1.4.0
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+
   packages/ai-sdk:
     devDependencies:
       '@ai-sdk/provider':
@@ -1185,6 +1282,27 @@ packages:
 
   '@changesets/write@0.4.0':
     resolution: {integrity: sha512-CdTLvIOPiCNuH71pyDu3rA+Q0n65cmAbXnwWH84rKGiFumFzkmHNT8KHTMEchcxN+Kl8I54xGUhJ7l3E7X396Q==}
+
+  '@commet/better-auth@7.0.0':
+    resolution: {integrity: sha512-robsxoBv7JtOwFE4fyymB/FIKfJBIMUd7W7G3I3usLi+cwdjGNdT35tuLgPHIbt/1VXv/FIjKHIpv/OQ+EKKBA==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      '@commet/node': ^7.0.0
+      better-auth: '>=1.5.6'
+      better-call: '>=1.3.2'
+      zod: '>=3.24.2'
+
+  '@commet/next@1.1.0':
+    resolution: {integrity: sha512-wX0EZEWax2bMvnf5+dHaiweuQ3cTge8nPDERHzyYJ36PYlVjK3Pwc21V+IB29gHcg544O+iZIfpYorruqE78+w==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      next: '>=16.0.0'
+
+  '@commet/node@7.3.0':
+    resolution: {integrity: sha512-dhDwy0Mm9v1x62MX01LShpsh2EIFqnPGN2yI5szHNb8629R/tPBbEPnbP+nWy/AB/HfSgBo0UXKg7kfL/AiUEg==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      typescript: '>=5.0.0'
 
   '@date-fns/tz@1.4.1':
     resolution: {integrity: sha512-P5LUNhtbj6YfI3iJjw5EL9eUAG6OitD0W3fWQcpQjDRc/QIsL0tRNuO1PcDvPccWL1fSTXXdE1ds+l95DV/OFA==}
@@ -3349,6 +3467,9 @@ packages:
     resolution: {integrity: sha512-tlqY9xq5ukxTUZBmoOp+m61cqwQD5pHJtFY3Mn8CA8ps6yghLH/Hw8UPdqg4OLmFW3IFlcXnQNmo/dh8HzXYIQ==}
     engines: {node: '>=18'}
 
+  '@stablelib/base64@1.0.1':
+    resolution: {integrity: sha512-1bnPQqSxSuc3Ii6MhBysoWCg58j97aUjuCSZrGSmDxNqtytIi0k8utUenAwTZN4V5mXXYGsVUI9zeBqy+jBOSQ==}
+
   '@standard-schema/spec@1.1.0':
     resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
 
@@ -4324,6 +4445,9 @@ packages:
     resolution: {integrity: sha512-7MptL8U0cqcFdzIzwOTHoilX9x5BrNqye7Z/LuC7kCMRio1EMSyqRK3BEAUD7sXRq4iT4AzTVuZdhgQ2TCvYLg==}
     engines: {node: '>=8.6.0'}
 
+  fast-sha256@1.3.0:
+    resolution: {integrity: sha512-n11RGP/lrWEFI/bWdygLxhI+pVeo1ZYIVwvvPkW7azl/rOy+F3HYRZ2K5zeE9mmkhQppyv9sQFx0JM9UabnpPQ==}
+
   fast-string-truncated-width@3.0.3:
     resolution: {integrity: sha512-0jjjIEL6+0jag3l2XWWizO64/aZVtpiGE3t0Zgqxv0DPuxiMjvB3M24fCyhZUO4KomJQPj3LTSUnDP3GpdwC0g==}
 
@@ -5135,6 +5259,9 @@ packages:
   pkg-types@1.3.1:
     resolution: {integrity: sha512-/Jm5M4RvtBFVkKWRu2BLUTNP8/M2a+UwuAX+ae4770q1qVGtfjG+WTCupoZixokjmHiry8uI+dlY8KXYV5HVVQ==}
 
+  postal-mime@2.7.4:
+    resolution: {integrity: sha512-0WdnFQYUrPGGTFu1uOqD2s7omwua8xaeYGdO6rb88oD5yJ/4pPHDA4sdWqfD8wQVfCny563n/HQS7zTFft+f/g==}
+
   postcss-load-config@6.0.1:
     resolution: {integrity: sha512-oPtTM4oerL+UXmx+93ytZVN82RrlY/wPUV8IeDxFrzIjXOLF1pN+EmKPLbubvKHT2HC20xXsCAH2Z+CKV6Oz/g==}
     engines: {node: '>= 18'}
@@ -5289,6 +5416,15 @@ packages:
 
   reselect@5.2.0:
     resolution: {integrity: sha512-AgZ3UOZm3YndfrJ4OYjgrT7bmCm/1iqkjvEfH/oYjzh6PD2qw4QuT3jjnXIrpdt4MTpMXclMT3lXbmRY+XRakw==}
+
+  resend@6.12.4:
+    resolution: {integrity: sha512-lRpJ2Hxd+ht+JPDm97juRcUp9HOMuZyxaRFRFmc9Tx8iNWiei94Dx9v6SWufgKk2667C/uCeKKspMotOHSpCSg==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      '@react-email/render': '*'
+    peerDependenciesMeta:
+      '@react-email/render':
+        optional: true
 
   resolve-alpn@1.2.1:
     resolution: {integrity: sha512-0a1F4l73/ZFZOakJnQ3FvkJ2+gSTQWz/r2KE5OdDY0TxPm5h4GkqkWWfM47T7HsbnOtcJVEF4epCVy6u7Q3K+g==}
@@ -5457,6 +5593,9 @@ packages:
 
   stackback@0.0.2:
     resolution: {integrity: sha512-1XMJE5fQo1jGH6Y/7ebnwPOBEkIEnT4QF32d5R1+VXdXveM0IBMJt8zfaxX1P3QhVwrYe+576+jkANtSS2mBbw==}
+
+  standardwebhooks@1.0.0:
+    resolution: {integrity: sha512-BbHGOQK9olHPMvQNHWul6MYlrRTAOKn03rOe4A8O3CLWhNf4YHBqq2HJKKC+sfqpxiBY52pNeesD6jIiLDz8jg==}
 
   statuses@2.0.2:
     resolution: {integrity: sha512-DvEy55V3DB7uknRo+4iOGT5fP1slR8wQohVdknigZPMpMstaKJQWhwiYBACJE3Ul2pTnATihhBYnRhZQHGBiRw==}
@@ -6386,6 +6525,24 @@ snapshots:
       fs-extra: 7.0.1
       human-id: 4.1.3
       prettier: 2.8.8
+
+  '@commet/better-auth@7.0.0(@commet/node@7.3.0(typescript@5.9.3))(better-auth@1.6.16(@opentelemetry/api@1.9.1)(drizzle-kit@0.31.10)(drizzle-orm@0.45.2(@opentelemetry/api@1.9.1)(kysely@0.29.2)(postgres@3.4.9))(next@16.2.9(@opentelemetry/api@1.9.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vitest@4.1.8))(better-call@1.3.6(zod@4.4.3))(zod@4.4.3)':
+    dependencies:
+      '@commet/node': 7.3.0(typescript@5.9.3)
+      better-auth: 1.6.16(@opentelemetry/api@1.9.1)(drizzle-kit@0.31.10)(drizzle-orm@0.45.2(@opentelemetry/api@1.9.1)(kysely@0.29.2)(postgres@3.4.9))(next@16.2.9(@opentelemetry/api@1.9.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vitest@4.1.8)
+      better-call: 1.3.6(zod@4.4.3)
+      zod: 4.4.3
+
+  '@commet/next@1.1.0(next@16.2.9(@opentelemetry/api@1.9.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(typescript@5.9.3)':
+    dependencies:
+      '@commet/node': 7.3.0(typescript@5.9.3)
+      next: 16.2.9(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+    transitivePeerDependencies:
+      - typescript
+
+  '@commet/node@7.3.0(typescript@5.9.3)':
+    dependencies:
+      typescript: 5.9.3
 
   '@date-fns/tz@1.4.1':
     optional: true
@@ -8079,6 +8236,8 @@ snapshots:
 
   '@sindresorhus/merge-streams@4.0.0': {}
 
+  '@stablelib/base64@1.0.1': {}
+
   '@standard-schema/spec@1.1.0': {}
 
   '@swc/helpers@0.5.15':
@@ -8972,6 +9131,8 @@ snapshots:
       merge2: 1.4.1
       micromatch: 4.0.8
 
+  fast-sha256@1.3.0: {}
+
   fast-string-truncated-width@3.0.3: {}
 
   fast-string-width@3.0.2:
@@ -9694,6 +9855,8 @@ snapshots:
       mlly: 1.8.0
       pathe: 2.0.3
 
+  postal-mime@2.7.4: {}
+
   postcss-load-config@6.0.1(jiti@2.7.0)(postcss@8.5.15)(tsx@4.22.0)(yaml@2.8.3):
     dependencies:
       lilconfig: 3.1.3
@@ -9884,6 +10047,11 @@ snapshots:
   require-from-string@2.0.2: {}
 
   reselect@5.2.0: {}
+
+  resend@6.12.4:
+    dependencies:
+      postal-mime: 2.7.4
+      standardwebhooks: 1.0.0
 
   resolve-alpn@1.2.1: {}
 
@@ -10166,6 +10334,11 @@ snapshots:
   sprintf-js@1.0.3: {}
 
   stackback@0.0.2: {}
+
+  standardwebhooks@1.0.0:
+    dependencies:
+      '@stablelib/base64': 1.0.1
+      fast-sha256: 1.3.0
 
   statuses@2.0.2: {}
 

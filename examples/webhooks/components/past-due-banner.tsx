@@ -1,0 +1,33 @@
+import { AlertTriangle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+export function PastDueBanner() {
+  return (
+    <div className="flex items-center justify-between gap-4 border-b border-destructive/30 bg-destructive/10 px-6 py-3">
+      <div className="flex items-center gap-2">
+        <AlertTriangle className="size-4 shrink-0 text-destructive" />
+        <p className="text-sm">
+          <span className="font-medium">Your last payment failed.</span>{" "}
+          <span className="text-muted-foreground">
+            Premium features are paused until payment succeeds.
+          </span>
+        </p>
+      </div>
+      <Button
+        variant="outline"
+        size="sm"
+        nativeButton={false}
+        render={
+          <a
+            href="/api/commet/portal"
+            aria-label="Update payment method"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Update payment method
+          </a>
+        }
+      />
+    </div>
+  );
+}
