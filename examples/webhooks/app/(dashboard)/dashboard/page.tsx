@@ -12,8 +12,8 @@ import {
   hasUsableSubscription,
   resolveAccessForBillingState,
 } from "@/lib/billing/entitlements";
-import type { BillingFeature } from "@/lib/db/schema";
 import { getBillingStateForUser } from "@/lib/db/queries";
+import type { BillingFeature } from "@/lib/db/schema";
 
 function formatPeriodEnd(periodEnd: Date | null): string {
   if (!periodEnd) return "—";
@@ -61,8 +61,7 @@ export default async function DashboardPage() {
       <div>
         <h1 className="text-lg font-semibold">Dashboard</h1>
         <p className="text-sm text-muted-foreground">
-          Everything below reads local state synced by webhooks — no Commet API
-          call on this page.
+          Your subscription, renewal date, and included limits.
         </p>
       </div>
 
@@ -70,9 +69,7 @@ export default async function DashboardPage() {
         <Card>
           <CardHeader>
             <CardTitle>Current plan</CardTitle>
-            <CardDescription>
-              Synced from the customer.state_changed snapshot.
-            </CardDescription>
+            <CardDescription>Your current subscription.</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
@@ -99,14 +96,12 @@ export default async function DashboardPage() {
         <Card>
           <CardHeader>
             <CardTitle>Features</CardTitle>
-            <CardDescription>
-              Real feature access from customer.state_changed.
-            </CardDescription>
+            <CardDescription>Included limits and access.</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-3">
             {access.features.length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                No feature access yet.
+                No included features for this plan.
               </p>
             ) : (
               access.features.map((feature) => (
@@ -126,16 +121,6 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       </div>
-      <Card>
-        <CardHeader>
-          <CardTitle>Usage sync</CardTitle>
-          <CardDescription>
-            Deploy this template and subscribe the endpoint to{" "}
-            <code>usage.recorded</code>. Usage changes will update this local
-            state when Commet delivers that webhook.
-          </CardDescription>
-        </CardHeader>
-      </Card>
     </div>
   );
 }
