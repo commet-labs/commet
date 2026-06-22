@@ -1,7 +1,68 @@
-import type { WebhookPayload } from "@commet/node";
+import type { WebhookEvent, WebhookEventPayload } from "@commet/node";
 import { Webhooks as CommetWebhooks } from "@commet/node";
 import { type NextRequest, NextResponse } from "next/server";
-import type { WebhooksConfig } from "./types";
+import type { WebhookHandlerName, WebhooksConfig } from "./types";
+
+const webhookEventHandlerNames = {
+  "subscription.created": "onSubscriptionCreated",
+  "subscription.activated": "onSubscriptionActivated",
+  "subscription.reactivated": "onSubscriptionReactivated",
+  "subscription.canceled": "onSubscriptionCanceled",
+  "subscription.updated": "onSubscriptionUpdated",
+  "subscription.plan_changed": "onSubscriptionPlanChanged",
+  "subscription.cancellation_scheduled": "onSubscriptionCancellationScheduled",
+  "subscription.cancellation_revoked": "onSubscriptionCancellationRevoked",
+  "subscription.plan_change_scheduled": "onSubscriptionPlanChangeScheduled",
+  "subscription.plan_change_revoked": "onSubscriptionPlanChangeRevoked",
+  "subscription.past_due": "onSubscriptionPastDue",
+  "trial.started": "onTrialStarted",
+  "trial.converted": "onTrialConverted",
+  "trial.expired": "onTrialExpired",
+  "trial.will_end": "onTrialWillEnd",
+  "trial.checkout_ready": "onTrialCheckoutReady",
+  "checkout.ready": "onCheckoutReady",
+  "payment.received": "onPaymentReceived",
+  "payment.failed": "onPaymentFailed",
+  "payment.recovered": "onPaymentRecovered",
+  "payment.retry_failed": "onPaymentRetryFailed",
+  "payment.refunded": "onPaymentRefunded",
+  "payment.disputed": "onPaymentDisputed",
+  "payment.dispute_resolved": "onPaymentDisputeResolved",
+  "payment_link.created": "onPaymentLinkCreated",
+  "payment_link.completed": "onPaymentLinkCompleted",
+  "payment_link.failed": "onPaymentLinkFailed",
+  "payment_link.canceled": "onPaymentLinkCanceled",
+  "invoice.created": "onInvoiceCreated",
+  "invoice.upcoming": "onInvoiceUpcoming",
+  "invoice.overdue": "onInvoiceOverdue",
+  "invoice.voided": "onInvoiceVoided",
+  "payment_method.attached": "onPaymentMethodAttached",
+  "payment_method.updated": "onPaymentMethodUpdated",
+  "customer.created": "onCustomerCreated",
+  "customer.updated": "onCustomerUpdated",
+  "customer.state_changed": "onCustomerStateChanged",
+  "credits.granted": "onCreditsGranted",
+  "credits.purchased": "onCreditsPurchased",
+  "credits.low": "onCreditsLow",
+  "credits.depleted": "onCreditsDepleted",
+  "credits.expired": "onCreditsExpired",
+  "balance.topped_up": "onBalanceToppedUp",
+  "balance.low": "onBalanceLow",
+  "balance.depleted": "onBalanceDepleted",
+  "quota.threshold_reached": "onQuotaThresholdReached",
+  "quota.exceeded": "onQuotaExceeded",
+  "usage.recorded": "onUsageRecorded",
+  "seats.updated": "onSeatsUpdated",
+  "seats.limit_reached": "onSeatsLimitReached",
+  "addon.activated": "onAddonActivated",
+  "addon.deactivated": "onAddonDeactivated",
+  "payout.available": "onPayoutAvailable",
+  "payout.created": "onPayoutCreated",
+  "payout.paid": "onPayoutPaid",
+  "payout.failed": "onPayoutFailed",
+} as const satisfies Record<WebhookEvent, WebhookHandlerName>;
+
+type RuntimeWebhookHandler = (payload: WebhookEventPayload) => Promise<void>;
 
 /**
  * Create a Next.js webhook handler for Commet events
@@ -28,22 +89,7 @@ import type { WebhooksConfig } from "./types";
  * ```
  */
 export const Webhooks = (config: WebhooksConfig) => {
-  const {
-    webhookSecret,
-    onSubscriptionActivated,
-    onSubscriptionCanceled,
-    onSubscriptionCreated,
-    onSubscriptionUpdated,
-    onSubscriptionPlanChanged,
-    onCustomerStateChanged,
-    onPaymentReceived,
-    onPaymentRecovered,
-    onPaymentFailed,
-    onUsageRecorded,
-    onInvoiceCreated,
-    onPayload,
-    onError,
-  } = config;
+  const { webhookSecret, onPayload, onError } = config;
 
   const webhooks = new CommetWebhooks();
 
@@ -66,9 +112,9 @@ export const Webhooks = (config: WebhooksConfig) => {
         );
       }
 
-      let payload: WebhookPayload;
+      let payload: WebhookEventPayload;
       try {
-        payload = JSON.parse(rawBody) as WebhookPayload;
+        payload = JSON.parse(rawBody) as WebhookEventPayload;
       } catch (parseError) {
         console.error("[Commet Webhook] Failed to parse payload:", parseError);
         if (onError) {
@@ -91,75 +137,10 @@ export const Webhooks = (config: WebhooksConfig) => {
         promises.push(onPayload(payload));
       }
 
-      switch (payload.event) {
-        case "subscription.activated":
-          if (onSubscriptionActivated) {
-            promises.push(onSubscriptionActivated(payload));
-          }
-          break;
-
-        case "subscription.canceled":
-          if (onSubscriptionCanceled) {
-            promises.push(onSubscriptionCanceled(payload));
-          }
-          break;
-
-        case "subscription.created":
-          if (onSubscriptionCreated) {
-            promises.push(onSubscriptionCreated(payload));
-          }
-          break;
-
-        case "subscription.updated":
-          if (onSubscriptionUpdated) {
-            promises.push(onSubscriptionUpdated(payload));
-          }
-          break;
-
-        case "subscription.plan_changed":
-          if (onSubscriptionPlanChanged) {
-            promises.push(onSubscriptionPlanChanged(payload));
-          }
-          break;
-
-        case "customer.state_changed":
-          if (onCustomerStateChanged) {
-            promises.push(onCustomerStateChanged(payload));
-          }
-          break;
-
-        case "payment.received":
-          if (onPaymentReceived) {
-            promises.push(onPaymentReceived(payload));
-          }
-          break;
-
-        case "payment.recovered":
-          if (onPaymentRecovered) {
-            promises.push(onPaymentRecovered(payload));
-          }
-          break;
-
-        case "payment.failed":
-          if (onPaymentFailed) {
-            promises.push(onPaymentFailed(payload));
-          }
-          break;
-
-        case "usage.recorded":
-          if (onUsageRecorded) {
-            promises.push(onUsageRecorded(payload));
-          }
-          break;
-
-        case "invoice.created":
-          if (onInvoiceCreated) {
-            promises.push(onInvoiceCreated(payload));
-          }
-          break;
-
-        default:
-          console.log(`[Commet Webhook] Unhandled event: ${payload.event}`);
+      const handlerName = webhookEventHandlerNames[payload.event];
+      const handler = config[handlerName] as RuntimeWebhookHandler | undefined;
+      if (handler) {
+        promises.push(handler(payload));
       }
 
       try {

@@ -1,5 +1,5 @@
 ---
-"@commet/next": patch
+"@commet/next": minor
 ---
 
-Route all typed webhook callbacks and return a non-2xx response when handlers fail so failed deliveries can be retried.
+Add named webhook callbacks for the full typed Commet webhook catalog and return non-2xx responses when handlers fail so failed deliveries can be retried.

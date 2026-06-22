@@ -1,12 +1,49 @@
-import type { WebhookData, WebhookEvent, WebhookPayload } from "@commet/node";
+import type {
+  WebhookData,
+  WebhookEvent,
+  WebhookEventPayload,
+  WebhookPayload,
+} from "@commet/node";
 
 // Re-export types from @commet/node for convenience
-export type { WebhookData, WebhookEvent, WebhookPayload };
+export type { WebhookData, WebhookEvent, WebhookEventPayload, WebhookPayload };
+
+type PascalCaseEventSegment<S extends string> =
+  S extends `${infer Head}_${infer Tail}`
+    ? `${Capitalize<Head>}${PascalCaseEventSegment<Tail>}`
+    : Capitalize<S>;
+
+type PascalCaseEventName<S extends string> =
+  S extends `${infer Head}.${infer Tail}`
+    ? `${PascalCaseEventSegment<Head>}${PascalCaseEventName<Tail>}`
+    : PascalCaseEventSegment<S>;
+
+export type WebhookPayloadFor<E extends WebhookEvent> = Extract<
+  WebhookEventPayload,
+  { event: E }
+>;
+
+export type WebhookHandler<E extends WebhookEvent> = (
+  payload: WebhookPayloadFor<E>,
+) => Promise<void>;
+
+export type WebhookHandlerName<E extends WebhookEvent = WebhookEvent> =
+  `on${PascalCaseEventName<E>}`;
+
+/**
+ * Named callbacks for every Commet webhook event.
+ *
+ * Event names become callback names by removing dots/underscores and applying PascalCase:
+ * `payment_link.completed` -> `onPaymentLinkCompleted`.
+ */
+export type WebhookNamedHandlers = {
+  [E in WebhookEvent as WebhookHandlerName<E>]?: WebhookHandler<E>;
+};
 
 /**
  * Configuration for the Commet webhook handler
  */
-export interface WebhooksConfig {
+export interface WebhooksConfig extends WebhookNamedHandlers {
   /**
    * Webhook secret from your Commet dashboard
    * Used to verify webhook signatures
@@ -30,7 +67,7 @@ export interface WebhooksConfig {
    * }
    * ```
    */
-  onSubscriptionActivated?: (payload: WebhookPayload) => Promise<void>;
+  onSubscriptionActivated?: WebhookHandler<"subscription.activated">;
 
   /**
    * Handles the `subscription.canceled` webhook event
@@ -49,7 +86,7 @@ export interface WebhooksConfig {
    * }
    * ```
    */
-  onSubscriptionCanceled?: (payload: WebhookPayload) => Promise<void>;
+  onSubscriptionCanceled?: WebhookHandler<"subscription.canceled">;
 
   /**
    * Handles the `subscription.created` webhook event
@@ -66,7 +103,7 @@ export interface WebhooksConfig {
    * }
    * ```
    */
-  onSubscriptionCreated?: (payload: WebhookPayload) => Promise<void>;
+  onSubscriptionCreated?: WebhookHandler<"subscription.created">;
 
   /**
    * Handles the `subscription.updated` webhook event
@@ -85,7 +122,7 @@ export interface WebhooksConfig {
    * }
    * ```
    */
-  onSubscriptionUpdated?: (payload: WebhookPayload) => Promise<void>;
+  onSubscriptionUpdated?: WebhookHandler<"subscription.updated">;
 
   /**
    * Handles the `subscription.plan_changed` webhook event
@@ -104,14 +141,14 @@ export interface WebhooksConfig {
    * }
    * ```
    */
-  onSubscriptionPlanChanged?: (payload: WebhookPayload) => Promise<void>;
+  onSubscriptionPlanChanged?: WebhookHandler<"subscription.plan_changed">;
 
   /**
    * Handles the `customer.state_changed` webhook event
    *
    * Fired whenever a customer's billing state snapshot changes.
    */
-  onCustomerStateChanged?: (payload: WebhookPayload) => Promise<void>;
+  onCustomerStateChanged?: WebhookHandler<"customer.state_changed">;
 
   /**
    * Handles the `payment.received` webhook event
@@ -120,14 +157,14 @@ export interface WebhooksConfig {
    *
    * @param payload - The webhook payload containing payment data
    */
-  onPaymentReceived?: (payload: WebhookPayload) => Promise<void>;
+  onPaymentReceived?: WebhookHandler<"payment.received">;
 
   /**
    * Handles the `payment.recovered` webhook event
    *
    * Fired when a previously failed payment succeeds.
    */
-  onPaymentRecovered?: (payload: WebhookPayload) => Promise<void>;
+  onPaymentRecovered?: WebhookHandler<"payment.recovered">;
 
   /**
    * Handles the `payment.failed` webhook event
@@ -137,14 +174,14 @@ export interface WebhooksConfig {
    *
    * @param payload - The webhook payload containing payment data
    */
-  onPaymentFailed?: (payload: WebhookPayload) => Promise<void>;
+  onPaymentFailed?: WebhookHandler<"payment.failed">;
 
   /**
    * Handles the `usage.recorded` webhook event
    *
    * Fired after usage is recorded for a customer feature.
    */
-  onUsageRecorded?: (payload: WebhookPayload) => Promise<void>;
+  onUsageRecorded?: WebhookHandler<"usage.recorded">;
 
   /**
    * Handles the `invoice.created` webhook event
@@ -153,7 +190,7 @@ export interface WebhooksConfig {
    *
    * @param payload - The webhook payload containing invoice data
    */
-  onInvoiceCreated?: (payload: WebhookPayload) => Promise<void>;
+  onInvoiceCreated?: WebhookHandler<"invoice.created">;
 
   /**
    * Catch-all handler that receives all webhook events
@@ -171,7 +208,7 @@ export interface WebhooksConfig {
    * }
    * ```
    */
-  onPayload?: (payload: WebhookPayload) => Promise<void>;
+  onPayload?: (payload: WebhookEventPayload) => Promise<void>;
 
   /**
    * Error handler for webhook processing failures
