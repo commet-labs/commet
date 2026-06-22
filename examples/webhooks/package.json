@@ -15,7 +15,7 @@
   "dependencies": {
     "@base-ui/react": "^1.3.0",
     "@commet/better-auth": "7.0.0",
-    "@commet/next": "1.0.11",
+    "@commet/next": "1.1.0",
     "@commet/node": "7.3.0",
     "@radix-ui/react-slot": "1.2.5",
     "@vercel/analytics": "^2.0.1",
