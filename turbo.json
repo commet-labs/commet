@@ -7,9 +7,12 @@
       "env": [
         "BETTER_AUTH_URL",
         "BETTER_AUTH_SECRET",
+        "COMMET_WEBHOOK_SECRET",
         "POSTGRES_URL",
         "COMMET_API_KEY",
-        "COMMET_ENVIRONMENT"
+        "COMMET_ENVIRONMENT",
+        "NEXT_PUBLIC_APP_URL",
+        "NEXT_PUBLIC_BETTER_AUTH_URL"
       ]
     },
     "dev": {
