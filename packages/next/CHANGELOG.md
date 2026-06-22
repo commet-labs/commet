@@ -1,5 +1,11 @@
 # @commet/next
 
+## 1.1.0
+
+### Minor Changes
+
+- e15c85c: Add named webhook callbacks for the full typed Commet webhook catalog and return non-2xx responses when handlers fail so failed deliveries can be retried.
+
 ## 1.0.11
 
 ### Patch Changes
