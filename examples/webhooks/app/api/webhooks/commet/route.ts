@@ -97,8 +97,8 @@ export async function POST(request: NextRequest) {
     await markWebhookEventFailed(eventId);
     console.error("[commet-webhook] handler failed", { error, payload });
     return NextResponse.json(
-      { received: false, error: "Handler failed" },
-      { status: 500 },
+      { received: true, processed: false, error: "Handler failed" },
+      { status: 200 },
     );
   }
 
