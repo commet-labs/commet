@@ -65,16 +65,13 @@ function resolveTargetUrl(input: string): string {
     return `http://localhost:${input}/`;
   }
 
-  const withProtocol =
-    input.startsWith("http://") || input.startsWith("https://")
-      ? input
-      : `http://${input}`;
+  const hasProtocol =
+    input.startsWith("http://") || input.startsWith("https://");
+  const parsed = new URL(hasProtocol ? input : `http://${input}`);
 
-  const parsed = new URL(withProtocol);
-
-  if (!parsed.port) {
+  if (!hasProtocol && !parsed.port) {
     throw new Error(
-      `Missing port in "${input}". Example: commet listen localhost:3000/webhooks`,
+      `Missing port in "${input}". Pass a port (commet listen localhost:3000/webhooks) or a full URL (commet listen https://app.localhost/webhooks).`,
     );
   }
 
