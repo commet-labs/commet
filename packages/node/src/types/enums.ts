@@ -23,7 +23,8 @@ export type InvoiceType =
   | "credit_purchase"
   | "balance_topup"
   | "addon_activation"
-  | "one_time_payment";
+  | "one_time_payment"
+  | "reactivation";
 
 export type TransactionStatus =
   | "pending"
