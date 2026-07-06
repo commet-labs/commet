@@ -39,11 +39,11 @@
     "@commet/node": "workspace:*"
   },
   "devDependencies": {
-    "@types/node": "24.13.1",
-    "next": "16.2.9",
+    "@types/node": "24.13.2",
+    "next": "16.2.10",
     "tsup": "8.5.1",
     "typescript": "5.9.3",
-    "vitest": "4.1.8"
+    "vitest": "4.1.10"
   },
   "peerDependencies": {
     "next": ">=16.0.0"
