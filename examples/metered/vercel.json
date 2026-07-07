@@ -4,5 +4,6 @@
     "deploymentEnabled": {
       "dependabot/**": false
     }
-  }
+  },
+  "buildCommand": "pnpm db:push && cd ../.. && pnpm exec turbo build --filter=metered-example"
 }
