@@ -61,7 +61,7 @@ const auth = betterAuth({
         metadata: { source: "signup" }
       }),
       use: [
-        portal({ returnUrl: "/dashboard" }),
+        portal(),
         subscriptions(),
         features(),
         usage(),
@@ -135,11 +135,10 @@ commet({
 ### Portal Plugin
 
 ```typescript
-portal({
-  // Optional: URL to return to after leaving the portal
-  returnUrl: "/dashboard"
-})
+portal()
 ```
+
+Set the Customer app URL in the Commet dashboard to show a back button in the customer portal.
 
 ### Subscriptions Plugin
 

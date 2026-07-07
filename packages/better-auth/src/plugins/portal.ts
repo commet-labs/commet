@@ -5,13 +5,6 @@ import {
   sessionMiddleware,
 } from "better-auth/api";
 
-export interface PortalConfig {
-  /**
-   * URL to return to after leaving the customer portal
-   */
-  returnUrl?: string;
-}
-
 /**
  * Portal plugin - Provides customer portal access
  *
@@ -19,7 +12,7 @@ export interface PortalConfig {
  * - GET /customer/portal - Redirects to the Commet customer portal
  */
 export const portal =
-  ({ returnUrl }: PortalConfig = {}) =>
+  () =>
   (commet: Commet) => {
     return {
       portal: createAuthEndpoint(
@@ -50,16 +43,8 @@ export const portal =
               });
             }
 
-            // Append return URL if configured
-            let portalUrl = portalAccess.data.portalUrl;
-            if (returnUrl) {
-              const url = new URL(portalUrl);
-              url.searchParams.set("return_url", returnUrl);
-              portalUrl = url.toString();
-            }
-
             return ctx.json({
-              url: portalUrl,
+              url: portalAccess.data.portalUrl,
               redirect: true,
             });
           } catch (e: unknown) {

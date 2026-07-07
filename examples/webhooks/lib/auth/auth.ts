@@ -28,7 +28,7 @@ export const auth = betterAuth({
       client: commet,
       createCustomerOnSignUp: true,
       use: [
-        portal({ returnUrl: "/dashboard/billing" }),
+        portal(),
         subscriptions(),
         features(),
       ],

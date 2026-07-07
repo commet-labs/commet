@@ -11,7 +11,6 @@ import type { CommetEndpoints, CommetOptions } from "./types";
 export { commetClient } from "./client";
 export type { FeaturesConfig } from "./plugins/features";
 export { features } from "./plugins/features";
-export type { PortalConfig } from "./plugins/portal";
 // Re-export all plugins
 export { portal } from "./plugins/portal";
 export type { SeatsConfig } from "./plugins/seats";
@@ -61,7 +60,7 @@ export type {
  *         metadata: { source: "signup" }
  *       }),
  *       use: [
- *         portal({ returnUrl: "/dashboard" }),
+ *         portal(),
  *         subscriptions(),
  *         features(),
  *         usage(),
