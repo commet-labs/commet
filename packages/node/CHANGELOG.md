@@ -1,5 +1,11 @@
 # @commet/node
 
+## 7.4.0
+
+### Minor Changes
+
+- 2ad982a: Typed webhook events generated from the OpenAPI contract. Webhook payload types (including the new `payment.retry_failed` event) now derive from the single source of truth, shared webhook types are exposed as regular models, and field nullability matches the wire. Regenerated to API version 2026-06-23.
+
 ## 7.3.0
 
 ### Minor Changes
