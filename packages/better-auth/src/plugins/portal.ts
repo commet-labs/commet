@@ -11,8 +11,29 @@ import {
  * Endpoints:
  * - GET /customer/portal - Redirects to the Commet customer portal
  */
+export interface PortalConfig {
+  /** Absolute or app-relative URL to return to after leaving the customer portal */
+  returnUrl?: string;
+}
+
+function resolvePortalReturnUrl(
+  returnUrl: string,
+  baseUrl: string,
+): string | null {
+  try {
+    const parsedUrl = new URL(returnUrl, baseUrl);
+    if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
+      return null;
+    }
+
+    return parsedUrl.toString();
+  } catch {
+    return null;
+  }
+}
+
 export const portal =
-  () =>
+  ({ returnUrl }: PortalConfig = {}) =>
   (commet: Commet) => {
     return {
       portal: createAuthEndpoint(
@@ -43,8 +64,19 @@ export const portal =
               });
             }
 
+            const resolvedReturnUrl = returnUrl
+              ? resolvePortalReturnUrl(returnUrl, ctx.context.baseURL)
+              : null;
+
+            let portalUrl = portalAccess.data.portalUrl;
+            if (resolvedReturnUrl) {
+              const url = new URL(portalUrl);
+              url.searchParams.set("return_url", resolvedReturnUrl);
+              portalUrl = url.toString();
+            }
+
             return ctx.json({
-              url: portalAccess.data.portalUrl,
+              url: portalUrl,
               redirect: true,
             });
           } catch (e: unknown) {
