@@ -10,10 +10,7 @@ import type {
   WebhookEvent,
   WebhookEventDataMap,
 } from "../types/webhook-events";
-import type {
-  WebhookFeatureAccess,
-  WebhookPlanRef,
-} from "../types/webhook-shared";
+import type { WebhookFeatureAccess, WebhookPlanRef } from "../types/models";
 
 function signPayload(payload: string, secret: string): string {
   return crypto.createHmac("sha256", secret).update(payload).digest("hex");
@@ -283,14 +280,14 @@ describe("Webhooks", () => {
         expectTypeOf(data).toEqualTypeOf<PaymentLinkCompletedData>();
         expectTypeOf(payload.data).toEqualTypeOf<PaymentLinkCompletedData>();
         expectTypeOf(data.invoiceId).toEqualTypeOf<string>();
-        expectTypeOf(data.paymentTransactionId).toEqualTypeOf<string>();
+        expectTypeOf(data.paymentTransactionId).toEqualTypeOf<string | null>();
       });
 
       dispatcher.on("payment_link.failed", (data, payload) => {
         expectTypeOf(data).toEqualTypeOf<PaymentLinkFailedData>();
         expectTypeOf(payload.data).toEqualTypeOf<PaymentLinkFailedData>();
-        expectTypeOf(data.failureCode).toEqualTypeOf<string | null>();
-        expectTypeOf(data.failureMessage).toEqualTypeOf<string | null>();
+        expectTypeOf(data.failureCode).toEqualTypeOf<string>();
+        expectTypeOf(data.failureMessage).toEqualTypeOf<string>();
       });
 
       dispatcher.on("subscription.reactivated", (data, payload) => {

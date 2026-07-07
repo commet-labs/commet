@@ -166,6 +166,8 @@ export interface Customer {
   externalId: string | null;
   fullName: string | null;
   email: string;
+  taxDocument: string | null;
+  documentType: string | null;
   timezone: string | null;
   metadata: Record<string, unknown> | null;
   /** @format date-time */
@@ -190,6 +192,7 @@ export interface CustomerBatch {
       externalId?: string;
       email: string;
       fullName?: string | null;
+      taxDocument?: string | null;
       timezone?: string;
       metadata?: Record<string, unknown> | null;
       address?: {
@@ -375,7 +378,7 @@ export interface Payment {
     | "requires_action"
     | "failed"
     | "canceled";
-  provider: "stripe" | "commet";
+  provider: "stripe" | "commet" | "dlocal";
   amountSubtotal: number;
   taxAmount: number;
   amountTotal: number;
@@ -855,7 +858,7 @@ export interface Transaction {
   invoiceId: string | null;
   grossAmount: number;
   subtotal: number;
-  taxAmount: number;
+  taxAmount: number | null;
   currency: string;
   status: TransactionStatus;
   customerEmail: string | null;
@@ -919,4 +922,60 @@ export interface UsageQuotaEvent {
   createdAt: string;
   object: "usage_quota";
   livemode: boolean;
+}
+
+export interface WebhookAddonRef {
+  id: string;
+  name: string;
+}
+
+export interface WebhookBalance {
+  currentBalance: number;
+}
+
+export interface WebhookBankRef {
+  bankName: string | null;
+  last4: string;
+}
+
+export interface WebhookCardInfo {
+  brand: string;
+  last4: string;
+  expMonth: number;
+  expYear: number;
+}
+
+export interface WebhookCreditsBalance {
+  planCredits: number;
+  purchasedCredits: number;
+  totalCredits: number;
+}
+
+export interface WebhookFeatureAccess {
+  code: string;
+  name: string;
+  type: string;
+  allowed: boolean;
+  enabled: boolean | null;
+  current: number | null;
+  included: number | null;
+  remaining: number | null;
+  overageQuantity: number | null;
+  overageUnitPrice: number | null;
+  unlimited: boolean | null;
+  overageEnabled: boolean | null;
+  billedQuantity: number | null;
+}
+
+export interface WebhookPlanRef {
+  id: string;
+  name: string;
+}
+
+export interface WebhookSeatSummary {
+  code: string;
+  current: number | null;
+  included: number | null;
+  remaining: number | null;
+  unlimited: boolean | null;
 }

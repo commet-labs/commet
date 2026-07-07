@@ -13,6 +13,7 @@ export interface CreateCustomerParams {
   id?: string;
   externalId?: string;
   fullName?: string;
+  taxDocument?: string;
   address?: {
     line1: string;
     line2?: string;
@@ -36,6 +37,7 @@ export interface UpdateCustomerParams {
   id: string;
   email?: string;
   fullName?: string;
+  taxDocument?: string;
   externalId?: string;
   timezone?: Timezone;
   metadata?: Record<string, unknown>;
@@ -56,6 +58,7 @@ export interface BatchCreateCustomersParams {
     id?: string;
     externalId?: string;
     fullName?: string;
+    taxDocument?: string;
     timezone?: Timezone;
     metadata?: Record<string, unknown>;
     address?: {

@@ -259,9 +259,6 @@ export type {
   UncanceledSubscription,
   UsageQuota,
   UsageQuotaEvent,
-} from "./types/models";
-export type * from "./types/webhook-events";
-export type {
   WebhookAddonRef,
   WebhookBalance,
   WebhookBankRef,
@@ -270,7 +267,8 @@ export type {
   WebhookFeatureAccess,
   WebhookPlanRef,
   WebhookSeatSummary,
-} from "./types/webhook-shared";
+} from "./types/models";
+export type * from "./types/webhook-events";
 export { registerIntegration } from "./utils/telemetry";
 export { API_VERSION, SDK_VERSION } from "./version";
 
