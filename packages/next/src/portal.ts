@@ -4,7 +4,36 @@ import { type NextRequest, NextResponse } from "next/server";
 export interface CustomerPortalConfig {
   apiKey: string;
   getCustomerId: (req: NextRequest) => Promise<string | null>;
+  returnUrl?:
+    | string
+    | ((req: NextRequest) => string | null | Promise<string | null>);
   onError?: (error: Error) => void;
+}
+
+async function resolveReturnUrl(
+  returnUrl: CustomerPortalConfig["returnUrl"],
+  req: NextRequest,
+): Promise<string | null> {
+  if (!returnUrl) {
+    return null;
+  }
+
+  const rawReturnUrl =
+    typeof returnUrl === "function" ? await returnUrl(req) : returnUrl;
+  if (!rawReturnUrl) {
+    return null;
+  }
+
+  try {
+    const parsedUrl = new URL(rawReturnUrl, req.nextUrl.origin);
+    if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
+      return null;
+    }
+
+    return parsedUrl.toString();
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -40,6 +69,7 @@ export interface CustomerPortalConfig {
 export const CustomerPortal = ({
   apiKey,
   getCustomerId,
+  returnUrl,
   onError,
 }: CustomerPortalConfig) => {
   const commet = new Commet({
@@ -59,8 +89,10 @@ export const CustomerPortal = ({
       }
 
       // Get portal URL from Commet
+      const resolvedReturnUrl = await resolveReturnUrl(returnUrl, req);
       const result = await commet.portal.getUrl({
         customerId,
+        ...(resolvedReturnUrl ? { returnUrl: resolvedReturnUrl } : {}),
       });
 
       if (!result.success || !result.data) {
