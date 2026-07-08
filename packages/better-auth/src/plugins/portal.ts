@@ -52,8 +52,13 @@ export const portal =
           }
 
           try {
+            const resolvedReturnUrl = returnUrl
+              ? resolvePortalReturnUrl(returnUrl, ctx.context.baseURL)
+              : null;
+
             const portalAccess = await commet.portal.getUrl({
               customerId: userId,
+              ...(resolvedReturnUrl ? { returnUrl: resolvedReturnUrl } : {}),
             });
 
             if (!portalAccess.success || !portalAccess.data) {
@@ -64,19 +69,8 @@ export const portal =
               });
             }
 
-            const resolvedReturnUrl = returnUrl
-              ? resolvePortalReturnUrl(returnUrl, ctx.context.baseURL)
-              : null;
-
-            let portalUrl = portalAccess.data.portalUrl;
-            if (resolvedReturnUrl) {
-              const url = new URL(portalUrl);
-              url.searchParams.set("return_url", resolvedReturnUrl);
-              portalUrl = url.toString();
-            }
-
             return ctx.json({
-              url: portalUrl,
+              url: portalAccess.data.portalUrl,
               redirect: true,
             });
           } catch (e: unknown) {

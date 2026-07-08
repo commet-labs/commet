@@ -1,5 +1,6 @@
 ---
+"@commet/node": patch
 "@commet/better-auth": patch
 ---
 
-Keep customer portal return URLs in the Better Auth plugin and resolve app-relative return URLs against the Better Auth base URL before redirecting to Commet.
+Support customer portal return URLs through portal session creation, and have the Better Auth plugin send app-relative return URLs through the Commet API instead of appending query params.

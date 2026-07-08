@@ -5,6 +5,7 @@ import type { CommetHTTPClient } from "../utils/http";
 export interface RequestPortalAccessParams {
   email?: string;
   customerId?: string;
+  returnUrl?: string;
 }
 
 export class PortalResource {
