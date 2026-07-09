@@ -109,6 +109,8 @@ export interface SubscriptionActivatedData {
   invoiceTotal: number;
   /** The invoice currency code. */
   invoiceCurrency: string;
+  /** The payment provider that processed the activating charge: stripe, commet, or dlocal. Null when the subscription activated without a charge (zero-total or setup-based activation). */
+  provider: PaymentProvider | null;
 }
 
 /** Fired when a canceled subscription is reactivated and its reactivation charge succeeds. The subscription returns to active with a fresh invoice and a billing period anchored to the reactivation date. Distinct from subscription.activated (first activation) and payment.recovered (past_due recovery, which keeps the original anchor). */
@@ -133,6 +135,8 @@ export interface SubscriptionReactivatedData {
   invoiceTotal: number;
   /** The invoice currency code. */
   invoiceCurrency: string;
+  /** The payment provider that processed the reactivation charge: stripe, commet, or dlocal. */
+  provider: PaymentProvider;
 }
 
 /** Fired when a subscription is actually terminated at the end of the billing period. The status is now canceled and access should be revoked. This event is NOT fired when cancellation is scheduled — that triggers subscription.updated instead. See the cancellation lifecycle below. */
