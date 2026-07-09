@@ -9,6 +9,8 @@ import type {
   WebhookSeatSummary,
 } from "./models";
 
+import type { PaymentProvider } from "./enums";
+
 export type WebhookEvent =
   | "subscription.created"
   | "subscription.activated"
@@ -85,7 +87,7 @@ export interface SubscriptionCreatedData {
   name: string | null;
 }
 
-/** Fired when the first charge succeeds and status becomes active (or trialing if a trial is configured). This is where you grant access. */
+/** Fired once, when the subscription's first charge succeeds and it becomes active — this is where you grant access. Never re-fired on renewals; use payment.received for per-charge notifications. */
 export interface SubscriptionActivatedData {
   /** The subscription ID. */
   subscriptionId: string;
@@ -359,7 +361,7 @@ export interface CheckoutReadyData {
   checkoutUrl: string;
 }
 
-/** Fired when a recurring payment is successfully processed. This event is for recurring charges only — the first checkout payment triggers subscription.activated instead. */
+/** Fired every time a payment settles successfully — the first payment and every renewal alike. subscription.activated fires alongside it only on the first one. */
 export interface PaymentReceivedData {
   /** The invoice ID. */
   invoiceId: string;
@@ -373,6 +375,8 @@ export interface PaymentReceivedData {
   subscriptionId: string | null;
   /** The payment transaction ID. */
   paymentTransactionId: string | null;
+  /** The payment provider the charge was routed to: stripe, commet, or dlocal. Null for billing-only charges with no Commet ledger row. */
+  provider: PaymentProvider | null;
   /** Gross amount in cents before fees. */
   grossAmount: number | null;
   /** The payment currency code. */
@@ -399,6 +403,8 @@ export interface PaymentFailedData {
   failureCode: string;
   /** A human-readable failure message. */
   failureMessage: string;
+  /** A ready-to-use link the customer can follow to retry this payment, or null when no recovery path applies. For a first failed charge (pending_payment) it is the checkout URL; for a failed renewal (past_due) it is a signed recovery link — no separate createRecoveryLink call needed. */
+  recoveryUrl: string | null;
 }
 
 /** Fired when an outstanding invoice that previously failed is successfully paid — automatically on retry or by the customer through the portal. The subscription returns to active at the same time; use this event to close the dunning flow you opened on payment.failed. */
@@ -433,6 +439,8 @@ export interface PaymentRetryFailedData {
 export interface PaymentRefundedData {
   /** The refunded payment transaction ID. */
   paymentTransactionId: string;
+  /** The payment provider the charge was routed to: stripe, commet, or dlocal. */
+  provider: PaymentProvider;
   /** The payment link the payment originated from, or null when the payment did not come from a payment link. */
   paymentLinkId: string | null;
   /** The invoice the payment collected, or null for payments without an invoice. */
@@ -453,6 +461,8 @@ export interface PaymentRefundedData {
 export interface PaymentDisputedData {
   /** The disputed payment transaction ID. */
   paymentTransactionId: string;
+  /** The payment provider the charge was routed to: stripe, commet, or dlocal. */
+  provider: PaymentProvider;
   /** The payment link the payment originated from, or null when the payment did not come from a payment link. */
   paymentLinkId: string | null;
   /** The invoice the payment collected, or null for payments without an invoice. */
@@ -475,6 +485,8 @@ export interface PaymentDisputedData {
 export interface PaymentDisputeResolvedData {
   /** The disputed payment transaction ID. */
   paymentTransactionId: string;
+  /** The payment provider the charge was routed to: stripe, commet, or dlocal. */
+  provider: PaymentProvider;
   /** The payment link the payment originated from, or null when the payment did not come from a payment link. */
   paymentLinkId: string | null;
   /** The invoice the payment collected, or null for payments without an invoice. */

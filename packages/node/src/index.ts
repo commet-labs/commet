@@ -195,6 +195,7 @@ export type {
   DiscountType,
   FeatureType,
   InvoiceType,
+  PaymentProvider,
   SubscriptionStatus,
   Timezone,
   TransactionStatus,

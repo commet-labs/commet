@@ -4,6 +4,7 @@ import type {
   DiscountType,
   FeatureType,
   InvoiceType,
+  PaymentProvider,
   SubscriptionStatus,
   TransactionStatus,
 } from "./enums";
@@ -378,7 +379,7 @@ export interface Payment {
     | "requires_action"
     | "failed"
     | "canceled";
-  provider: "stripe" | "commet" | "dlocal";
+  provider: PaymentProvider;
   amountSubtotal: number;
   taxAmount: number;
   amountTotal: number;
@@ -860,6 +861,8 @@ export interface Transaction {
   subtotal: number;
   taxAmount: number | null;
   currency: string;
+  /** The payment provider the charge was routed to: stripe, commet, or dlocal. */
+  provider: PaymentProvider;
   status: TransactionStatus;
   customerEmail: string | null;
   customerName: string | null;

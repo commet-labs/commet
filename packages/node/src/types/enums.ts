@@ -33,6 +33,8 @@ export type TransactionStatus =
   | "refunded"
   | "disputed";
 
+export type PaymentProvider = "stripe" | "commet" | "dlocal";
+
 export type FeatureType = "boolean" | "usage" | "seats" | "quota";
 
 export type DiscountType = "percentage" | "amount";
