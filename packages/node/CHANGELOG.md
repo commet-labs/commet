@@ -1,5 +1,11 @@
 # @commet/node
 
+## 7.6.0
+
+### Minor Changes
+
+- 6202ef0: Add `provider` to the `subscription.activated` and `subscription.reactivated` webhook event payloads. `SubscriptionActivatedData.provider` is `PaymentProvider | null` (null when the subscription activated without a charge); `SubscriptionReactivatedData.provider` is always a `PaymentProvider`.
+
 ## 7.5.0
 
 ### Minor Changes
