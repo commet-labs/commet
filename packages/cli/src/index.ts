@@ -157,8 +157,7 @@ function printAgentInfo() {
     },
     mcp: {
       url: "https://commet.co/mcp",
-      sandbox: "https://sandbox.commet.co/mcp",
-      hint: "For full billing CRUD (plans, features, customers, subscriptions), connect to the MCP server.",
+      hint: "For full billing CRUD (plans, features, customers, subscriptions), connect to the MCP server. The organization behind your credentials determines sandbox vs live mode.",
     },
     auth: {
       interactive: "commet login",
