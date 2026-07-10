@@ -33,6 +33,7 @@ export interface CreateSubscriptionParams {
   billingInterval?: BillingInterval | null;
   initialSeats?: Record<string, number>;
   skipTrial?: boolean;
+  customTrialDays?: number;
   introOffer?: {
     discountType: DiscountType;
     discountValue: number;
