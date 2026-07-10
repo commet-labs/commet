@@ -100,7 +100,7 @@ export const listenCommand = new Command("listen")
 Examples:
   $ commet listen 3000                          Forward to http://localhost:3000/
   $ commet listen localhost:3000/webhooks        Forward to a specific path
-  $ commet listen 3000 --events invoice.paid     Only forward invoice.paid events
+  $ commet listen 3000 --events invoice.created  Only forward invoice.created events
 `,
   )
   .action(async (url: string, options: ListenOptions) => {

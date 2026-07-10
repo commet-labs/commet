@@ -22,26 +22,10 @@ const customersResource: ResourceDef = {
           description: "Full name",
           sdkKey: "fullName",
         },
-        { flag: "--domain <domain>", description: "Domain", sdkKey: "domain" },
-        {
-          flag: "--website <url>",
-          description: "Website URL",
-          sdkKey: "website",
-        },
         {
           flag: "--timezone <tz>",
           description: "Timezone",
           sdkKey: "timezone",
-        },
-        {
-          flag: "--language <lang>",
-          description: "Language code",
-          sdkKey: "language",
-        },
-        {
-          flag: "--industry <industry>",
-          description: "Industry",
-          sdkKey: "industry",
         },
         {
           flag: "--metadata <json>",
@@ -103,26 +87,10 @@ const customersResource: ResourceDef = {
           description: "Full name",
           sdkKey: "fullName",
         },
-        { flag: "--domain <domain>", description: "Domain", sdkKey: "domain" },
-        {
-          flag: "--website <url>",
-          description: "Website URL",
-          sdkKey: "website",
-        },
         {
           flag: "--timezone <tz>",
           description: "Timezone",
           sdkKey: "timezone",
-        },
-        {
-          flag: "--language <lang>",
-          description: "Language code",
-          sdkKey: "language",
-        },
-        {
-          flag: "--industry <industry>",
-          description: "Industry",
-          sdkKey: "industry",
         },
         {
           flag: "--metadata <json>",
@@ -686,7 +654,7 @@ const plansResource: ResourceDef = {
           flag: "--plan-id <id>",
           description: "Plan ID",
           required: true,
-          sdkKey: "planId",
+          sdkKey: "id",
         },
         {
           flag: "--feature-id <id>",
@@ -716,13 +684,13 @@ const plansResource: ResourceDef = {
           flag: "--overage-enabled <bool>",
           description: "Whether overage is enabled",
           parse: parseBool,
-          sdkKey: "overageEnabled",
+          sdkKey: "overage.enabled",
         },
         {
           flag: "--overage-unit-price <n>",
           description: "Overage unit price (fixed pricing)",
           parse: parseNumber,
-          sdkKey: "overageUnitPrice",
+          sdkKey: "overage.unitPrice",
         },
         {
           flag: "--pricing-mode <mode>",
@@ -751,7 +719,7 @@ const plansResource: ResourceDef = {
           flag: "--plan-id <id>",
           description: "Plan ID",
           required: true,
-          sdkKey: "planId",
+          sdkKey: "id",
         },
         {
           flag: "--feature-id <id>",
@@ -781,13 +749,13 @@ const plansResource: ResourceDef = {
           flag: "--overage-enabled <bool>",
           description: "Whether overage is enabled",
           parse: parseBool,
-          sdkKey: "overageEnabled",
+          sdkKey: "overage.enabled",
         },
         {
           flag: "--overage-unit-price <n>",
           description: "Overage unit price (fixed pricing)",
           parse: parseNumber,
-          sdkKey: "overageUnitPrice",
+          sdkKey: "overage.unitPrice",
         },
         {
           flag: "--pricing-mode <mode>",
@@ -816,7 +784,7 @@ const plansResource: ResourceDef = {
           flag: "--plan-id <id>",
           description: "Plan ID",
           required: true,
-          sdkKey: "planId",
+          sdkKey: "id",
         },
         {
           flag: "--feature-id <id>",
@@ -834,7 +802,7 @@ const plansResource: ResourceDef = {
           flag: "--plan-id <id>",
           description: "Plan ID",
           required: true,
-          sdkKey: "planId",
+          sdkKey: "id",
         },
         {
           flag: "--billing-interval <interval>",
@@ -878,24 +846,24 @@ const plansResource: ResourceDef = {
           flag: "--intro-offer-enabled <bool>",
           description: "Enable intro offer",
           parse: parseBool,
-          sdkKey: "introOfferEnabled",
+          sdkKey: "introOffer.enabled",
         },
         {
           flag: "--intro-offer-discount-type <type>",
           description: "Intro offer discount type: percentage or amount",
-          sdkKey: "introOfferDiscountType",
+          sdkKey: "introOffer.discountType",
         },
         {
           flag: "--intro-offer-discount-value <n>",
           description: "Intro offer discount value",
           parse: parseNumber,
-          sdkKey: "introOfferDiscountValue",
+          sdkKey: "introOffer.discountValue",
         },
         {
           flag: "--intro-offer-duration-cycles <n>",
           description: "Intro offer duration in cycles",
           parse: parseNumber,
-          sdkKey: "introOfferDurationCycles",
+          sdkKey: "introOffer.durationCycles",
         },
       ],
     },
@@ -907,7 +875,7 @@ const plansResource: ResourceDef = {
           flag: "--plan-id <id>",
           description: "Plan ID",
           required: true,
-          sdkKey: "planId",
+          sdkKey: "id",
         },
         {
           flag: "--price-id <id>",
@@ -949,24 +917,24 @@ const plansResource: ResourceDef = {
           flag: "--intro-offer-enabled <bool>",
           description: "Enable intro offer",
           parse: parseBool,
-          sdkKey: "introOfferEnabled",
+          sdkKey: "introOffer.enabled",
         },
         {
           flag: "--intro-offer-discount-type <type>",
           description: "Intro offer discount type: percentage or amount",
-          sdkKey: "introOfferDiscountType",
+          sdkKey: "introOffer.discountType",
         },
         {
           flag: "--intro-offer-discount-value <n>",
           description: "Intro offer discount value",
           parse: parseNumber,
-          sdkKey: "introOfferDiscountValue",
+          sdkKey: "introOffer.discountValue",
         },
         {
           flag: "--intro-offer-duration-cycles <n>",
           description: "Intro offer duration in cycles",
           parse: parseNumber,
-          sdkKey: "introOfferDurationCycles",
+          sdkKey: "introOffer.durationCycles",
         },
       ],
     },
@@ -978,7 +946,7 @@ const plansResource: ResourceDef = {
           flag: "--plan-id <id>",
           description: "Plan ID",
           required: true,
-          sdkKey: "planId",
+          sdkKey: "id",
         },
         {
           flag: "--price-id <id>",
@@ -996,7 +964,7 @@ const plansResource: ResourceDef = {
           flag: "--plan-id <id>",
           description: "Plan ID",
           required: true,
-          sdkKey: "planId",
+          sdkKey: "id",
         },
         {
           flag: "--price-id <id>",
@@ -1014,7 +982,7 @@ const plansResource: ResourceDef = {
           flag: "--plan-id <id>",
           description: "Plan ID",
           required: true,
-          sdkKey: "planId",
+          sdkKey: "id",
         },
         {
           flag: "--price-id <id>",
@@ -1040,7 +1008,7 @@ const plansResource: ResourceDef = {
           flag: "--plan-id <id>",
           description: "Plan ID",
           required: true,
-          sdkKey: "planId",
+          sdkKey: "id",
         },
         {
           flag: "--price-id <id>",
@@ -1093,7 +1061,7 @@ const featuresResource: ResourceDef = {
         },
         {
           flag: "--type <type>",
-          description: "Feature type: boolean, usage, or seats",
+          description: "Feature type: boolean, usage, seats, or quota",
           required: true,
           sdkKey: "type",
         },

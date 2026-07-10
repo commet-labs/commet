@@ -10,7 +10,42 @@ export interface ParamDef {
   description: string;
   required?: boolean;
   parse?: (value: string) => unknown;
+  /** Dot-separated path in the SDK params object, e.g. "overage.enabled". */
   sdkKey: string;
+}
+
+function commanderOptionKey(flag: string): string {
+  const longFlagMatch = flag.match(/--([a-z0-9-]+)/i);
+  if (!longFlagMatch?.[1]) {
+    throw new Error(`Cannot derive option name from flag: ${flag}`);
+  }
+  return longFlagMatch[1].replace(/-([a-z])/g, (_hyphen, letter: string) =>
+    letter.toUpperCase(),
+  );
+}
+
+function assignSdkKeyPath(
+  target: Record<string, unknown>,
+  sdkKey: string,
+  value: unknown,
+): void {
+  const segments = sdkKey.split(".");
+  const leafKey = segments.pop();
+  if (!leafKey) {
+    throw new Error(`Invalid sdkKey: ${sdkKey}`);
+  }
+  let current = target;
+  for (const segment of segments) {
+    const existing = current[segment];
+    if (typeof existing === "object" && existing !== null) {
+      current = existing as Record<string, unknown>;
+    } else {
+      const nested: Record<string, unknown> = {};
+      current[segment] = nested;
+      current = nested;
+    }
+  }
+  current[leafKey] = value;
 }
 
 export interface ActionDef {
@@ -66,13 +101,15 @@ export function createResourceCommand(def: ResourceDef): Command {
         } else {
           const built: Record<string, unknown> = {};
           for (const paramDef of actionDef.params) {
-            const rawValue = options[paramDef.sdkKey];
+            const rawValue = options[commanderOptionKey(paramDef.flag)];
             if (rawValue === undefined) {
               continue;
             }
-            built[paramDef.sdkKey] = paramDef.parse
-              ? paramDef.parse(rawValue)
-              : rawValue;
+            assignSdkKeyPath(
+              built,
+              paramDef.sdkKey,
+              paramDef.parse ? paramDef.parse(rawValue) : rawValue,
+            );
           }
           params = built;
         }
