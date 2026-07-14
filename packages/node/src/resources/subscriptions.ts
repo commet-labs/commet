@@ -33,6 +33,7 @@ export interface CreateSubscriptionParams {
   billingInterval?: BillingInterval | null;
   initialSeats?: Record<string, number>;
   skipTrial?: boolean;
+  customTrialDays?: number;
   introOffer?: {
     discountType: DiscountType;
     discountValue: number;
@@ -217,7 +218,7 @@ export class SubscriptionsResource {
     );
   }
 
-  /** Preview proration details for an immediate plan change (an upgrade or a longer interval) without applying it. Returns credit, charge, and net amount. Downgrades — a cheaper plan in the same group, or a shorter interval — are scheduled for the end of the current period instead of being prorated, so they return a 400 with code `plan_change_scheduled`; apply those via the change-plan endpoint. */
+  /** Preview proration details for an immediate plan change (an upgrade or a longer interval) without applying it. Returns credit, charge, and net amount. The target plan must belong to the same plan group as the current plan, otherwise a 400 with code `plans_not_in_same_group` is returned. A change between two free plans has nothing to prorate and returns a zero-amount estimate. Downgrades — a cheaper plan in the same group, or a shorter interval — are scheduled for the end of the current period instead of being prorated, so they return a 400 with code `plan_change_scheduled`; apply those via the change-plan endpoint. */
   async previewChange(
     params: PreviewChangePlanParams,
     options?: RequestOptions,

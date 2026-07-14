@@ -857,9 +857,13 @@ export interface TestClockBilling {
 export interface Transaction {
   id: string;
   invoiceId: string | null;
-  grossAmount: number;
-  subtotal: number;
+  /** Gross amount in USD cents. Null when the charge never settled in USD — a failed non-USD attempt has no exchange rate, so no USD figure exists; see presentmentAmount. */
+  grossAmount: number | null;
+  /** Subtotal in USD cents (gross minus tax). Null when grossAmount is null. */
+  subtotal: number | null;
   taxAmount: number | null;
+  /** Amount in the charge currency's smallest unit, as presented to the customer. Set for non-USD charges; null when the charge was made in USD. */
+  presentmentAmount: number | null;
   currency: string;
   /** The payment provider the charge was routed to: stripe, commet, or dlocal. */
   provider: PaymentProvider;
