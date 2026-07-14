@@ -1,5 +1,12 @@
 # commet
 
+## 3.1.7
+
+### Patch Changes
+
+- Updated dependencies [08e8ac1]
+  - @commet/node@7.7.0
+
 ## 3.1.6
 
 ### Patch Changes
