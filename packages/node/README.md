@@ -110,6 +110,10 @@ commet pull
 
 This generates type-safe autocomplete for your plan codes, feature codes, and seat types.
 
+## Update notifications
+
+During local development, the SDK checks npm once per process and warns when a newer `@commet/node` version is available. The check never runs in production or CI and does not block SDK initialization. Set `COMMET_NO_UPDATE_CHECK=1` to disable it.
+
 ## Documentation
 
 Visit [commet.co/docs](https://commet.co/docs) for:
