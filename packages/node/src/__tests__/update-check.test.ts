@@ -13,6 +13,7 @@ function distTagsResponse(latest: unknown, status = 200): Response {
 }
 
 afterEach(() => {
+  Reflect.deleteProperty(globalThis, Symbol.for("@commet/node.update-check"));
   vi.unstubAllEnvs();
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
@@ -23,6 +24,8 @@ describe("SDK update check", () => {
     expect(isNewerVersion("7.7.0", "7.1.0")).toBe(true);
     expect(isNewerVersion("7.7.1", "7.7.0")).toBe(true);
     expect(isNewerVersion("8.0.0", "7.7.0")).toBe(true);
+    expect(isNewerVersion("7.7.0", "7.7.0-beta.1")).toBe(true);
+    expect(isNewerVersion("7.7.0-beta.10", "7.7.0-beta.2")).toBe(true);
     expect(isNewerVersion("7.7.0", "7.7.0")).toBe(false);
     expect(isNewerVersion("7.6.0", "7.7.0")).toBe(false);
     expect(isNewerVersion("canary", "7.7.0")).toBe(false);
@@ -96,11 +99,16 @@ describe("SDK update check", () => {
     const fetchMock = vi.fn().mockResolvedValue(distTagsResponse("7.7.0"));
     vi.stubGlobal("fetch", fetchMock);
     vi.spyOn(console, "warn").mockImplementation(() => {});
-    const { scheduleSdkUpdateCheck } = await import("../utils/update-check");
+    const firstSdkModule = await import("../utils/update-check");
 
-    scheduleSdkUpdateCheck();
-    scheduleSdkUpdateCheck();
-
+    firstSdkModule.scheduleSdkUpdateCheck();
     await vi.waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+
+    vi.resetModules();
+    const secondSdkModule = await import("../utils/update-check");
+    secondSdkModule.scheduleSdkUpdateCheck();
+    await new Promise((resolve) => setImmediate(resolve));
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });
