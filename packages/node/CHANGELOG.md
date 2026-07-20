@@ -1,5 +1,11 @@
 # @commet/node
 
+## 7.8.0
+
+### Minor Changes
+
+- 71b4c21: Warn during local development when a newer `@commet/node` version is available.
+
 ## 7.7.0
 
 ### Minor Changes
