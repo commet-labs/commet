@@ -134,9 +134,11 @@ export type {
 // Preserved hand-written resources (custom logic, not generated)
 export type {
   CheckUsageParams,
+  SetUsageParams,
   TrackModelTokensParams,
   TrackParams,
   TrackUsageParams,
+  UsageAdjustment,
   UsageCheckDenialReason,
   UsageCheckResult,
   UsageEvent,
@@ -209,6 +211,7 @@ export type {
   BalanceTopup,
   BulkSeatUpdate,
   CanceledSubscription,
+  ClaimLink,
   CreatedApiKey,
   CreatedInvoice,
   CreditGrant,

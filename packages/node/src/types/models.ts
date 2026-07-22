@@ -103,6 +103,14 @@ export interface CanceledSubscription {
   livemode: boolean;
 }
 
+export interface ClaimLink {
+  url: string;
+  /** @format date-time */
+  expiresAt: string;
+  object: "claim_link";
+  livemode: boolean;
+}
+
 export interface CreatedApiKey {
   id: string;
   name: string;
@@ -669,6 +677,7 @@ export interface PromoCode {
   discountType: DiscountType;
   discountValue: number;
   durationCycles: number | null;
+  billingInterval: BillingInterval | null;
   maxRedemptions: number | null;
   expiresAt: string | null;
   isActive: boolean;
@@ -821,6 +830,8 @@ export interface Subscription {
   billingDayOfMonth: number | null;
   nextBillingDate: string | null;
   checkoutUrl: string | null;
+  /** Payment provider resolved for this checkout when the subscription response was created. This is an informational snapshot and may differ when the checkout is loaded if its country or the organization's routing changes. */
+  checkoutProvider?: PaymentProvider | null;
   /** @format date-time */
   createdAt: string;
   /** @format date-time */
@@ -850,6 +861,8 @@ export interface TestClockBilling {
   customersFound: number;
   enqueued: number;
   failed: number;
+  dunningRetried: number;
+  dunningFailed: number;
   object: "test_clock";
   livemode: boolean;
 }

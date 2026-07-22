@@ -11,6 +11,7 @@ import { PlanGroupsResource } from "./resources/plan-groups";
 import { PlansResource } from "./resources/plans";
 import { PortalResource } from "./resources/portal";
 import { PromoCodesResource } from "./resources/promo-codes";
+import { ProvisioningResource } from "./resources/provisioning";
 import { QuotaResource } from "./resources/quota";
 import { SeatsResource } from "./resources/seats";
 import { SubscriptionsResource } from "./resources/subscriptions";
@@ -32,6 +33,7 @@ export class GeneratedResources {
   public plans!: PlansResource;
   public portal!: PortalResource;
   public promoCodes!: PromoCodesResource;
+  public provisioning!: ProvisioningResource;
   public quota!: QuotaResource;
   public seats!: SeatsResource;
   public subscriptions!: SubscriptionsResource;
@@ -52,6 +54,7 @@ export class GeneratedResources {
     this.plans = new PlansResource(http);
     this.portal = new PortalResource(http);
     this.promoCodes = new PromoCodesResource(http);
+    this.provisioning = new ProvisioningResource(http);
     this.quota = new QuotaResource(http);
     this.seats = new SeatsResource(http);
     this.subscriptions = new SubscriptionsResource(http);

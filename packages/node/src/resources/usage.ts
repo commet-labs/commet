@@ -63,6 +63,29 @@ export interface CheckUsageParams {
   quantity: number;
 }
 
+export interface SetUsageParams {
+  customerId: CustomerID;
+  feature: string;
+  value: number;
+  idempotencyKey?: string;
+  reason?: string;
+}
+
+export interface UsageAdjustment {
+  id: EventID;
+  feature: string;
+  value: number;
+  previousValue: number;
+  adjustment: number;
+  customerId: CustomerID;
+  idempotencyKey: string | null;
+  reason: string | null;
+  ts: string;
+  createdAt: string;
+  object: "usage_event";
+  livemode: boolean;
+}
+
 export interface UsageCheckResult {
   allowed: boolean;
   consumptionModel: ConsumptionModel;
@@ -132,5 +155,13 @@ export class UsageResource {
     options?: RequestOptions,
   ): Promise<ApiResponse<UsageCheckResult>> {
     return this.httpClient.post("/usage/check", params, options);
+  }
+
+  /** Set a metered feature's usage to an exact value for the current period. */
+  async set(
+    params: SetUsageParams,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<UsageAdjustment>> {
+    return this.httpClient.put("/usage", params, options);
   }
 }

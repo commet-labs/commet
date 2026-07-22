@@ -24,8 +24,10 @@ export class TestClockResource {
     return this.httpClient.post("/test-clock", params, options);
   }
 
-  /** Discovers customers due for billing at the org's current (simulated) time and enqueues a billing cycle for each — renewals, expired trials, pending cancellations. Enqueueing is asynchronous. Sandbox only. */
-  async processBilling(): Promise<ApiResponse<TestClockBilling>> {
-    return this.httpClient.post("/test-clock/process-billing", {});
+  /** Discovers customers due for billing at the org's current (simulated) time and enqueues a billing cycle for each — renewals, expired trials, pending cancellations. Also fires any dunning retry whose scheduled time has passed. Enqueueing is asynchronous. Sandbox only. */
+  async processBilling(
+    options?: RequestOptions,
+  ): Promise<ApiResponse<TestClockBilling>> {
+    return this.httpClient.post("/test-clock/process-billing", {}, options);
   }
 }

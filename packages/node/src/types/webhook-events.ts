@@ -139,7 +139,7 @@ export interface SubscriptionReactivatedData {
   provider: PaymentProvider;
 }
 
-/** Fired when a subscription is actually terminated at the end of the billing period. The status is now canceled and access should be revoked. This event is NOT fired when cancellation is scheduled — that triggers subscription.updated instead. See the cancellation lifecycle below. */
+/** Fired when a subscription is actually terminated. A scheduled cancellation fires it at the end of the billing period; immediate cancellations, full refunds (cancelReason refund), and exhausted dunning retries (cancelReason dunning_exhausted) fire it right away. The status is now canceled and access should be revoked. This event is NOT fired when cancellation is scheduled — that triggers subscription.updated instead. See the cancellation lifecycle below. */
 export interface SubscriptionCanceledData {
   /** The subscription ID. */
   subscriptionId: string;
@@ -147,11 +147,11 @@ export interface SubscriptionCanceledData {
   customerId: string;
   /** Always "canceled" for this event. Revoke access when you receive this. */
   status: string;
-  /** ISO 8601 datetime when the customer originally requested cancellation. */
+  /** ISO 8601 datetime when the cancellation was requested or triggered. */
   canceledAt?: string;
-  /** The reason for cancellation, if provided. */
+  /** The reason for cancellation, if provided. Set by Commet on system-initiated terminations: "refund" (full refund of a subscription invoice) or "dunning_exhausted" (all payment retries failed). */
   cancelReason: string | null;
-  /** ISO 8601 datetime when the subscription ended (matches the billing period end). */
+  /** ISO 8601 datetime when the subscription ended. Matches the billing period end for scheduled cancellations; for immediate terminations it is the moment of termination. */
   endDate?: string;
 }
 

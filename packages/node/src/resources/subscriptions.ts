@@ -39,6 +39,7 @@ export interface CreateSubscriptionParams {
     discountValue: number;
     durationCycles: number;
   };
+  promoCode?: string;
   name?: string;
   /** @format date-time */
   startDate?: string;
