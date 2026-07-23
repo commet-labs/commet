@@ -1,5 +1,11 @@
 # @commet/node
 
+## 7.10.0
+
+### Minor Changes
+
+- Add the `provider` option to subscription creation so callers can override payment routing.
+
 ## 7.9.0
 
 ### Minor Changes

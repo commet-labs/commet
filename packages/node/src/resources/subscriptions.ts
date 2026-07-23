@@ -2,6 +2,7 @@ import type { ApiResponse, RequestOptions } from "../types/common";
 import type {
   BillingInterval,
   DiscountType,
+  PaymentProvider,
   SubscriptionStatus,
 } from "../types/enums";
 import type {
@@ -40,6 +41,8 @@ export interface CreateSubscriptionParams {
     durationCycles: number;
   };
   promoCode?: string;
+  /** Payment provider for the initial checkout. Overrides country routing when present. */
+  provider?: PaymentProvider;
   name?: string;
   /** @format date-time */
   startDate?: string;
