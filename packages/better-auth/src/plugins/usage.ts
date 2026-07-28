@@ -45,21 +45,20 @@ export const usage =
             const result = await commet.usage.track(
               {
                 customerId: userId,
-                feature: ctx.body.feature,
+                featureCode: ctx.body.feature,
                 value: ctx.body.value,
-                idempotencyKey: ctx.body.idempotencyKey,
-                properties: ctx.body.properties,
+                properties: ctx.body.properties
+                  ? Object.entries(ctx.body.properties).map(
+                      ([property, value]) => ({ property, value }),
+                    )
+                  : undefined,
               },
-              {},
+              ctx.body.idempotencyKey
+                ? { idempotencyKey: ctx.body.idempotencyKey }
+                : undefined,
             );
 
-            if (!result.success) {
-              throw new APIError("INTERNAL_SERVER_ERROR", {
-                message: result.error?.message || "Failed to track usage",
-              });
-            }
-
-            return ctx.json(result.data ?? null);
+            return ctx.json(result);
           } catch (e: unknown) {
             if (e instanceof APIError) {
               throw e;

@@ -240,7 +240,7 @@ describe("CommetHTTPClient", () => {
             jsonResponse({ success: true, data: { id: "1" } }),
           );
 
-        const promise = client.get("/test");
+        const promise = client.get<{ success: boolean }>("/test");
         await vi.advanceTimersByTimeAsync(10_000);
         const result = await promise;
         expect(result.success).toBe(true);
@@ -277,7 +277,7 @@ describe("CommetHTTPClient", () => {
           jsonResponse({ success: true, data: { id: "1" } }),
         );
 
-      const promise = client.get("/test");
+      const promise = client.get<{ success: boolean }>("/test");
       await vi.advanceTimersByTimeAsync(6_900);
       expect(fetch).toHaveBeenCalledTimes(1);
       await vi.advanceTimersByTimeAsync(200);
@@ -303,7 +303,7 @@ describe("CommetHTTPClient", () => {
           jsonResponse({ success: true, data: { id: "1" } }),
         );
 
-      const promise = client.get("/test");
+      const promise = client.get<{ success: boolean }>("/test");
       await vi.advanceTimersByTimeAsync(30_100);
       const result = await promise;
       expect(result.success).toBe(true);
@@ -343,7 +343,7 @@ describe("CommetHTTPClient", () => {
         .mockRejectedValueOnce(new TypeError("fetch failed"))
         .mockResolvedValueOnce(jsonResponse({ success: true, data: {} }));
 
-      const promise = client.get("/test");
+      const promise = client.get<{ success: boolean }>("/test");
       await vi.advanceTimersByTimeAsync(10_000);
       const result = await promise;
       expect(result.success).toBe(true);
@@ -375,7 +375,7 @@ describe("CommetHTTPClient", () => {
         .mockRejectedValueOnce(abortError)
         .mockResolvedValueOnce(jsonResponse({ success: true, data: {} }));
 
-      const promise = client.get("/test");
+      const promise = client.get<{ success: boolean }>("/test");
       await vi.advanceTimersByTimeAsync(10_000);
       const result = await promise;
       expect(result.success).toBe(true);
@@ -393,7 +393,7 @@ describe("CommetHTTPClient", () => {
         .mockRejectedValueOnce(timeoutError)
         .mockResolvedValueOnce(jsonResponse({ success: true, data: {} }));
 
-      const promise = client.get("/test");
+      const promise = client.get<{ success: boolean }>("/test");
       await vi.advanceTimersByTimeAsync(10_000);
       const result = await promise;
       expect(result.success).toBe(true);

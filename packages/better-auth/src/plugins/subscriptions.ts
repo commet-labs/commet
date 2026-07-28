@@ -49,15 +49,7 @@ export const subscriptions =
               customerId: userId,
             });
 
-            if (!subscription.success) {
-              throw new APIError("INTERNAL_SERVER_ERROR", {
-                message:
-                  subscription.error?.message ||
-                  "Failed to retrieve subscription",
-              });
-            }
-
-            return ctx.json(subscription.data ?? null);
+            return ctx.json(subscription);
           } catch (e: unknown) {
             if (e instanceof APIError) {
               throw e;
@@ -98,26 +90,19 @@ export const subscriptions =
               customerId: userId,
             });
 
-            if (!currentSub.success || !currentSub.data) {
+            if (!currentSub) {
               throw new APIError("BAD_REQUEST", {
                 message: "No active subscription found",
               });
             }
 
             const result = await commet.subscriptions.cancel({
-              id: currentSub.data.id,
+              id: currentSub.id,
               reason: ctx.body?.reason,
               immediate: ctx.body?.immediate,
             });
 
-            if (!result.success) {
-              throw new APIError("INTERNAL_SERVER_ERROR", {
-                message:
-                  result.error?.message || "Failed to cancel subscription",
-              });
-            }
-
-            return ctx.json(result.data ?? null);
+            return ctx.json(result);
           } catch (e: unknown) {
             if (e instanceof APIError) {
               throw e;

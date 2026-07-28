@@ -1,11 +1,5 @@
-import type { ApiResponse, RequestOptions } from "../types/common";
+import type { RequestOptions } from "../types/common";
 import type {
-  BillingInterval,
-  ConsumptionModel,
-  DiscountType,
-} from "../types/enums";
-import type {
-  DefaultPlanPrice,
   DeletedObject,
   DeletedPlanRegionalPricing,
   Plan,
@@ -13,62 +7,9 @@ import type {
   PlanPrice,
   PlanRegionalPricing,
   PlanRegionalPricingResult,
-  PlanVisibility,
   RemovedPlanFeature,
 } from "../types/models";
 import type { CommetHTTPClient } from "../utils/http";
-
-export interface ListPlansParams {
-  includePrivate?: "true" | "false";
-}
-
-export interface GetPlanParams {
-  id: string;
-}
-
-export interface CreatePlanParams {
-  name: string;
-  code: string;
-  description?: string;
-  consumptionModel?: ConsumptionModel;
-  isPublic?: boolean;
-  isFree?: boolean;
-  blockOnExhaustion?: boolean;
-  planGroupId?: string;
-  metadata?: Record<string, unknown>;
-}
-
-export interface UpdatePlanParams {
-  id: string;
-  name?: string;
-  description?: string | null;
-  metadata?: Record<string, unknown>;
-  isPublic?: boolean;
-}
-
-export interface DeletePlanParams {
-  id: string;
-}
-
-export interface SetPlanVisibilityParams {
-  id: string;
-  isPublic: boolean;
-}
-
-export interface AddPlanFeatureParams {
-  id: string;
-  featureId: string;
-  enabled?: boolean;
-  includedAmount?: number;
-  unlimited?: boolean;
-  overage?: {
-    enabled: boolean;
-    unitPrice: number;
-  };
-  creditsPerUnit?: number | null;
-  pricingMode?: "fixed" | "ai_model";
-  margin?: number | null;
-}
 
 export interface UpdatePlanFeatureParams {
   id: string;
@@ -88,41 +29,19 @@ export interface RemovePlanFeatureParams {
   featureId: string;
 }
 
-export interface AddPlanPriceParams {
+export interface AddPlanFeatureParams {
   id: string;
-  billingInterval: BillingInterval;
-  price: number;
-  trialDays?: number;
-  isDefault?: boolean;
-  includedBalance?: number | null;
-  includedCredits?: number | null;
-  introOffer?: {
-    enabled: boolean;
-    discountType?: DiscountType | null;
-    discountValue?: number | null;
-    durationCycles?: number | null;
-  };
-}
-
-export interface UpdatePlanPriceParams {
-  id: string;
-  priceId: string;
-  price?: number;
-  isDefault?: boolean;
-  trialDays?: number;
-  includedBalance?: number | null;
-  includedCredits?: number | null;
-  introOffer?: {
+  featureId: string;
+  enabled?: boolean;
+  includedAmount?: number;
+  unlimited?: boolean;
+  overage?: {
     enabled?: boolean;
-    discountType?: DiscountType | null;
-    discountValue?: number | null;
-    durationCycles?: number | null;
+    unitPrice?: number;
   };
-}
-
-export interface DeletePlanPriceParams {
-  id: string;
-  priceId: string;
+  creditsPerUnit?: number | null;
+  pricingMode?: "fixed" | "ai_model";
+  margin?: number | null;
 }
 
 export interface SetDefaultPlanPriceParams {
@@ -139,6 +58,137 @@ export interface UpsertRegionalPricesParams {
     includedBalance?: number;
   }>;
 }
+
+export interface DeleteRegionalPricesParams {
+  id: string;
+  priceId: string;
+}
+
+export interface UpdatePlanPriceParams {
+  id: string;
+  priceId: string;
+  price?: number;
+  isDefault?: boolean;
+  trialDays?: number;
+  includedBalance?: number | null;
+  includedCredits?: number | null;
+  /** Metadata keys to merge into the existing price metadata. */
+  metadata?: Record<string, unknown>;
+  marketPrices?: Array<{
+    marketGroupId: string;
+    currency:
+      | "usd"
+      | "ars"
+      | "brl"
+      | "clp"
+      | "cop"
+      | "pen"
+      | "uyu"
+      | "pyg"
+      | "bob"
+      | "mxn"
+      | "cad"
+      | "eur"
+      | "jpy"
+      | "cny"
+      | "krw"
+      | "hkd"
+      | "sgd"
+      | "twd"
+      | "inr"
+      | "thb";
+    price: number;
+  }>;
+}
+
+export interface DeletePlanPriceParams {
+  id: string;
+  priceId: string;
+}
+
+export type AddPlanPriceParams =
+  | {
+      id: string;
+      billingInterval:
+        | "weekly"
+        | "monthly"
+        | "quarterly"
+        | "yearly"
+        | "one_time";
+      metadata?: Record<string, unknown>;
+      price: number;
+      trialDays?: number;
+      isDefault?: boolean;
+      includedBalance?: number | null;
+      includedCredits?: number | null;
+      marketPrices?: Array<{
+        /** Public ID of a reusable pricing market group. */
+        marketGroupId: string;
+        /** Presentment currency configured for this plan and market. */
+        currency:
+          | "usd"
+          | "ars"
+          | "brl"
+          | "clp"
+          | "cop"
+          | "pen"
+          | "uyu"
+          | "pyg"
+          | "bob"
+          | "mxn"
+          | "cad"
+          | "eur"
+          | "jpy"
+          | "cny"
+          | "krw"
+          | "hkd"
+          | "sgd"
+          | "twd"
+          | "inr"
+          | "thb";
+        /** Market price in the currency's minor unit. */
+        price: number;
+      }>;
+    }
+  | {
+      id: string;
+      billingInterval:
+        | "weekly"
+        | "monthly"
+        | "quarterly"
+        | "yearly"
+        | "one_time";
+      metadata?: Record<string, unknown>;
+      inheritsFromPriceId: string;
+      marketPrices: Array<{
+        /** Public ID of a reusable pricing market group. */
+        marketGroupId: string;
+        /** Presentment currency configured for this plan and market. */
+        currency:
+          | "usd"
+          | "ars"
+          | "brl"
+          | "clp"
+          | "cop"
+          | "pen"
+          | "uyu"
+          | "pyg"
+          | "bob"
+          | "mxn"
+          | "cad"
+          | "eur"
+          | "jpy"
+          | "cny"
+          | "krw"
+          | "hkd"
+          | "sgd"
+          | "twd"
+          | "inr"
+          | "thb";
+        /** Market price in the currency's minor unit. */
+        price: number;
+      }>;
+    };
 
 export interface SetPlanRegionalPricingParams {
   id: string;
@@ -173,90 +223,55 @@ export interface SetPlanRegionalPricingParams {
     featureId: string;
     overageUnitPrice: number;
   }>;
-  introOffers?: Array<{
-    priceId: string;
-    discountType: DiscountType;
-    discountValue: number;
-    durationCycles: number;
-  }>;
 }
 
-export interface DeleteRegionalPricesParams {
+export interface GetPlanParams {
   id: string;
-  priceId: string;
+}
+
+export interface UpdatePlanParams {
+  id: string;
+  name?: string;
+  description?: string | null;
+  metadata?: Record<string, unknown>;
+  isPublic?: boolean;
+}
+
+export interface DeletePlanParams {
+  id: string;
+}
+
+export interface SetPlanVisibilityParams {
+  id: string;
+  isPublic: boolean;
+}
+
+export interface ListPlansParams {
+  includePrivate?: boolean;
+}
+
+export interface CreatePlanParams {
+  name: string;
+  code: string;
+  description?: string;
+  consumptionModel?: "metered" | "credits" | "balance";
+  isPublic?: boolean;
+  isFree?: boolean;
+  blockOnExhaustion?: boolean;
+  planGroupId?: string;
+  metadata?: Record<string, unknown>;
 }
 
 export class PlansResource {
   constructor(private httpClient: CommetHTTPClient) {}
 
-  /** List all plans with their prices and features. Optionally include private plans. */
-  async list(
-    params?: ListPlansParams,
-    options?: RequestOptions,
-  ): Promise<ApiResponse<Array<Plan>>> {
-    return this.httpClient.get("/plans", params, options);
-  }
-
-  /** Get detailed plan information by code or ID. */
-  async get(
-    params: GetPlanParams,
-    options?: RequestOptions,
-  ): Promise<ApiResponse<Plan>> {
-    const { id } = params;
-    return this.httpClient.get(`/plans/${id}`, undefined, options);
-  }
-
-  /** Create a new plan with optional consumption model, visibility, and plan group assignment. */
-  async create(
-    params: CreatePlanParams,
-    options?: RequestOptions,
-  ): Promise<ApiResponse<Plan>> {
-    return this.httpClient.post("/plans/manage", params, options);
-  }
-
-  /** Update a plan's name, description, visibility, or metadata. */
-  async update(
-    params: UpdatePlanParams,
-    options?: RequestOptions,
-  ): Promise<ApiResponse<Plan>> {
-    const { id, ...rest } = params;
-    return this.httpClient.put(`/plans/${id}/manage`, rest, options);
-  }
-
-  /** Soft-delete a plan. */
-  async delete(
-    params: DeletePlanParams,
-    options?: RequestOptions,
-  ): Promise<ApiResponse<DeletedObject>> {
-    const { id } = params;
-    return this.httpClient.delete(`/plans/${id}/manage`, undefined, options);
-  }
-
-  /** Toggle a plan between public and private. */
-  async setVisibility(
-    params: SetPlanVisibilityParams,
-    options?: RequestOptions,
-  ): Promise<ApiResponse<PlanVisibility>> {
-    const { id, ...rest } = params;
-    return this.httpClient.put(`/plans/${id}/visibility`, rest, options);
-  }
-
-  /** Attach a feature to a plan with limits, overage, and credits configuration. */
-  async addFeature(
-    params: AddPlanFeatureParams,
-    options?: RequestOptions,
-  ): Promise<ApiResponse<PlanFeature>> {
-    const { id, ...rest } = params;
-    return this.httpClient.post(`/plans/${id}/features`, rest, options);
-  }
-
   /** Update limits, overage, or enabled status of a feature on a plan. */
   async updateFeature(
     params: UpdatePlanFeatureParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<PlanFeature>> {
+  ): Promise<PlanFeature> {
     const { id, featureId, ...rest } = params;
-    return this.httpClient.put(
+    return this.httpClient.patch(
       `/plans/${id}/features/${featureId}`,
       rest,
       options,
@@ -267,7 +282,7 @@ export class PlansResource {
   async removeFeature(
     params: RemovePlanFeatureParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<RemovedPlanFeature>> {
+  ): Promise<RemovedPlanFeature> {
     const { id, featureId } = params;
     return this.httpClient.delete(
       `/plans/${id}/features/${featureId}`,
@@ -276,42 +291,20 @@ export class PlansResource {
     );
   }
 
-  /** Add a billing interval price to a plan with optional trial days and included balance/credits. */
-  async addPrice(
-    params: AddPlanPriceParams,
+  /** Attach a feature to a plan with limits, overage, and credits configuration. */
+  async addFeature(
+    params: AddPlanFeatureParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<PlanPrice>> {
+  ): Promise<PlanFeature> {
     const { id, ...rest } = params;
-    return this.httpClient.post(`/plans/${id}/prices`, rest, options);
+    return this.httpClient.post(`/plans/${id}/features`, rest, options);
   }
 
-  /** Update an existing price on a plan. */
-  async updatePrice(
-    params: UpdatePlanPriceParams,
-    options?: RequestOptions,
-  ): Promise<ApiResponse<PlanPrice>> {
-    const { id, priceId, ...rest } = params;
-    return this.httpClient.put(`/plans/${id}/prices/${priceId}`, rest, options);
-  }
-
-  /** Remove a price from a plan. */
-  async deletePrice(
-    params: DeletePlanPriceParams,
-    options?: RequestOptions,
-  ): Promise<ApiResponse<DeletedObject>> {
-    const { id, priceId } = params;
-    return this.httpClient.delete(
-      `/plans/${id}/prices/${priceId}`,
-      undefined,
-      options,
-    );
-  }
-
-  /** Set a specific price as the default for its plan. Unsets previous default. */
+  /** Set a specific price as the default and return the updated plan price. */
   async setDefaultPrice(
     params: SetDefaultPlanPriceParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<DefaultPlanPrice>> {
+  ): Promise<PlanPrice> {
     const { id, priceId } = params;
     return this.httpClient.put(
       `/plans/${id}/prices/${priceId}/default`,
@@ -324,7 +317,7 @@ export class PlansResource {
   async setRegionalPrices(
     params: UpsertRegionalPricesParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<PlanRegionalPricing>> {
+  ): Promise<PlanRegionalPricing> {
     const { id, priceId, ...rest } = params;
     return this.httpClient.put(
       `/plans/${id}/prices/${priceId}/regional`,
@@ -333,25 +326,114 @@ export class PlansResource {
     );
   }
 
-  /** Configure a plan's regional pricing for one currency. USD configures the United States variant; exchangeRate acts as its price multiplier. Sending only currency and exchangeRate derives every regional value (base price, included balance, feature overage, intro offer) from the default USD value. Optional per-price and per-feature overrides are stored as manual values. */
-  async setRegionalPricing(
-    params: SetPlanRegionalPricingParams,
-    options?: RequestOptions,
-  ): Promise<ApiResponse<PlanRegionalPricingResult>> {
-    const { id, ...rest } = params;
-    return this.httpClient.put(`/plans/${id}/regional`, rest, options);
-  }
-
-  /** Remove all regional currency overrides for a plan price. */
+  /** Remove all regional currency overrides for a plan price. The request is rejected while billable subscriptions depend on an override. */
   async deleteRegionalPrices(
     params: DeleteRegionalPricesParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<DeletedPlanRegionalPricing>> {
+  ): Promise<DeletedPlanRegionalPricing> {
     const { id, priceId } = params;
     return this.httpClient.delete(
       `/plans/${id}/prices/${priceId}/regional`,
       undefined,
       options,
     );
+  }
+
+  /** Update a base price or market price variant. Removing a base market override is rejected while a variant depends on it. Offer terms are managed through Offers. */
+  async updatePrice(
+    params: UpdatePlanPriceParams,
+    options?: RequestOptions,
+  ): Promise<PlanPrice> {
+    const { id, priceId, ...rest } = params;
+    return this.httpClient.patch(
+      `/plans/${id}/prices/${priceId}`,
+      rest,
+      options,
+    );
+  }
+
+  /** Archive a price for new subscriptions. Existing subscriptions that selected it continue using its current catalog value. */
+  async deletePrice(
+    params: DeletePlanPriceParams,
+    options?: RequestOptions,
+  ): Promise<DeletedObject> {
+    const { id, priceId } = params;
+    return this.httpClient.delete(
+      `/plans/${id}/prices/${priceId}`,
+      undefined,
+      options,
+    );
+  }
+
+  /** Add a base price or a selectable market price variant. Variants inherit their base price outside the markets they override. Configure introductory and promotional benefits through Offers. */
+  async addPrice(
+    params: AddPlanPriceParams,
+    options?: RequestOptions,
+  ): Promise<PlanPrice> {
+    const { id, ...rest } = params;
+    return this.httpClient.post(`/plans/${id}/prices`, rest, options);
+  }
+
+  /** Configure regional prices and feature overage values for one currency. Currency-specific offer terms are managed through Offers. */
+  async setRegionalPricing(
+    params: SetPlanRegionalPricingParams,
+    options?: RequestOptions,
+  ): Promise<PlanRegionalPricingResult> {
+    const { id, ...rest } = params;
+    return this.httpClient.put(`/plans/${id}/regional`, rest, options);
+  }
+
+  /** Get a plan with public price IDs and their automatic introductory offer IDs. */
+  async get(params: GetPlanParams, options?: RequestOptions): Promise<Plan> {
+    const { id } = params;
+    return this.httpClient.get(`/plans/${id}`, undefined, options);
+  }
+
+  /** Update a plan's name, description, visibility, or metadata. */
+  async update(
+    params: UpdatePlanParams,
+    options?: RequestOptions,
+  ): Promise<Plan> {
+    const { id, ...rest } = params;
+    return this.httpClient.patch(`/plans/${id}`, rest, options);
+  }
+
+  /** Soft-delete a plan. */
+  async delete(
+    params: DeletePlanParams,
+    options?: RequestOptions,
+  ): Promise<DeletedObject> {
+    const { id } = params;
+    return this.httpClient.delete(`/plans/${id}`, undefined, options);
+  }
+
+  /** Set a plan's public visibility and return the updated plan. */
+  async setVisibility(
+    params: SetPlanVisibilityParams,
+    options?: RequestOptions,
+  ): Promise<Plan> {
+    const { id, ...rest } = params;
+    return this.httpClient.put(`/plans/${id}/visibility`, rest, options);
+  }
+
+  /** List plans with public price IDs and their automatic introductory offer IDs. */
+  async list(
+    params?: ListPlansParams,
+    options?: RequestOptions,
+  ): Promise<{
+    object: "list";
+    data: Array<Plan>;
+    hasMore: boolean;
+    nextCursor?: string;
+  }> {
+    return this.httpClient.get("/plans", params, options);
+  }
+
+  /** Create a new plan with optional consumption model, visibility, and plan group assignment. */
+  async create(
+    params: CreatePlanParams,
+    options?: RequestOptions,
+  ): Promise<Plan> {
+    return this.httpClient.post("/plans", params, options);
   }
 }

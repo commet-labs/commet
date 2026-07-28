@@ -42,16 +42,8 @@ export const portal =
               customerId: userId,
             });
 
-            if (!portalAccess.success || !portalAccess.data) {
-              throw new APIError("INTERNAL_SERVER_ERROR", {
-                message:
-                  portalAccess.error?.message ||
-                  "Failed to generate portal URL",
-              });
-            }
-
             // Append return URL if configured
-            let portalUrl = portalAccess.data.portalUrl;
+            let portalUrl = portalAccess.portalUrl;
             if (returnUrl) {
               const url = new URL(portalUrl);
               url.searchParams.set("return_url", returnUrl);

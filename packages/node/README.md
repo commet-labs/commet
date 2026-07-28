@@ -60,7 +60,7 @@ await commet.subscriptions.create({
 
 // Track usage events
 await commet.usage.track({
-  feature: 'api_call',
+  featureCode: 'api_call',
   value: 1,
   customerId: 'cus_123'
 });
@@ -86,9 +86,9 @@ const projects = await commet.quota.get({
 });
 
 // Check feature access
-const access = await commet.featureAccess.canUse({
+const access = await commet.usage.check({
   customerId: 'cus_123',
-  code: 'api_calls'
+  featureCode: 'api_calls'
 });
 
 // Generate customer portal link

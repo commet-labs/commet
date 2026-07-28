@@ -1,13 +1,36 @@
-import type { WebhookData } from "@commet/node";
+import type {
+  CustomerStateChangedData,
+  PaymentReceivedData,
+  PaymentRecoveredData,
+  SubscriptionActivatedData,
+  SubscriptionReactivatedData,
+  UsageRecordedData,
+} from "@commet/node";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db/drizzle";
 import { type BillingFeature, billingState, user } from "@/lib/db/schema";
 
-export function readExternalUserId(data: WebhookData): string | null {
+function readStringProperty(data: unknown, property: string): string | null {
+  if (
+    typeof data !== "object" ||
+    data === null ||
+    !(property in data) ||
+    typeof data[property as keyof typeof data] !== "string"
+  ) {
+    return null;
+  }
+
+  return data[property as keyof typeof data] as string;
+}
+
+export function readCustomerId(data: unknown): string | null {
+  return readStringProperty(data, "customerId");
+}
+
+export function readExternalUserId(data: unknown): string | null {
   const candidates = [
-    data.externalId,
-    data._customerExternalId,
-    data.customerId,
+    readStringProperty(data, "externalId"),
+    readCustomerId(data),
   ];
   return (
     candidates.find(
@@ -16,7 +39,7 @@ export function readExternalUserId(data: WebhookData): string | null {
   );
 }
 
-function requireExternalUserId(data: WebhookData): string {
+function requireExternalUserId(data: { customerId: string }): string {
   const externalId = readExternalUserId(data);
   if (!externalId) {
     throw new Error(
@@ -27,7 +50,7 @@ function requireExternalUserId(data: WebhookData): string {
   return externalId;
 }
 
-async function resolveLocalUser(data: WebhookData) {
+async function resolveLocalUser(data: { customerId: string }) {
   const userId = requireExternalUserId(data);
   const [localUser] = await db
     .select({ id: user.id, email: user.email, name: user.name })
@@ -42,7 +65,7 @@ async function resolveLocalUser(data: WebhookData) {
   return localUser;
 }
 
-function readPlanName(data: WebhookData): string | null {
+function readPlanName(data: CustomerStateChangedData): string | null {
   const plan = data.plan;
   if (
     plan &&
@@ -55,26 +78,11 @@ function readPlanName(data: WebhookData): string | null {
   return null;
 }
 
-function isBillingFeature(value: unknown): value is BillingFeature {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "code" in value &&
-    "name" in value &&
-    "type" in value &&
-    typeof (value as { code?: unknown }).code === "string" &&
-    typeof (value as { name?: unknown }).name === "string" &&
-    typeof (value as { type?: unknown }).type === "string"
-  );
+function readFeatures(data: CustomerStateChangedData): BillingFeature[] {
+  return data.features;
 }
 
-function readFeatures(data: WebhookData): BillingFeature[] {
-  return Array.isArray(data.features)
-    ? data.features.filter(isBillingFeature)
-    : [];
-}
-
-function readUsageRecorded(data: WebhookData): {
+function readUsageRecorded(data: UsageRecordedData): {
   featureCode: string;
   value: number;
 } {
@@ -106,27 +114,60 @@ function applyUsageToFeatures(
       return feature;
     }
 
-    const current = (feature.current ?? 0) + value;
-    const remaining =
-      typeof feature.remaining === "number"
-        ? Math.max(feature.remaining - value, 0)
-        : feature.remaining;
-    const overageQuantity =
-      typeof feature.included === "number"
-        ? Math.max(current - feature.included, 0)
-        : feature.overageQuantity;
+    const unitsUsed = feature.consumption.unitsUsed + value;
+    if (feature.consumption.model === "metered") {
+      return {
+        ...feature,
+        consumption: {
+          ...feature.consumption,
+          unitsUsed,
+          remainingUnits:
+            feature.consumption.remainingUnits === undefined
+              ? undefined
+              : Math.max(feature.consumption.remainingUnits - value, 0),
+          overage: {
+            ...feature.consumption.overage,
+            units: Math.max(unitsUsed - feature.consumption.includedUnits, 0),
+          },
+        },
+      };
+    }
+
+    if (feature.consumption.model === "credits") {
+      return {
+        ...feature,
+        consumption: {
+          ...feature.consumption,
+          unitsUsed,
+          availableUnits: Math.max(
+            feature.consumption.availableUnits - value,
+            0,
+          ),
+        },
+      };
+    }
 
     return {
       ...feature,
-      current,
-      remaining,
-      overageQuantity,
-      billedQuantity: Math.max(feature.billedQuantity ?? 0, current),
+      consumption: {
+        ...feature.consumption,
+        unitsUsed,
+        ...(feature.consumption.availableUnits === undefined
+          ? {}
+          : {
+              availableUnits: Math.max(
+                feature.consumption.availableUnits - value,
+                0,
+              ),
+            }),
+      },
     };
   });
 }
 
-export async function syncBillingStateFromSnapshot(data: WebhookData) {
+export async function syncBillingStateFromSnapshot(
+  data: CustomerStateChangedData,
+) {
   const localUser = await resolveLocalUser(data);
 
   const status: string | undefined = data.status;
@@ -155,7 +196,7 @@ export async function syncBillingStateFromSnapshot(data: WebhookData) {
     .onConflictDoUpdate({ target: billingState.userId, set: syncedState });
 }
 
-export async function recordUsageFromEvent(data: WebhookData) {
+export async function recordUsageFromEvent(data: UsageRecordedData) {
   const localUser = await resolveLocalUser(data);
   const { featureCode, value } = readUsageRecorded(data);
 
@@ -181,7 +222,9 @@ export async function recordUsageFromEvent(data: WebhookData) {
     .where(eq(billingState.userId, localUser.id));
 }
 
-export async function resolveActivatedUserForWelcome(data: WebhookData) {
+export async function resolveActivatedUserForWelcome(
+  data: CustomerStateChangedData,
+) {
   const localUser = await resolveLocalUser(data);
   const planName = readPlanName(data);
   if (!planName) {
@@ -197,7 +240,9 @@ export async function resolveActivatedUserForWelcome(data: WebhookData) {
   };
 }
 
-export async function recordCurrentPeriod(data: WebhookData) {
+export async function recordCurrentPeriod(
+  data: SubscriptionActivatedData | SubscriptionReactivatedData,
+) {
   const localUser = await resolveLocalUser(data);
   const currentPeriodEnd =
     typeof data.currentPeriodEnd === "string"
@@ -210,7 +255,9 @@ export async function recordCurrentPeriod(data: WebhookData) {
     .where(eq(billingState.userId, localUser.id));
 }
 
-export async function restoreAccessAfterPayment(data: WebhookData) {
+export async function restoreAccessAfterPayment(
+  data: PaymentReceivedData | PaymentRecoveredData,
+) {
   const localUser = await resolveLocalUser(data);
   await db
     .update(billingState)

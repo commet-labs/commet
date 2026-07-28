@@ -5,10 +5,10 @@ import type { CommetHTTPClient } from "../utils/http";
 
 function createMockClient() {
   return {
-    get: vi.fn().mockResolvedValue({ success: true, data: {} }),
-    post: vi.fn().mockResolvedValue({ success: true, data: {} }),
-    put: vi.fn().mockResolvedValue({ success: true, data: {} }),
-    delete: vi.fn().mockResolvedValue({ success: true, data: {} }),
+    get: vi.fn().mockResolvedValue({}),
+    post: vi.fn().mockResolvedValue({}),
+    put: vi.fn().mockResolvedValue({}),
+    delete: vi.fn().mockResolvedValue({}),
   };
 }
 
@@ -65,15 +65,15 @@ describe("QuotaResource", () => {
   });
 
   describe("remove", () => {
-    it("deletes from /usage/quota, omitting count so the server default applies", async () => {
+    it("posts to /usage/quota/remove, omitting count so the server default applies", async () => {
       const client = createMockClient();
       await quotaResource(client).remove({
         customerId: "cus_1",
         featureCode: "projects",
       });
 
-      expect(client.delete).toHaveBeenCalledWith(
-        "/usage/quota",
+      expect(client.post).toHaveBeenCalledWith(
+        "/usage/quota/remove",
         { customerId: "cus_1", featureCode: "projects" },
         undefined,
       );
@@ -81,7 +81,7 @@ describe("QuotaResource", () => {
 
     it("propagates an insufficient_balance API error", async () => {
       const client = createMockClient();
-      client.delete.mockRejectedValueOnce(
+      client.post.mockRejectedValueOnce(
         new CommetAPIError(
           "Cannot decrement 9999 from quota. Current balance is 5",
           400,
@@ -114,7 +114,7 @@ describe("QuotaResource", () => {
         overageEnabled: true,
         asOf: "2026-05-29T00:00:00.000Z",
       };
-      client.get.mockResolvedValueOnce({ success: true, data: allowance });
+      client.get.mockResolvedValueOnce(allowance);
 
       const result = await quotaResource(client).get({
         customerId: "cus_1",
@@ -126,7 +126,7 @@ describe("QuotaResource", () => {
         { customerId: "cus_1", featureCode: "projects" },
         undefined,
       );
-      expect(result.data).toEqual(allowance);
+      expect(result).toEqual(allowance);
     });
   });
 
@@ -144,7 +144,11 @@ describe("QuotaResource", () => {
           asOf: "2026-05-29T00:00:00.000Z",
         },
       ];
-      client.get.mockResolvedValueOnce({ success: true, data: allowances });
+      client.get.mockResolvedValueOnce({
+        object: "list",
+        data: allowances,
+        hasMore: false,
+      });
 
       const result = await quotaResource(client).getAll({
         customerId: "cus_1",
@@ -178,8 +182,8 @@ describe("QuotaResource", () => {
         { customerId: "cus_1", featureCode: "projects", count: 0 },
         undefined,
       );
-      expect(client.delete).toHaveBeenCalledWith(
-        "/usage/quota",
+      expect(client.post).toHaveBeenLastCalledWith(
+        "/usage/quota/remove",
         { customerId: "cus_1", featureCode: "projects", count: 0 },
         undefined,
       );

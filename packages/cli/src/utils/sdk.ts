@@ -27,25 +27,29 @@ export async function fetchRemoteState(
   | { features: Feature[]; plans: Plan[] }
   | { error: { code: string; message: string } }
 > {
-  const featuresResponse = await commet.features.list();
-  if (!featuresResponse.success || !featuresResponse.data) {
+  let features: Feature[];
+  try {
+    features = (await commet.features.list()).data;
+  } catch (error) {
     return {
       error: {
         code: "fetch_features_failed",
-        message: featuresResponse.error?.message ?? "Failed to fetch features",
+        message:
+          error instanceof Error ? error.message : "Failed to fetch features",
       },
     };
   }
 
-  const plansResponse = await commet.plans.list({ includePrivate: "true" });
-  if (!plansResponse.success || !plansResponse.data) {
+  try {
+    const plans = (await commet.plans.list({ includePrivate: true })).data;
+    return { features, plans };
+  } catch (error) {
     return {
       error: {
         code: "fetch_plans_failed",
-        message: plansResponse.error?.message ?? "Failed to fetch plans",
+        message:
+          error instanceof Error ? error.message : "Failed to fetch plans",
       },
     };
   }
-
-  return { features: featuresResponse.data, plans: plansResponse.data };
 }

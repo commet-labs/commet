@@ -51,13 +51,7 @@ export const seats =
               customerId: userId,
             });
 
-            if (!result.success) {
-              throw new APIError("INTERNAL_SERVER_ERROR", {
-                message: result.error?.message || "Failed to list seats",
-              });
-            }
-
-            return ctx.json(result.data ?? null);
+            return ctx.json(result.balances);
           } catch (e: unknown) {
             if (e instanceof APIError) {
               throw e;
@@ -102,13 +96,7 @@ export const seats =
               {},
             );
 
-            if (!result.success) {
-              throw new APIError("INTERNAL_SERVER_ERROR", {
-                message: result.error?.message || "Failed to add seats",
-              });
-            }
-
-            return ctx.json(result.data ?? null);
+            return ctx.json(result);
           } catch (e: unknown) {
             if (e instanceof APIError) {
               throw e;
@@ -151,13 +139,7 @@ export const seats =
               {},
             );
 
-            if (!result.success) {
-              throw new APIError("INTERNAL_SERVER_ERROR", {
-                message: result.error?.message || "Failed to remove seats",
-              });
-            }
-
-            return ctx.json(result.data ?? null);
+            return ctx.json(result);
           } catch (e: unknown) {
             if (e instanceof APIError) {
               throw e;
@@ -202,13 +184,7 @@ export const seats =
               {},
             );
 
-            if (!result.success) {
-              throw new APIError("INTERNAL_SERVER_ERROR", {
-                message: result.error?.message || "Failed to set seats",
-              });
-            }
-
-            return ctx.json(result.data ?? null);
+            return ctx.json(result);
           } catch (e: unknown) {
             if (e instanceof APIError) {
               throw e;
@@ -250,13 +226,7 @@ export const seats =
               {},
             );
 
-            if (!result.success) {
-              throw new APIError("INTERNAL_SERVER_ERROR", {
-                message: result.error?.message || "Failed to set all seats",
-              });
-            }
-
-            return ctx.json(result.data ?? null);
+            return ctx.json(result.data);
           } catch (e: unknown) {
             if (e instanceof APIError) {
               throw e;

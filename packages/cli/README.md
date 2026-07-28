@@ -45,7 +45,7 @@ import { Commet } from '@commet/node';
 const commet = new Commet({ apiKey: '...' });
 
 await commet.usage.track({
-  feature: 'api_calls', // Autocomplete works!
+  featureCode: 'api_calls', // Autocomplete works!
   customerId: 'cus_123'
 });
 

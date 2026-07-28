@@ -17,13 +17,13 @@ async function resolveCheckout(
 ): Promise<CheckoutResolution> {
   const existing = await commet.subscriptions.getActive({ customerId });
 
-  if (existing.success && existing.data) {
-    const status = existing.data.status;
+  if (existing) {
+    const status = existing.status;
     if (status === "active" || status === "trialing") {
       return { status: "already_subscribed" };
     }
-    if (status === "pending_payment" && existing.data.checkoutUrl) {
-      return { status: "ready", checkoutUrl: existing.data.checkoutUrl };
+    if (status === "pending_payment" && existing.checkoutUrl) {
+      return { status: "ready", checkoutUrl: existing.checkoutUrl };
     }
   }
 
@@ -33,13 +33,11 @@ async function resolveCheckout(
     successUrl: getDashboardSuccessUrl(),
   });
 
-  if (!result.success || !result.data?.checkoutUrl) {
-    throw new Error(
-      result.error?.message || "Failed to create checkout session",
-    );
+  if (!result.checkoutUrl) {
+    throw new Error("Failed to create checkout session");
   }
 
-  return { status: "ready", checkoutUrl: result.data.checkoutUrl };
+  return { status: "ready", checkoutUrl: result.checkoutUrl };
 }
 
 export async function createCheckoutSession(planCode: string): Promise<never> {

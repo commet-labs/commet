@@ -63,14 +63,8 @@ export const CustomerPortal = ({
         customerId,
       });
 
-      if (!result.success || !result.data) {
-        throw new Error(
-          result.error?.message || "Failed to create portal session",
-        );
-      }
-
       // Redirect to customer portal
-      return NextResponse.redirect(result.data.portalUrl);
+      return NextResponse.redirect(result.portalUrl);
     } catch (error) {
       const errorObj =
         error instanceof Error ? error : new Error(String(error));

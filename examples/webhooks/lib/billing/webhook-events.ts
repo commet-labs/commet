@@ -2,7 +2,7 @@ import type { WebhookPayload } from "@commet/node";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db/drizzle";
 import { user, webhookEvents } from "@/lib/db/schema";
-import { readExternalUserId } from "./sync";
+import { readCustomerId, readExternalUserId } from "./sync";
 
 const staleProcessingWindowMs = 5 * 60 * 1000;
 
@@ -30,7 +30,7 @@ export async function recordWebhookEvent({
     .values({
       eventId,
       event: payload.event,
-      commetCustomerId: payload.data.customerId ?? null,
+      commetCustomerId: readCustomerId(payload.data),
       userId: localUserId,
       payload,
     })

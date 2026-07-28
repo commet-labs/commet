@@ -56,9 +56,9 @@ export async function customerPortalAction() {
   const { commet } = await import("@/lib/commet");
   const portalResult = await commet.portal.getUrl({ customerId: user.id });
 
-  if (!portalResult.success || !portalResult.data?.portalUrl) {
+  if (!portalResult.portalUrl) {
     redirect("/dashboard/billing");
   }
 
-  redirect(portalResult.data.portalUrl);
+  redirect(portalResult.portalUrl);
 }

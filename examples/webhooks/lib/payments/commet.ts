@@ -31,15 +31,15 @@ export async function createCheckoutSession({
     customerId: user.id,
   });
 
-  if (existing.success && existing.data) {
-    const status = existing.data.status;
+  if (existing) {
+    const status = existing.status;
 
     if (status === "active" || status === "trialing") {
       redirect("/dashboard/billing?error=already_subscribed");
     }
 
-    if (status === "pending_payment" && existing.data.checkoutUrl) {
-      redirect(existing.data.checkoutUrl);
+    if (status === "pending_payment" && existing.checkoutUrl) {
+      redirect(existing.checkoutUrl);
     }
   }
 
@@ -49,13 +49,11 @@ export async function createCheckoutSession({
     successUrl,
   });
 
-  if (!result.success || !result.data?.checkoutUrl) {
-    throw new Error(
-      result.error?.message || "Failed to create checkout session",
-    );
+  if (!result.checkoutUrl) {
+    throw new Error("Failed to create checkout session");
   }
 
-  redirect(result.data.checkoutUrl);
+  redirect(result.checkoutUrl);
 }
 
 export async function getCheckoutUrl({
@@ -80,15 +78,15 @@ export async function getCheckoutUrl({
     customerId: user.id,
   });
 
-  if (existing.success && existing.data) {
-    const status = existing.data.status;
+  if (existing) {
+    const status = existing.status;
 
     if (status === "active" || status === "trialing") {
       throw new Error("User already has active subscription");
     }
 
-    if (status === "pending_payment" && existing.data.checkoutUrl) {
-      return existing.data.checkoutUrl;
+    if (status === "pending_payment" && existing.checkoutUrl) {
+      return existing.checkoutUrl;
     }
   }
 
@@ -98,11 +96,9 @@ export async function getCheckoutUrl({
     successUrl,
   });
 
-  if (!result.success || !result.data?.checkoutUrl) {
-    throw new Error(
-      result.error?.message || "Failed to create checkout session",
-    );
+  if (!result.checkoutUrl) {
+    throw new Error("Failed to create checkout session");
   }
 
-  return result.data.checkoutUrl;
+  return result.checkoutUrl;
 }

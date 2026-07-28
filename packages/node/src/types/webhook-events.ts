@@ -4,12 +4,9 @@ import type {
   WebhookBankRef,
   WebhookCardInfo,
   WebhookCreditsBalance,
-  WebhookFeatureAccess,
   WebhookPlanRef,
   WebhookSeatSummary,
 } from "./models";
-
-import type { PaymentProvider } from "./enums";
 
 export type WebhookEvent =
   | "subscription.created"
@@ -110,7 +107,7 @@ export interface SubscriptionActivatedData {
   /** The invoice currency code. */
   invoiceCurrency: string;
   /** The payment provider that processed the activating charge: stripe, commet, or dlocal. Null when the subscription activated without a charge (zero-total or setup-based activation). */
-  provider: PaymentProvider | null;
+  provider: "stripe" | "commet" | "dlocal" | null;
 }
 
 /** Fired when a canceled subscription is reactivated and its reactivation charge succeeds. The subscription returns to active with a fresh invoice and a billing period anchored to the reactivation date. Distinct from subscription.activated (first activation) and payment.recovered (past_due recovery, which keeps the original anchor). */
@@ -136,7 +133,7 @@ export interface SubscriptionReactivatedData {
   /** The invoice currency code. */
   invoiceCurrency: string;
   /** The payment provider that processed the reactivation charge: stripe, commet, or dlocal. */
-  provider: PaymentProvider;
+  provider: "stripe" | "commet" | "dlocal";
 }
 
 /** Fired when a subscription is actually terminated. A scheduled cancellation fires it at the end of the billing period; immediate cancellations, full refunds (cancelReason refund), and exhausted dunning retries (cancelReason dunning_exhausted) fire it right away. The status is now canceled and access should be revoked. This event is NOT fired when cancellation is scheduled — that triggers subscription.updated instead. See the cancellation lifecycle below. */
@@ -380,7 +377,7 @@ export interface PaymentReceivedData {
   /** The payment transaction ID. */
   paymentTransactionId: string | null;
   /** The payment provider the charge was routed to: stripe, commet, or dlocal. Null for billing-only charges with no Commet ledger row. */
-  provider: PaymentProvider | null;
+  provider: "stripe" | "commet" | "dlocal" | null;
   /** Gross amount in cents before fees. */
   grossAmount: number | null;
   /** The payment currency code. */
@@ -444,7 +441,7 @@ export interface PaymentRefundedData {
   /** The refunded payment transaction ID. */
   paymentTransactionId: string;
   /** The payment provider the charge was routed to: stripe, commet, or dlocal. */
-  provider: PaymentProvider;
+  provider: "stripe" | "commet" | "dlocal";
   /** The payment link the payment originated from, or null when the payment did not come from a payment link. */
   paymentLinkId: string | null;
   /** The invoice the payment collected, or null for payments without an invoice. */
@@ -466,7 +463,7 @@ export interface PaymentDisputedData {
   /** The disputed payment transaction ID. */
   paymentTransactionId: string;
   /** The payment provider the charge was routed to: stripe, commet, or dlocal. */
-  provider: PaymentProvider;
+  provider: "stripe" | "commet" | "dlocal";
   /** The payment link the payment originated from, or null when the payment did not come from a payment link. */
   paymentLinkId: string | null;
   /** The invoice the payment collected, or null for payments without an invoice. */
@@ -490,7 +487,7 @@ export interface PaymentDisputeResolvedData {
   /** The disputed payment transaction ID. */
   paymentTransactionId: string;
   /** The payment provider the charge was routed to: stripe, commet, or dlocal. */
-  provider: PaymentProvider;
+  provider: "stripe" | "commet" | "dlocal";
   /** The payment link the payment originated from, or null when the payment did not come from a payment link. */
   paymentLinkId: string | null;
   /** The invoice the payment collected, or null for payments without an invoice. */
@@ -769,8 +766,236 @@ export interface CustomerStateChangedData {
   billingInterval: string | null;
   /** The plan's consumption model: metered, credits, or balance. */
   consumptionModel: string | null;
-  /** Current feature access, one entry per plan feature: code, name, type, allowed, enabled, current, included, remaining, overageQuantity, overageUnitPrice, unlimited, overageEnabled, billedQuantity. Fields that do not apply to a feature type are null. */
-  features: Array<WebhookFeatureAccess>;
+  /** Current feature access, discriminated by type. Boolean features expose enabled; usage features expose model-specific consumption; seats and quota expose usage allowances. */
+  features: Array<
+    | {
+        /** Unique feature code. */
+        code: string;
+        /** Display name of the feature. */
+        name: string;
+        /** Display name for one product unit, or null when not applicable. */
+        unitName: string | null;
+        /** Whether the customer can currently access or consume the feature. */
+        allowed: boolean;
+        type: "boolean";
+        /** Whether the feature is enabled. */
+        enabled: boolean;
+      }
+    | {
+        /** Unique feature code. */
+        code: string;
+        /** Display name of the feature. */
+        name: string;
+        /** Display name for one product unit, or null when not applicable. */
+        unitName: string | null;
+        /** Whether the customer can currently access or consume the feature. */
+        allowed: boolean;
+        type: "usage";
+        consumption:
+          | {
+              /** Usage is measured against an included allowance and overage. */
+              model: "metered";
+              /** Time range used to calculate this feature's consumption. */
+              period: {
+                /**
+                 * Inclusive usage period start.
+                 * @format date-time
+                 */
+                start: string;
+                /**
+                 * Exclusive usage period end.
+                 * @format date-time
+                 */
+                end: string;
+              };
+              /** Product units recorded during the period. */
+              unitsUsed: number;
+              /** Product units included in the subscription for the period. */
+              includedUnits: number;
+              /** Included units not yet consumed. Absent when usage is unlimited. */
+              remainingUnits?: number;
+              /** Whether the feature has no usage limit. */
+              unlimited: boolean;
+              overage: {
+                /** Whether usage above the included amount is allowed and billed. */
+                enabled: boolean;
+                /** Units consumed above the included amount. */
+                units: number;
+                /** Price for one additional product unit. */
+                unitPrice?: {
+                  /** Integer rate amount. Divide by scale to obtain the price. */
+                  amount: number;
+                  /** Lowercase ISO 4217 currency code. */
+                  currency: string;
+                  /** Divide amount by scale to obtain the major-unit price. */
+                  scale: 10000;
+                };
+              };
+            }
+          | {
+              /** Product usage consumes credits from a shared pool. */
+              model: "credits";
+              /** Time range used to calculate this feature's consumption. */
+              period: {
+                /**
+                 * Inclusive usage period start.
+                 * @format date-time
+                 */
+                start: string;
+                /**
+                 * Exclusive usage period end.
+                 * @format date-time
+                 */
+                end: string;
+              };
+              /** Product units recorded during the period. */
+              unitsUsed: number;
+              /** Credits deducted for each product unit. */
+              creditsPerUnit: number;
+              /** Actual credits deducted by this feature during the period. */
+              creditsConsumed: number;
+              /** Additional product units available from the current shared credit pool at this feature's conversion rate. */
+              availableUnits: number;
+            }
+          | {
+              /** Product usage deducts money from a shared balance. */
+              model: "balance";
+              /** Time range used to calculate this feature's consumption. */
+              period: {
+                /**
+                 * Inclusive usage period start.
+                 * @format date-time
+                 */
+                start: string;
+                /**
+                 * Exclusive usage period end.
+                 * @format date-time
+                 */
+                end: string;
+              };
+              /** Product units recorded during the period. */
+              unitsUsed: number;
+              /** Actual money deducted for this feature during the period. */
+              spent: {
+                /** Amount in the currency's smallest unit. */
+                amount: number;
+                /** Lowercase ISO 4217 currency code. */
+                currency: string;
+              };
+              /** Estimated additional units available from the current shared balance at this feature's fixed price. Absent for dynamic pricing. */
+              availableUnits?: number;
+              /** Price for one additional product unit. */
+              unitPrice?: {
+                /** Integer rate amount. Divide by scale to obtain the price. */
+                amount: number;
+                /** Lowercase ISO 4217 currency code. */
+                currency: string;
+                /** Divide amount by scale to obtain the major-unit price. */
+                scale: 10000;
+              };
+            };
+      }
+    | {
+        /** Unique feature code. */
+        code: string;
+        /** Display name of the feature. */
+        name: string;
+        /** Display name for one product unit, or null when not applicable. */
+        unitName: string | null;
+        /** Whether the customer can currently access or consume the feature. */
+        allowed: boolean;
+        type: "seats";
+        usage: {
+          /** Time range used to calculate this feature's consumption. */
+          period: {
+            /**
+             * Inclusive usage period start.
+             * @format date-time
+             */
+            start: string;
+            /**
+             * Exclusive usage period end.
+             * @format date-time
+             */
+            end: string;
+          };
+          /** Current units assigned or in use. */
+          unitsUsed: number;
+          /** Units included in the subscription for the period. */
+          includedUnits: number;
+          /** Included units still available. Absent when usage is unlimited. */
+          remainingUnits?: number;
+          /** Whether the feature has no usage limit. */
+          unlimited: boolean;
+          overage: {
+            /** Whether usage above the included amount is allowed and billed. */
+            enabled: boolean;
+            /** Units consumed above the included amount. */
+            units: number;
+            /** Price for one additional product unit. */
+            unitPrice?: {
+              /** Integer rate amount. Divide by scale to obtain the price. */
+              amount: number;
+              /** Lowercase ISO 4217 currency code. */
+              currency: string;
+              /** Divide amount by scale to obtain the major-unit price. */
+              scale: 10000;
+            };
+          };
+        };
+      }
+    | {
+        /** Unique feature code. */
+        code: string;
+        /** Display name of the feature. */
+        name: string;
+        /** Display name for one product unit, or null when not applicable. */
+        unitName: string | null;
+        /** Whether the customer can currently access or consume the feature. */
+        allowed: boolean;
+        type: "quota";
+        usage: {
+          /** Time range used to calculate this feature's consumption. */
+          period: {
+            /**
+             * Inclusive usage period start.
+             * @format date-time
+             */
+            start: string;
+            /**
+             * Exclusive usage period end.
+             * @format date-time
+             */
+            end: string;
+          };
+          /** Current units assigned or in use. */
+          unitsUsed: number;
+          /** Units included in the subscription for the period. */
+          includedUnits: number;
+          /** Included units still available. Absent when usage is unlimited. */
+          remainingUnits?: number;
+          /** Whether the feature has no usage limit. */
+          unlimited: boolean;
+          overage: {
+            /** Whether usage above the included amount is allowed and billed. */
+            enabled: boolean;
+            /** Units consumed above the included amount. */
+            units: number;
+            /** Price for one additional product unit. */
+            unitPrice?: {
+              /** Integer rate amount. Divide by scale to obtain the price. */
+              amount: number;
+              /** Lowercase ISO 4217 currency code. */
+              currency: string;
+              /** Divide amount by scale to obtain the major-unit price. */
+              scale: 10000;
+            };
+          };
+          /** Highest quota reached during the period and used for billing. */
+          billedUnits: number;
+        };
+      }
+  >;
   /** Summary of seats-type features: code, current, included, remaining, unlimited. */
   seats: Array<WebhookSeatSummary>;
   /** For credits plans: planCredits, purchasedCredits, totalCredits. Null otherwise. */

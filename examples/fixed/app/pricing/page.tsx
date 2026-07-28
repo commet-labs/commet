@@ -49,8 +49,8 @@ export default async function PricingPage() {
     const subscriptionResult = await commet.subscriptions.getActive({
       customerId: user.id,
     });
-    if (subscriptionResult.success && subscriptionResult.data) {
-      const subscription = subscriptionResult.data;
+    if (subscriptionResult) {
+      const subscription = subscriptionResult;
       if (
         subscription.status === "pending_payment" &&
         subscription.checkoutUrl

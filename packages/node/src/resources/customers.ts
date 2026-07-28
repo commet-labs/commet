@@ -1,33 +1,7 @@
-import type { ApiResponse, RequestOptions } from "../types/common";
+import type { RequestOptions } from "../types/common";
 import type { Timezone } from "../types/enums";
 import type { Customer, CustomerBatch } from "../types/models";
 import type { CommetHTTPClient } from "../utils/http";
-
-export interface ListCustomersParams {
-  externalId?: string;
-  limit?: number;
-  cursor?: string;
-}
-
-export interface CreateCustomerParams {
-  id?: string;
-  externalId?: string;
-  fullName?: string;
-  taxDocument?: string;
-  address?: {
-    line1: string;
-    line2?: string;
-    city: string;
-    state?: string;
-    postalCode: string;
-    country: string;
-    region?: string;
-  };
-  addressId?: string;
-  email: string;
-  timezone?: Timezone;
-  metadata?: Record<string, unknown>;
-}
 
 export interface GetCustomerParams {
   id: string;
@@ -73,30 +47,40 @@ export interface BatchCreateCustomersParams {
   }>;
 }
 
+export interface ListCustomersParams {
+  cursor?: string;
+  limit?: number;
+  externalId?: string;
+}
+
+export interface CreateCustomerParams {
+  id?: string;
+  externalId?: string;
+  fullName?: string;
+  taxDocument?: string;
+  address?: {
+    line1: string;
+    line2?: string;
+    city: string;
+    state?: string;
+    postalCode: string;
+    country: string;
+    region?: string;
+  };
+  addressId?: string;
+  email: string;
+  timezone?: Timezone;
+  metadata?: Record<string, unknown>;
+}
+
 export class CustomersResource {
   constructor(private httpClient: CommetHTTPClient) {}
-
-  /** List customers with cursor-based pagination. */
-  async list(
-    params?: ListCustomersParams,
-    options?: RequestOptions,
-  ): Promise<ApiResponse<Array<Customer>>> {
-    return this.httpClient.get("/customers", params, options);
-  }
-
-  /** Create a new customer. Idempotent when customerId is provided. */
-  async create(
-    params: CreateCustomerParams,
-    options?: RequestOptions,
-  ): Promise<ApiResponse<Customer>> {
-    return this.httpClient.post("/customers", params, options);
-  }
 
   /** Retrieve a customer by their public ID, including subscription status and metadata. */
   async get(
     params: GetCustomerParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<Customer>> {
+  ): Promise<Customer> {
     const { id } = params;
     return this.httpClient.get(`/customers/${id}`, undefined, options);
   }
@@ -105,16 +89,37 @@ export class CustomersResource {
   async update(
     params: UpdateCustomerParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<Customer>> {
+  ): Promise<Customer> {
     const { id, ...rest } = params;
-    return this.httpClient.put(`/customers/${id}`, rest, options);
+    return this.httpClient.patch(`/customers/${id}`, rest, options);
   }
 
   /** Create up to 100 customers in a single request. */
   async createBatch(
     params: BatchCreateCustomersParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<CustomerBatch>> {
+  ): Promise<CustomerBatch> {
     return this.httpClient.post("/customers/batch", params, options);
+  }
+
+  /** List customers with cursor-based pagination. */
+  async list(
+    params?: ListCustomersParams,
+    options?: RequestOptions,
+  ): Promise<{
+    object: "list";
+    data: Array<Customer>;
+    hasMore: boolean;
+    nextCursor?: string;
+  }> {
+    return this.httpClient.get("/customers", params, options);
+  }
+
+  /** Create a new customer. Idempotent when customerId is provided. */
+  async create(
+    params: CreateCustomerParams,
+    options?: RequestOptions,
+  ): Promise<Customer> {
+    return this.httpClient.post("/customers", params, options);
   }
 }

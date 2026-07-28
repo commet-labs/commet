@@ -1,4 +1,4 @@
-import type { BillingInterval, CreditPack, Plan } from "@commet/node";
+import type { BillingInterval, CreditPackListItem, Plan } from "@commet/node";
 import { Commet } from "@commet/node";
 import { type NextRequest, NextResponse } from "next/server";
 
@@ -37,18 +37,10 @@ export const PricingMarkdown = ({
     try {
       const plansResult = await commet.plans.list();
 
-      if (!plansResult.success || !plansResult.data) {
-        throw new Error(plansResult.error?.message ?? "Failed to fetch plans");
-      }
-
       const publicPlans = plansResult.data.filter((plan) => plan.isPublic);
 
       const creditPacks = includeCreditPacks
-        ? await commet.creditPacks
-            .list()
-            .then((result) =>
-              result.success && result.data ? result.data : [],
-            )
+        ? await commet.creditPacks.list().then((result) => result.data)
         : [];
 
       const markdown = generateMarkdown(
@@ -85,7 +77,7 @@ function generateMarkdown(
   title: string,
   description: string | undefined,
   plans: Plan[],
-  creditPacks: CreditPack[],
+  creditPacks: CreditPackListItem[],
   billingIntervals?: BillingInterval[],
 ): string {
   const sections: string[] = [`# ${title}`];
@@ -268,7 +260,7 @@ function renderFeatures(plans: Plan[]): string | null {
   return parts.length > 0 ? `## Features\n\n${parts.join("\n\n")}` : null;
 }
 
-function renderCreditPacks(packs: CreditPack[]): string {
+function renderCreditPacks(packs: CreditPackListItem[]): string {
   const lines = [
     "| Pack | Credits | Price |",
     "| --- | --- | --- |",

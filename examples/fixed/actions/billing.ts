@@ -34,8 +34,8 @@ export async function getBillingDataAction(): Promise<{
 
     let subscription: BillingSubscription | null = null;
 
-    if (subscriptionResult.success && subscriptionResult.data) {
-      const sub = subscriptionResult.data;
+    if (subscriptionResult) {
+      const sub = subscriptionResult;
       subscription = {
         id: sub.id,
         planName: sub.plan.name,
