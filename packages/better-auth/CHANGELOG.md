@@ -1,5 +1,12 @@
 # @commet/better-auth
 
+## 8.0.0
+
+### Patch Changes
+
+- Updated dependencies [870bc39]
+  - @commet/node@8.0.0
+
 ## 7.0.0
 
 ### Patch Changes
