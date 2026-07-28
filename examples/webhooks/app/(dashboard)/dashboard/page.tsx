@@ -31,18 +31,25 @@ function formatStatus(status: string): string {
 }
 
 function formatFeatureValue(feature: BillingFeature): string {
-  if (feature.unlimited) return "Unlimited";
   if (feature.type === "boolean") return feature.enabled ? "Enabled" : "Off";
-  if (feature.type === "usage" && typeof feature.remaining === "number") {
-    return `${feature.remaining.toLocaleString()} remaining`;
+  if (feature.type === "usage") {
+    if (feature.consumption.model === "metered") {
+      if (feature.consumption.unlimited) return "Unlimited";
+      if (feature.consumption.remainingUnits !== undefined) {
+        return `${feature.consumption.remainingUnits.toLocaleString()} remaining`;
+      }
+      return feature.consumption.unitsUsed.toLocaleString();
+    }
+    if (feature.consumption.availableUnits !== undefined) {
+      return `${feature.consumption.availableUnits.toLocaleString()} available`;
+    }
+    return feature.consumption.unitsUsed.toLocaleString();
   }
-  if (typeof feature.included === "number") {
-    return feature.included.toLocaleString();
+  if (feature.usage.unlimited) return "Unlimited";
+  if (feature.usage.remainingUnits !== undefined) {
+    return `${feature.usage.remainingUnits.toLocaleString()} remaining`;
   }
-  if (typeof feature.current === "number") {
-    return feature.current.toLocaleString();
-  }
-  return feature.allowed ? "Included" : "Not included";
+  return feature.usage.unitsUsed.toLocaleString();
 }
 
 export default async function DashboardPage() {

@@ -78,23 +78,8 @@ function readPlanName(data: CustomerStateChangedData): string | null {
   return null;
 }
 
-function isBillingFeature(value: unknown): value is BillingFeature {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "code" in value &&
-    "name" in value &&
-    "type" in value &&
-    typeof (value as { code?: unknown }).code === "string" &&
-    typeof (value as { name?: unknown }).name === "string" &&
-    typeof (value as { type?: unknown }).type === "string"
-  );
-}
-
 function readFeatures(data: CustomerStateChangedData): BillingFeature[] {
-  return Array.isArray(data.features)
-    ? data.features.filter(isBillingFeature)
-    : [];
+  return data.features;
 }
 
 function readUsageRecorded(data: UsageRecordedData): {
@@ -129,22 +114,53 @@ function applyUsageToFeatures(
       return feature;
     }
 
-    const current = (feature.current ?? 0) + value;
-    const remaining =
-      typeof feature.remaining === "number"
-        ? Math.max(feature.remaining - value, 0)
-        : feature.remaining;
-    const overageQuantity =
-      typeof feature.included === "number"
-        ? Math.max(current - feature.included, 0)
-        : feature.overageQuantity;
+    const unitsUsed = feature.consumption.unitsUsed + value;
+    if (feature.consumption.model === "metered") {
+      return {
+        ...feature,
+        consumption: {
+          ...feature.consumption,
+          unitsUsed,
+          remainingUnits:
+            feature.consumption.remainingUnits === undefined
+              ? undefined
+              : Math.max(feature.consumption.remainingUnits - value, 0),
+          overage: {
+            ...feature.consumption.overage,
+            units: Math.max(unitsUsed - feature.consumption.includedUnits, 0),
+          },
+        },
+      };
+    }
+
+    if (feature.consumption.model === "credits") {
+      return {
+        ...feature,
+        consumption: {
+          ...feature.consumption,
+          unitsUsed,
+          availableUnits: Math.max(
+            feature.consumption.availableUnits - value,
+            0,
+          ),
+        },
+      };
+    }
 
     return {
       ...feature,
-      current,
-      remaining,
-      overageQuantity,
-      billedQuantity: Math.max(feature.billedQuantity ?? 0, current),
+      consumption: {
+        ...feature.consumption,
+        unitsUsed,
+        ...(feature.consumption.availableUnits === undefined
+          ? {}
+          : {
+              availableUnits: Math.max(
+                feature.consumption.availableUnits - value,
+                0,
+              ),
+            }),
+      },
     };
   });
 }

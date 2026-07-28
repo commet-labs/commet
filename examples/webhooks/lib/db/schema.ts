@@ -1,3 +1,4 @@
+import type { CustomerStateChangedData } from "@commet/node";
 import { relations } from "drizzle-orm";
 import {
   boolean,
@@ -10,21 +11,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-export interface BillingFeature {
-  code: string;
-  name: string;
-  type: string;
-  allowed: boolean;
-  enabled: boolean | null;
-  current: number | null;
-  included: number | null;
-  remaining: number | null;
-  overageQuantity: number | null;
-  overageUnitPrice: number | null;
-  unlimited: boolean | null;
-  overageEnabled: boolean | null;
-  billedQuantity: number | null;
-}
+export type BillingFeature = CustomerStateChangedData["features"][number];
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
