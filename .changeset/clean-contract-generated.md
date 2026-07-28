@@ -1,9 +1,5 @@
 ---
 "@commet/node": major
-"@commet/next": patch
-"@commet/ai-sdk": patch
-"@commet/better-auth": patch
-"commet": patch
 ---
 
 Release the Node SDK v8 API with direct resource responses, explicit list pagination, Promotional Offers, usage operations, typed webhooks, and selectable market pricing.
