@@ -9,8 +9,6 @@ import type {
   WebhookSeatSummary,
 } from "./models";
 
-import type { PaymentProvider } from "./enums";
-
 export type WebhookEvent =
   | "subscription.created"
   | "subscription.activated"
@@ -110,7 +108,7 @@ export interface SubscriptionActivatedData {
   /** The invoice currency code. */
   invoiceCurrency: string;
   /** The payment provider that processed the activating charge: stripe, commet, or dlocal. Null when the subscription activated without a charge (zero-total or setup-based activation). */
-  provider: PaymentProvider | null;
+  provider: "stripe" | "commet" | "dlocal" | null;
 }
 
 /** Fired when a canceled subscription is reactivated and its reactivation charge succeeds. The subscription returns to active with a fresh invoice and a billing period anchored to the reactivation date. Distinct from subscription.activated (first activation) and payment.recovered (past_due recovery, which keeps the original anchor). */
@@ -136,7 +134,7 @@ export interface SubscriptionReactivatedData {
   /** The invoice currency code. */
   invoiceCurrency: string;
   /** The payment provider that processed the reactivation charge: stripe, commet, or dlocal. */
-  provider: PaymentProvider;
+  provider: "stripe" | "commet" | "dlocal";
 }
 
 /** Fired when a subscription is actually terminated. A scheduled cancellation fires it at the end of the billing period; immediate cancellations, full refunds (cancelReason refund), and exhausted dunning retries (cancelReason dunning_exhausted) fire it right away. The status is now canceled and access should be revoked. This event is NOT fired when cancellation is scheduled — that triggers subscription.updated instead. See the cancellation lifecycle below. */
@@ -380,7 +378,7 @@ export interface PaymentReceivedData {
   /** The payment transaction ID. */
   paymentTransactionId: string | null;
   /** The payment provider the charge was routed to: stripe, commet, or dlocal. Null for billing-only charges with no Commet ledger row. */
-  provider: PaymentProvider | null;
+  provider: "stripe" | "commet" | "dlocal" | null;
   /** Gross amount in cents before fees. */
   grossAmount: number | null;
   /** The payment currency code. */
@@ -444,7 +442,7 @@ export interface PaymentRefundedData {
   /** The refunded payment transaction ID. */
   paymentTransactionId: string;
   /** The payment provider the charge was routed to: stripe, commet, or dlocal. */
-  provider: PaymentProvider;
+  provider: "stripe" | "commet" | "dlocal";
   /** The payment link the payment originated from, or null when the payment did not come from a payment link. */
   paymentLinkId: string | null;
   /** The invoice the payment collected, or null for payments without an invoice. */
@@ -466,7 +464,7 @@ export interface PaymentDisputedData {
   /** The disputed payment transaction ID. */
   paymentTransactionId: string;
   /** The payment provider the charge was routed to: stripe, commet, or dlocal. */
-  provider: PaymentProvider;
+  provider: "stripe" | "commet" | "dlocal";
   /** The payment link the payment originated from, or null when the payment did not come from a payment link. */
   paymentLinkId: string | null;
   /** The invoice the payment collected, or null for payments without an invoice. */
@@ -490,7 +488,7 @@ export interface PaymentDisputeResolvedData {
   /** The disputed payment transaction ID. */
   paymentTransactionId: string;
   /** The payment provider the charge was routed to: stripe, commet, or dlocal. */
-  provider: PaymentProvider;
+  provider: "stripe" | "commet" | "dlocal";
   /** The payment link the payment originated from, or null when the payment did not come from a payment link. */
   paymentLinkId: string | null;
   /** The invoice the payment collected, or null for payments without an invoice. */

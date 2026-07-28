@@ -1,13 +1,36 @@
-import type { WebhookData } from "@commet/node";
+import type {
+  CustomerStateChangedData,
+  PaymentReceivedData,
+  PaymentRecoveredData,
+  SubscriptionActivatedData,
+  SubscriptionReactivatedData,
+  UsageRecordedData,
+} from "@commet/node";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db/drizzle";
 import { type BillingFeature, billingState, user } from "@/lib/db/schema";
 
-export function readExternalUserId(data: WebhookData): string | null {
+function readStringProperty(data: unknown, property: string): string | null {
+  if (
+    typeof data !== "object" ||
+    data === null ||
+    !(property in data) ||
+    typeof data[property as keyof typeof data] !== "string"
+  ) {
+    return null;
+  }
+
+  return data[property as keyof typeof data] as string;
+}
+
+export function readCustomerId(data: unknown): string | null {
+  return readStringProperty(data, "customerId");
+}
+
+export function readExternalUserId(data: unknown): string | null {
   const candidates = [
-    data.externalId,
-    data._customerExternalId,
-    data.customerId,
+    readStringProperty(data, "externalId"),
+    readCustomerId(data),
   ];
   return (
     candidates.find(
@@ -16,7 +39,7 @@ export function readExternalUserId(data: WebhookData): string | null {
   );
 }
 
-function requireExternalUserId(data: WebhookData): string {
+function requireExternalUserId(data: { customerId: string }): string {
   const externalId = readExternalUserId(data);
   if (!externalId) {
     throw new Error(
@@ -27,7 +50,7 @@ function requireExternalUserId(data: WebhookData): string {
   return externalId;
 }
 
-async function resolveLocalUser(data: WebhookData) {
+async function resolveLocalUser(data: { customerId: string }) {
   const userId = requireExternalUserId(data);
   const [localUser] = await db
     .select({ id: user.id, email: user.email, name: user.name })
@@ -42,7 +65,7 @@ async function resolveLocalUser(data: WebhookData) {
   return localUser;
 }
 
-function readPlanName(data: WebhookData): string | null {
+function readPlanName(data: CustomerStateChangedData): string | null {
   const plan = data.plan;
   if (
     plan &&
@@ -68,13 +91,13 @@ function isBillingFeature(value: unknown): value is BillingFeature {
   );
 }
 
-function readFeatures(data: WebhookData): BillingFeature[] {
+function readFeatures(data: CustomerStateChangedData): BillingFeature[] {
   return Array.isArray(data.features)
     ? data.features.filter(isBillingFeature)
     : [];
 }
 
-function readUsageRecorded(data: WebhookData): {
+function readUsageRecorded(data: UsageRecordedData): {
   featureCode: string;
   value: number;
 } {
@@ -126,7 +149,9 @@ function applyUsageToFeatures(
   });
 }
 
-export async function syncBillingStateFromSnapshot(data: WebhookData) {
+export async function syncBillingStateFromSnapshot(
+  data: CustomerStateChangedData,
+) {
   const localUser = await resolveLocalUser(data);
 
   const status: string | undefined = data.status;
@@ -155,7 +180,7 @@ export async function syncBillingStateFromSnapshot(data: WebhookData) {
     .onConflictDoUpdate({ target: billingState.userId, set: syncedState });
 }
 
-export async function recordUsageFromEvent(data: WebhookData) {
+export async function recordUsageFromEvent(data: UsageRecordedData) {
   const localUser = await resolveLocalUser(data);
   const { featureCode, value } = readUsageRecorded(data);
 
@@ -181,7 +206,9 @@ export async function recordUsageFromEvent(data: WebhookData) {
     .where(eq(billingState.userId, localUser.id));
 }
 
-export async function resolveActivatedUserForWelcome(data: WebhookData) {
+export async function resolveActivatedUserForWelcome(
+  data: CustomerStateChangedData,
+) {
   const localUser = await resolveLocalUser(data);
   const planName = readPlanName(data);
   if (!planName) {
@@ -197,7 +224,9 @@ export async function resolveActivatedUserForWelcome(data: WebhookData) {
   };
 }
 
-export async function recordCurrentPeriod(data: WebhookData) {
+export async function recordCurrentPeriod(
+  data: SubscriptionActivatedData | SubscriptionReactivatedData,
+) {
   const localUser = await resolveLocalUser(data);
   const currentPeriodEnd =
     typeof data.currentPeriodEnd === "string"
@@ -210,7 +239,9 @@ export async function recordCurrentPeriod(data: WebhookData) {
     .where(eq(billingState.userId, localUser.id));
 }
 
-export async function restoreAccessAfterPayment(data: WebhookData) {
+export async function restoreAccessAfterPayment(
+  data: PaymentReceivedData | PaymentRecoveredData,
+) {
   const localUser = await resolveLocalUser(data);
   await db
     .update(billingState)

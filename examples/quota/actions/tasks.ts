@@ -4,7 +4,6 @@ import { CommetAPIError } from "@commet/node";
 import { and, desc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getUser } from "@/lib/auth/session";
-import { RATE_SCALE } from "@/lib/billing";
 import { commet } from "@/lib/commet";
 import { db } from "@/lib/db/drizzle";
 import { type Task, task, workspace } from "@/lib/db/schema";
@@ -177,11 +176,11 @@ export async function getTaskQuotaStatusAction(): Promise<TaskQuotaStatus> {
     const subscriptionResult = await commet.subscriptions.getActive({
       customerId: user.id,
     });
-    if (!subscriptionResult.success || !subscriptionResult.data) {
+    if (!subscriptionResult) {
       return defaultStatus;
     }
 
-    const subscription = subscriptionResult.data;
+    const subscription = subscriptionResult;
     const isActive =
       subscription.status === "active" || subscription.status === "trialing";
 
@@ -197,8 +196,8 @@ export async function getTaskQuotaStatusAction(): Promise<TaskQuotaStatus> {
       customerId: user.id,
       code: TASKS_FEATURE_CODE,
     });
-    const access = feature.data;
-    const overageRate = access?.overageUnitPrice;
+    const usage = feature.type === "quota" ? feature.usage : undefined;
+    const overageUnitPrice = usage?.overage.unitPrice;
 
     return {
       isPaid: isActive,
@@ -206,12 +205,14 @@ export async function getTaskQuotaStatusAction(): Promise<TaskQuotaStatus> {
       status: subscription.status,
       planName: subscription.plan.name,
       daysRemaining: subscription.currentPeriod?.daysRemaining,
-      used: access?.current ?? 0,
-      included: access?.included ?? 0,
-      billed: access?.billedQuantity ?? 0,
-      unlimited: access?.unlimited ?? false,
-      overageEnabled: access?.overageEnabled ?? false,
-      overagePricePerTask: overageRate ? overageRate / RATE_SCALE : undefined,
+      used: usage?.unitsUsed ?? 0,
+      included: usage?.includedUnits ?? 0,
+      billed: usage?.billedUnits ?? 0,
+      unlimited: usage?.unlimited ?? false,
+      overageEnabled: usage?.overage.enabled ?? false,
+      overagePricePerTask: overageUnitPrice
+        ? overageUnitPrice.amount / overageUnitPrice.scale
+        : undefined,
     };
   } catch (error) {
     if (error instanceof CommetAPIError && error.statusCode === 429) {

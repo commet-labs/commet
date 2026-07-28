@@ -16,24 +16,21 @@ export default async function DashboardPage() {
 
   const results = await Promise.all(
     FEATURE_CODES.map((code) =>
-      commet.featureAccess.canUse({ customerId: user!.id, code }),
+      commet.featureAccess.get({ customerId: user!.id, code }),
     ),
   );
 
   const features = FEATURE_CODES.map((code, i) => {
-    const result = results[i];
-    const data = result?.data;
+    const feature = results[i];
+    const consumption =
+      feature?.type === "usage" && feature.consumption.model === "metered"
+        ? feature.consumption
+        : undefined;
     return {
       code,
-      allowed: data?.allowed ?? false,
-      currentUsage:
-        data && "currentUsage" in data
-          ? (data as { currentUsage?: number }).currentUsage
-          : undefined,
-      includedAmount:
-        data && "includedAmount" in data
-          ? (data as { includedAmount?: number }).includedAmount
-          : undefined,
+      allowed: feature?.allowed ?? false,
+      currentUsage: consumption?.unitsUsed,
+      includedAmount: consumption?.includedUnits,
     };
   });
 

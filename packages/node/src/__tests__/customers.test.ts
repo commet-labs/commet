@@ -24,9 +24,7 @@ describe("Customers — id (external_id) on the wire", () => {
   });
 
   it("create sends id in the body", async () => {
-    vi.mocked(fetch).mockResolvedValueOnce(
-      jsonResponse({ success: true, data: { id: "cus_x" } }),
-    );
+    vi.mocked(fetch).mockResolvedValueOnce(jsonResponse({ id: "cus_x" }));
     const client = new Commet({ apiKey: "ck_test_123" });
 
     await client.customers.create({ email: "a@b.com", id: "ext_123" });
@@ -37,9 +35,7 @@ describe("Customers — id (external_id) on the wire", () => {
   });
 
   it("create without id omits it", async () => {
-    vi.mocked(fetch).mockResolvedValueOnce(
-      jsonResponse({ success: true, data: { id: "cus_x" } }),
-    );
+    vi.mocked(fetch).mockResolvedValueOnce(jsonResponse({ id: "cus_x" }));
     const client = new Commet({ apiKey: "ck_test_123" });
 
     await client.customers.create({ email: "a@b.com" });
@@ -49,7 +45,7 @@ describe("Customers — id (external_id) on the wire", () => {
 
   it("createBatch sends id per customer", async () => {
     vi.mocked(fetch).mockResolvedValueOnce(
-      jsonResponse({ success: true, data: { successful: [], failed: [] } }),
+      jsonResponse({ successful: [], failed: [] }),
     );
     const client = new Commet({ apiKey: "ck_test_123" });
 

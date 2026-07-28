@@ -7,9 +7,6 @@ import { commet } from "@/lib/commet";
 const getCachedPlans = unstable_cache(
   async () => {
     const result = await commet.plans.list();
-    if (!result.success || !result.data) {
-      throw new Error("Unable to load plans");
-    }
     return result.data;
   },
   ["plans"],

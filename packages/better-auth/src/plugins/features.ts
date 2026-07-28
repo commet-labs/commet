@@ -40,13 +40,7 @@ export const features =
               customerId: userId,
             });
 
-            if (!result.success) {
-              throw new APIError("INTERNAL_SERVER_ERROR", {
-                message: result.error?.message || "Failed to list features",
-              });
-            }
-
-            return ctx.json(result.data ?? null);
+            return ctx.json(result.data);
           } catch (e: unknown) {
             if (e instanceof APIError) {
               throw e;
@@ -93,13 +87,7 @@ export const features =
               code,
             });
 
-            if (!result.success) {
-              throw new APIError("INTERNAL_SERVER_ERROR", {
-                message: result.error?.message || "Failed to get feature",
-              });
-            }
-
-            return ctx.json(result.data ?? null);
+            return ctx.json(result);
           } catch (e: unknown) {
             if (e instanceof APIError) {
               throw e;
@@ -141,18 +129,12 @@ export const features =
           }
 
           try {
-            const result = await commet.featureAccess.canUse({
+            const result = await commet.usage.check({
               customerId: userId,
-              code,
+              featureCode: code,
             });
 
-            if (!result.success) {
-              throw new APIError("INTERNAL_SERVER_ERROR", {
-                message: result.error?.message || "Failed to check feature",
-              });
-            }
-
-            return ctx.json(result.data ?? null);
+            return ctx.json(result);
           } catch (e: unknown) {
             if (e instanceof APIError) {
               throw e;
@@ -194,19 +176,12 @@ export const features =
           }
 
           try {
-            const result = await commet.featureAccess.canUse({
+            const result = await commet.usage.check({
               customerId: userId,
-              code,
+              featureCode: code,
             });
 
-            if (!result.success) {
-              throw new APIError("INTERNAL_SERVER_ERROR", {
-                message:
-                  result.error?.message || "Failed to check feature usage",
-              });
-            }
-
-            return ctx.json(result.data ?? null);
+            return ctx.json(result);
           } catch (e: unknown) {
             if (e instanceof APIError) {
               throw e;

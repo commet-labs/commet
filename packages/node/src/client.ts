@@ -1,5 +1,4 @@
 import { GeneratedResources } from "./_generated_resources";
-import { UsageResource } from "./resources/usage";
 import { Webhooks } from "./resources/webhooks";
 import type { CommetClientOptions } from "./types/common";
 import type { BillingConfig } from "./types/config";
@@ -9,7 +8,6 @@ import { scheduleSdkUpdateCheck } from "./utils/update-check";
 export class Commet<_TConfig = unknown> extends GeneratedResources {
   private httpClient: CommetHTTPClient;
 
-  public readonly usage: UsageResource;
   public readonly webhooks: Webhooks;
 
   constructor(config: CommetClientOptions) {
@@ -27,7 +25,6 @@ export class Commet<_TConfig = unknown> extends GeneratedResources {
 
     this.httpClient = new CommetHTTPClient(config);
     this.initResources(this.httpClient);
-    this.usage = new UsageResource(this.httpClient);
     this.webhooks = new Webhooks(this.httpClient);
     scheduleSdkUpdateCheck();
   }

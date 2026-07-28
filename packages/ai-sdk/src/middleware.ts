@@ -27,16 +27,20 @@ async function reportTokenUsage(
   const cacheWriteTokens = usage.inputTokens?.cacheWrite ?? 0;
 
   try {
-    await options.commet.usage.track({
-      feature: options.feature,
-      customerId: options.customerId,
-      model: modelId,
-      inputTokens,
-      outputTokens,
-      ...(cacheReadTokens > 0 && { cacheReadTokens }),
-      ...(cacheWriteTokens > 0 && { cacheWriteTokens }),
-      idempotencyKey: options.idempotencyKey,
-    });
+    await options.commet.usage.track(
+      {
+        featureCode: options.feature,
+        customerId: options.customerId,
+        model: modelId,
+        inputTokens,
+        outputTokens,
+        ...(cacheReadTokens > 0 && { cacheReadTokens }),
+        ...(cacheWriteTokens > 0 && { cacheWriteTokens }),
+      },
+      options.idempotencyKey
+        ? { idempotencyKey: options.idempotencyKey }
+        : undefined,
+    );
   } catch (error) {
     const trackingError =
       error instanceof Error ? error : new Error("Unknown tracking error");

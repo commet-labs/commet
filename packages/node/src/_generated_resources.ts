@@ -5,6 +5,7 @@ import { CustomersResource } from "./resources/customers";
 import { FeatureAccessResource } from "./resources/feature-access";
 import { FeaturesResource } from "./resources/features";
 import { InvoicesResource } from "./resources/invoices";
+import { OffersResource } from "./resources/offers";
 import { PaymentsResource } from "./resources/payments";
 import { PayoutsResource } from "./resources/payouts";
 import { PlanGroupsResource } from "./resources/plan-groups";
@@ -17,6 +18,7 @@ import { SeatsResource } from "./resources/seats";
 import { SubscriptionsResource } from "./resources/subscriptions";
 import { TestClockResource } from "./resources/test-clock";
 import { TransactionsResource } from "./resources/transactions";
+import { UsageResource } from "./resources/usage";
 import type { CommetHTTPClient } from "./utils/http";
 
 export class GeneratedResources {
@@ -27,6 +29,7 @@ export class GeneratedResources {
   public featureAccess!: FeatureAccessResource;
   public features!: FeaturesResource;
   public invoices!: InvoicesResource;
+  public offers!: OffersResource;
   public payments!: PaymentsResource;
   public payouts!: PayoutsResource;
   public planGroups!: PlanGroupsResource;
@@ -39,6 +42,7 @@ export class GeneratedResources {
   public subscriptions!: SubscriptionsResource;
   public testClock!: TestClockResource;
   public transactions!: TransactionsResource;
+  public usage!: UsageResource;
 
   protected initResources(http: CommetHTTPClient): void {
     this.addons = new AddonsResource(http);
@@ -48,6 +52,7 @@ export class GeneratedResources {
     this.featureAccess = new FeatureAccessResource(http);
     this.features = new FeaturesResource(http);
     this.invoices = new InvoicesResource(http);
+    this.offers = new OffersResource(http);
     this.payments = new PaymentsResource(http);
     this.payouts = new PayoutsResource(http);
     this.planGroups = new PlanGroupsResource(http);
@@ -60,5 +65,6 @@ export class GeneratedResources {
     this.subscriptions = new SubscriptionsResource(http);
     this.testClock = new TestClockResource(http);
     this.transactions = new TransactionsResource(http);
+    this.usage = new UsageResource(http);
   }
 }

@@ -7,14 +7,6 @@ export type CommetClientOptions = {
   telemetry?: boolean;
 };
 
-export interface ApiResponse<T = unknown> {
-  success: boolean;
-  data?: T;
-  error?: ApiErrorDetail;
-  hasMore?: boolean;
-  nextCursor?: string;
-}
-
 export interface ApiErrorDetail {
   type: string;
   code: string;
@@ -22,18 +14,6 @@ export interface ApiErrorDetail {
   param?: string;
   details?: unknown;
   doc_url?: string;
-}
-
-export interface PaginatedResponse<T> {
-  data: T[];
-  hasMore: boolean;
-  nextCursor?: string;
-  totalCount?: number;
-}
-
-export interface PaginatedList<T> extends PaginatedResponse<T> {
-  next(): Promise<PaginatedList<T>>;
-  all(): Promise<T[]>;
 }
 
 // Error types
@@ -79,41 +59,6 @@ export class CommetValidationError extends CommetError {
   }
 }
 
-export type CustomerID = string;
-export type AgreementID = `agr_${string}`;
-export type InvoiceID = `inv_${string}`;
-export type PhaseID = `phs_${string}`;
-export type ItemID = `itm_${string}`;
-export type ProductID = `prd_${string}`;
-export type EventID = `evt_${string}`;
-export type WebhookID = `wh_${string}`;
-
-// Currency enum
-export type Currency =
-  | "USD"
-  | "EUR"
-  | "GBP"
-  | "CAD"
-  | "AUD"
-  | "JPY"
-  | "ARS"
-  | "BRL"
-  | "MXN"
-  | "CLP";
-
-// Common parameters
-export interface ListParams extends Record<string, unknown> {
-  limit?: number;
-  cursor?: string;
-  startDate?: string;
-  endDate?: string;
-}
-
-export interface RetrieveOptions {
-  expand?: string[];
-}
-
-// Request options
 export interface RequestOptions {
   apiVersion?: string;
   idempotencyKey?: string;

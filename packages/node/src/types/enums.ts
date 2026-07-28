@@ -1,11 +1,3 @@
-export type SubscriptionStatus =
-  | "draft"
-  | "pending_payment"
-  | "trialing"
-  | "active"
-  | "past_due"
-  | "canceled";
-
 export type BillingInterval =
   | "weekly"
   | "monthly"
@@ -14,6 +6,8 @@ export type BillingInterval =
   | "one_time";
 
 export type ConsumptionModel = "metered" | "credits" | "balance";
+
+export type FeatureType = "boolean" | "usage" | "seats" | "quota";
 
 export type InvoiceType =
   | "recurring"
@@ -26,18 +20,15 @@ export type InvoiceType =
   | "one_time_payment"
   | "reactivation";
 
-export type TransactionStatus =
-  | "pending"
-  | "succeeded"
-  | "failed"
-  | "refunded"
-  | "disputed";
-
 export type PaymentProvider = "stripe" | "commet" | "dlocal";
 
-export type FeatureType = "boolean" | "usage" | "seats" | "quota";
-
-export type DiscountType = "percentage" | "amount";
+export type SubscriptionStatus =
+  | "draft"
+  | "pending_payment"
+  | "trialing"
+  | "active"
+  | "past_due"
+  | "canceled";
 
 export type Timezone =
   | "UTC"
@@ -61,3 +52,10 @@ export type Timezone =
   | "Asia/Singapore"
   | "Asia/Dubai"
   | "Australia/Sydney";
+
+export type TransactionStatus =
+  | "pending"
+  | "succeeded"
+  | "failed"
+  | "refunded"
+  | "disputed";

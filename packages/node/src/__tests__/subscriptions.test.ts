@@ -28,7 +28,7 @@ describe("Subscriptions — successUrl on the wire", () => {
 
   it("changePlan sends successUrl in the body and keeps id out of it", async () => {
     vi.mocked(fetch).mockResolvedValueOnce(
-      jsonResponse({ success: true, data: { id: "sub_1", scheduled: false } }),
+      jsonResponse({ id: "sub_1", scheduled: false }),
     );
     const client = new Commet({ apiKey: "ck_test_123" });
 
@@ -45,28 +45,18 @@ describe("Subscriptions — successUrl on the wire", () => {
     expect(url).toContain("/subscriptions/sub_1/change-plan");
   });
 
-  it("create sends introOffer with camelCase keys", async () => {
-    vi.mocked(fetch).mockResolvedValueOnce(
-      jsonResponse({ success: true, data: { id: "sub_1" } }),
-    );
+  it("create sends the promotional offer id", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(jsonResponse({ id: "sub_1" }));
     const client = new Commet({ apiKey: "ck_test_123" });
 
     await client.subscriptions.create({
       customerId: "cus_1",
       planId: "plan_pro",
-      introOffer: {
-        discountType: "percentage",
-        discountValue: 2500,
-        durationCycles: 3,
-      },
+      offerId: "offer_intro",
     });
 
     const { url, body } = lastRequest();
     expect(url).toContain("/subscriptions");
-    expect(body.introOffer).toEqual({
-      discountType: "percentage",
-      discountValue: 2500,
-      durationCycles: 3,
-    });
+    expect(body.offerId).toBe("offer_intro");
   });
 });

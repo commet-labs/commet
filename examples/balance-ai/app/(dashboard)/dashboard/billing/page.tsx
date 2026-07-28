@@ -31,10 +31,7 @@ export default async function BillingPage() {
   const subscriptionResult = await commet.subscriptions.getActive({
     customerId: user.id,
   });
-  const subscription =
-    subscriptionResult.success && subscriptionResult.data
-      ? subscriptionResult.data
-      : null;
+  const subscription = subscriptionResult;
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-6">

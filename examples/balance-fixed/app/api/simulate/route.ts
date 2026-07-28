@@ -19,19 +19,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid feature" }, { status: 400 });
   }
 
-  const result = await commet.usage.track({
+  await commet.usage.track({
     customerId: user.id,
-    feature: featureCode,
+    featureCode,
     value: 1,
   });
-
-  if (!result.success) {
-    return NextResponse.json({
-      feature: featureCode,
-      cost: "-",
-      status: result.error?.message || "Failed — balance may be exhausted",
-    });
-  }
 
   return NextResponse.json({
     feature: featureCode,

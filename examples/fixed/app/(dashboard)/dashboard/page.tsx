@@ -22,13 +22,13 @@ export default async function DashboardPage() {
 
   const results = await Promise.all(
     FEATURE_CODES.map((code) =>
-      commet.featureAccess.canUse({ customerId: user!.id, code }),
+      commet.featureAccess.get({ customerId: user!.id, code }),
     ),
   );
 
   const features = FEATURE_CODES.map((code, i) => ({
     code,
-    allowed: results[i]?.data?.allowed ?? false,
+    allowed: results[i]?.allowed ?? false,
   }));
 
   return (

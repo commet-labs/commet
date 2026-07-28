@@ -1,4 +1,4 @@
-import type { ApiResponse, RequestOptions } from "../types/common";
+import type { RequestOptions } from "../types/common";
 import type { PortalAccess } from "../types/models";
 import type { CommetHTTPClient } from "../utils/http";
 
@@ -15,7 +15,7 @@ export class PortalResource {
   async getUrl(
     params?: RequestPortalAccessParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<PortalAccess>> {
-    return this.httpClient.post("/portal/request-access", params, options);
+  ): Promise<PortalAccess> {
+    return this.httpClient.post("/portal/sessions", params, options);
   }
 }

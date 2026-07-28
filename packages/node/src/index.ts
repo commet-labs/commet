@@ -1,4 +1,3 @@
-// Core (hand-written, never generated)
 export { Commet, createCommet } from "./client";
 export type {
   CreateAddonParams,
@@ -26,7 +25,6 @@ export type {
   UpdateCustomerParams,
 } from "./resources/customers";
 export type {
-  CanUseFeatureParams,
   GetFeatureAccessParams,
   ListFeatureAccessParams,
 } from "./resources/feature-access";
@@ -37,6 +35,14 @@ export type {
   UpdateFeatureParams,
 } from "./resources/features";
 export type {
+  CreateWebhookEndpointParams,
+  DeleteWebhookEndpointParams,
+  GetWebhookEndpointParams,
+  ListWebhookEndpointsParams,
+  TestWebhookEndpointParams,
+  UpdateWebhookEndpointParams,
+} from "./resources/generated-webhooks";
+export type {
   CreateAdjustmentInvoiceParams,
   DownloadInvoiceParams,
   GetInvoiceParams,
@@ -44,6 +50,13 @@ export type {
   SendInvoiceParams,
   UpdateInvoiceStatusParams,
 } from "./resources/invoices";
+export type {
+  CreateOfferParams,
+  DeleteOfferParams,
+  GetOfferParams,
+  ListOffersParams,
+  UpdateOfferParams,
+} from "./resources/offers";
 export type {
   CancelPaymentParams,
   ChargePaymentParams,
@@ -131,43 +144,20 @@ export type {
   RefundTransactionParams,
   RetryTransactionParams,
 } from "./resources/transactions";
-// Preserved hand-written resources (custom logic, not generated)
 export type {
-  CheckUsageParams,
+  CheckUsageAvailabilityParams,
   SetUsageParams,
-  TrackModelTokensParams,
-  TrackParams,
   TrackUsageParams,
-  UsageAdjustment,
-  UsageCheckDenialReason,
-  UsageCheckResult,
-  UsageEvent,
-  UsageEventProperty,
 } from "./resources/usage";
 export type {
-  CreateWebhookParams,
-  DeleteWebhookParams,
-  GetWebhookParams,
-  ListWebhooksParams,
-  TestWebhookParams,
-  UpdateWebhookParams,
   WebhookData,
-  WebhookEndpoint,
-  WebhookEndpointCreated,
   WebhookEventHandler,
   WebhookPayload,
-  WebhookTestResult,
 } from "./resources/webhooks";
 export { Webhooks } from "./resources/webhooks";
 export type {
   ApiErrorDetail,
-  ApiResponse,
   CommetClientOptions,
-  Currency,
-  CustomerID,
-  EventID,
-  PaginatedList,
-  PaginatedResponse,
   RequestOptions,
   ResolvedFeatureCode,
   ResolvedPlanCode,
@@ -194,7 +184,6 @@ export { defineConfig } from "./types/config";
 export type {
   BillingInterval,
   ConsumptionModel,
-  DiscountType,
   FeatureType,
   InvoiceType,
   PaymentProvider,
@@ -210,24 +199,23 @@ export type {
   BalanceAdjustment,
   BalanceTopup,
   BulkSeatUpdate,
-  CanceledSubscription,
   ClaimLink,
   CreatedApiKey,
-  CreatedInvoice,
+  CreatedWebhook,
   CreditGrant,
   CreditPack,
   Customer,
   CustomerBatch,
-  DefaultPlanPrice,
   DeletedObject,
+  DeletedOffer,
   DeletedPlanRegionalPricing,
   DeletedSubscriptionAddon,
   Feature,
   FeatureAccess,
-  FeatureLookup,
+  FeatureAccessLookup,
   Invoice,
   InvoiceDownload,
-  InvoiceStatus,
+  Offer,
   Payment,
   PaymentMethodUpdateCheckout,
   Payout,
@@ -240,12 +228,12 @@ export type {
   PlanPrice,
   PlanRegionalPricing,
   PlanRegionalPricingResult,
-  PlanVisibility,
   PortalAccess,
   PreviewChange,
   PromoCode,
   ReactivatedSubscription,
   RecoveryLink,
+  Refund,
   RemovedPlanFeature,
   RemovedPlanFromGroup,
   ReorderedPlans,
@@ -258,11 +246,13 @@ export type {
   TestClock,
   TestClockBilling,
   Transaction,
-  TransactionRefund,
   TransactionRetry,
-  UncanceledSubscription,
+  UsageAdjustment,
+  UsageCheck,
+  UsageEvent,
   UsageQuota,
   UsageQuotaEvent,
+  Webhook,
   WebhookAddonRef,
   WebhookBalance,
   WebhookBankRef,
@@ -271,6 +261,7 @@ export type {
   WebhookFeatureAccess,
   WebhookPlanRef,
   WebhookSeatSummary,
+  WebhookTest,
 } from "./types/models";
 export type * from "./types/webhook-events";
 export { registerIntegration } from "./utils/telemetry";

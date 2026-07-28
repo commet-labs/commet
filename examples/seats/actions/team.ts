@@ -53,16 +53,16 @@ export async function inviteMemberAction(
       return { success: false, error: "Not authenticated" };
     }
 
-    const canAdd = await commet.featureAccess.canUse({
+    const memberAccess = await commet.featureAccess.get({
       customerId: user.id,
       code: "member",
     });
-    if (!canAdd.success || !canAdd.data?.allowed) {
+    const memberUsage =
+      memberAccess.type === "seats" ? memberAccess.usage : undefined;
+    if (!memberAccess.allowed || !memberUsage) {
       return {
         success: false,
-        error:
-          canAdd.data?.reason ||
-          "Seat limit reached. Please upgrade your plan.",
+        error: "Seat limit reached. Please upgrade your plan.",
       };
     }
 
@@ -122,7 +122,8 @@ export async function inviteMemberAction(
 
     return {
       success: true,
-      willBeCharged: canAdd.data.willBeCharged,
+      willBeCharged:
+        memberUsage.remainingUnits === 0 && memberUsage.overage.enabled,
     };
   } catch (error) {
     console.error("Error inviting member:", error);
@@ -219,11 +220,11 @@ export async function checkSubscriptionStatusAction(): Promise<SubscriptionStatu
     const result = await commet.subscriptions.getActive({
       customerId: user.id,
     });
-    if (!result.success || !result.data) {
+    if (!result) {
       return defaultStatus;
     }
 
-    const subscription = result.data;
+    const subscription = result;
     const isActive =
       subscription.status === "active" || subscription.status === "trialing";
 
@@ -231,6 +232,8 @@ export async function checkSubscriptionStatusAction(): Promise<SubscriptionStatu
       customerId: user.id,
       code: "member",
     });
+    const seatUsage =
+      seatResult.type === "seats" ? seatResult.usage : undefined;
 
     return {
       isPaid: isActive,
@@ -238,9 +241,11 @@ export async function checkSubscriptionStatusAction(): Promise<SubscriptionStatu
       status: subscription.status,
       planName: subscription.plan.name,
       daysRemaining: subscription.currentPeriod?.daysRemaining,
-      seatsUsed: seatResult.data?.current ?? 0,
-      seatsIncluded: seatResult.data?.included ?? 0,
-      seatOveragePrice: seatResult.data?.overageUnitPrice,
+      seatsUsed: seatUsage?.unitsUsed ?? 0,
+      seatsIncluded: seatUsage?.includedUnits ?? 0,
+      seatOveragePrice: seatUsage?.overage.unitPrice
+        ? seatUsage.overage.unitPrice.amount / 100
+        : undefined,
     };
   } catch (error) {
     if (

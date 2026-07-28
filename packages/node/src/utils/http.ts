@@ -1,6 +1,5 @@
 import type {
   ApiErrorDetail,
-  ApiResponse,
   CommetClientOptions,
   RequestOptions,
 } from "../types/common";
@@ -52,7 +51,7 @@ export class CommetHTTPClient {
     endpoint: string,
     params?: Record<string, unknown> | object,
     options?: RequestOptions,
-  ): Promise<ApiResponse<T>> {
+  ): Promise<T> {
     return this.request(
       "GET",
       endpoint,
@@ -66,7 +65,7 @@ export class CommetHTTPClient {
     endpoint: string,
     data?: unknown,
     options?: RequestOptions,
-  ): Promise<ApiResponse<T>> {
+  ): Promise<T> {
     return this.request("POST", endpoint, data, options);
   }
 
@@ -74,15 +73,23 @@ export class CommetHTTPClient {
     endpoint: string,
     data?: unknown,
     options?: RequestOptions,
-  ): Promise<ApiResponse<T>> {
+  ): Promise<T> {
     return this.request("PUT", endpoint, data, options);
+  }
+
+  async patch<T = unknown>(
+    endpoint: string,
+    data?: unknown,
+    options?: RequestOptions,
+  ): Promise<T> {
+    return this.request("PATCH", endpoint, data, options);
   }
 
   async delete<T = unknown>(
     endpoint: string,
     data?: unknown,
     options?: RequestOptions,
-  ): Promise<ApiResponse<T>> {
+  ): Promise<T> {
     return this.request("DELETE", endpoint, data, options);
   }
 
@@ -98,7 +105,7 @@ export class CommetHTTPClient {
     data?: unknown,
     options?: RequestOptions,
     params?: Record<string, unknown>,
-  ): Promise<ApiResponse<T>> {
+  ): Promise<T> {
     const url = this.buildURL(endpoint, params);
 
     // Generate idempotency key once before retries — all attempts reuse the same key
@@ -122,7 +129,7 @@ export class CommetHTTPClient {
     data?: unknown,
     options?: RequestOptions,
     attempt = 1,
-  ): Promise<ApiResponse<T>> {
+  ): Promise<T> {
     try {
       const apiVersion = this.resolveApiVersion(options);
 
@@ -286,7 +293,7 @@ export class CommetHTTPClient {
         };
       }
 
-      return responseData as ApiResponse<T>;
+      return responseData as T;
     } catch (error) {
       // Handle network errors and timeouts
       const isNetworkError =

@@ -17,7 +17,7 @@ export default async function DashboardLayout({
     customerId: user.id,
   });
 
-  if (!subscription.success || !subscription.data) {
+  if (!subscription) {
     redirect("/pricing");
   }
 

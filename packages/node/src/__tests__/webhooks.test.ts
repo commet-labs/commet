@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import { describe, expect, expectTypeOf, it } from "vitest";
 import { type WebhookPayload, Webhooks } from "../resources/webhooks";
+import type { WebhookFeatureAccess, WebhookPlanRef } from "../types/models";
 import type {
   CustomerStateChangedData,
   PaymentLinkCompletedData,
@@ -10,7 +11,6 @@ import type {
   WebhookEvent,
   WebhookEventDataMap,
 } from "../types/webhook-events";
-import type { WebhookFeatureAccess, WebhookPlanRef } from "../types/models";
 
 function signPayload(payload: string, secret: string): string {
   return crypto.createHmac("sha256", secret).update(payload).digest("hex");
@@ -180,7 +180,9 @@ describe("Webhooks", () => {
       expectTypeOf(result).toEqualTypeOf<WebhookPayload | null>();
       expect(result?.event).toBe("subscription.activated");
       expect(result?.organizationId).toBe("org_123");
-      expect(result?.data.customerId).toBe("cus_456");
+      if (result?.event === "subscription.activated") {
+        expect(result.data.customerId).toBe("cus_456");
+      }
     });
 
     it("returns null for invalid signature", () => {
@@ -245,7 +247,7 @@ describe("Webhooks", () => {
       },
     });
 
-    it("verifyAndParse stays wide; on() delivers the typed, narrowed data", async () => {
+    it("verifyAndParse and on() use the generated event union", async () => {
       const dispatcher = new Webhooks();
       let received: CustomerStateChangedData | undefined;
       dispatcher.on("customer.state_changed", (data, payload) => {

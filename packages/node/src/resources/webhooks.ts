@@ -1,46 +1,14 @@
 import crypto from "node:crypto";
-import type { ApiResponse, RequestOptions } from "../types/common";
-import type { SubscriptionStatus } from "../types/enums";
 import type {
   WebhookEvent,
   WebhookEventDataMap,
   WebhookEventPayload,
 } from "../types/webhook-events";
 import type { CommetHTTPClient } from "../utils/http";
+import { GeneratedWebhooksResource } from "./generated-webhooks";
 
-/**
- * Webhook payload structure from Commet
- */
-export interface WebhookPayload {
-  event: WebhookEvent;
-  timestamp: string;
-  organizationId: string;
-  mode: "live" | "sandbox";
-  apiVersion: string;
-  data: WebhookData;
-}
-
-/**
- * Webhook data structure (subscription-related fields).
- *
- * The `status` field is present on `subscription.*` events. Grant access only
- * when it is `"active"` or `"trialing"`. `"pending_payment"` means the first
- * charge has not been confirmed yet — wait for `subscription.activated` before
- * granting access.
- */
-export interface WebhookData {
-  publicId?: string;
-  subscriptionId?: string;
-  customerId?: string;
-  /**
-   * Subscription status. Present on `subscription.*` events.
-   * Grant access when this is `"active"` or `"trialing"`.
-   */
-  status?: SubscriptionStatus;
-  name?: string;
-  canceledAt?: string;
-  [key: string]: unknown;
-}
+export type WebhookPayload = WebhookEventPayload;
+export type WebhookData = WebhookPayload["data"];
 
 export type WebhookEventHandler<E extends WebhookEvent> = (
   data: WebhookEventDataMap[E],
@@ -64,68 +32,15 @@ export interface VerifyAndParseParams {
   secret: string;
 }
 
-export interface WebhookEndpoint {
-  id: string;
-  object: "webhook";
-  livemode: boolean;
-  url: string;
-  events: string[];
-  description: string | null;
-  isActive: boolean;
-  apiVersion: string | null;
-  createdAt: string;
-}
-
-export interface WebhookEndpointCreated extends WebhookEndpoint {
-  secretKey: string;
-}
-
-export interface WebhookTestResult {
-  success: boolean;
-  deliveryId: string;
-  deliveredAt: string;
-}
-
-export interface ListWebhooksParams {
-  limit?: number;
-  cursor?: string;
-}
-
-export interface CreateWebhookParams {
-  url: string;
-  events: string[];
-  description?: string;
-  apiVersion?: string;
-}
-
-export interface GetWebhookParams {
-  id: string;
-}
-
-export interface UpdateWebhookParams {
-  id: string;
-  url?: string;
-  events?: string[];
-  description?: string | null;
-  isActive?: boolean;
-  apiVersion?: string;
-}
-
-export interface DeleteWebhookParams {
-  id: string;
-}
-
-export interface TestWebhookParams {
-  id: string;
-}
-
-export class Webhooks {
+export class Webhooks extends GeneratedWebhooksResource {
   private readonly eventHandlers = new Map<
     WebhookEvent,
     WebhookEventHandler<WebhookEvent>
   >();
 
-  constructor(private httpClient?: CommetHTTPClient) {}
+  constructor(httpClient?: CommetHTTPClient) {
+    super(httpClient as CommetHTTPClient);
+  }
 
   verify(params: VerifyParams): boolean {
     const { payload, signature, secret } = params;
@@ -179,51 +94,5 @@ export class Webhooks {
     const handler = this.eventHandlers.get(payload.event);
     if (handler) await handler(payload.data as never, payload as never);
     return payload;
-  }
-
-  async list(
-    params?: ListWebhooksParams,
-    options?: RequestOptions,
-  ): Promise<ApiResponse<WebhookEndpoint[]>> {
-    return this.httpClient!.get("/webhooks", params, options);
-  }
-
-  async create(
-    params: CreateWebhookParams,
-    options?: RequestOptions,
-  ): Promise<ApiResponse<WebhookEndpointCreated>> {
-    return this.httpClient!.post("/webhooks", params, options);
-  }
-
-  async get(
-    params: GetWebhookParams,
-    options?: RequestOptions,
-  ): Promise<ApiResponse<WebhookEndpoint>> {
-    const { id } = params;
-    return this.httpClient!.get(`/webhooks/${id}`, undefined, options);
-  }
-
-  async update(
-    params: UpdateWebhookParams,
-    options?: RequestOptions,
-  ): Promise<ApiResponse<WebhookEndpoint>> {
-    const { id, ...body } = params;
-    return this.httpClient!.put(`/webhooks/${id}`, body, options);
-  }
-
-  async delete(
-    params: DeleteWebhookParams,
-    options?: RequestOptions,
-  ): Promise<ApiResponse<{ id: string; deleted: true }>> {
-    const { id } = params;
-    return this.httpClient!.delete(`/webhooks/${id}`, undefined, options);
-  }
-
-  async test(
-    params: TestWebhookParams,
-    options?: RequestOptions,
-  ): Promise<ApiResponse<WebhookTestResult>> {
-    const { id } = params;
-    return this.httpClient!.post(`/webhooks/${id}/test`, undefined, options);
   }
 }

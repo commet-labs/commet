@@ -23,8 +23,8 @@ export default async function PricingPage() {
     const subscriptionResult = await commet.subscriptions.getActive({
       customerId: user.id,
     });
-    if (subscriptionResult.success && subscriptionResult.data) {
-      const subscription = subscriptionResult.data;
+    if (subscriptionResult) {
+      const subscription = subscriptionResult;
       if (
         subscription.status === "pending_payment" &&
         subscription.checkoutUrl
@@ -41,8 +41,7 @@ export default async function PricingPage() {
   }
 
   const result = await commet.plans.list();
-  const plans =
-    result.success && result.data ? result.data.filter((p) => p.isPublic) : [];
+  const plans = result.data.filter((plan) => plan.isPublic);
 
   return (
     <div className="flex flex-1 flex-col items-center px-4 py-20">

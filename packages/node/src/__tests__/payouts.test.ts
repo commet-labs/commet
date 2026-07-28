@@ -1,13 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Commet } from "../client";
-import type { ApiResponse } from "../types/common";
-
-function unwrap<T>(response: ApiResponse<T>): T {
-  if (response.data === undefined) {
-    throw new Error("expected response.data to be defined");
-  }
-  return response.data;
-}
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -42,8 +34,9 @@ describe("Payouts — wire serialization", () => {
     it("sends the full camelCase bank payload and omits unset optionals", async () => {
       vi.mocked(fetch).mockResolvedValueOnce(
         jsonResponse({
-          success: true,
-          data: { id: "pba_1", last4: "6789", object: "payout_bank_account" },
+          id: "pba_1",
+          last4: "6789",
+          object: "payout_bank_account",
         }),
       );
 
@@ -63,9 +56,7 @@ describe("Payouts — wire serialization", () => {
     });
 
     it("serializes the accountType enum and setDefault=false (not dropped)", async () => {
-      vi.mocked(fetch).mockResolvedValueOnce(
-        jsonResponse({ success: true, data: { id: "pba_1" } }),
-      );
+      vi.mocked(fetch).mockResolvedValueOnce(jsonResponse({ id: "pba_1" }));
 
       await client().payouts.addBankAccount({
         accountNumber: "000123456789",
@@ -97,9 +88,7 @@ describe("Payouts — wire serialization", () => {
         object: "payout_bank_account",
         livemode: true,
       };
-      vi.mocked(fetch).mockResolvedValueOnce(
-        jsonResponse({ success: true, data: account }),
-      );
+      vi.mocked(fetch).mockResolvedValueOnce(jsonResponse(account));
 
       const result = await client().payouts.addBankAccount({
         accountNumber: "000123456789",
@@ -107,7 +96,7 @@ describe("Payouts — wire serialization", () => {
       });
 
       // wire null survives as null, not coerced to undefined / dropped
-      const data = unwrap(result);
+      const data = result;
       expect(data.providerExternalAccountId).toBeNull();
       expect(data.bankName).toBeNull();
       expect(data.last4).toBe("6789");
@@ -120,8 +109,8 @@ describe("Payouts — wire serialization", () => {
     it("sends amount (cents) and omits description when not provided", async () => {
       vi.mocked(fetch).mockResolvedValueOnce(
         jsonResponse({
-          success: true,
-          data: { id: "po_1", status: "pending" },
+          id: "po_1",
+          status: "pending",
         }),
       );
 
@@ -147,16 +136,14 @@ describe("Payouts — wire serialization", () => {
         object: "payout",
         livemode: true,
       };
-      vi.mocked(fetch).mockResolvedValueOnce(
-        jsonResponse({ success: true, data: payout }),
-      );
+      vi.mocked(fetch).mockResolvedValueOnce(jsonResponse(payout));
 
       const result = await client().payouts.request({
         amount: 5000,
         description: "weekly",
       });
 
-      const data = unwrap(result);
+      const data = result;
       expect(data.status).toBe("pending");
       expect(data.netAmount).toBe(5000);
       expect(data.providerTransferId).toBe("tr_abc");
@@ -168,8 +155,8 @@ describe("Payouts — wire serialization", () => {
     it("sends the nested bank + individual + address payload intact", async () => {
       vi.mocked(fetch).mockResolvedValueOnce(
         jsonResponse({
-          success: true,
-          data: { providerAccountId: "acct_1", status: "pending_verification" },
+          providerAccountId: "acct_1",
+          status: "pending_verification",
         }),
       );
 
@@ -232,9 +219,7 @@ describe("Payouts — wire serialization", () => {
         object: "payout_account",
         livemode: true,
       };
-      vi.mocked(fetch).mockResolvedValueOnce(
-        jsonResponse({ success: true, data: verification }),
-      );
+      vi.mocked(fetch).mockResolvedValueOnce(jsonResponse(verification));
 
       const result = await client().payouts.completeVerification({
         email: "ops@acme.com",
@@ -255,7 +240,7 @@ describe("Payouts — wire serialization", () => {
         },
       });
 
-      const data = unwrap(result);
+      const data = result;
       expect(data.status).toBe("verified");
       expect(data.transfersEnabled).toBe(true);
       expect(data.alreadyExists).toBe(true);

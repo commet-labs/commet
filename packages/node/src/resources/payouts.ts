@@ -1,4 +1,4 @@
-import type { ApiResponse, RequestOptions } from "../types/common";
+import type { RequestOptions } from "../types/common";
 import type {
   Payout,
   PayoutBankAccount,
@@ -73,7 +73,7 @@ export class PayoutsResource {
   async addBankAccount(
     params: AddPayoutBankAccountParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<PayoutBankAccount>> {
+  ): Promise<PayoutBankAccount> {
     return this.httpClient.post("/payouts/bank-accounts", params, options);
   }
 
@@ -81,7 +81,7 @@ export class PayoutsResource {
   async request(
     params: RequestPayoutParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<Payout>> {
+  ): Promise<Payout> {
     return this.httpClient.post("/payouts", params, options);
   }
 
@@ -89,7 +89,7 @@ export class PayoutsResource {
   async completeVerification(
     params: CompletePayoutVerificationParams,
     options?: RequestOptions,
-  ): Promise<ApiResponse<PayoutVerification>> {
+  ): Promise<PayoutVerification> {
     return this.httpClient.post("/payouts/verification", params, options);
   }
 }
