@@ -28,16 +28,39 @@ export interface ListAddonsParams {
   limit?: number;
 }
 
-export interface CreateAddonParams {
-  name: string;
-  description?: string;
-  basePrice: number;
-  featureId: string;
-  consumptionModel: "boolean" | "metered" | "credits" | "balance";
-  includedUnits?: number;
-  overageRate?: number;
-  creditCost?: number;
-}
+export type CreateAddonParams =
+  | {
+      name: string;
+      description?: string;
+      basePrice: number;
+      featureId: string;
+      consumptionModel: "boolean";
+    }
+  | {
+      name: string;
+      description?: string;
+      basePrice: number;
+      featureId: string;
+      consumptionModel: "metered";
+      includedUnits: number;
+      overageRate: number;
+    }
+  | {
+      name: string;
+      description?: string;
+      basePrice: number;
+      featureId: string;
+      consumptionModel: "credits";
+      creditCost: number;
+    }
+  | {
+      name: string;
+      description?: string;
+      basePrice: number;
+      featureId: string;
+      consumptionModel: "balance";
+      overageRate: number;
+    };
 
 export class AddonsResource {
   constructor(private httpClient: CommetHTTPClient) {}

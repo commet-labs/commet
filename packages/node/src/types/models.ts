@@ -34,16 +34,16 @@ export interface Addon {
   slug: string;
   description: string | null;
   basePrice: number;
-  consumptionModel: "boolean" | "metered" | "credits" | "balance";
   featureCode: string;
   featureName: string;
-  includedUnits: number | null;
-  overageRate: number | null;
-  creditCost: number | null;
   /** @format date-time */
   createdAt: string;
   /** @format date-time */
   updatedAt: string;
+  consumptionModel: "boolean" | "metered" | "credits" | "balance";
+  includedUnits: number | null;
+  overageRate: number | null;
+  creditCost: number | null;
   object: "addon";
   livemode: boolean;
 }
@@ -74,19 +74,6 @@ export interface BalanceTopup {
   livemode: boolean;
 }
 
-export interface BulkSeatUpdate {
-  id: string;
-  featureCode: string;
-  previousBalance: number;
-  newBalance: number;
-  /** @format date-time */
-  ts: string;
-  /** @format date-time */
-  createdAt: string;
-  object: "seat_event";
-  livemode: boolean;
-}
-
 export interface ClaimLink {
   url: string;
   /** @format date-time */
@@ -105,6 +92,64 @@ export interface CreatedApiKey {
   /** @format date-time */
   createdAt: string;
   object: "api_key";
+  livemode: boolean;
+}
+
+export interface CreatedSubscription {
+  id: string;
+  customerId: string;
+  plan: {
+    id: string;
+    name: string;
+  };
+  name: string;
+  description: string | null;
+  status: SubscriptionStatus;
+  billingInterval: BillingInterval | null;
+  trialEndsAt: string | null;
+  currentPeriod: {
+    /** @format date-time */
+    start: string;
+    /** @format date-time */
+    end: string;
+    daysRemaining: number;
+  } | null;
+  cancellation: {
+    /** @format date-time */
+    scheduledAt: string;
+    reason: string | null;
+    /** @format date-time */
+    effectiveAt: string;
+  } | null;
+  cancelAtPeriodEnd: boolean;
+  scheduledPlanChange: {
+    changeType: "plan_downgrade" | "interval_change";
+    newPlanId: string | null;
+    newPlanName: string | null;
+    newBillingInterval: string | null;
+    /** @format date-time */
+    scheduledFor: string;
+  } | null;
+  discount: {
+    type: "percentage" | "amount";
+    value: number;
+    name: string | null;
+    endsAt: string | null;
+  } | null;
+  /** @format date-time */
+  startDate: string;
+  endDate: string | null;
+  billingDayOfMonth: number | null;
+  nextBillingDate: string | null;
+  checkoutUrl: string | null;
+  /** @format date-time */
+  createdAt: string;
+  /** @format date-time */
+  updatedAt: string;
+  /** Payment provider resolved for this checkout when the subscription response was created. This is an informational snapshot and may differ when the checkout is loaded if its country or the organization's routing changes. */
+  checkoutProvider: PaymentProvider | null;
+  priceId: string | null;
+  object: "subscription";
   livemode: boolean;
 }
 
@@ -134,12 +179,22 @@ export interface CreditPack {
   description: string | null;
   credits: number;
   price: number;
-  currency?: string;
-  isActive?: boolean;
+  isActive: boolean;
   /** @format date-time */
-  createdAt?: string;
+  createdAt: string;
   /** @format date-time */
-  updatedAt?: string;
+  updatedAt: string;
+  object: "credit_pack";
+  livemode: boolean;
+}
+
+export interface CreditPackListItem {
+  id: string;
+  name: string;
+  description: string | null;
+  credits: number;
+  price: number;
+  currency: string;
   object: "credit_pack";
   livemode: boolean;
 }
@@ -189,7 +244,7 @@ export interface CustomerBatch {
       };
     };
   }>;
-  object: "customer";
+  object: "customer_batch";
   livemode: boolean;
 }
 
@@ -248,7 +303,7 @@ export type FeatureAccess =
       type: "boolean";
       /** Whether the feature is enabled. */
       enabled: boolean;
-      object: "feature";
+      object: "feature_access";
       livemode: boolean;
     }
   | {
@@ -364,7 +419,7 @@ export type FeatureAccess =
               scale: 10000;
             };
           };
-      object: "feature";
+      object: "feature_access";
       livemode: boolean;
     }
   | {
@@ -415,7 +470,7 @@ export type FeatureAccess =
           };
         };
       };
-      object: "feature";
+      object: "feature_access";
       livemode: boolean;
     }
   | {
@@ -468,244 +523,7 @@ export type FeatureAccess =
         /** Highest quota reached during the period and used for billing. */
         billedUnits: number;
       };
-      object: "feature";
-      livemode: boolean;
-    };
-
-export type FeatureAccessLookup =
-  | {
-      /** Unique feature code. */
-      code: string;
-      /** Display name of the feature. */
-      name: string;
-      /** Display name for one product unit, or null when not applicable. */
-      unitName: string | null;
-      /** Whether the customer can currently access or consume the feature. */
-      allowed: boolean;
-      type: "boolean";
-      /** Whether the feature is enabled. */
-      enabled: boolean;
-      object: "feature";
-      livemode: boolean;
-    }
-  | {
-      /** Unique feature code. */
-      code: string;
-      /** Display name of the feature. */
-      name: string;
-      /** Display name for one product unit, or null when not applicable. */
-      unitName: string | null;
-      /** Whether the customer can currently access or consume the feature. */
-      allowed: boolean;
-      type: "usage";
-      consumption:
-        | {
-            /** Usage is measured against an included allowance and overage. */
-            model: "metered";
-            /** Time range used to calculate this feature's consumption. */
-            period: {
-              /**
-               * Inclusive usage period start.
-               * @format date-time
-               */
-              start: string;
-              /**
-               * Exclusive usage period end.
-               * @format date-time
-               */
-              end: string;
-            };
-            /** Product units recorded during the period. */
-            unitsUsed: number;
-            /** Product units included in the subscription for the period. */
-            includedUnits: number;
-            /** Included units not yet consumed. Absent when usage is unlimited. */
-            remainingUnits?: number;
-            /** Whether the feature has no usage limit. */
-            unlimited: boolean;
-            overage: {
-              /** Whether usage above the included amount is allowed and billed. */
-              enabled: boolean;
-              /** Units consumed above the included amount. */
-              units: number;
-              /** Price for one additional product unit. */
-              unitPrice?: {
-                /** Integer rate amount. Divide by scale to obtain the price. */
-                amount: number;
-                /** Lowercase ISO 4217 currency code. */
-                currency: string;
-                /** Divide amount by scale to obtain the major-unit price. */
-                scale: 10000;
-              };
-            };
-          }
-        | {
-            /** Product usage consumes credits from a shared pool. */
-            model: "credits";
-            /** Time range used to calculate this feature's consumption. */
-            period: {
-              /**
-               * Inclusive usage period start.
-               * @format date-time
-               */
-              start: string;
-              /**
-               * Exclusive usage period end.
-               * @format date-time
-               */
-              end: string;
-            };
-            /** Product units recorded during the period. */
-            unitsUsed: number;
-            /** Credits deducted for each product unit. */
-            creditsPerUnit: number;
-            /** Actual credits deducted by this feature during the period. */
-            creditsConsumed: number;
-            /** Additional product units available from the current shared credit pool at this feature's conversion rate. */
-            availableUnits: number;
-          }
-        | {
-            /** Product usage deducts money from a shared balance. */
-            model: "balance";
-            /** Time range used to calculate this feature's consumption. */
-            period: {
-              /**
-               * Inclusive usage period start.
-               * @format date-time
-               */
-              start: string;
-              /**
-               * Exclusive usage period end.
-               * @format date-time
-               */
-              end: string;
-            };
-            /** Product units recorded during the period. */
-            unitsUsed: number;
-            /** Actual money deducted for this feature during the period. */
-            spent: {
-              /** Amount in the currency's smallest unit. */
-              amount: number;
-              /** Lowercase ISO 4217 currency code. */
-              currency: string;
-            };
-            /** Estimated additional units available from the current shared balance at this feature's fixed price. Absent for dynamic pricing. */
-            availableUnits?: number;
-            /** Price for one additional product unit. */
-            unitPrice?: {
-              /** Integer rate amount. Divide by scale to obtain the price. */
-              amount: number;
-              /** Lowercase ISO 4217 currency code. */
-              currency: string;
-              /** Divide amount by scale to obtain the major-unit price. */
-              scale: 10000;
-            };
-          };
-      object: "feature";
-      livemode: boolean;
-    }
-  | {
-      /** Unique feature code. */
-      code: string;
-      /** Display name of the feature. */
-      name: string;
-      /** Display name for one product unit, or null when not applicable. */
-      unitName: string | null;
-      /** Whether the customer can currently access or consume the feature. */
-      allowed: boolean;
-      type: "seats";
-      usage: {
-        /** Time range used to calculate this feature's consumption. */
-        period: {
-          /**
-           * Inclusive usage period start.
-           * @format date-time
-           */
-          start: string;
-          /**
-           * Exclusive usage period end.
-           * @format date-time
-           */
-          end: string;
-        };
-        /** Current units assigned or in use. */
-        unitsUsed: number;
-        /** Units included in the subscription for the period. */
-        includedUnits: number;
-        /** Included units still available. Absent when usage is unlimited. */
-        remainingUnits?: number;
-        /** Whether the feature has no usage limit. */
-        unlimited: boolean;
-        overage: {
-          /** Whether usage above the included amount is allowed and billed. */
-          enabled: boolean;
-          /** Units consumed above the included amount. */
-          units: number;
-          /** Price for one additional product unit. */
-          unitPrice?: {
-            /** Integer rate amount. Divide by scale to obtain the price. */
-            amount: number;
-            /** Lowercase ISO 4217 currency code. */
-            currency: string;
-            /** Divide amount by scale to obtain the major-unit price. */
-            scale: 10000;
-          };
-        };
-      };
-      object: "feature";
-      livemode: boolean;
-    }
-  | {
-      /** Unique feature code. */
-      code: string;
-      /** Display name of the feature. */
-      name: string;
-      /** Display name for one product unit, or null when not applicable. */
-      unitName: string | null;
-      /** Whether the customer can currently access or consume the feature. */
-      allowed: boolean;
-      type: "quota";
-      usage: {
-        /** Time range used to calculate this feature's consumption. */
-        period: {
-          /**
-           * Inclusive usage period start.
-           * @format date-time
-           */
-          start: string;
-          /**
-           * Exclusive usage period end.
-           * @format date-time
-           */
-          end: string;
-        };
-        /** Current units assigned or in use. */
-        unitsUsed: number;
-        /** Units included in the subscription for the period. */
-        includedUnits: number;
-        /** Included units still available. Absent when usage is unlimited. */
-        remainingUnits?: number;
-        /** Whether the feature has no usage limit. */
-        unlimited: boolean;
-        overage: {
-          /** Whether usage above the included amount is allowed and billed. */
-          enabled: boolean;
-          /** Units consumed above the included amount. */
-          units: number;
-          /** Price for one additional product unit. */
-          unitPrice?: {
-            /** Integer rate amount. Divide by scale to obtain the price. */
-            amount: number;
-            /** Lowercase ISO 4217 currency code. */
-            currency: string;
-            /** Divide amount by scale to obtain the major-unit price. */
-            scale: 10000;
-          };
-        };
-        /** Highest quota reached during the period and used for billing. */
-        billedUnits: number;
-      };
-      object: "feature";
+      object: "feature_access";
       livemode: boolean;
     };
 
@@ -719,7 +537,6 @@ export interface Invoice {
   currency: string;
   subtotal: number;
   discountAmount: number;
-  creditApplied?: number;
   taxAmount: number;
   total: number;
   /** @format date-time */
@@ -730,16 +547,17 @@ export interface Invoice {
   issueDate: string;
   /** @format date-time */
   dueDate: string;
-  planName?: string | null;
   memo: string | null;
-  poNumber?: string | null;
-  reference?: string | null;
   metadata: Record<string, unknown>;
   /** @format date-time */
   createdAt: string;
   /** @format date-time */
   updatedAt: string;
-  lineItems?: Array<{
+  creditApplied: number;
+  planName: string | null;
+  poNumber: string | null;
+  reference: string | null;
+  lineItems: Array<{
     lineType:
       | "plan_base"
       | "feature_overage"
@@ -773,6 +591,49 @@ export interface InvoiceDownload {
   /** @format date-time */
   expiresAt: string;
   object: "invoice_download_link";
+  livemode: boolean;
+}
+
+export interface InvoiceListItem {
+  id: string;
+  customerId: string;
+  subscriptionId: string | null;
+  invoiceNumber: string;
+  status: "draft" | "outstanding" | "paid" | "void" | "uncollectible";
+  invoiceType: InvoiceType;
+  currency: string;
+  subtotal: number;
+  discountAmount: number;
+  taxAmount: number;
+  total: number;
+  /** @format date-time */
+  periodStart: string;
+  /** @format date-time */
+  periodEnd: string;
+  /** @format date-time */
+  issueDate: string;
+  /** @format date-time */
+  dueDate: string;
+  memo: string | null;
+  metadata: Record<string, unknown>;
+  /** @format date-time */
+  createdAt: string;
+  /** @format date-time */
+  updatedAt: string;
+  object: "invoice";
+  livemode: boolean;
+}
+
+export interface MarketGroup {
+  id: string;
+  name: string;
+  countryCodes: Array<string>;
+  metadata: Record<string, unknown>;
+  /** @format date-time */
+  createdAt: string;
+  /** @format date-time */
+  updatedAt: string;
+  object: "market_group";
   livemode: boolean;
 }
 
@@ -889,16 +750,25 @@ export interface PayoutBankAccount {
   livemode: boolean;
 }
 
-export interface PayoutVerification {
-  providerAccountId: string;
-  status: "pending_verification" | "verified" | "restricted" | "disabled";
-  transfersEnabled: boolean;
-  alreadyExists?: boolean;
-  businessType?: "individual" | "company";
-  country?: string;
-  object: "payout_account";
-  livemode: boolean;
-}
+export type PayoutVerification =
+  | {
+      providerAccountId: string;
+      status: "pending_verification" | "verified" | "restricted" | "disabled";
+      transfersEnabled: boolean;
+      outcome: "existing";
+      object: "payout_account";
+      livemode: boolean;
+    }
+  | {
+      providerAccountId: string;
+      status: "pending_verification" | "verified" | "restricted" | "disabled";
+      transfersEnabled: boolean;
+      outcome: "created";
+      businessType: "individual" | "company";
+      country: string;
+      object: "payout_account";
+      livemode: boolean;
+    };
 
 export interface Plan {
   id: string;
@@ -917,7 +787,7 @@ export interface Plan {
   createdAt: string;
   /** @format date-time */
   updatedAt: string;
-  features?: Array<{
+  features: Array<{
     code: string;
     name: string;
     type: FeatureType;
@@ -930,13 +800,13 @@ export interface Plan {
       model: "per_unit" | null;
       unitPrice: number | null;
     } | null;
-    regionalPrices?: Array<{
+    regionalPrices: Array<{
       currency: string;
       overageUnitPrice: number | null;
       autoSynced: boolean;
     }>;
   }>;
-  prices?: Array<{
+  prices: Array<{
     /** Public plan price ID. */
     id: string;
     billingInterval: BillingInterval;
@@ -948,14 +818,27 @@ export interface Plan {
     includedCredits: number | null;
     /** Automatic introductory offer for this price. Pass a Promotional Offer ID when creating a subscription to override it. */
     offerId: string | null;
-    regionalPrices?: Array<{
+    /** Public base price ID for a market price variant, or null for a base price. */
+    inheritsFromPriceId: string | null;
+    /** Application metadata. Variant display names may use metadata.name. */
+    metadata: Record<string, unknown>;
+    /** Country-market overrides. An empty array means currency pricing and then the global USD price remain the fallback. */
+    marketPrices: Array<{
+      /** Public pricing market group ID. */
+      marketGroupId: string;
+      /** Presentment currency for this market. */
+      currency: string;
+      /** Market price in the currency's minor unit. */
+      price: number;
+    }>;
+    regionalPrices: Array<{
       currency: string;
       price: number;
       includedBalance: number | null;
       autoSynced: boolean;
     }>;
   }>;
-  exchangeRates?: Array<{
+  exchangeRates: Array<{
     currency: string;
     exchangeRate: number;
   }>;
@@ -1128,7 +1011,20 @@ export interface PlanGroup {
   createdAt: string;
   /** @format date-time */
   updatedAt: string;
-  plans?: Array<{
+  object: "plan_group";
+  livemode: boolean;
+}
+
+export interface PlanGroupDetail {
+  id: string;
+  name: string;
+  description: string | null;
+  isPublic: boolean;
+  /** @format date-time */
+  createdAt: string;
+  /** @format date-time */
+  updatedAt: string;
+  plans: Array<{
     id: string;
     name: string;
     sortOrder: number;
@@ -1150,6 +1046,19 @@ export interface PlanPrice {
   includedCredits: number | null;
   /** Automatic introductory offer for this price. */
   offerId: string | null;
+  /** Public base price ID for a market price variant, or null for a base price. */
+  inheritsFromPriceId: string | null;
+  /** Application metadata. Variant display names may use metadata.name. */
+  metadata: Record<string, unknown>;
+  /** Country-market overrides. Variants inherit their base price for every market not listed. */
+  marketPrices: Array<{
+    /** Public pricing market group ID. */
+    marketGroupId: string;
+    /** Presentment currency for this market. */
+    currency: string;
+    /** Market price in the currency's minor unit. */
+    price: number;
+  }>;
   /** @format date-time */
   createdAt: string;
   /** @format date-time */
@@ -1347,7 +1256,7 @@ export interface SeatBalance {
   livemode: boolean;
 }
 
-export interface SeatBalanceListItem {
+export interface SeatBalanceCollection {
   balances: Record<
     string,
     {
@@ -1356,7 +1265,7 @@ export interface SeatBalanceListItem {
       asOf: string;
     }
   >;
-  object: "seat_balance";
+  object: "seat_balance_collection";
   livemode: boolean;
 }
 
@@ -1388,13 +1297,12 @@ export interface Subscription {
   plan: {
     id: string;
     name: string;
-    basePrice?: number;
+    basePrice: number;
   };
   name: string;
   description: string | null;
   status: SubscriptionStatus;
   billingInterval: BillingInterval | null;
-  consumptionModel?: ConsumptionModel | null;
   trialEndsAt: string | null;
   currentPeriod: {
     /** @format date-time */
@@ -1402,28 +1310,6 @@ export interface Subscription {
     /** @format date-time */
     end: string;
     daysRemaining: number;
-  } | null;
-  features?: Array<{
-    code: string;
-    name: string;
-    type: FeatureType;
-    enabled?: boolean;
-    usage?: {
-      current: number;
-      included: number;
-      overageQuantity: number;
-      overageUnitPrice?: number;
-    };
-  }>;
-  credits?: {
-    remaining: number;
-    included: number;
-    purchased: number;
-  } | null;
-  balance?: {
-    remaining: number;
-    included: number;
-    currency: string;
   } | null;
   cancellation: {
     /** @format date-time */
@@ -1453,12 +1339,57 @@ export interface Subscription {
   billingDayOfMonth: number | null;
   nextBillingDate: string | null;
   checkoutUrl: string | null;
-  /** Payment provider resolved for this checkout when the subscription response was created. This is an informational snapshot and may differ when the checkout is loaded if its country or the organization's routing changes. */
-  checkoutProvider?: PaymentProvider | null;
   /** @format date-time */
   createdAt: string;
   /** @format date-time */
   updatedAt: string;
+  consumptionModel: ConsumptionModel | null;
+  features: Array<
+    | {
+        code: string;
+        name: string;
+        type: "boolean";
+        enabled: boolean;
+      }
+    | {
+        code: string;
+        name: string;
+        type: "usage";
+        usage?: {
+          current: number;
+          included: number;
+          overageQuantity: number;
+          overageUnitPrice?: number;
+        };
+      }
+    | {
+        code: string;
+        name: string;
+        type: "seats";
+        usage: {
+          current: number;
+          included: number;
+          overageQuantity: number;
+          overageUnitPrice?: number;
+        };
+      }
+    | {
+        code: string;
+        name: string;
+        type: "quota";
+      }
+  >;
+  credits: {
+    remaining: number;
+    included: number;
+    purchased: number;
+  } | null;
+  balance: {
+    remaining: number;
+    included: number;
+    currency: string;
+  } | null;
+  priceId: string | null;
   object: "subscription";
   livemode: boolean;
 }
@@ -1468,6 +1399,62 @@ export interface SubscriptionAddon {
   status: "active";
   proratedCharge: number;
   object: "subscription_addon";
+  livemode: boolean;
+}
+
+export interface SubscriptionSummary {
+  id: string;
+  customerId: string;
+  plan: {
+    id: string;
+    name: string;
+  };
+  name: string;
+  description: string | null;
+  status: SubscriptionStatus;
+  billingInterval: BillingInterval | null;
+  trialEndsAt: string | null;
+  currentPeriod: {
+    /** @format date-time */
+    start: string;
+    /** @format date-time */
+    end: string;
+    daysRemaining: number;
+  } | null;
+  cancellation: {
+    /** @format date-time */
+    scheduledAt: string;
+    reason: string | null;
+    /** @format date-time */
+    effectiveAt: string;
+  } | null;
+  cancelAtPeriodEnd: boolean;
+  scheduledPlanChange: {
+    changeType: "plan_downgrade" | "interval_change";
+    newPlanId: string | null;
+    newPlanName: string | null;
+    newBillingInterval: string | null;
+    /** @format date-time */
+    scheduledFor: string;
+  } | null;
+  discount: {
+    type: "percentage" | "amount";
+    value: number;
+    name: string | null;
+    endsAt: string | null;
+  } | null;
+  /** @format date-time */
+  startDate: string;
+  endDate: string | null;
+  billingDayOfMonth: number | null;
+  nextBillingDate: string | null;
+  checkoutUrl: string | null;
+  /** @format date-time */
+  createdAt: string;
+  /** @format date-time */
+  updatedAt: string;
+  priceId: string | null;
+  object: "subscription";
   livemode: boolean;
 }
 
@@ -1511,7 +1498,32 @@ export interface Transaction {
   createdAt: string;
   /** @format date-time */
   updatedAt: string;
-  availableAt?: string | null;
+  availableAt: string | null;
+  object: "transaction";
+  livemode: boolean;
+}
+
+export interface TransactionListItem {
+  id: string;
+  invoiceId: string | null;
+  /** Gross amount in USD cents. Null when the provider has not reported an honest USD figure; see presentmentAmount. */
+  grossAmount: number | null;
+  /** Subtotal in USD cents (gross minus tax). Null when grossAmount is null. */
+  subtotal: number | null;
+  taxAmount: number | null;
+  /** Amount in the charge currency's smallest unit, as presented to the customer. Set for non-USD charges; null when the charge was made in USD. */
+  presentmentAmount: number | null;
+  currency: string;
+  /** The payment provider the charge was routed to: stripe, commet, or dlocal. */
+  provider: PaymentProvider;
+  status: TransactionStatus;
+  customerEmail: string | null;
+  customerName: string | null;
+  paidAt: string | null;
+  /** @format date-time */
+  createdAt: string;
+  /** @format date-time */
+  updatedAt: string;
   object: "transaction";
   livemode: boolean;
 }
@@ -1606,10 +1618,10 @@ export interface UsageEvent {
     value: string;
   }>;
   consumption?: {
-    model: string;
-    deducted?: number;
-    remaining?: number;
-    blocked?: boolean;
+    model: "credits" | "balance";
+    deducted: number;
+    remaining: number;
+    blocked: boolean;
   };
   object: "usage_event";
   livemode: boolean;
@@ -1680,22 +1692,6 @@ export interface WebhookCreditsBalance {
   planCredits: number;
   purchasedCredits: number;
   totalCredits: number;
-}
-
-export interface WebhookFeatureAccess {
-  code: string;
-  name: string;
-  type: string;
-  allowed: boolean;
-  enabled: boolean | null;
-  current: number | null;
-  included: number | null;
-  remaining: number | null;
-  overageQuantity: number | null;
-  overageUnitPrice: number | null;
-  unlimited: boolean | null;
-  overageEnabled: boolean | null;
-  billedQuantity: number | null;
 }
 
 export interface WebhookPlanRef {

@@ -6,31 +6,46 @@ export interface GetAllQuotaAllowancesParams {
   customerId: string;
 }
 
-export interface RemoveQuotaParams {
-  customerId?: string;
-  externalId?: string;
-  featureCode: string;
-  count?: number;
-}
+export type RemoveQuotaParams =
+  | {
+      featureCode: string;
+      count?: number;
+      customerId: string;
+    }
+  | {
+      featureCode: string;
+      count?: number;
+      externalId: string;
+    };
 
 export interface GetQuotaAllowanceParams {
   customerId: string;
   featureCode: string;
 }
 
-export interface AddQuotaParams {
-  customerId?: string;
-  externalId?: string;
-  featureCode: string;
-  count?: number;
-}
+export type AddQuotaParams =
+  | {
+      featureCode: string;
+      count?: number;
+      customerId: string;
+    }
+  | {
+      featureCode: string;
+      count?: number;
+      externalId: string;
+    };
 
-export interface SetQuotaParams {
-  customerId?: string;
-  externalId?: string;
-  featureCode: string;
-  count: number;
-}
+export type SetQuotaParams =
+  | {
+      featureCode: string;
+      count: number;
+      customerId: string;
+    }
+  | {
+      featureCode: string;
+      count: number;
+      externalId: string;
+    };
 
 export class QuotaResource {
   constructor(private httpClient: CommetHTTPClient) {}

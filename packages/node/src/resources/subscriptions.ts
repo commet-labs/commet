@@ -3,6 +3,7 @@ import type { SubscriptionStatus } from "../types/enums";
 import type {
   BalanceAdjustment,
   BalanceTopup,
+  CreatedSubscription,
   CreditGrant,
   DeletedSubscriptionAddon,
   PaymentMethodUpdateCheckout,
@@ -12,6 +13,7 @@ import type {
   RecoveryLink,
   Subscription,
   SubscriptionAddon,
+  SubscriptionSummary,
 } from "../types/models";
 import type { CommetHTTPClient } from "../utils/http";
 
@@ -94,29 +96,103 @@ export interface ListSubscriptionsParams {
   status?: SubscriptionStatus;
 }
 
-export interface CreateSubscriptionParams {
-  planId?: string;
-  planCode?: string;
-  customerId: string;
-  billingInterval?:
-    | "weekly"
-    | "monthly"
-    | "quarterly"
-    | "yearly"
-    | "one_time"
-    | null;
-  initialSeats?: Record<string, number>;
-  skipTrial?: boolean;
-  customTrialDays?: number;
-  offerId?: string;
-  promoCode?: string;
-  /** Payment provider for the initial checkout. Overrides country routing when present. */
-  provider?: "stripe" | "commet" | "dlocal";
-  name?: string;
-  /** @format date-time */
-  startDate?: string;
-  successUrl?: string;
-}
+export type CreateSubscriptionParams =
+  | {
+      customerId: string;
+      billingInterval?:
+        | "weekly"
+        | "monthly"
+        | "quarterly"
+        | "yearly"
+        | "one_time"
+        | null;
+      /** Public price ID. When omitted, Commet selects the default price for the billing interval and still applies its market pricing. */
+      priceId?: string;
+      initialSeats?: Record<string, number>;
+      /** Payment provider for the initial checkout. Overrides country routing when present. */
+      provider?: "stripe" | "commet" | "dlocal";
+      name?: string;
+      /** @format date-time */
+      startDate?: string;
+      successUrl?: string;
+      offerId?: never;
+      promoCode?: string;
+      customTrialDays?: number;
+      skipTrial?: boolean;
+      planId: string;
+    }
+  | {
+      customerId: string;
+      billingInterval?:
+        | "weekly"
+        | "monthly"
+        | "quarterly"
+        | "yearly"
+        | "one_time"
+        | null;
+      /** Public price ID. When omitted, Commet selects the default price for the billing interval and still applies its market pricing. */
+      priceId?: string;
+      initialSeats?: Record<string, number>;
+      /** Payment provider for the initial checkout. Overrides country routing when present. */
+      provider?: "stripe" | "commet" | "dlocal";
+      name?: string;
+      /** @format date-time */
+      startDate?: string;
+      successUrl?: string;
+      offerId?: never;
+      promoCode?: string;
+      customTrialDays?: number;
+      skipTrial?: boolean;
+      planCode: string;
+    }
+  | {
+      customerId: string;
+      billingInterval?:
+        | "weekly"
+        | "monthly"
+        | "quarterly"
+        | "yearly"
+        | "one_time"
+        | null;
+      /** Public price ID. When omitted, Commet selects the default price for the billing interval and still applies its market pricing. */
+      priceId?: string;
+      initialSeats?: Record<string, number>;
+      /** Payment provider for the initial checkout. Overrides country routing when present. */
+      provider?: "stripe" | "commet" | "dlocal";
+      name?: string;
+      /** @format date-time */
+      startDate?: string;
+      successUrl?: string;
+      offerId: string;
+      promoCode?: never;
+      customTrialDays?: never;
+      skipTrial?: false;
+      planId: string;
+    }
+  | {
+      customerId: string;
+      billingInterval?:
+        | "weekly"
+        | "monthly"
+        | "quarterly"
+        | "yearly"
+        | "one_time"
+        | null;
+      /** Public price ID. When omitted, Commet selects the default price for the billing interval and still applies its market pricing. */
+      priceId?: string;
+      initialSeats?: Record<string, number>;
+      /** Payment provider for the initial checkout. Overrides country routing when present. */
+      provider?: "stripe" | "commet" | "dlocal";
+      name?: string;
+      /** @format date-time */
+      startDate?: string;
+      successUrl?: string;
+      offerId: string;
+      promoCode?: never;
+      customTrialDays?: never;
+      skipTrial?: false;
+      planCode: string;
+    };
 
 export class SubscriptionsResource {
   constructor(private httpClient: CommetHTTPClient) {}
@@ -284,18 +360,18 @@ export class SubscriptionsResource {
     options?: RequestOptions,
   ): Promise<{
     object: "list";
-    data: Array<Subscription>;
+    data: Array<SubscriptionSummary>;
     hasMore: boolean;
     nextCursor?: string;
   }> {
     return this.httpClient.get("/subscriptions", params, options);
   }
 
-  /** Create a subscription for a customer. Without an override, Commet applies the price's automatic introductory offer. Pass one Promotional Offer through offerId to override it. Experiment assignment remains external. */
+  /** Create a subscription for a customer. Commet selects the default price when priceId is omitted and resolves its market from the customer's billing country. Without an offer override, Commet applies the price's automatic introductory offer. Pass one Promotional Offer through offerId to override it. Experiment assignment remains external. */
   async create(
     params: CreateSubscriptionParams,
     options?: RequestOptions,
-  ): Promise<Subscription> {
+  ): Promise<CreatedSubscription> {
     return this.httpClient.post("/subscriptions", params, options);
   }
 }

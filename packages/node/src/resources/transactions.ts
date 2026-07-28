@@ -1,6 +1,11 @@
 import type { RequestOptions } from "../types/common";
 import type { TransactionStatus } from "../types/enums";
-import type { Refund, Transaction, TransactionRetry } from "../types/models";
+import type {
+  Refund,
+  Transaction,
+  TransactionListItem,
+  TransactionRetry,
+} from "../types/models";
 import type { CommetHTTPClient } from "../utils/http";
 
 export interface RefundTransactionParams {
@@ -58,7 +63,7 @@ export class TransactionsResource {
     options?: RequestOptions,
   ): Promise<{
     object: "list";
-    data: Array<Transaction>;
+    data: Array<TransactionListItem>;
     hasMore: boolean;
     nextCursor?: string;
   }> {

@@ -1,5 +1,9 @@
 import type { RequestOptions } from "../types/common";
-import type { CreditPack, DeletedObject } from "../types/models";
+import type {
+  CreditPack,
+  CreditPackListItem,
+  DeletedObject,
+} from "../types/models";
 import type { CommetHTTPClient } from "../utils/http";
 
 export interface UpdateCreditPackParams {
@@ -47,7 +51,7 @@ export class CreditPacksResource {
   /** List all active credit packs. */
   async list(): Promise<{
     object: "list";
-    data: Array<CreditPack>;
+    data: Array<CreditPackListItem>;
     hasMore: boolean;
     nextCursor?: string;
   }> {

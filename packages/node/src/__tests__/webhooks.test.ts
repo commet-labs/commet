@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import { describe, expect, expectTypeOf, it } from "vitest";
 import { type WebhookPayload, Webhooks } from "../resources/webhooks";
-import type { WebhookFeatureAccess, WebhookPlanRef } from "../types/models";
+import type { WebhookPlanRef } from "../types/models";
 import type {
   CustomerStateChangedData,
   PaymentLinkCompletedData,
@@ -252,7 +252,9 @@ describe("Webhooks", () => {
       let received: CustomerStateChangedData | undefined;
       dispatcher.on("customer.state_changed", (data, payload) => {
         expectTypeOf(data).toEqualTypeOf<CustomerStateChangedData>();
-        expectTypeOf(data.features).toEqualTypeOf<WebhookFeatureAccess[]>();
+        expectTypeOf(data.features).toEqualTypeOf<
+          CustomerStateChangedData["features"]
+        >();
         expectTypeOf(data.plan).toEqualTypeOf<WebhookPlanRef | null>();
         expectTypeOf(payload.data).toEqualTypeOf<CustomerStateChangedData>();
         received = data;

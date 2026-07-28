@@ -19,12 +19,12 @@ export type TrackUsageParams =
         property: string;
         value: string;
       }>;
-      value?: number;
-      cacheReadTokens?: number;
-      cacheWriteTokens?: number;
       model: string;
       inputTokens: number;
       outputTokens: number;
+      value?: never;
+      cacheReadTokens?: number;
+      cacheWriteTokens?: number;
     }
   | {
       featureCode: string;
@@ -37,11 +37,11 @@ export type TrackUsageParams =
         value: string;
       }>;
       value?: number;
-      cacheReadTokens?: number;
-      cacheWriteTokens?: number;
       model?: never;
-      inputTokens?: number;
-      outputTokens?: number;
+      inputTokens?: never;
+      outputTokens?: never;
+      cacheReadTokens?: never;
+      cacheWriteTokens?: never;
     };
 
 export interface SetUsageParams {

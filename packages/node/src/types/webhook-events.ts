@@ -4,7 +4,6 @@ import type {
   WebhookBankRef,
   WebhookCardInfo,
   WebhookCreditsBalance,
-  WebhookFeatureAccess,
   WebhookPlanRef,
   WebhookSeatSummary,
 } from "./models";
@@ -767,8 +766,236 @@ export interface CustomerStateChangedData {
   billingInterval: string | null;
   /** The plan's consumption model: metered, credits, or balance. */
   consumptionModel: string | null;
-  /** Current feature access, one entry per plan feature: code, name, type, allowed, enabled, current, included, remaining, overageQuantity, overageUnitPrice, unlimited, overageEnabled, billedQuantity. Fields that do not apply to a feature type are null. */
-  features: Array<WebhookFeatureAccess>;
+  /** Current feature access, discriminated by type. Boolean features expose enabled; usage features expose model-specific consumption; seats and quota expose usage allowances. */
+  features: Array<
+    | {
+        /** Unique feature code. */
+        code: string;
+        /** Display name of the feature. */
+        name: string;
+        /** Display name for one product unit, or null when not applicable. */
+        unitName: string | null;
+        /** Whether the customer can currently access or consume the feature. */
+        allowed: boolean;
+        type: "boolean";
+        /** Whether the feature is enabled. */
+        enabled: boolean;
+      }
+    | {
+        /** Unique feature code. */
+        code: string;
+        /** Display name of the feature. */
+        name: string;
+        /** Display name for one product unit, or null when not applicable. */
+        unitName: string | null;
+        /** Whether the customer can currently access or consume the feature. */
+        allowed: boolean;
+        type: "usage";
+        consumption:
+          | {
+              /** Usage is measured against an included allowance and overage. */
+              model: "metered";
+              /** Time range used to calculate this feature's consumption. */
+              period: {
+                /**
+                 * Inclusive usage period start.
+                 * @format date-time
+                 */
+                start: string;
+                /**
+                 * Exclusive usage period end.
+                 * @format date-time
+                 */
+                end: string;
+              };
+              /** Product units recorded during the period. */
+              unitsUsed: number;
+              /** Product units included in the subscription for the period. */
+              includedUnits: number;
+              /** Included units not yet consumed. Absent when usage is unlimited. */
+              remainingUnits?: number;
+              /** Whether the feature has no usage limit. */
+              unlimited: boolean;
+              overage: {
+                /** Whether usage above the included amount is allowed and billed. */
+                enabled: boolean;
+                /** Units consumed above the included amount. */
+                units: number;
+                /** Price for one additional product unit. */
+                unitPrice?: {
+                  /** Integer rate amount. Divide by scale to obtain the price. */
+                  amount: number;
+                  /** Lowercase ISO 4217 currency code. */
+                  currency: string;
+                  /** Divide amount by scale to obtain the major-unit price. */
+                  scale: 10000;
+                };
+              };
+            }
+          | {
+              /** Product usage consumes credits from a shared pool. */
+              model: "credits";
+              /** Time range used to calculate this feature's consumption. */
+              period: {
+                /**
+                 * Inclusive usage period start.
+                 * @format date-time
+                 */
+                start: string;
+                /**
+                 * Exclusive usage period end.
+                 * @format date-time
+                 */
+                end: string;
+              };
+              /** Product units recorded during the period. */
+              unitsUsed: number;
+              /** Credits deducted for each product unit. */
+              creditsPerUnit: number;
+              /** Actual credits deducted by this feature during the period. */
+              creditsConsumed: number;
+              /** Additional product units available from the current shared credit pool at this feature's conversion rate. */
+              availableUnits: number;
+            }
+          | {
+              /** Product usage deducts money from a shared balance. */
+              model: "balance";
+              /** Time range used to calculate this feature's consumption. */
+              period: {
+                /**
+                 * Inclusive usage period start.
+                 * @format date-time
+                 */
+                start: string;
+                /**
+                 * Exclusive usage period end.
+                 * @format date-time
+                 */
+                end: string;
+              };
+              /** Product units recorded during the period. */
+              unitsUsed: number;
+              /** Actual money deducted for this feature during the period. */
+              spent: {
+                /** Amount in the currency's smallest unit. */
+                amount: number;
+                /** Lowercase ISO 4217 currency code. */
+                currency: string;
+              };
+              /** Estimated additional units available from the current shared balance at this feature's fixed price. Absent for dynamic pricing. */
+              availableUnits?: number;
+              /** Price for one additional product unit. */
+              unitPrice?: {
+                /** Integer rate amount. Divide by scale to obtain the price. */
+                amount: number;
+                /** Lowercase ISO 4217 currency code. */
+                currency: string;
+                /** Divide amount by scale to obtain the major-unit price. */
+                scale: 10000;
+              };
+            };
+      }
+    | {
+        /** Unique feature code. */
+        code: string;
+        /** Display name of the feature. */
+        name: string;
+        /** Display name for one product unit, or null when not applicable. */
+        unitName: string | null;
+        /** Whether the customer can currently access or consume the feature. */
+        allowed: boolean;
+        type: "seats";
+        usage: {
+          /** Time range used to calculate this feature's consumption. */
+          period: {
+            /**
+             * Inclusive usage period start.
+             * @format date-time
+             */
+            start: string;
+            /**
+             * Exclusive usage period end.
+             * @format date-time
+             */
+            end: string;
+          };
+          /** Current units assigned or in use. */
+          unitsUsed: number;
+          /** Units included in the subscription for the period. */
+          includedUnits: number;
+          /** Included units still available. Absent when usage is unlimited. */
+          remainingUnits?: number;
+          /** Whether the feature has no usage limit. */
+          unlimited: boolean;
+          overage: {
+            /** Whether usage above the included amount is allowed and billed. */
+            enabled: boolean;
+            /** Units consumed above the included amount. */
+            units: number;
+            /** Price for one additional product unit. */
+            unitPrice?: {
+              /** Integer rate amount. Divide by scale to obtain the price. */
+              amount: number;
+              /** Lowercase ISO 4217 currency code. */
+              currency: string;
+              /** Divide amount by scale to obtain the major-unit price. */
+              scale: 10000;
+            };
+          };
+        };
+      }
+    | {
+        /** Unique feature code. */
+        code: string;
+        /** Display name of the feature. */
+        name: string;
+        /** Display name for one product unit, or null when not applicable. */
+        unitName: string | null;
+        /** Whether the customer can currently access or consume the feature. */
+        allowed: boolean;
+        type: "quota";
+        usage: {
+          /** Time range used to calculate this feature's consumption. */
+          period: {
+            /**
+             * Inclusive usage period start.
+             * @format date-time
+             */
+            start: string;
+            /**
+             * Exclusive usage period end.
+             * @format date-time
+             */
+            end: string;
+          };
+          /** Current units assigned or in use. */
+          unitsUsed: number;
+          /** Units included in the subscription for the period. */
+          includedUnits: number;
+          /** Included units still available. Absent when usage is unlimited. */
+          remainingUnits?: number;
+          /** Whether the feature has no usage limit. */
+          unlimited: boolean;
+          overage: {
+            /** Whether usage above the included amount is allowed and billed. */
+            enabled: boolean;
+            /** Units consumed above the included amount. */
+            units: number;
+            /** Price for one additional product unit. */
+            unitPrice?: {
+              /** Integer rate amount. Divide by scale to obtain the price. */
+              amount: number;
+              /** Lowercase ISO 4217 currency code. */
+              currency: string;
+              /** Divide amount by scale to obtain the major-unit price. */
+              scale: 10000;
+            };
+          };
+          /** Highest quota reached during the period and used for billing. */
+          billedUnits: number;
+        };
+      }
+  >;
   /** Summary of seats-type features: code, current, included, remaining, unlimited. */
   seats: Array<WebhookSeatSummary>;
   /** For credits plans: planCredits, purchasedCredits, totalCredits. Null otherwise. */

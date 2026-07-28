@@ -6,6 +6,7 @@ import type {
   WebhookTest,
 } from "../types/models";
 import type { CommetHTTPClient } from "../utils/http";
+import { Webhooks } from "./webhooks";
 
 export interface GetWebhookEndpointParams {
   id: string;
@@ -154,8 +155,10 @@ export interface CreateWebhookEndpointParams {
   apiVersion?: string;
 }
 
-export class GeneratedWebhooksResource {
-  constructor(private httpClient: CommetHTTPClient) {}
+export class GeneratedWebhooksResource extends Webhooks {
+  constructor(private httpClient: CommetHTTPClient) {
+    super();
+  }
 
   /** Retrieve a webhook endpoint by its public ID. */
   async get(

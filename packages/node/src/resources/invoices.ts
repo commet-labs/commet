@@ -1,5 +1,10 @@
 import type { RequestOptions } from "../types/common";
-import type { Invoice, InvoiceDownload, SentInvoice } from "../types/models";
+import type {
+  Invoice,
+  InvoiceDownload,
+  InvoiceListItem,
+  SentInvoice,
+} from "../types/models";
 import type { CommetHTTPClient } from "../utils/http";
 
 export interface DownloadInvoiceParams {
@@ -79,7 +84,7 @@ export class InvoicesResource {
     options?: RequestOptions,
   ): Promise<{
     object: "list";
-    data: Array<Invoice>;
+    data: Array<InvoiceListItem>;
     hasMore: boolean;
     nextCursor?: string;
   }> {

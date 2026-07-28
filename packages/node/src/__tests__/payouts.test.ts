@@ -208,14 +208,12 @@ describe("Payouts — wire serialization", () => {
       expect(body).not.toHaveProperty("company");
     });
 
-    it("parses the verification response enum and alreadyExists flag", async () => {
+    it("parses the existing verification outcome", async () => {
       const verification = {
         providerAccountId: "acct_1",
         status: "verified",
         transfersEnabled: true,
-        alreadyExists: true,
-        businessType: "company",
-        country: "US",
+        outcome: "existing",
         object: "payout_account",
         livemode: true,
       };
@@ -243,7 +241,7 @@ describe("Payouts — wire serialization", () => {
       const data = result;
       expect(data.status).toBe("verified");
       expect(data.transfersEnabled).toBe(true);
-      expect(data.alreadyExists).toBe(true);
+      expect(data.outcome).toBe("existing");
     });
   });
 });

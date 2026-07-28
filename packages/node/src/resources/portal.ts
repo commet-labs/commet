@@ -2,11 +2,15 @@ import type { RequestOptions } from "../types/common";
 import type { PortalAccess } from "../types/models";
 import type { CommetHTTPClient } from "../utils/http";
 
-export interface RequestPortalAccessParams {
-  email?: string;
-  customerId?: string;
-  returnUrl?: string;
-}
+export type RequestPortalAccessParams =
+  | {
+      email: string;
+      returnUrl?: string;
+    }
+  | {
+      customerId: string;
+      returnUrl?: string;
+    };
 
 export class PortalResource {
   constructor(private httpClient: CommetHTTPClient) {}

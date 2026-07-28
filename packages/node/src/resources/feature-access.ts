@@ -1,5 +1,5 @@
 import type { RequestOptions } from "../types/common";
-import type { FeatureAccess, FeatureAccessLookup } from "../types/models";
+import type { FeatureAccess } from "../types/models";
 import type { CommetHTTPClient } from "../utils/http";
 
 export interface GetFeatureAccessParams {
@@ -18,7 +18,7 @@ export class FeatureAccessResource {
   async get(
     params: GetFeatureAccessParams,
     options?: RequestOptions,
-  ): Promise<FeatureAccessLookup> {
+  ): Promise<FeatureAccess> {
     const { code, ...rest } = params;
     return this.httpClient.get(`/feature-access/${code}`, rest, options);
   }

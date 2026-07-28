@@ -72,6 +72,33 @@ export interface UpdatePlanPriceParams {
   trialDays?: number;
   includedBalance?: number | null;
   includedCredits?: number | null;
+  /** Metadata keys to merge into the existing price metadata. */
+  metadata?: Record<string, unknown>;
+  marketPrices?: Array<{
+    marketGroupId: string;
+    currency:
+      | "usd"
+      | "ars"
+      | "brl"
+      | "clp"
+      | "cop"
+      | "pen"
+      | "uyu"
+      | "pyg"
+      | "bob"
+      | "mxn"
+      | "cad"
+      | "eur"
+      | "jpy"
+      | "cny"
+      | "krw"
+      | "hkd"
+      | "sgd"
+      | "twd"
+      | "inr"
+      | "thb";
+    price: number;
+  }>;
 }
 
 export interface DeletePlanPriceParams {
@@ -79,15 +106,89 @@ export interface DeletePlanPriceParams {
   priceId: string;
 }
 
-export interface AddPlanPriceParams {
-  id: string;
-  billingInterval: "weekly" | "monthly" | "quarterly" | "yearly" | "one_time";
-  price: number;
-  trialDays?: number;
-  isDefault?: boolean;
-  includedBalance?: number | null;
-  includedCredits?: number | null;
-}
+export type AddPlanPriceParams =
+  | {
+      id: string;
+      billingInterval:
+        | "weekly"
+        | "monthly"
+        | "quarterly"
+        | "yearly"
+        | "one_time";
+      metadata?: Record<string, unknown>;
+      price: number;
+      trialDays?: number;
+      isDefault?: boolean;
+      includedBalance?: number | null;
+      includedCredits?: number | null;
+      marketPrices?: Array<{
+        /** Public ID of a reusable pricing market group. */
+        marketGroupId: string;
+        /** Presentment currency configured for this plan and market. */
+        currency:
+          | "usd"
+          | "ars"
+          | "brl"
+          | "clp"
+          | "cop"
+          | "pen"
+          | "uyu"
+          | "pyg"
+          | "bob"
+          | "mxn"
+          | "cad"
+          | "eur"
+          | "jpy"
+          | "cny"
+          | "krw"
+          | "hkd"
+          | "sgd"
+          | "twd"
+          | "inr"
+          | "thb";
+        /** Market price in the currency's minor unit. */
+        price: number;
+      }>;
+    }
+  | {
+      id: string;
+      billingInterval:
+        | "weekly"
+        | "monthly"
+        | "quarterly"
+        | "yearly"
+        | "one_time";
+      metadata?: Record<string, unknown>;
+      inheritsFromPriceId: string;
+      marketPrices: Array<{
+        /** Public ID of a reusable pricing market group. */
+        marketGroupId: string;
+        /** Presentment currency configured for this plan and market. */
+        currency:
+          | "usd"
+          | "ars"
+          | "brl"
+          | "clp"
+          | "cop"
+          | "pen"
+          | "uyu"
+          | "pyg"
+          | "bob"
+          | "mxn"
+          | "cad"
+          | "eur"
+          | "jpy"
+          | "cny"
+          | "krw"
+          | "hkd"
+          | "sgd"
+          | "twd"
+          | "inr"
+          | "thb";
+        /** Market price in the currency's minor unit. */
+        price: number;
+      }>;
+    };
 
 export interface SetPlanRegionalPricingParams {
   id: string;
@@ -225,7 +326,7 @@ export class PlansResource {
     );
   }
 
-  /** Remove all regional currency overrides for a plan price. */
+  /** Remove all regional currency overrides for a plan price. The request is rejected while billable subscriptions depend on an override. */
   async deleteRegionalPrices(
     params: DeleteRegionalPricesParams,
     options?: RequestOptions,
@@ -238,7 +339,7 @@ export class PlansResource {
     );
   }
 
-  /** Update an existing price on a plan. Offer terms are managed through Offers. */
+  /** Update a base price or market price variant. Removing a base market override is rejected while a variant depends on it. Offer terms are managed through Offers. */
   async updatePrice(
     params: UpdatePlanPriceParams,
     options?: RequestOptions,
@@ -251,7 +352,7 @@ export class PlansResource {
     );
   }
 
-  /** Remove a price from a plan. */
+  /** Archive a price for new subscriptions. Existing subscriptions that selected it continue using its current catalog value. */
   async deletePrice(
     params: DeletePlanPriceParams,
     options?: RequestOptions,
@@ -264,7 +365,7 @@ export class PlansResource {
     );
   }
 
-  /** Add a billing interval price to a plan. Configure introductory and promotional benefits through Offers. */
+  /** Add a base price or a selectable market price variant. Variants inherit their base price outside the markets they override. Configure introductory and promotional benefits through Offers. */
   async addPrice(
     params: AddPlanPriceParams,
     options?: RequestOptions,

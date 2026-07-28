@@ -3,6 +3,7 @@ import type {
   AddedPlanToGroup,
   DeletedObject,
   PlanGroup,
+  PlanGroupDetail,
   RemovedPlanFromGroup,
   ReorderedPlans,
 } from "../types/models";
@@ -92,7 +93,7 @@ export class PlanGroupsResource {
   async get(
     params: GetPlanGroupParams,
     options?: RequestOptions,
-  ): Promise<PlanGroup> {
+  ): Promise<PlanGroupDetail> {
     const { id } = params;
     return this.httpClient.get(`/plan-groups/${id}`, undefined, options);
   }

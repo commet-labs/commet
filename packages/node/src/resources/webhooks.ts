@@ -4,8 +4,6 @@ import type {
   WebhookEventDataMap,
   WebhookEventPayload,
 } from "../types/webhook-events";
-import type { CommetHTTPClient } from "../utils/http";
-import { GeneratedWebhooksResource } from "./generated-webhooks";
 
 export type WebhookPayload = WebhookEventPayload;
 export type WebhookData = WebhookPayload["data"];
@@ -32,15 +30,11 @@ export interface VerifyAndParseParams {
   secret: string;
 }
 
-export class Webhooks extends GeneratedWebhooksResource {
+export class Webhooks {
   private readonly eventHandlers = new Map<
     WebhookEvent,
     WebhookEventHandler<WebhookEvent>
   >();
-
-  constructor(httpClient?: CommetHTTPClient) {
-    super(httpClient as CommetHTTPClient);
-  }
 
   verify(params: VerifyParams): boolean {
     const { payload, signature, secret } = params;

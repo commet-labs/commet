@@ -1,8 +1,7 @@
 import type { RequestOptions } from "../types/common";
 import type {
-  BulkSeatUpdate,
   SeatBalance,
-  SeatBalanceListItem,
+  SeatBalanceCollection,
   SeatEvent,
 } from "../types/models";
 import type { CommetHTTPClient } from "../utils/http";
@@ -54,7 +53,7 @@ export class SeatsResource {
   async getAllBalances(
     params: GetAllSeatBalancesParams,
     options?: RequestOptions,
-  ): Promise<SeatBalanceListItem> {
+  ): Promise<SeatBalanceCollection> {
     return this.httpClient.get("/seats/balances", params, options);
   }
 
@@ -64,7 +63,7 @@ export class SeatsResource {
     options?: RequestOptions,
   ): Promise<{
     object: "list";
-    data: Array<BulkSeatUpdate>;
+    data: Array<SeatEvent>;
     hasMore: boolean;
     nextCursor?: string;
   }> {

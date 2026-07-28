@@ -45,18 +45,20 @@ describe("Subscriptions — successUrl on the wire", () => {
     expect(url).toContain("/subscriptions/sub_1/change-plan");
   });
 
-  it("create sends the promotional offer id", async () => {
+  it("create sends the selected price and promotional offer ids", async () => {
     vi.mocked(fetch).mockResolvedValueOnce(jsonResponse({ id: "sub_1" }));
     const client = new Commet({ apiKey: "ck_test_123" });
 
     await client.subscriptions.create({
       customerId: "cus_1",
       planId: "plan_pro",
+      priceId: "price_ar_1",
       offerId: "offer_intro",
     });
 
     const { url, body } = lastRequest();
     expect(url).toContain("/subscriptions");
+    expect(body.priceId).toBe("price_ar_1");
     expect(body.offerId).toBe("offer_intro");
   });
 });

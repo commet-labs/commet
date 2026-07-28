@@ -167,7 +167,6 @@ describe("CreditPacks — wire serialization", () => {
             credits: 1000,
             price: 999,
             currency: "usd",
-            isActive: true,
             object: "credit_pack",
             livemode: true,
           },
@@ -179,9 +178,29 @@ describe("CreditPacks — wire serialization", () => {
     const result = await client().creditPacks.list();
     const pack = result.data[0];
     expect(pack.description).toBeNull();
-    expect(pack.isActive).toBe(true);
     expect(pack.credits).toBe(1000);
     expect(pack.price).toBe(999);
+  });
+});
+
+describe("Pricing — market groups", () => {
+  it("createMarketGroup sends countries through the generated pricing resource", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      jsonResponse({ id: "market_latam", object: "market_group" }),
+    );
+
+    await client().pricing.createMarketGroup({
+      name: "LATAM",
+      countryCodes: ["AR", "BO", "PY"],
+    });
+
+    const { url, init } = lastCall();
+    expect(url).toContain("/pricing/market-groups");
+    expect(init.method).toBe("POST");
+    expect(lastBody()).toEqual({
+      name: "LATAM",
+      countryCodes: ["AR", "BO", "PY"],
+    });
   });
 });
 
@@ -356,7 +375,7 @@ describe("Transactions — status enum + refund/retry bodies", () => {
 });
 
 describe("Addons — consumptionModel enum + active listing", () => {
-  it("create() sends the consumptionModel enum and omits unset numeric optionals", async () => {
+  it("create() sends the required metered configuration", async () => {
     vi.mocked(fetch).mockResolvedValueOnce(jsonResponse({ id: "addon_1" }));
 
     await client().addons.create({
@@ -364,14 +383,16 @@ describe("Addons — consumptionModel enum + active listing", () => {
       basePrice: 1000,
       featureId: "feat_1",
       consumptionModel: "metered",
+      includedUnits: 0,
+      overageRate: 0,
     });
 
     const { url } = lastCall();
     expect(url).toContain("/addons");
     const body = lastBody();
     expect(body.consumptionModel).toBe("metered");
-    expect(body).not.toHaveProperty("includedUnits");
-    expect(body).not.toHaveProperty("overageRate");
+    expect(body.includedUnits).toBe(0);
+    expect(body.overageRate).toBe(0);
     expect(body).not.toHaveProperty("creditCost");
   });
 

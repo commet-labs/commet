@@ -2,11 +2,14 @@ import type { RequestOptions } from "../types/common";
 import type { TestClock, TestClockBilling } from "../types/models";
 import type { CommetHTTPClient } from "../utils/http";
 
-export interface AdvanceTestClockParams {
-  advanceDays?: number;
-  /** @format date-time */
-  frozenTime?: string;
-}
+export type AdvanceTestClockParams =
+  | {
+      advanceDays: number;
+    }
+  | {
+      /** @format date-time */
+      frozenTime: string;
+    };
 
 export class TestClockResource {
   constructor(private httpClient: CommetHTTPClient) {}

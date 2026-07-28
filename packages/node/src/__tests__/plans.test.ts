@@ -51,6 +51,39 @@ describe("Plans — wire serialization of nested pricing", () => {
       expect(body).not.toHaveProperty("introOffer");
     });
 
+    it("addPrice sends a selectable market price variant", async () => {
+      vi.mocked(fetch).mockResolvedValueOnce(
+        jsonResponse({ id: "price_ar_1" }),
+      );
+
+      await client().plans.addPrice({
+        id: "plan_pro",
+        billingInterval: "monthly",
+        inheritsFromPriceId: "price_base",
+        marketPrices: [
+          {
+            marketGroupId: "market_latam",
+            currency: "usd",
+            price: 500,
+          },
+        ],
+      });
+
+      const { url, body } = lastRequest();
+      expect(url).toContain("/plans/plan_pro/prices");
+      expect(body).toEqual({
+        billingInterval: "monthly",
+        inheritsFromPriceId: "price_base",
+        marketPrices: [
+          {
+            marketGroupId: "market_latam",
+            currency: "usd",
+            price: 500,
+          },
+        ],
+      });
+    });
+
     it("updatePrice strips both id and priceId path params from the body", async () => {
       vi.mocked(fetch).mockResolvedValueOnce(jsonResponse({ id: "price_1" }));
 

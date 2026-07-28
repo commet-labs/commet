@@ -19,52 +19,65 @@ export interface RequestPayoutParams {
   description?: string;
 }
 
-export interface CompletePayoutVerificationParams {
-  email: string;
-  businessType: "individual" | "company";
-  businessUrl: string;
-  documentUrl: string;
-  bank: {
-    accountNumber: string;
-    accountHolderName: string;
-    routingNumber?: string;
-    accountType?: "checking" | "savings";
-  };
-  individual?: {
-    firstName: string;
-    lastName: string;
-    phone: string;
-    dateOfBirth: string;
-    ssnLast4?: string;
-    idNumber?: string;
-    address: {
-      line1: string;
-      line2?: string;
-      city: string;
-      state?: string;
-      postalCode: string;
-      country: string;
+export type CompletePayoutVerificationParams =
+  | {
+      email: string;
+      businessUrl: string;
+      documentUrl: string;
+      bank: {
+        accountNumber: string;
+        accountHolderName: string;
+        routingNumber?: string;
+        accountType?: "checking" | "savings";
+      };
+      businessType: "individual";
+      individual: {
+        firstName: string;
+        lastName: string;
+        phone: string;
+        dateOfBirth: string;
+        ssnLast4?: string;
+        idNumber?: string;
+        address: {
+          line1: string;
+          line2?: string;
+          city: string;
+          state?: string;
+          postalCode: string;
+          country: string;
+        };
+      };
+    }
+  | {
+      email: string;
+      businessUrl: string;
+      documentUrl: string;
+      bank: {
+        accountNumber: string;
+        accountHolderName: string;
+        routingNumber?: string;
+        accountType?: "checking" | "savings";
+      };
+      businessType: "company";
+      company: {
+        name: string;
+        taxId: string;
+        address: {
+          line1: string;
+          line2?: string;
+          city: string;
+          state?: string;
+          postalCode: string;
+          country: string;
+        };
+        representative: {
+          firstName: string;
+          lastName: string;
+          phone?: string;
+          email?: string;
+        };
+      };
     };
-  };
-  company?: {
-    name: string;
-    taxId: string;
-    address: {
-      line1: string;
-      line2?: string;
-      city: string;
-      state?: string;
-      postalCode: string;
-      country: string;
-    };
-    representative: {
-      firstName: string;
-      lastName: string;
-      phone?: string;
-      email?: string;
-    };
-  };
-}
 
 export class PayoutsResource {
   constructor(private httpClient: CommetHTTPClient) {}
