@@ -1,5 +1,11 @@
 # @commet/node
 
+## 8.0.1
+
+### Patch Changes
+
+- d2010c1: Document Offers, reusable pricing Market Groups, selectable price variants, and the current plan-change behavior in the Node SDK.
+
 ## 8.0.0
 
 ### Major Changes
