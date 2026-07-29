@@ -322,6 +322,11 @@ const subscriptionsResource: ResourceDef = {
           required: true,
           sdkKey: "id",
         },
+        {
+          flag: "--offer-id <id>",
+          description: "Promotional Offer ID for a canceled subscription",
+          sdkKey: "offerId",
+        },
       ],
     },
     "create-recovery-link": {
@@ -375,6 +380,16 @@ const subscriptionsResource: ResourceDef = {
           description: "New billing interval",
           sdkKey: "newBillingInterval",
         },
+        {
+          flag: "--offer-id <id>",
+          description: "Promotional Offer ID for an immediate change",
+          sdkKey: "offerId",
+        },
+        {
+          flag: "--success-url <url>",
+          description: "Redirect URL when the change requires checkout",
+          sdkKey: "successUrl",
+        },
       ],
     },
     list: {
@@ -406,12 +421,18 @@ const subscriptionsResource: ResourceDef = {
         {
           flag: "--plan-id <planId>",
           description: "New plan ID",
+          required: true,
           sdkKey: "planId",
         },
         {
           flag: "--billing-interval <interval>",
           description: "New billing interval",
           sdkKey: "billingInterval",
+        },
+        {
+          flag: "--offer-id <id>",
+          description: "Promotional Offer ID to include in the preview",
+          sdkKey: "offerId",
         },
       ],
     },
@@ -1351,7 +1372,8 @@ const usageResource: ResourceDef = {
         },
         {
           flag: "--properties <json>",
-          description: "Event properties (JSON: {key: value})",
+          description:
+            'Event properties (JSON array: [{"property":"region","value":"us"}])',
           parse: parseJson,
           sdkKey: "properties",
         },
@@ -1400,7 +1422,6 @@ const usageResource: ResourceDef = {
         {
           flag: "--quantity <n>",
           description: "Quantity to check",
-          required: true,
           parse: parseNumber,
           sdkKey: "quantity",
         },

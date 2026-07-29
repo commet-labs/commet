@@ -16,7 +16,7 @@
     "lint": "biome lint src/",
     "lint:fix": "biome lint --write src/",
     "validate:registry": "tsx scripts/validate-resource-registry.ts",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && pnpm validate:registry",
     "clean": "rm -rf .turbo node_modules dist"
   },
   "keywords": [

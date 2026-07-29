@@ -91,13 +91,19 @@ export function createResourceCommand(def: ResourceDef): Command {
 
       try {
         const client = createSdkClient();
-        const resource = client[
-          def.sdkProperty as keyof typeof client
-        ] as unknown as Record<
-          string,
-          (params: unknown, requestOptions?: unknown) => Promise<unknown>
-        >;
-        const method = resource[actionDef.method];
+        const resource = Reflect.get(client, def.sdkProperty);
+        if (
+          (typeof resource !== "object" || resource === null) &&
+          typeof resource !== "function"
+        ) {
+          throw new Error(`SDK resource ${def.sdkProperty} is unavailable`);
+        }
+        const method = Reflect.get(resource, actionDef.method);
+        if (typeof method !== "function") {
+          throw new Error(
+            `SDK method ${def.sdkProperty}.${actionDef.method} is unavailable`,
+          );
+        }
 
         let params: unknown;
         const requestOptions: Record<string, unknown> = {};

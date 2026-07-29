@@ -37,15 +37,66 @@ if (!commetClass) {
 const commetType = checker.getTypeAtLocation(commetClass);
 const failures: string[] = [];
 
-function parameterKeys(parameterType: ts.Type): Set<string> {
-  const variants = parameterType.isUnion()
-    ? parameterType.types
-    : [parameterType];
-  return new Set(
-    variants.flatMap((variant) =>
-      checker.getPropertiesOfType(variant).map((property) => property.name),
-    ),
+function typeVariants(type: ts.Type): ts.Type[] {
+  const nonNullableType = checker.getNonNullableType(type);
+  return nonNullableType.isUnion()
+    ? nonNullableType.types.flatMap(typeVariants)
+    : [nonNullableType];
+}
+
+function hasParameterPath(type: ts.Type, pathSegments: string[]): boolean {
+  const [segment, ...remainingSegments] = pathSegments;
+  if (!segment) return true;
+
+  return typeVariants(type).some((variant) => {
+    const property = checker.getPropertyOfType(variant, segment);
+    const propertyDeclaration =
+      property?.valueDeclaration ?? property?.declarations?.[0];
+    if (!(property && propertyDeclaration)) return false;
+    if (remainingSegments.length === 0) return true;
+
+    return hasParameterPath(
+      checker.getTypeOfSymbolAtLocation(property, propertyDeclaration),
+      remainingSegments,
+    );
+  });
+}
+
+function validateParameters(
+  resourceName: string,
+  actionName: string,
+  parameters: Array<{ sdkKey: string }>,
+  methodParameter: ts.Symbol | undefined,
+  parameterKind: string,
+): void {
+  if (parameters.length === 0) return;
+  if (!methodParameter) {
+    failures.push(
+      `${resourceName} ${actionName}: SDK method accepts no ${parameterKind}`,
+    );
+    return;
+  }
+
+  const methodParameterDeclaration =
+    methodParameter.valueDeclaration ?? methodParameter.declarations?.[0];
+  if (!methodParameterDeclaration) {
+    failures.push(
+      `${resourceName} ${actionName}: could not inspect SDK ${parameterKind}`,
+    );
+    return;
+  }
+
+  const methodParameterType = checker.getTypeOfSymbolAtLocation(
+    methodParameter,
+    methodParameterDeclaration,
   );
+  for (const parameter of parameters) {
+    if (!hasParameterPath(methodParameterType, parameter.sdkKey.split("."))) {
+      failures.push(
+        `${resourceName} ${actionName}: ${parameter.sdkKey} is not an SDK ${parameterKind}`,
+      );
+    }
+  }
 }
 
 for (const resourceDefinition of resourceDefinitions) {
@@ -96,41 +147,24 @@ for (const resourceDefinition of resourceDefinitions) {
     const bodyParameters = actionDefinition.params.filter(
       (parameter) => !parameter.requestOption,
     );
-    const firstParameter = signature?.getParameters()[0];
-
-    if (!firstParameter) {
-      if (bodyParameters.length > 0) {
-        failures.push(
-          `${resourceDefinition.name} ${actionName}: SDK method accepts no parameters`,
-        );
-      }
-      continue;
-    }
-
-    const firstParameterDeclaration =
-      firstParameter.valueDeclaration ?? firstParameter.declarations?.[0];
-    if (!firstParameterDeclaration) {
-      failures.push(
-        `${resourceDefinition.name} ${actionName}: could not inspect SDK parameters`,
-      );
-      continue;
-    }
-
-    const allowedKeys = parameterKeys(
-      checker.getTypeOfSymbolAtLocation(
-        firstParameter,
-        firstParameterDeclaration,
-      ),
+    const requestOptionParameters = actionDefinition.params.filter(
+      (parameter) => parameter.requestOption,
     );
-
-    for (const parameter of bodyParameters) {
-      const rootKey = parameter.sdkKey.split(".")[0];
-      if (rootKey && !allowedKeys.has(rootKey)) {
-        failures.push(
-          `${resourceDefinition.name} ${actionName}: ${parameter.sdkKey} is not an SDK parameter`,
-        );
-      }
-    }
+    const methodParameters = signature?.getParameters() ?? [];
+    validateParameters(
+      resourceDefinition.name,
+      actionName,
+      bodyParameters,
+      methodParameters[0],
+      "request parameter",
+    );
+    validateParameters(
+      resourceDefinition.name,
+      actionName,
+      requestOptionParameters,
+      methodParameters[bodyParameters.length > 0 ? 1 : 0],
+      "request option",
+    );
   }
 }
 
