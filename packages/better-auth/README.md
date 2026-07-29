@@ -147,9 +147,9 @@ portal({
 subscriptions({
   // Optional: Plan mappings for slug-based plan changes
   plans: [
-    { planId: "plan_123", slug: "starter" },
-    { planId: "plan_456", slug: "pro" },
-    { planId: "plan_789", slug: "enterprise" }
+    { planId: "pln_123", slug: "starter" },
+    { planId: "pln_456", slug: "pro" },
+    { planId: "pln_789", slug: "enterprise" }
   ]
 })
 ```

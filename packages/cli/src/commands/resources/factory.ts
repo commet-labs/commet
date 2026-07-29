@@ -12,6 +12,7 @@ export interface ParamDef {
   parse?: (value: string) => unknown;
   /** Dot-separated path in the SDK params object, e.g. "overage.enabled". */
   sdkKey: string;
+  requestOption?: boolean;
 }
 
 function commanderOptionKey(flag: string): string {
@@ -92,10 +93,14 @@ export function createResourceCommand(def: ResourceDef): Command {
         const client = createSdkClient();
         const resource = client[
           def.sdkProperty as keyof typeof client
-        ] as unknown as Record<string, (params: unknown) => Promise<unknown>>;
+        ] as unknown as Record<
+          string,
+          (params: unknown, requestOptions?: unknown) => Promise<unknown>
+        >;
         const method = resource[actionDef.method];
 
         let params: unknown;
+        const requestOptions: Record<string, unknown> = {};
         if (actionDef.buildParams) {
           params = actionDef.buildParams(options);
         } else {
@@ -105,16 +110,23 @@ export function createResourceCommand(def: ResourceDef): Command {
             if (rawValue === undefined) {
               continue;
             }
-            assignSdkKeyPath(
-              built,
-              paramDef.sdkKey,
-              paramDef.parse ? paramDef.parse(rawValue) : rawValue,
-            );
+            const parsedValue = paramDef.parse
+              ? paramDef.parse(rawValue)
+              : rawValue;
+            if (paramDef.requestOption) {
+              assignSdkKeyPath(requestOptions, paramDef.sdkKey, parsedValue);
+              continue;
+            }
+            assignSdkKeyPath(built, paramDef.sdkKey, parsedValue);
           }
           params = built;
         }
 
-        const result = await method.call(resource, params);
+        const result = await method.call(
+          resource,
+          params,
+          Object.keys(requestOptions).length > 0 ? requestOptions : undefined,
+        );
 
         spinner?.succeed(`${def.name} ${actionName}`);
 
@@ -197,7 +209,10 @@ export function generateResourceSchema(
     for (const [actionName, actionDef] of Object.entries(def.actions)) {
       const params: Record<string, unknown> = {};
       for (const param of actionDef.params) {
-        params[param.sdkKey] = {
+        const schemaKey = param.requestOption
+          ? `requestOptions.${param.sdkKey}`
+          : param.sdkKey;
+        params[schemaKey] = {
           flag: param.flag,
           description: param.description,
           required: param.required ?? false,
