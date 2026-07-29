@@ -18,9 +18,19 @@ const customersResource: ResourceDef = {
         },
         { flag: "--id <id>", description: "Custom customer ID", sdkKey: "id" },
         {
+          flag: "--external-id <id>",
+          description: "ID from your system",
+          sdkKey: "externalId",
+        },
+        {
           flag: "--full-name <name>",
           description: "Full name",
           sdkKey: "fullName",
+        },
+        {
+          flag: "--tax-document <value>",
+          description: "Tax document",
+          sdkKey: "taxDocument",
         },
         {
           flag: "--timezone <tz>",
@@ -39,6 +49,11 @@ const customersResource: ResourceDef = {
             "Address (JSON: {line1, city, postalCode, country, ...})",
           parse: parseJson,
           sdkKey: "address",
+        },
+        {
+          flag: "--address-id <id>",
+          description: "Existing customer address ID",
+          sdkKey: "addressId",
         },
       ],
     },
@@ -88,6 +103,16 @@ const customersResource: ResourceDef = {
           sdkKey: "fullName",
         },
         {
+          flag: "--external-id <id>",
+          description: "ID from your system",
+          sdkKey: "externalId",
+        },
+        {
+          flag: "--tax-document <value>",
+          description: "Tax document",
+          sdkKey: "taxDocument",
+        },
+        {
           flag: "--timezone <tz>",
           description: "Timezone",
           sdkKey: "timezone",
@@ -111,11 +136,6 @@ const customersResource: ResourceDef = {
       description: "List customers",
       params: [
         {
-          flag: "--search <query>",
-          description: "Search query",
-          sdkKey: "search",
-        },
-        {
           flag: "--limit <n>",
           description: "Max results",
           parse: parseNumber,
@@ -127,14 +147,9 @@ const customersResource: ResourceDef = {
           sdkKey: "cursor",
         },
         {
-          flag: "--start-date <date>",
-          description: "Start date filter",
-          sdkKey: "startDate",
-        },
-        {
-          flag: "--end-date <date>",
-          description: "End date filter",
-          sdkKey: "endDate",
+          flag: "--external-id <id>",
+          description: "Filter by external ID",
+          sdkKey: "externalId",
         },
       ],
     },
@@ -173,6 +188,11 @@ const subscriptionsResource: ResourceDef = {
           sdkKey: "billingInterval",
         },
         {
+          flag: "--price-id <id>",
+          description: "Selectable plan price ID",
+          sdkKey: "priceId",
+        },
+        {
           flag: "--initial-seats <json>",
           description: "Initial seats map (JSON: {featureCode: count})",
           parse: parseJson,
@@ -183,6 +203,27 @@ const subscriptionsResource: ResourceDef = {
           description: "Skip trial period",
           parse: parseBool,
           sdkKey: "skipTrial",
+        },
+        {
+          flag: "--custom-trial-days <n>",
+          description: "Override the catalog trial duration",
+          parse: parseNumber,
+          sdkKey: "customTrialDays",
+        },
+        {
+          flag: "--offer-id <id>",
+          description: "Explicit Introductory Offer ID",
+          sdkKey: "offerId",
+        },
+        {
+          flag: "--promo-code <code>",
+          description: "Promotional Offer promo code",
+          sdkKey: "promoCode",
+        },
+        {
+          flag: "--provider <provider>",
+          description: "Initial checkout provider override",
+          sdkKey: "provider",
         },
         {
           flag: "--name <name>",
@@ -208,9 +249,15 @@ const subscriptionsResource: ResourceDef = {
         if (options.planId) params.planId = options.planId;
         if (options.billingInterval)
           params.billingInterval = options.billingInterval;
+        if (options.priceId) params.priceId = options.priceId;
         if (options.initialSeats)
           params.initialSeats = parseJson(options.initialSeats);
         if (options.skipTrial) params.skipTrial = parseBool(options.skipTrial);
+        if (options.customTrialDays)
+          params.customTrialDays = parseNumber(options.customTrialDays);
+        if (options.offerId) params.offerId = options.offerId;
+        if (options.promoCode) params.promoCode = options.promoCode;
+        if (options.provider) params.provider = options.provider;
         if (options.name) params.name = options.name;
         if (options.startDate) params.startDate = options.startDate;
         if (options.successUrl) params.successUrl = options.successUrl;
@@ -275,6 +322,11 @@ const subscriptionsResource: ResourceDef = {
           required: true,
           sdkKey: "id",
         },
+        {
+          flag: "--offer-id <id>",
+          description: "Promotional Offer ID for a canceled subscription",
+          sdkKey: "offerId",
+        },
       ],
     },
     "create-recovery-link": {
@@ -328,6 +380,16 @@ const subscriptionsResource: ResourceDef = {
           description: "New billing interval",
           sdkKey: "newBillingInterval",
         },
+        {
+          flag: "--offer-id <id>",
+          description: "Promotional Offer ID for an immediate change",
+          sdkKey: "offerId",
+        },
+        {
+          flag: "--success-url <url>",
+          description: "Redirect URL when the change requires checkout",
+          sdkKey: "successUrl",
+        },
       ],
     },
     list: {
@@ -344,17 +406,6 @@ const subscriptionsResource: ResourceDef = {
           description: "Filter by status",
           sdkKey: "status",
         },
-        {
-          flag: "--limit <n>",
-          description: "Max results",
-          parse: parseNumber,
-          sdkKey: "limit",
-        },
-        {
-          flag: "--cursor <cursor>",
-          description: "Pagination cursor",
-          sdkKey: "cursor",
-        },
       ],
     },
     "preview-change": {
@@ -370,12 +421,18 @@ const subscriptionsResource: ResourceDef = {
         {
           flag: "--plan-id <planId>",
           description: "New plan ID",
+          required: true,
           sdkKey: "planId",
         },
         {
           flag: "--billing-interval <interval>",
           description: "New billing interval",
           sdkKey: "billingInterval",
+        },
+        {
+          flag: "--offer-id <id>",
+          description: "Promotional Offer ID to include in the preview",
+          sdkKey: "offerId",
         },
       ],
     },
@@ -498,17 +555,6 @@ const plansResource: ResourceDef = {
           description: "Include private plans",
           parse: parseBool,
           sdkKey: "includePrivate",
-        },
-        {
-          flag: "--limit <n>",
-          description: "Max results",
-          parse: parseNumber,
-          sdkKey: "limit",
-        },
-        {
-          flag: "--cursor <cursor>",
-          description: "Pagination cursor",
-          sdkKey: "cursor",
         },
       ],
     },
@@ -758,17 +804,6 @@ const plansResource: ResourceDef = {
           sdkKey: "overage.unitPrice",
         },
         {
-          flag: "--pricing-mode <mode>",
-          description: "Pricing mode: fixed or ai_model",
-          sdkKey: "pricingMode",
-        },
-        {
-          flag: "--margin <n>",
-          description: "Margin percentage (ai_model pricing)",
-          parse: parseNumber,
-          sdkKey: "margin",
-        },
-        {
           flag: "--credits-per-unit <n>",
           description: "Credits per unit",
           parse: parseNumber,
@@ -814,9 +849,13 @@ const plansResource: ResourceDef = {
         {
           flag: "--price <n>",
           description: "Price in cents",
-          required: true,
           parse: parseNumber,
           sdkKey: "price",
+        },
+        {
+          flag: "--inherits-from-price-id <id>",
+          description: "Base price ID inherited by this selectable variant",
+          sdkKey: "inheritsFromPriceId",
         },
         {
           flag: "--trial-days <n>",
@@ -843,27 +882,16 @@ const plansResource: ResourceDef = {
           sdkKey: "includedCredits",
         },
         {
-          flag: "--intro-offer-enabled <bool>",
-          description: "Enable intro offer",
-          parse: parseBool,
-          sdkKey: "introOffer.enabled",
+          flag: "--market-prices <json>",
+          description: "Market prices (JSON array)",
+          parse: parseJson,
+          sdkKey: "marketPrices",
         },
         {
-          flag: "--intro-offer-discount-type <type>",
-          description: "Intro offer discount type: percentage or amount",
-          sdkKey: "introOffer.discountType",
-        },
-        {
-          flag: "--intro-offer-discount-value <n>",
-          description: "Intro offer discount value",
-          parse: parseNumber,
-          sdkKey: "introOffer.discountValue",
-        },
-        {
-          flag: "--intro-offer-duration-cycles <n>",
-          description: "Intro offer duration in cycles",
-          parse: parseNumber,
-          sdkKey: "introOffer.durationCycles",
+          flag: "--metadata <json>",
+          description: "Price metadata (JSON)",
+          parse: parseJson,
+          sdkKey: "metadata",
         },
       ],
     },
@@ -914,27 +942,16 @@ const plansResource: ResourceDef = {
           sdkKey: "includedCredits",
         },
         {
-          flag: "--intro-offer-enabled <bool>",
-          description: "Enable intro offer",
-          parse: parseBool,
-          sdkKey: "introOffer.enabled",
+          flag: "--market-prices <json>",
+          description: "Market prices (JSON array)",
+          parse: parseJson,
+          sdkKey: "marketPrices",
         },
         {
-          flag: "--intro-offer-discount-type <type>",
-          description: "Intro offer discount type: percentage or amount",
-          sdkKey: "introOffer.discountType",
-        },
-        {
-          flag: "--intro-offer-discount-value <n>",
-          description: "Intro offer discount value",
-          parse: parseNumber,
-          sdkKey: "introOffer.discountValue",
-        },
-        {
-          flag: "--intro-offer-duration-cycles <n>",
-          description: "Intro offer duration in cycles",
-          parse: parseNumber,
-          sdkKey: "introOffer.durationCycles",
+          flag: "--metadata <json>",
+          description: "Price metadata to merge (JSON)",
+          parse: parseJson,
+          sdkKey: "metadata",
         },
       ],
     },
@@ -1154,24 +1171,6 @@ const featureAccessResource: ResourceDef = {
         },
       ],
     },
-    "can-use": {
-      method: "canUse",
-      description: "Check if a customer can use one more unit of a feature",
-      params: [
-        {
-          flag: "--customer-id <id>",
-          description: "Customer ID",
-          required: true,
-          sdkKey: "customerId",
-        },
-        {
-          flag: "--code <code>",
-          description: "Feature code",
-          required: true,
-          sdkKey: "code",
-        },
-      ],
-    },
   },
 };
 
@@ -1315,10 +1314,10 @@ const usageResource: ResourceDef = {
       description: "Track a usage event",
       params: [
         {
-          flag: "--feature <code>",
+          flag: "--feature-code <code>",
           description: "Feature code",
           required: true,
-          sdkKey: "feature",
+          sdkKey: "featureCode",
         },
         {
           flag: "--customer-id <id>",
@@ -1362,9 +1361,9 @@ const usageResource: ResourceDef = {
           sdkKey: "cacheWriteTokens",
         },
         {
-          flag: "--idempotency-key <key>",
-          description: "Idempotency key for deduplication",
-          sdkKey: "idempotencyKey",
+          flag: "--event-id <id>",
+          description: "Caller-owned event ID for deduplication",
+          sdkKey: "eventId",
         },
         {
           flag: "--timestamp <ts>",
@@ -1373,18 +1372,18 @@ const usageResource: ResourceDef = {
         },
         {
           flag: "--properties <json>",
-          description: "Event properties (JSON: {key: value})",
+          description:
+            'Event properties (JSON array: [{"property":"region","value":"us"}])',
           parse: parseJson,
           sdkKey: "properties",
         },
       ],
       buildParams: (options: Record<string, string>) => {
         const params: Record<string, unknown> = {
-          feature: options.feature,
+          featureCode: options.featureCode,
           customerId: options.customerId,
         };
-        if (options.idempotencyKey)
-          params.idempotencyKey = options.idempotencyKey;
+        if (options.eventId) params.eventId = options.eventId;
         if (options.timestamp) params.timestamp = options.timestamp;
         if (options.properties)
           params.properties = parseJson(options.properties);
@@ -1423,7 +1422,6 @@ const usageResource: ResourceDef = {
         {
           flag: "--quantity <n>",
           description: "Quantity to check",
-          required: true,
           parse: parseNumber,
           sdkKey: "quantity",
         },
@@ -2149,23 +2147,15 @@ const promoCodesResource: ResourceDef = {
           sdkKey: "code",
         },
         {
-          flag: "--discount-type <type>",
-          description: "Discount type: percentage or amount",
+          flag: "--offer-id <id>",
+          description: "Promotional Offer ID",
           required: true,
-          sdkKey: "discountType",
+          sdkKey: "offerId",
         },
         {
-          flag: "--discount-value <n>",
-          description: "Discount value",
-          required: true,
-          parse: parseNumber,
-          sdkKey: "discountValue",
-        },
-        {
-          flag: "--duration-cycles <n>",
-          description: "Duration in billing cycles",
-          parse: parseNumber,
-          sdkKey: "durationCycles",
+          flag: "--billing-interval <interval>",
+          description: "Optional billing interval restriction",
+          sdkKey: "billingInterval",
         },
         {
           flag: "--max-redemptions <n>",
@@ -2197,6 +2187,11 @@ const promoCodesResource: ResourceDef = {
           sdkKey: "id",
         },
         {
+          flag: "--billing-interval <interval>",
+          description: "Optional billing interval restriction",
+          sdkKey: "billingInterval",
+        },
+        {
           flag: "--max-redemptions <n>",
           description: "Maximum number of redemptions",
           parse: parseNumber,
@@ -2218,6 +2213,278 @@ const promoCodesResource: ResourceDef = {
           description: "Restrict to plan IDs (JSON array)",
           parse: parseJson,
           sdkKey: "planIds",
+        },
+      ],
+    },
+  },
+};
+
+const offersResource: ResourceDef = {
+  name: "offers",
+  description: "Manage Introductory and Promotional Offers",
+  sdkProperty: "offers",
+  actions: {
+    list: {
+      method: "list",
+      description: "List offers",
+      params: [
+        {
+          flag: "--limit <n>",
+          description: "Max results",
+          parse: parseNumber,
+          sdkKey: "limit",
+        },
+        {
+          flag: "--cursor <cursor>",
+          description: "Pagination cursor",
+          sdkKey: "cursor",
+        },
+        {
+          flag: "--plan-price-id <id>",
+          description: "Filter by plan price ID",
+          sdkKey: "planPriceId",
+        },
+        {
+          flag: "--purpose <purpose>",
+          description: "Filter by introductory or promotional purpose",
+          sdkKey: "purpose",
+        },
+        {
+          flag: "--active <bool>",
+          description: "Filter by active status",
+          parse: parseBool,
+          sdkKey: "active",
+        },
+      ],
+    },
+    get: {
+      method: "get",
+      description: "Get an offer",
+      params: [
+        {
+          flag: "--id <id>",
+          description: "Offer ID",
+          required: true,
+          sdkKey: "id",
+        },
+      ],
+    },
+    create: {
+      method: "create",
+      description: "Create an offer",
+      params: [
+        {
+          flag: "--name <name>",
+          description: "Offer name",
+          required: true,
+          sdkKey: "name",
+        },
+        {
+          flag: "--purpose <purpose>",
+          description: "introductory or promotional",
+          required: true,
+          sdkKey: "purpose",
+        },
+        {
+          flag: "--plan-price-ids <json>",
+          description: "Plan price IDs (JSON array)",
+          required: true,
+          parse: parseJson,
+          sdkKey: "planPriceIds",
+        },
+        {
+          flag: "--phases <json>",
+          description: "Offer phases (JSON array)",
+          required: true,
+          parse: parseJson,
+          sdkKey: "phases",
+        },
+        {
+          flag: "--starts-at <date>",
+          description: "Start date (ISO 8601)",
+          sdkKey: "startsAt",
+        },
+        {
+          flag: "--ends-at <date>",
+          description: "End date (ISO 8601)",
+          sdkKey: "endsAt",
+        },
+        {
+          flag: "--active <bool>",
+          description: "Whether the offer is active",
+          parse: parseBool,
+          sdkKey: "active",
+        },
+        {
+          flag: "--metadata <json>",
+          description: "Metadata (JSON)",
+          parse: parseJson,
+          sdkKey: "metadata",
+        },
+      ],
+    },
+    update: {
+      method: "update",
+      description: "Replace an offer definition",
+      params: [
+        {
+          flag: "--id <id>",
+          description: "Offer ID",
+          required: true,
+          sdkKey: "id",
+        },
+        {
+          flag: "--name <name>",
+          description: "Offer name",
+          required: true,
+          sdkKey: "name",
+        },
+        {
+          flag: "--purpose <purpose>",
+          description: "introductory or promotional",
+          required: true,
+          sdkKey: "purpose",
+        },
+        {
+          flag: "--plan-price-ids <json>",
+          description: "Plan price IDs (JSON array)",
+          required: true,
+          parse: parseJson,
+          sdkKey: "planPriceIds",
+        },
+        {
+          flag: "--phases <json>",
+          description: "Offer phases (JSON array)",
+          required: true,
+          parse: parseJson,
+          sdkKey: "phases",
+        },
+        {
+          flag: "--starts-at <date>",
+          description: "Start date (ISO 8601)",
+          sdkKey: "startsAt",
+        },
+        {
+          flag: "--ends-at <date>",
+          description: "End date (ISO 8601)",
+          sdkKey: "endsAt",
+        },
+        {
+          flag: "--active <bool>",
+          description: "Whether the offer is active",
+          parse: parseBool,
+          sdkKey: "active",
+        },
+        {
+          flag: "--metadata <json>",
+          description: "Metadata (JSON)",
+          parse: parseJson,
+          sdkKey: "metadata",
+        },
+      ],
+    },
+    delete: {
+      method: "delete",
+      description: "Archive an offer",
+      params: [
+        {
+          flag: "--id <id>",
+          description: "Offer ID",
+          required: true,
+          sdkKey: "id",
+        },
+      ],
+    },
+  },
+};
+
+const pricingResource: ResourceDef = {
+  name: "pricing",
+  description: "Manage reusable pricing market groups",
+  sdkProperty: "pricing",
+  actions: {
+    "list-market-groups": {
+      method: "listMarketGroups",
+      description: "List market groups",
+      params: [],
+    },
+    "get-market-group": {
+      method: "getMarketGroup",
+      description: "Get a market group",
+      params: [
+        {
+          flag: "--id <id>",
+          description: "Market group ID",
+          required: true,
+          sdkKey: "id",
+        },
+      ],
+    },
+    "create-market-group": {
+      method: "createMarketGroup",
+      description: "Create a market group",
+      params: [
+        {
+          flag: "--name <name>",
+          description: "Market group name",
+          required: true,
+          sdkKey: "name",
+        },
+        {
+          flag: "--country-codes <json>",
+          description: "ISO country codes (JSON array)",
+          required: true,
+          parse: parseJson,
+          sdkKey: "countryCodes",
+        },
+        {
+          flag: "--metadata <json>",
+          description: "Metadata (JSON)",
+          parse: parseJson,
+          sdkKey: "metadata",
+        },
+      ],
+    },
+    "update-market-group": {
+      method: "updateMarketGroup",
+      description: "Replace a market group",
+      params: [
+        {
+          flag: "--id <id>",
+          description: "Market group ID",
+          required: true,
+          sdkKey: "id",
+        },
+        {
+          flag: "--name <name>",
+          description: "Market group name",
+          required: true,
+          sdkKey: "name",
+        },
+        {
+          flag: "--country-codes <json>",
+          description: "ISO country codes (JSON array)",
+          required: true,
+          parse: parseJson,
+          sdkKey: "countryCodes",
+        },
+        {
+          flag: "--metadata <json>",
+          description: "Metadata (JSON)",
+          parse: parseJson,
+          sdkKey: "metadata",
+        },
+      ],
+    },
+    "delete-market-group": {
+      method: "deleteMarketGroup",
+      description: "Delete an unused market group",
+      params: [
+        {
+          flag: "--id <id>",
+          description: "Market group ID",
+          required: true,
+          sdkKey: "id",
         },
       ],
     },
@@ -2697,8 +2964,9 @@ const quotaResource: ResourceDef = {
         },
         {
           flag: "--idempotency-key <key>",
-          description: "Idempotency key for deduplication",
+          description: "HTTP idempotency key for request deduplication",
           sdkKey: "idempotencyKey",
+          requestOption: true,
         },
       ],
     },
@@ -2731,8 +2999,9 @@ const quotaResource: ResourceDef = {
         },
         {
           flag: "--idempotency-key <key>",
-          description: "Idempotency key for deduplication",
+          description: "HTTP idempotency key for request deduplication",
           sdkKey: "idempotencyKey",
+          requestOption: true,
         },
       ],
     },
@@ -2764,8 +3033,9 @@ const quotaResource: ResourceDef = {
         },
         {
           flag: "--idempotency-key <key>",
-          description: "Idempotency key for deduplication",
+          description: "HTTP idempotency key for request deduplication",
           sdkKey: "idempotencyKey",
+          requestOption: true,
         },
       ],
     },
@@ -2817,7 +3087,9 @@ export const resourceDefinitions: ResourceDef[] = [
   apiKeysResource,
   invoicesResource,
   transactionsResource,
+  offersResource,
   promoCodesResource,
+  pricingResource,
   planGroupsResource,
   paymentsResource,
   payoutsResource,

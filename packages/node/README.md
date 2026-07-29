@@ -97,6 +97,52 @@ const portal = await commet.portal.getUrl({
 });
 ```
 
+## Offers and selectable pricing
+
+Create reusable country Markets and attach market prices to a base price or an inherited selectable variant:
+
+```typescript
+const argentina = await commet.pricing.createMarketGroup({
+  name: 'Argentina',
+  countryCodes: ['AR'],
+});
+
+const variant = await commet.plans.addPrice({
+  id: 'pln_pro',
+  billingInterval: 'monthly',
+  inheritsFromPriceId: 'pp_monthly',
+  marketPrices: [{
+    marketGroupId: argentina.id,
+    currency: 'ars',
+    price: 1_500_000,
+  }],
+});
+
+await commet.subscriptions.create({
+  customerId: 'cus_123',
+  planId: 'pln_pro',
+  priceId: variant.id,
+});
+```
+
+Offers own discount phases. Promo Codes reference Promotional Offers instead of duplicating discount fields:
+
+```typescript
+const offer = await commet.offers.create({
+  name: 'First three months at 25% off',
+  purpose: 'promotional',
+  planPriceIds: ['pp_monthly'],
+  phases: [{ type: 'percentage', percentage: 2500, durationCycles: 3 }],
+});
+
+await commet.promoCodes.create({
+  code: 'LAUNCH25',
+  offerId: offer.id,
+});
+```
+
+Omitting `priceId` preserves default price resolution and still applies Currency Pricing and Markets. A subscription keeps the selected price identity and renews from that catalog price's current value.
+
 ## Type Safety
 
 Use the [Commet CLI](https://www.npmjs.com/package/commet) to generate TypeScript types from your organization:
