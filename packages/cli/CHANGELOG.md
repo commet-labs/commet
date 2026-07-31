@@ -1,5 +1,11 @@
 # commet
 
+## 5.0.1
+
+### Patch Changes
+
+- 874a813: Install Commet agent skills from the canonical `commet-labs/skills` repository.
+
 ## 5.0.0
 
 ### Major Changes
