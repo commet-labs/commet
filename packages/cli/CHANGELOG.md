@@ -1,5 +1,16 @@
 # commet
 
+## 5.0.0
+
+### Major Changes
+
+- 2c6b019: Align the Node SDK and CLI with API `2026-07-31`: replace pricing Market Groups with top-level Markets, make Offers independent from purposes and plan-price associations, and expose target-aware Offer Applications on subscriptions.
+
+### Patch Changes
+
+- Updated dependencies [2c6b019]
+  - @commet/node@9.0.0
+
 ## 4.0.0
 
 ### Major Changes

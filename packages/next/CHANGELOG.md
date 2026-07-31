@@ -1,5 +1,12 @@
 # @commet/next
 
+## 1.1.10
+
+### Patch Changes
+
+- Updated dependencies [2c6b019]
+  - @commet/node@9.0.0
+
 ## 1.1.9
 
 ### Patch Changes
