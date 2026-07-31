@@ -76,7 +76,7 @@ export class PromoCodesResource {
     return this.httpClient.get("/promo-codes", params, options);
   }
 
-  /** Create a distribution code for an existing promotional offer. Offer economics remain owned by the referenced Offer. */
+  /** Create a distribution code for an existing Offer. The referenced Offer owns the benefit and duration; the promo code owns redemption restrictions. */
   async create(
     params: CreatePromoCodeParams,
     options?: RequestOptions,

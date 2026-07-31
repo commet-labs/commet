@@ -9,8 +9,6 @@ export interface GetOfferParams {
 export interface UpdateOfferParams {
   id: string;
   name: string;
-  purpose: "introductory" | "promotional";
-  planPriceIds: Array<string>;
   phases: Array<
     | {
         type: "free_trial";
@@ -18,13 +16,13 @@ export interface UpdateOfferParams {
       }
     | {
         type: "percentage";
-        durationCycles: number;
+        durationCycles: number | null;
         /** Discount in basis points. 5000 means 50%. */
         percentage: number;
       }
     | {
         type: "amount_off";
-        durationCycles: number;
+        durationCycles: number | null;
         amounts: Array<{
           currency: string;
           /** Amount in the currency's minor unit (for example, cents for USD). */
@@ -33,7 +31,7 @@ export interface UpdateOfferParams {
       }
     | {
         type: "fixed_price";
-        durationCycles: number;
+        durationCycles: number | null;
         prices: Array<{
           currency: string;
           /** Amount in the currency's minor unit (for example, cents for USD). */
@@ -54,15 +52,11 @@ export interface DeleteOfferParams {
 export interface ListOffersParams {
   cursor?: string;
   limit?: number;
-  planPriceId?: string;
-  purpose?: "introductory" | "promotional";
   active?: boolean;
 }
 
 export interface CreateOfferParams {
   name: string;
-  purpose: "introductory" | "promotional";
-  planPriceIds: Array<string>;
   phases: Array<
     | {
         type: "free_trial";
@@ -70,13 +64,13 @@ export interface CreateOfferParams {
       }
     | {
         type: "percentage";
-        durationCycles: number;
+        durationCycles: number | null;
         /** Discount in basis points. 5000 means 50%. */
         percentage: number;
       }
     | {
         type: "amount_off";
-        durationCycles: number;
+        durationCycles: number | null;
         amounts: Array<{
           currency: string;
           /** Amount in the currency's minor unit (for example, cents for USD). */
@@ -85,7 +79,7 @@ export interface CreateOfferParams {
       }
     | {
         type: "fixed_price";
-        durationCycles: number;
+        durationCycles: number | null;
         prices: Array<{
           currency: string;
           /** Amount in the currency's minor unit (for example, cents for USD). */
@@ -102,13 +96,13 @@ export interface CreateOfferParams {
 export class OffersResource {
   constructor(private httpClient: CommetHTTPClient) {}
 
-  /** Retrieve a canonical offer by its public ID. */
+  /** Retrieve reusable offer terms by public ID. */
   async get(params: GetOfferParams, options?: RequestOptions): Promise<Offer> {
     const { id } = params;
     return this.httpClient.get(`/offers/${id}`, undefined, options);
   }
 
-  /** Replace an offer's catalog definition. Existing offer applications keep their immutable accepted terms. */
+  /** Replace reusable offer terms. Existing applications keep their immutable accepted terms. */
   async update(
     params: UpdateOfferParams,
     options?: RequestOptions,
@@ -117,7 +111,7 @@ export class OffersResource {
     return this.httpClient.patch(`/offers/${id}`, rest, options);
   }
 
-  /** Soft-delete an offer. Existing applications and their accepted terms remain available for billing and audit. */
+  /** Soft-delete an Offer. Existing applications and their accepted terms remain available for billing and audit. */
   async delete(
     params: DeleteOfferParams,
     options?: RequestOptions,
@@ -126,7 +120,7 @@ export class OffersResource {
     return this.httpClient.delete(`/offers/${id}`, undefined, options);
   }
 
-  /** List the organization's canonical introductory and promotional offers. */
+  /** List reusable offer terms. Offers are independent from plans, prices, eligibility, and distribution channels. */
   async list(
     params?: ListOffersParams,
     options?: RequestOptions,
@@ -139,7 +133,7 @@ export class OffersResource {
     return this.httpClient.get("/offers", params, options);
   }
 
-  /** Create a canonical offer scoped to one or more plan prices. Currency-specific phases require an explicit USD value and never fall back across currencies. */
+  /** Create reusable offer terms without assigning a plan, price, eligibility rule, or distribution channel. */
   async create(
     params: CreateOfferParams,
     options?: RequestOptions,
