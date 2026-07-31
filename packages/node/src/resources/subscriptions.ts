@@ -254,7 +254,7 @@ export class SubscriptionsResource {
     return this.httpClient.post(`/subscriptions/${id}/cancel`, rest, options);
   }
 
-  /** Upgrade or change billing interval immediately, optionally applying a quoted Promotional Offer. Scheduled changes do not accept offers. */
+  /** Upgrade or change billing interval immediately, optionally applying an Offer. Scheduled changes do not accept offers. */
   async changePlan(
     params: ChangePlanParams,
     options?: RequestOptions,
@@ -289,7 +289,7 @@ export class SubscriptionsResource {
     );
   }
 
-  /** Preview proration details for an immediate plan change (a higher-sort-order plan or a longer interval) without applying it. Returns credit, charge, and net amount. The target plan must belong to the same plan group as the current plan, otherwise a 400 with code `plans_not_in_same_group` is returned. A change between two free plans has nothing to prorate and returns a zero-amount estimate. Downgrades — a lower-sort-order plan in the same group, or a shorter interval — are scheduled for the end of the current period instead of being prorated, so they return a 400 with code `plan_change_scheduled`; apply those via the change-plan endpoint. Pass offerId to quote the destination plan with a Promotional Offer. */
+  /** Preview proration details for an immediate plan change without applying it. Interval direction takes precedence: a longer interval is immediate and a shorter interval is scheduled. When the interval is unchanged, a higher-sort-order plan is immediate and a lower-sort-order plan is scheduled. A paid-to-free change is always scheduled. Returns credit, charge, and net amount. The target plan must belong to the same plan group as the current plan, otherwise a 400 with code `plans_not_in_same_group` is returned. A change between two free plans has nothing to prorate and returns a zero-amount estimate. Scheduled changes return a 400 with code `plan_change_scheduled`; apply those via the change-plan endpoint. Pass offerId to quote the destination plan with an Offer. */
   async previewChange(
     params: PreviewChangePlanParams,
     options?: RequestOptions,
@@ -302,7 +302,7 @@ export class SubscriptionsResource {
     );
   }
 
-  /** Reactivates a subscription. A past_due subscription retries its outstanding renewal charge (recovering to active on success). A canceled subscription generates a fresh invoice, charges the saved card, and resets the billing period. On a successful charge the subscription becomes active; a declined charge returns an error with a recoveryUrl in the error details that can be sent to the customer to update their card. A canceled subscription may apply a Promotional Offer by offerId; past-due recovery cannot. */
+  /** Reactivates a subscription. A past_due subscription retries its outstanding renewal charge (recovering to active on success). A canceled subscription generates a fresh invoice, charges the saved card, and resets the billing period. On a successful charge the subscription becomes active; a declined charge returns an error with a recoveryUrl in the error details that can be sent to the customer to update their card. A canceled subscription may apply an Offer by offerId; past-due recovery cannot. */
   async reactivate(
     params: ReactivateSubscriptionParams,
     options?: RequestOptions,
@@ -367,7 +367,7 @@ export class SubscriptionsResource {
     return this.httpClient.get("/subscriptions", params, options);
   }
 
-  /** Create a subscription for a customer. Commet selects the default price when priceId is omitted and resolves its market from the customer's billing country. Without an offer override, Commet applies the price's automatic introductory offer. Pass one Promotional Offer through offerId to override it. Experiment assignment remains external. */
+  /** Create a subscription for a customer. Commet selects the default price when priceId is omitted and resolves its market from the customer's billing country. Without an offer override, Commet applies the price's automatic introductory Offer. Pass offerId to apply any active compatible Offer directly; the Offer does not need a prior plan-price association. */
   async create(
     params: CreateSubscriptionParams,
     options?: RequestOptions,

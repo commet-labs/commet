@@ -2240,16 +2240,6 @@ const offersResource: ResourceDef = {
           sdkKey: "cursor",
         },
         {
-          flag: "--plan-price-id <id>",
-          description: "Filter by plan price ID",
-          sdkKey: "planPriceId",
-        },
-        {
-          flag: "--purpose <purpose>",
-          description: "Filter by introductory or promotional purpose",
-          sdkKey: "purpose",
-        },
-        {
           flag: "--active <bool>",
           description: "Filter by active status",
           parse: parseBool,
@@ -2278,19 +2268,6 @@ const offersResource: ResourceDef = {
           description: "Offer name",
           required: true,
           sdkKey: "name",
-        },
-        {
-          flag: "--purpose <purpose>",
-          description: "introductory or promotional",
-          required: true,
-          sdkKey: "purpose",
-        },
-        {
-          flag: "--plan-price-ids <json>",
-          description: "Plan price IDs (JSON array)",
-          required: true,
-          parse: parseJson,
-          sdkKey: "planPriceIds",
         },
         {
           flag: "--phases <json>",
@@ -2340,19 +2317,6 @@ const offersResource: ResourceDef = {
           sdkKey: "name",
         },
         {
-          flag: "--purpose <purpose>",
-          description: "introductory or promotional",
-          required: true,
-          sdkKey: "purpose",
-        },
-        {
-          flag: "--plan-price-ids <json>",
-          description: "Plan price IDs (JSON array)",
-          required: true,
-          parse: parseJson,
-          sdkKey: "planPriceIds",
-        },
-        {
           flag: "--phases <json>",
           description: "Offer phases (JSON array)",
           required: true,
@@ -2398,31 +2362,31 @@ const offersResource: ResourceDef = {
   },
 };
 
-const pricingResource: ResourceDef = {
-  name: "pricing",
-  description: "Manage reusable pricing market groups",
-  sdkProperty: "pricing",
+const marketsResource: ResourceDef = {
+  name: "markets",
+  description: "Manage reusable markets",
+  sdkProperty: "markets",
   actions: {
-    "list-market-groups": {
-      method: "listMarketGroups",
-      description: "List market groups",
+    list: {
+      method: "list",
+      description: "List markets",
       params: [],
     },
-    "get-market-group": {
-      method: "getMarketGroup",
-      description: "Get a market group",
+    get: {
+      method: "get",
+      description: "Get a market",
       params: [
         {
           flag: "--id <id>",
-          description: "Market group ID",
+          description: "Market ID",
           required: true,
           sdkKey: "id",
         },
       ],
     },
-    "create-market-group": {
-      method: "createMarketGroup",
-      description: "Create a market group",
+    create: {
+      method: "create",
+      description: "Create a market",
       params: [
         {
           flag: "--name <name>",
@@ -2445,13 +2409,13 @@ const pricingResource: ResourceDef = {
         },
       ],
     },
-    "update-market-group": {
-      method: "updateMarketGroup",
-      description: "Replace a market group",
+    update: {
+      method: "update",
+      description: "Replace a market",
       params: [
         {
           flag: "--id <id>",
-          description: "Market group ID",
+          description: "Market ID",
           required: true,
           sdkKey: "id",
         },
@@ -2476,13 +2440,13 @@ const pricingResource: ResourceDef = {
         },
       ],
     },
-    "delete-market-group": {
-      method: "deleteMarketGroup",
-      description: "Delete an unused market group",
+    delete: {
+      method: "delete",
+      description: "Delete an unused market",
       params: [
         {
           flag: "--id <id>",
-          description: "Market group ID",
+          description: "Market ID",
           required: true,
           sdkKey: "id",
         },
@@ -3089,7 +3053,7 @@ export const resourceDefinitions: ResourceDef[] = [
   transactionsResource,
   offersResource,
   promoCodesResource,
-  pricingResource,
+  marketsResource,
   planGroupsResource,
   paymentsResource,
   payoutsResource,

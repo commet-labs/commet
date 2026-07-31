@@ -102,7 +102,7 @@ const portal = await commet.portal.getUrl({
 Create reusable country Markets and attach market prices to a base price or an inherited selectable variant:
 
 ```typescript
-const argentina = await commet.pricing.createMarketGroup({
+const argentina = await commet.markets.create({
   name: 'Argentina',
   countryCodes: ['AR'],
 });
@@ -130,8 +130,6 @@ Offers own discount phases. Promo Codes reference Promotional Offers instead of 
 ```typescript
 const offer = await commet.offers.create({
   name: 'First three months at 25% off',
-  purpose: 'promotional',
-  planPriceIds: ['pp_monthly'],
   phases: [{ type: 'percentage', percentage: 2500, durationCycles: 3 }],
 });
 

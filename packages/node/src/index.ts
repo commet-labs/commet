@@ -51,6 +51,12 @@ export type {
   UpdateInvoiceStatusParams,
 } from "./resources/invoices";
 export type {
+  CreateMarketParams,
+  DeleteMarketParams,
+  GetMarketParams,
+  UpdateMarketParams,
+} from "./resources/markets";
+export type {
   CreateOfferParams,
   DeleteOfferParams,
   GetOfferParams,
@@ -98,12 +104,6 @@ export type {
   UpsertRegionalPricesParams,
 } from "./resources/plans";
 export type { RequestPortalAccessParams } from "./resources/portal";
-export type {
-  CreateMarketGroupParams,
-  DeleteMarketGroupParams,
-  GetMarketGroupParams,
-  UpdateMarketGroupParams,
-} from "./resources/pricing";
 export type {
   CreatePromoCodeParams,
   GetPromoCodeParams,
@@ -222,7 +222,7 @@ export type {
   Invoice,
   InvoiceDownload,
   InvoiceListItem,
-  MarketGroup,
+  Market,
   Offer,
   Payment,
   PaymentMethodUpdateCheckout,
@@ -252,6 +252,8 @@ export type {
   SentInvoice,
   Subscription,
   SubscriptionAddon,
+  SubscriptionOfferApplication,
+  SubscriptionOfferApplicationPhase,
   SubscriptionSummary,
   TestClock,
   TestClockBilling,

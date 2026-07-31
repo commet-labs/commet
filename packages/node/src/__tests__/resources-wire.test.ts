@@ -183,19 +183,19 @@ describe("CreditPacks — wire serialization", () => {
   });
 });
 
-describe("Pricing — market groups", () => {
-  it("createMarketGroup sends countries through the generated pricing resource", async () => {
+describe("Markets", () => {
+  it("create sends countries through the generated markets resource", async () => {
     vi.mocked(fetch).mockResolvedValueOnce(
-      jsonResponse({ id: "market_latam", object: "market_group" }),
+      jsonResponse({ id: "market_latam", object: "market" }),
     );
 
-    await client().pricing.createMarketGroup({
+    await client().markets.create({
       name: "LATAM",
       countryCodes: ["AR", "BO", "PY"],
     });
 
     const { url, init } = lastCall();
-    expect(url).toContain("/pricing/market-groups");
+    expect(url).toContain("/markets");
     expect(init.method).toBe("POST");
     expect(lastBody()).toEqual({
       name: "LATAM",
@@ -500,8 +500,6 @@ describe("Offers — contract-generated CRUD", () => {
 
     await client().offers.create({
       name: "Launch",
-      purpose: "promotional",
-      planPriceIds: ["price_1"],
       phases: [
         {
           type: "percentage",
@@ -514,6 +512,8 @@ describe("Offers — contract-generated CRUD", () => {
     const { url, init } = lastCall();
     expect(url).toContain("/offers");
     expect(init.method).toBe("POST");
+    expect(lastBody()).not.toHaveProperty("purpose");
+    expect(lastBody()).not.toHaveProperty("planPriceIds");
     expect(lastBody().phases).toEqual([
       {
         type: "percentage",
@@ -529,8 +529,6 @@ describe("Offers — contract-generated CRUD", () => {
     await client().offers.update({
       id: "offer_1",
       name: "Launch",
-      purpose: "promotional",
-      planPriceIds: ["price_1"],
       phases: [{ type: "free_trial", durationDays: 14 }],
       active: false,
     });

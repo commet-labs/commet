@@ -130,12 +130,6 @@ export interface CreatedSubscription {
     /** @format date-time */
     scheduledFor: string;
   } | null;
-  discount: {
-    type: "percentage" | "amount";
-    value: number;
-    name: string | null;
-    endsAt: string | null;
-  } | null;
   /** @format date-time */
   startDate: string;
   endDate: string | null;
@@ -146,6 +140,7 @@ export interface CreatedSubscription {
   createdAt: string;
   /** @format date-time */
   updatedAt: string;
+  offerApplications: Array<SubscriptionOfferApplication>;
   /** Payment provider resolved for this checkout when the subscription response was created. This is an informational snapshot and may differ when the checkout is loaded if its country or the organization's routing changes. */
   checkoutProvider: PaymentProvider | null;
   priceId: string | null;
@@ -624,7 +619,7 @@ export interface InvoiceListItem {
   livemode: boolean;
 }
 
-export interface MarketGroup {
+export interface Market {
   id: string;
   name: string;
   countryCodes: Array<string>;
@@ -633,15 +628,13 @@ export interface MarketGroup {
   createdAt: string;
   /** @format date-time */
   updatedAt: string;
-  object: "market_group";
+  object: "market";
   livemode: boolean;
 }
 
 export interface Offer {
   id: string;
   name: string;
-  purpose: "introductory" | "promotional";
-  planPriceIds: Array<string>;
   phases: Array<
     | {
         type: "free_trial";
@@ -649,13 +642,13 @@ export interface Offer {
       }
     | {
         type: "percentage";
-        durationCycles: number;
+        durationCycles: number | null;
         /** Discount in basis points. 5000 means 50%. */
         percentage: number;
       }
     | {
         type: "amount_off";
-        durationCycles: number;
+        durationCycles: number | null;
         amounts: Array<{
           currency: string;
           /** Amount in the currency's minor unit (for example, cents for USD). */
@@ -664,7 +657,7 @@ export interface Offer {
       }
     | {
         type: "fixed_price";
-        durationCycles: number;
+        durationCycles: number | null;
         prices: Array<{
           currency: string;
           /** Amount in the currency's minor unit (for example, cents for USD). */
@@ -864,8 +857,14 @@ export type PlanChange =
         total: number;
         phases: Array<
           | {
+              type: "free_trial";
+              durationDays: number;
+              startsAt: string | null;
+              endsAt: string | null;
+            }
+          | {
               type: "percentage";
-              durationCycles: number;
+              durationCycles: number | null;
               startsAt: string | null;
               endsAt: string | null;
               /** Discount in basis points. 5000 means 50%. */
@@ -873,7 +872,7 @@ export type PlanChange =
             }
           | {
               type: "amount_off";
-              durationCycles: number;
+              durationCycles: number | null;
               startsAt: string | null;
               endsAt: string | null;
               /** Discount in the application currency's minor unit. */
@@ -881,13 +880,26 @@ export type PlanChange =
             }
           | {
               type: "fixed_price";
-              durationCycles: number;
+              durationCycles: number | null;
               startsAt: string | null;
               endsAt: string | null;
               /** Fixed price in the application currency's minor unit. */
               price: number;
             }
         >;
+        appliesTo:
+          | {
+              type: "plan_price";
+              id: string;
+            }
+          | {
+              type: "addon";
+              id: string;
+            }
+          | {
+              type: "credit_pack";
+              id: string;
+            };
       };
       object: "plan_change";
       livemode: boolean;
@@ -956,8 +968,14 @@ export type PlanChange =
         total: number;
         phases: Array<
           | {
+              type: "free_trial";
+              durationDays: number;
+              startsAt: string | null;
+              endsAt: string | null;
+            }
+          | {
               type: "percentage";
-              durationCycles: number;
+              durationCycles: number | null;
               startsAt: string | null;
               endsAt: string | null;
               /** Discount in basis points. 5000 means 50%. */
@@ -965,7 +983,7 @@ export type PlanChange =
             }
           | {
               type: "amount_off";
-              durationCycles: number;
+              durationCycles: number | null;
               startsAt: string | null;
               endsAt: string | null;
               /** Discount in the application currency's minor unit. */
@@ -973,13 +991,26 @@ export type PlanChange =
             }
           | {
               type: "fixed_price";
-              durationCycles: number;
+              durationCycles: number | null;
               startsAt: string | null;
               endsAt: string | null;
               /** Fixed price in the application currency's minor unit. */
               price: number;
             }
         >;
+        appliesTo:
+          | {
+              type: "plan_price";
+              id: string;
+            }
+          | {
+              type: "addon";
+              id: string;
+            }
+          | {
+              type: "credit_pack";
+              id: string;
+            };
       };
       object: "plan_change";
       livemode: boolean;
@@ -1117,8 +1148,14 @@ export interface PreviewChange {
     total: number;
     phases: Array<
       | {
+          type: "free_trial";
+          durationDays: number;
+          startsAt: string | null;
+          endsAt: string | null;
+        }
+      | {
           type: "percentage";
-          durationCycles: number;
+          durationCycles: number | null;
           startsAt: string | null;
           endsAt: string | null;
           /** Discount in basis points. 5000 means 50%. */
@@ -1126,7 +1163,7 @@ export interface PreviewChange {
         }
       | {
           type: "amount_off";
-          durationCycles: number;
+          durationCycles: number | null;
           startsAt: string | null;
           endsAt: string | null;
           /** Discount in the application currency's minor unit. */
@@ -1134,13 +1171,26 @@ export interface PreviewChange {
         }
       | {
           type: "fixed_price";
-          durationCycles: number;
+          durationCycles: number | null;
           startsAt: string | null;
           endsAt: string | null;
           /** Fixed price in the application currency's minor unit. */
           price: number;
         }
     >;
+    appliesTo:
+      | {
+          type: "plan_price";
+          id: string;
+        }
+      | {
+          type: "addon";
+          id: string;
+        }
+      | {
+          type: "credit_pack";
+          id: string;
+        };
   };
   object: "plan_change_preview";
   livemode: boolean;
@@ -1180,8 +1230,14 @@ export interface ReactivatedSubscription {
     total: number;
     phases: Array<
       | {
+          type: "free_trial";
+          durationDays: number;
+          startsAt: string | null;
+          endsAt: string | null;
+        }
+      | {
           type: "percentage";
-          durationCycles: number;
+          durationCycles: number | null;
           startsAt: string | null;
           endsAt: string | null;
           /** Discount in basis points. 5000 means 50%. */
@@ -1189,7 +1245,7 @@ export interface ReactivatedSubscription {
         }
       | {
           type: "amount_off";
-          durationCycles: number;
+          durationCycles: number | null;
           startsAt: string | null;
           endsAt: string | null;
           /** Discount in the application currency's minor unit. */
@@ -1197,13 +1253,26 @@ export interface ReactivatedSubscription {
         }
       | {
           type: "fixed_price";
-          durationCycles: number;
+          durationCycles: number | null;
           startsAt: string | null;
           endsAt: string | null;
           /** Fixed price in the application currency's minor unit. */
           price: number;
         }
     >;
+    appliesTo:
+      | {
+          type: "plan_price";
+          id: string;
+        }
+      | {
+          type: "addon";
+          id: string;
+        }
+      | {
+          type: "credit_pack";
+          id: string;
+        };
   };
   object: "subscription_reactivation";
   livemode: boolean;
@@ -1327,12 +1396,6 @@ export interface Subscription {
     /** @format date-time */
     scheduledFor: string;
   } | null;
-  discount: {
-    type: "percentage" | "amount";
-    value: number;
-    name: string | null;
-    endsAt: string | null;
-  } | null;
   /** @format date-time */
   startDate: string;
   endDate: string | null;
@@ -1343,6 +1406,7 @@ export interface Subscription {
   createdAt: string;
   /** @format date-time */
   updatedAt: string;
+  offerApplications: Array<SubscriptionOfferApplication>;
   consumptionModel: ConsumptionModel | null;
   features: Array<
     | {
@@ -1402,6 +1466,64 @@ export interface SubscriptionAddon {
   livemode: boolean;
 }
 
+export interface SubscriptionOfferApplication {
+  id: string;
+  name: string;
+  appliesTo:
+    | {
+        type: "plan_price";
+        id: string;
+      }
+    | {
+        type: "addon";
+        id: string;
+      }
+    | {
+        type: "credit_pack";
+        id: string;
+      };
+  offerId: string | null;
+  source: "direct" | "introductory" | "promo_code" | "custom";
+  status: "quoted" | "applied" | "failed" | "expired";
+  currency: string | null;
+  subtotal: number | null;
+  discountAmount: number | null;
+  total: number | null;
+  phases: Array<SubscriptionOfferApplicationPhase>;
+  /** @format date-time */
+  quotedAt: string;
+  appliedAt: string | null;
+}
+
+export type SubscriptionOfferApplicationPhase =
+  | {
+      type: "free_trial";
+      durationDays: number;
+      startsAt: string | null;
+      endsAt: string | null;
+    }
+  | {
+      type: "percentage";
+      durationCycles: number | null;
+      percentage: number;
+      startsAt: string | null;
+      endsAt: string | null;
+    }
+  | {
+      type: "amount_off";
+      durationCycles: number | null;
+      amount: number;
+      startsAt: string | null;
+      endsAt: string | null;
+    }
+  | {
+      type: "fixed_price";
+      durationCycles: number | null;
+      price: number;
+      startsAt: string | null;
+      endsAt: string | null;
+    };
+
 export interface SubscriptionSummary {
   id: string;
   customerId: string;
@@ -1437,12 +1559,6 @@ export interface SubscriptionSummary {
     /** @format date-time */
     scheduledFor: string;
   } | null;
-  discount: {
-    type: "percentage" | "amount";
-    value: number;
-    name: string | null;
-    endsAt: string | null;
-  } | null;
   /** @format date-time */
   startDate: string;
   endDate: string | null;
@@ -1453,6 +1569,7 @@ export interface SubscriptionSummary {
   createdAt: string;
   /** @format date-time */
   updatedAt: string;
+  offerApplications: Array<SubscriptionOfferApplication>;
   priceId: string | null;
   object: "subscription";
   livemode: boolean;
