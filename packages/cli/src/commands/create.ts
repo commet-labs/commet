@@ -223,14 +223,14 @@ async function installSkills(projectRoot: string): Promise<void> {
   return new Promise((resolve) => {
     const child = spawn(
       npx,
-      ["-y", "--loglevel=error", "skills", "add", "commet-labs/commet-skills"],
+      ["-y", "--loglevel=error", "skills", "add", "commet-labs/skills"],
       { cwd: projectRoot, stdio: "inherit" },
     );
 
     child.on("close", (code: number | null) => {
       if (code !== 0) {
         console.log(chalk.dim("  You can install them manually by running:"));
-        console.log(chalk.dim("  npx skills add commet-labs/commet-skills"));
+        console.log(chalk.dim("  npx skills add commet-labs/skills"));
       }
       resolve();
     });
