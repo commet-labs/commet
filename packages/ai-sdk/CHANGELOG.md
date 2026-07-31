@@ -1,5 +1,11 @@
 # @commet/ai-sdk
 
+## 6.0.1
+
+### Patch Changes
+
+- 2c6b019: Align the Node SDK and CLI with API `2026-07-31`: replace pricing Market Groups with top-level Markets, make Offers independent from purposes and plan-price associations, and expose target-aware Offer Applications on subscriptions.
+
 ## 6.0.0
 
 ### Patch Changes
