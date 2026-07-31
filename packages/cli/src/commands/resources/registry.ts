@@ -212,12 +212,12 @@ const subscriptionsResource: ResourceDef = {
         },
         {
           flag: "--offer-id <id>",
-          description: "Explicit Introductory Offer ID",
+          description: "Offer ID",
           sdkKey: "offerId",
         },
         {
           flag: "--promo-code <code>",
-          description: "Promotional Offer promo code",
+          description: "Promo code for an Offer",
           sdkKey: "promoCode",
         },
         {
@@ -324,7 +324,7 @@ const subscriptionsResource: ResourceDef = {
         },
         {
           flag: "--offer-id <id>",
-          description: "Promotional Offer ID for a canceled subscription",
+          description: "Offer ID for a canceled subscription",
           sdkKey: "offerId",
         },
       ],
@@ -382,7 +382,7 @@ const subscriptionsResource: ResourceDef = {
         },
         {
           flag: "--offer-id <id>",
-          description: "Promotional Offer ID for an immediate change",
+          description: "Offer ID for an immediate change",
           sdkKey: "offerId",
         },
         {
@@ -431,7 +431,7 @@ const subscriptionsResource: ResourceDef = {
         },
         {
           flag: "--offer-id <id>",
-          description: "Promotional Offer ID to include in the preview",
+          description: "Offer ID to include in the preview",
           sdkKey: "offerId",
         },
       ],
@@ -2148,7 +2148,7 @@ const promoCodesResource: ResourceDef = {
         },
         {
           flag: "--offer-id <id>",
-          description: "Promotional Offer ID",
+          description: "Offer ID",
           required: true,
           sdkKey: "offerId",
         },
@@ -2221,7 +2221,7 @@ const promoCodesResource: ResourceDef = {
 
 const offersResource: ResourceDef = {
   name: "offers",
-  description: "Manage Introductory and Promotional Offers",
+  description: "Manage Offers",
   sdkProperty: "offers",
   actions: {
     list: {
@@ -2390,7 +2390,7 @@ const marketsResource: ResourceDef = {
       params: [
         {
           flag: "--name <name>",
-          description: "Market group name",
+          description: "Market name",
           required: true,
           sdkKey: "name",
         },
@@ -2421,7 +2421,7 @@ const marketsResource: ResourceDef = {
         },
         {
           flag: "--name <name>",
-          description: "Market group name",
+          description: "Market name",
           required: true,
           sdkKey: "name",
         },

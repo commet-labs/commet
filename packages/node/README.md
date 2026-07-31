@@ -125,7 +125,7 @@ await commet.subscriptions.create({
 });
 ```
 
-Offers own discount phases. Promo Codes reference Promotional Offers instead of duplicating discount fields:
+Offers own discount phases. Promo Codes reference compatible Offers instead of duplicating discount fields:
 
 ```typescript
 const offer = await commet.offers.create({
