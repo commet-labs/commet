@@ -3,29 +3,54 @@ import chalk from "chalk";
 import { Command } from "commander";
 import ora from "ora";
 import { apiRequest, BASE_URL } from "../utils/api";
-import { loadBillingConfig } from "../utils/config-loader";
+import {
+  BillingConfigValidationError,
+  loadBillingConfig,
+} from "../utils/config-loader";
 import { computeDiff, formatDiff } from "../utils/diff";
 import { isAgentMode, requireOrgContext } from "../utils/output";
 import { createSdkClient, fetchRemoteState } from "../utils/sdk";
 
-interface PushResponse {
+export interface PushResponse {
   success: boolean;
   features: {
     created: string[];
     updated: string[];
-    errors: Array<{ code: string; message: string }>;
+    errors: Array<{ code: string; path: string; message: string }>;
   };
   plans: {
     created: string[];
     updated: string[];
-    errors: Array<{ code: string; message: string }>;
+    errors: Array<{ code: string; path: string; message: string }>;
   };
+}
+
+function formatReceivedValue(received: unknown): string {
+  if (typeof received === "string") return received;
+  return JSON.stringify(received) ?? String(received);
 }
 
 interface PushOptions {
   yes?: boolean;
   dryRun?: boolean;
   output?: string;
+}
+
+export function createPushRequestBody(
+  config: Awaited<ReturnType<typeof loadBillingConfig>>["config"],
+  orgId: string,
+): Record<string, unknown> {
+  return {
+    config,
+    ...(orgId === "__from_api_key__" ? {} : { orgId }),
+  };
+}
+
+export function getPushExitCode(pushOutcome: PushResponse): 0 | 1 {
+  const hasErrors =
+    pushOutcome.features.errors.length > 0 ||
+    pushOutcome.plans.errors.length > 0;
+  return pushOutcome.success && !hasErrors ? 0 : 1;
 }
 
 export const pushCommand = new Command("push")
@@ -64,12 +89,26 @@ Examples:
         if (agentMode) {
           console.log(
             JSON.stringify({
-              error: { code: "config_invalid", message },
+              error: {
+                code: "config_invalid",
+                message,
+                ...(error instanceof BillingConfigValidationError
+                  ? { issues: error.issues }
+                  : {}),
+              },
             }),
           );
         } else {
           loadSpinner?.fail("Failed to load config");
           console.error(chalk.red(message));
+          if (error instanceof BillingConfigValidationError) {
+            for (const issue of error.issues) {
+              console.error(
+                chalk.red(`  ${issue.path}: ${issue.expected}`),
+                chalk.dim(`(received ${formatReceivedValue(issue.received)})`),
+              );
+            }
+          }
         }
         return null;
       },
@@ -171,12 +210,7 @@ Examples:
 
     const pushSpinner = agentMode ? null : ora("Pushing config...").start();
 
-    const pushBody: Record<string, unknown> = {
-      config: { features: config.features, plans: config.plans },
-    };
-    if (orgId !== "__from_api_key__") {
-      pushBody.orgId = orgId;
-    }
+    const pushBody = createPushRequestBody(config, orgId);
 
     const pushResult = await apiRequest<PushResponse>(
       `${BASE_URL}/api/cli/push`,
@@ -189,26 +223,34 @@ Examples:
       } else {
         pushSpinner?.fail("Push failed");
         console.error(chalk.red("Error:"), pushResult.error?.message);
+        for (const issue of pushResult.error?.issues ?? []) {
+          console.error(
+            chalk.red(`  ${issue.path}: ${issue.expected}`),
+            chalk.dim(`(received ${formatReceivedValue(issue.received)})`),
+          );
+        }
       }
       process.exit(1);
     }
 
     const pushOutcome = pushResult.data;
-
-    if (agentMode) {
-      console.log(JSON.stringify({ diff, applied: true, result: pushOutcome }));
-      return;
-    }
-
     const errors = [
       ...pushOutcome.features.errors,
       ...pushOutcome.plans.errors,
     ];
 
+    if (agentMode) {
+      console.log(JSON.stringify({ diff, applied: true, result: pushOutcome }));
+      if (getPushExitCode(pushOutcome) !== 0) process.exit(1);
+      return;
+    }
+
     if (errors.length > 0) {
       pushSpinner?.warn("Push completed with errors");
       for (const error of errors) {
-        console.log(chalk.red(`  ✗ ${error.code}: ${error.message}`));
+        console.log(
+          chalk.red(`  ✗ ${error.path} (${error.code}): ${error.message}`),
+        );
       }
     } else {
       pushSpinner?.succeed("Push complete");
@@ -240,4 +282,6 @@ Examples:
         ),
       );
     }
+
+    if (getPushExitCode(pushOutcome) !== 0) process.exit(1);
   });

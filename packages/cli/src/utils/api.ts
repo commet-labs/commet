@@ -1,12 +1,23 @@
 import { loadAuth } from "./config";
 import { getClientInfoHeader, getUserAgent, markApiRequest } from "./telemetry";
 
+export interface ApiRequestError {
+  code: string;
+  message: string;
+  issues?: Array<{
+    code: string;
+    path: string;
+    expected: string;
+    received: unknown;
+  }>;
+}
+
 export const BASE_URL = "https://commet.co";
 
 export async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {},
-): Promise<{ data?: T; error?: { code: string; message: string } }> {
+): Promise<{ data?: T; error?: ApiRequestError }> {
   const apiKey = process.env.COMMET_API_KEY;
   const auth = apiKey ? null : loadAuth();
 
@@ -39,6 +50,7 @@ export async function apiRequest<T>(
         message?: string;
         error?: string;
         code?: string;
+        issues?: ApiRequestError["issues"];
       };
       return {
         error: {
@@ -47,6 +59,7 @@ export async function apiRequest<T>(
             errorData.message ??
             errorData.error ??
             `Request failed with status ${response.status}`,
+          ...(errorData.issues ? { issues: errorData.issues } : {}),
         },
       };
     }

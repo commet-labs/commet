@@ -70,6 +70,35 @@ commet plans list      # List plans
 commet customers list  # List customers
 ```
 
+## Config as Code
+
+```typescript
+import { defineConfig } from "@commet/node";
+
+export default defineConfig({
+  schemaVersion: 1,
+  features: {
+    api_calls: { name: "API calls", type: "usage", unitName: "call" },
+  },
+  plans: {
+    pro: {
+      name: "Pro",
+      consumptionModel: "metered",
+      defaultInterval: "monthly",
+      prices: [{ interval: "monthly", amountInCents: 499 }],
+      features: {
+        api_calls: {
+          included: 1_000,
+          overage: { unitPrice: 10_000 },
+        },
+      },
+    },
+  },
+});
+```
+
+`amountInCents` is an integer USD amount (`499` = `$4.99`). Overage `unitPrice` uses rate scale (`10_000` = `$1.00` per unit). Run `commet pull --yes` to regenerate configs that still use the removed `amount` field.
+
 ## Documentation
 
 Visit [commet.co/docs](https://commet.co/docs) for:

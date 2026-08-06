@@ -25,6 +25,9 @@
       "dependsOn": ["^build"]
     },
     "test": {},
+    "test:unit": {
+      "dependsOn": ["^build"]
+    },
     "clean": {
       "cache": false
     }

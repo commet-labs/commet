@@ -17,6 +17,7 @@
     "lint:fix": "biome lint --write src/",
     "validate:registry": "tsx scripts/validate-resource-registry.ts",
     "typecheck": "tsc --noEmit && pnpm validate:registry",
+    "test:unit": "vitest run",
     "clean": "rm -rf .turbo node_modules dist"
   },
   "keywords": [
@@ -43,7 +44,8 @@
     "@types/node": "24.13.1",
     "tsx": "4.22.0",
     "tsup": "8.5.1",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "vitest": "4.1.8"
   },
   "engines": {
     "node": ">=18.0.0"

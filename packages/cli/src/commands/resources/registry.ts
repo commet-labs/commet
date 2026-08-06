@@ -1,5 +1,14 @@
 import type { ResourceDef } from "./factory";
-import { parseBool, parseJson, parseNumber } from "./param-types";
+import {
+  parseBool,
+  parseJson,
+  parseNonNegativeInteger,
+  parseNonNegativeNumber,
+  parseNonNegativePostgresInteger,
+  parsePositiveInteger,
+  parsePositivePostgresInteger,
+  parseSafeInteger,
+} from "./param-types";
 
 const customersResource: ResourceDef = {
   name: "customers",
@@ -138,7 +147,7 @@ const customersResource: ResourceDef = {
         {
           flag: "--limit <n>",
           description: "Max results",
-          parse: parseNumber,
+          parse: parsePositiveInteger,
           sdkKey: "limit",
         },
         {
@@ -206,8 +215,8 @@ const subscriptionsResource: ResourceDef = {
         },
         {
           flag: "--custom-trial-days <n>",
-          description: "Override the catalog trial duration",
-          parse: parseNumber,
+          description: "Override the catalog trial duration in whole days",
+          parse: parseNonNegativeInteger,
           sdkKey: "customTrialDays",
         },
         {
@@ -254,7 +263,9 @@ const subscriptionsResource: ResourceDef = {
           params.initialSeats = parseJson(options.initialSeats);
         if (options.skipTrial) params.skipTrial = parseBool(options.skipTrial);
         if (options.customTrialDays)
-          params.customTrialDays = parseNumber(options.customTrialDays);
+          params.customTrialDays = parseNonNegativeInteger(
+            options.customTrialDays,
+          );
         if (options.offerId) params.offerId = options.offerId;
         if (options.promoCode) params.promoCode = options.promoCode;
         if (options.provider) params.provider = options.provider;
@@ -484,9 +495,10 @@ const subscriptionsResource: ResourceDef = {
         },
         {
           flag: "--amount <amount>",
-          description: "Amount (positive adds, negative subtracts)",
+          description:
+            "Signed integer: rate scale for balance, whole units for credits",
           required: true,
-          parse: parseNumber,
+          parse: parseSafeInteger,
           sdkKey: "amount",
         },
         {
@@ -513,9 +525,9 @@ const subscriptionsResource: ResourceDef = {
         },
         {
           flag: "--amount <amount>",
-          description: "Amount to top up",
+          description: "Positive amount in USD cents (499 = $4.99)",
           required: true,
-          parse: parseNumber,
+          parse: parsePositiveInteger,
           sdkKey: "amount",
         },
       ],
@@ -716,8 +728,8 @@ const plansResource: ResourceDef = {
         },
         {
           flag: "--included-amount <n>",
-          description: "Included amount",
-          parse: parseNumber,
+          description: "Included whole units",
+          parse: parseNonNegativeInteger,
           sdkKey: "includedAmount",
         },
         {
@@ -734,8 +746,8 @@ const plansResource: ResourceDef = {
         },
         {
           flag: "--overage-unit-price <n>",
-          description: "Overage unit price (fixed pricing)",
-          parse: parseNumber,
+          description: "Overage price in rate scale (10000 = $1.00)",
+          parse: parseNonNegativeInteger,
           sdkKey: "overage.unitPrice",
         },
         {
@@ -745,14 +757,14 @@ const plansResource: ResourceDef = {
         },
         {
           flag: "--margin <n>",
-          description: "Margin percentage (ai_model pricing)",
-          parse: parseNumber,
+          description: "Margin in basis points (2000 = 20%)",
+          parse: parseNonNegativeInteger,
           sdkKey: "margin",
         },
         {
           flag: "--credits-per-unit <n>",
-          description: "Credits per unit",
-          parse: parseNumber,
+          description: "Whole credits consumed per unit",
+          parse: parseNonNegativeInteger,
           sdkKey: "creditsPerUnit",
         },
       ],
@@ -781,8 +793,8 @@ const plansResource: ResourceDef = {
         },
         {
           flag: "--included-amount <n>",
-          description: "Included amount",
-          parse: parseNumber,
+          description: "Included whole units",
+          parse: parseNonNegativeInteger,
           sdkKey: "includedAmount",
         },
         {
@@ -799,14 +811,14 @@ const plansResource: ResourceDef = {
         },
         {
           flag: "--overage-unit-price <n>",
-          description: "Overage unit price (fixed pricing)",
-          parse: parseNumber,
+          description: "Overage price in rate scale (10000 = $1.00)",
+          parse: parseNonNegativeInteger,
           sdkKey: "overage.unitPrice",
         },
         {
           flag: "--credits-per-unit <n>",
-          description: "Credits per unit",
-          parse: parseNumber,
+          description: "Whole credits consumed per unit",
+          parse: parseNonNegativeInteger,
           sdkKey: "creditsPerUnit",
         },
       ],
@@ -848,8 +860,8 @@ const plansResource: ResourceDef = {
         },
         {
           flag: "--price <n>",
-          description: "Price in cents",
-          parse: parseNumber,
+          description: "Price in USD cents (499 = $4.99)",
+          parse: parseNonNegativeInteger,
           sdkKey: "price",
         },
         {
@@ -859,8 +871,8 @@ const plansResource: ResourceDef = {
         },
         {
           flag: "--trial-days <n>",
-          description: "Trial days",
-          parse: parseNumber,
+          description: "Trial duration in whole days",
+          parse: parseNonNegativePostgresInteger,
           sdkKey: "trialDays",
         },
         {
@@ -871,14 +883,14 @@ const plansResource: ResourceDef = {
         },
         {
           flag: "--included-balance <n>",
-          description: "Included balance",
-          parse: parseNumber,
+          description: "Included balance in USD cents (1000 = $10.00)",
+          parse: parseNonNegativeInteger,
           sdkKey: "includedBalance",
         },
         {
           flag: "--included-credits <n>",
-          description: "Included credits",
-          parse: parseNumber,
+          description: "Included whole credits",
+          parse: parseNonNegativeInteger,
           sdkKey: "includedCredits",
         },
         {
@@ -913,8 +925,8 @@ const plansResource: ResourceDef = {
         },
         {
           flag: "--price <n>",
-          description: "Price in cents",
-          parse: parseNumber,
+          description: "Price in USD cents (499 = $4.99)",
+          parse: parseNonNegativeInteger,
           sdkKey: "price",
         },
         {
@@ -925,20 +937,20 @@ const plansResource: ResourceDef = {
         },
         {
           flag: "--trial-days <n>",
-          description: "Trial days",
-          parse: parseNumber,
+          description: "Trial duration in whole days",
+          parse: parseNonNegativePostgresInteger,
           sdkKey: "trialDays",
         },
         {
           flag: "--included-balance <n>",
-          description: "Included balance",
-          parse: parseNumber,
+          description: "Included balance in USD cents (1000 = $10.00)",
+          parse: parseNonNegativeInteger,
           sdkKey: "includedBalance",
         },
         {
           flag: "--included-credits <n>",
-          description: "Included credits",
-          parse: parseNumber,
+          description: "Included whole credits",
+          parse: parseNonNegativeInteger,
           sdkKey: "includedCredits",
         },
         {
@@ -1198,7 +1210,7 @@ const seatsResource: ResourceDef = {
         {
           flag: "--count <n>",
           description: "Number of seats to add (defaults to 1)",
-          parse: parseNumber,
+          parse: parsePositiveInteger,
           sdkKey: "count",
         },
       ],
@@ -1222,7 +1234,7 @@ const seatsResource: ResourceDef = {
         {
           flag: "--count <n>",
           description: "Number of seats to remove (defaults to 1)",
-          parse: parseNumber,
+          parse: parsePositiveInteger,
           sdkKey: "count",
         },
       ],
@@ -1247,7 +1259,7 @@ const seatsResource: ResourceDef = {
           flag: "--count <n>",
           description: "Exact seat count",
           required: true,
-          parse: parseNumber,
+          parse: parseNonNegativeInteger,
           sdkKey: "count",
         },
       ],
@@ -1328,7 +1340,7 @@ const usageResource: ResourceDef = {
         {
           flag: "--value <n>",
           description: "Usage value (standard tracking)",
-          parse: parseNumber,
+          parse: parseNonNegativeNumber,
           sdkKey: "value",
         },
         {
@@ -1339,25 +1351,25 @@ const usageResource: ResourceDef = {
         {
           flag: "--input-tokens <n>",
           description: "Input tokens (model tracking)",
-          parse: parseNumber,
+          parse: parseNonNegativeInteger,
           sdkKey: "inputTokens",
         },
         {
           flag: "--output-tokens <n>",
           description: "Output tokens (model tracking)",
-          parse: parseNumber,
+          parse: parseNonNegativeInteger,
           sdkKey: "outputTokens",
         },
         {
           flag: "--cache-read-tokens <n>",
           description: "Cache read tokens (model tracking)",
-          parse: parseNumber,
+          parse: parseNonNegativeInteger,
           sdkKey: "cacheReadTokens",
         },
         {
           flag: "--cache-write-tokens <n>",
           description: "Cache write tokens (model tracking)",
-          parse: parseNumber,
+          parse: parseNonNegativeInteger,
           sdkKey: "cacheWriteTokens",
         },
         {
@@ -1390,14 +1402,19 @@ const usageResource: ResourceDef = {
 
         if (options.model) {
           params.model = options.model;
-          params.inputTokens = parseNumber(options.inputTokens);
-          params.outputTokens = parseNumber(options.outputTokens);
+          params.inputTokens = parseNonNegativeInteger(options.inputTokens);
+          params.outputTokens = parseNonNegativeInteger(options.outputTokens);
           if (options.cacheReadTokens)
-            params.cacheReadTokens = parseNumber(options.cacheReadTokens);
+            params.cacheReadTokens = parseNonNegativeInteger(
+              options.cacheReadTokens,
+            );
           if (options.cacheWriteTokens)
-            params.cacheWriteTokens = parseNumber(options.cacheWriteTokens);
+            params.cacheWriteTokens = parseNonNegativeInteger(
+              options.cacheWriteTokens,
+            );
         } else {
-          if (options.value) params.value = parseNumber(options.value);
+          if (options.value)
+            params.value = parseNonNegativeNumber(options.value);
         }
 
         return params;
@@ -1422,7 +1439,7 @@ const usageResource: ResourceDef = {
         {
           flag: "--quantity <n>",
           description: "Quantity to check",
-          parse: parseNumber,
+          parse: parsePositiveInteger,
           sdkKey: "quantity",
         },
       ],
@@ -1487,7 +1504,7 @@ const addonsResource: ResourceDef = {
         {
           flag: "--limit <n>",
           description: "Max results",
-          parse: parseNumber,
+          parse: parsePositiveInteger,
           sdkKey: "limit",
         },
         {
@@ -1521,9 +1538,9 @@ const addonsResource: ResourceDef = {
         },
         {
           flag: "--base-price <n>",
-          description: "Base price in cents",
+          description: "Base price in USD cents (499 = $4.99)",
           required: true,
-          parse: parseNumber,
+          parse: parseNonNegativeInteger,
           sdkKey: "basePrice",
         },
         {
@@ -1547,19 +1564,19 @@ const addonsResource: ResourceDef = {
         {
           flag: "--included-units <n>",
           description: "Included units (metered)",
-          parse: parseNumber,
+          parse: parseNonNegativeInteger,
           sdkKey: "includedUnits",
         },
         {
           flag: "--overage-rate <n>",
-          description: "Overage rate (metered/balance)",
-          parse: parseNumber,
+          description: "Overage rate scale (10000 = $1.00)",
+          parse: parseNonNegativeInteger,
           sdkKey: "overageRate",
         },
         {
           flag: "--credit-cost <n>",
           description: "Credit cost (credits)",
-          parse: parseNumber,
+          parse: parseNonNegativeInteger,
           sdkKey: "creditCost",
         },
       ],
@@ -1586,20 +1603,20 @@ const addonsResource: ResourceDef = {
         },
         {
           flag: "--base-price <n>",
-          description: "Base price in cents",
-          parse: parseNumber,
+          description: "Base price in USD cents (499 = $4.99)",
+          parse: parseNonNegativeInteger,
           sdkKey: "basePrice",
         },
         {
           flag: "--included-units <n>",
           description: "Included units",
-          parse: parseNumber,
+          parse: parseNonNegativeInteger,
           sdkKey: "includedUnits",
         },
         {
           flag: "--overage-rate <n>",
-          description: "Overage rate",
-          parse: parseNumber,
+          description: "Overage rate scale (10000 = $1.00)",
+          parse: parseNonNegativeInteger,
           sdkKey: "overageRate",
         },
       ],
@@ -1643,14 +1660,14 @@ const creditPacksResource: ResourceDef = {
           flag: "--credits <n>",
           description: "Number of credits",
           required: true,
-          parse: parseNumber,
+          parse: parsePositiveInteger,
           sdkKey: "credits",
         },
         {
           flag: "--price <n>",
-          description: "Price in cents",
+          description: "Price in USD cents (499 = $4.99)",
           required: true,
-          parse: parseNumber,
+          parse: parseNonNegativeInteger,
           sdkKey: "price",
         },
         {
@@ -1689,13 +1706,13 @@ const creditPacksResource: ResourceDef = {
         {
           flag: "--credits <n>",
           description: "Number of credits",
-          parse: parseNumber,
+          parse: parsePositiveInteger,
           sdkKey: "credits",
         },
         {
           flag: "--price <n>",
-          description: "Price in cents",
-          parse: parseNumber,
+          description: "Price in USD cents (499 = $4.99)",
+          parse: parseNonNegativeInteger,
           sdkKey: "price",
         },
         {
@@ -1733,7 +1750,7 @@ const webhooksResource: ResourceDef = {
         {
           flag: "--limit <n>",
           description: "Max results",
-          parse: parseNumber,
+          parse: parsePositiveInteger,
           sdkKey: "limit",
         },
         {
@@ -1864,7 +1881,7 @@ const apiKeysResource: ResourceDef = {
         {
           flag: "--limit <n>",
           description: "Max results",
-          parse: parseNumber,
+          parse: parsePositiveInteger,
           sdkKey: "limit",
         },
         {
@@ -1886,8 +1903,8 @@ const apiKeysResource: ResourceDef = {
         },
         {
           flag: "--expires-in-days <n>",
-          description: "Expiration in days",
-          parse: parseNumber,
+          description: "Expiration in whole days",
+          parse: parsePositiveInteger,
           sdkKey: "expiresInDays",
         },
       ],
@@ -1934,7 +1951,7 @@ const invoicesResource: ResourceDef = {
         {
           flag: "--limit <n>",
           description: "Max results",
-          parse: parseNumber,
+          parse: parsePositiveInteger,
           sdkKey: "limit",
         },
         {
@@ -1968,9 +1985,9 @@ const invoicesResource: ResourceDef = {
         },
         {
           flag: "--amount <n>",
-          description: "Amount in cents (negative for credit)",
+          description: "Signed amount in USD cents (negative for credit)",
           required: true,
-          parse: parseNumber,
+          parse: parseSafeInteger,
           sdkKey: "amount",
         },
         {
@@ -2053,7 +2070,7 @@ const transactionsResource: ResourceDef = {
         {
           flag: "--limit <n>",
           description: "Max results",
-          parse: parseNumber,
+          parse: parsePositiveInteger,
           sdkKey: "limit",
         },
         {
@@ -2114,7 +2131,7 @@ const promoCodesResource: ResourceDef = {
         {
           flag: "--limit <n>",
           description: "Max results",
-          parse: parseNumber,
+          parse: parsePositiveInteger,
           sdkKey: "limit",
         },
         {
@@ -2160,7 +2177,7 @@ const promoCodesResource: ResourceDef = {
         {
           flag: "--max-redemptions <n>",
           description: "Maximum number of redemptions",
-          parse: parseNumber,
+          parse: parsePositivePostgresInteger,
           sdkKey: "maxRedemptions",
         },
         {
@@ -2194,7 +2211,7 @@ const promoCodesResource: ResourceDef = {
         {
           flag: "--max-redemptions <n>",
           description: "Maximum number of redemptions",
-          parse: parseNumber,
+          parse: parsePositivePostgresInteger,
           sdkKey: "maxRedemptions",
         },
         {
@@ -2231,7 +2248,7 @@ const offersResource: ResourceDef = {
         {
           flag: "--limit <n>",
           description: "Max results",
-          parse: parseNumber,
+          parse: parsePositiveInteger,
           sdkKey: "limit",
         },
         {
@@ -2467,7 +2484,7 @@ const planGroupsResource: ResourceDef = {
         {
           flag: "--limit <n>",
           description: "Max results",
-          parse: parseNumber,
+          parse: parsePositiveInteger,
           sdkKey: "limit",
         },
         {
@@ -2571,7 +2588,7 @@ const planGroupsResource: ResourceDef = {
         {
           flag: "--sort-order <n>",
           description: "Sort order",
-          parse: parseNumber,
+          parse: parseNonNegativePostgresInteger,
           sdkKey: "sortOrder",
         },
       ],
@@ -2628,9 +2645,9 @@ const paymentsResource: ResourceDef = {
       params: [
         {
           flag: "--amount <n>",
-          description: "Amount in cents",
+          description: "Positive amount in currency minor units",
           required: true,
-          parse: parseNumber,
+          parse: parsePositiveInteger,
           sdkKey: "amount",
         },
         {
@@ -2675,9 +2692,9 @@ const paymentsResource: ResourceDef = {
         },
         {
           flag: "--amount <n>",
-          description: "Amount in cents",
+          description: "Positive amount in currency minor units",
           required: true,
-          parse: parseNumber,
+          parse: parsePositiveInteger,
           sdkKey: "amount",
         },
         {
@@ -2724,7 +2741,7 @@ const paymentsResource: ResourceDef = {
         {
           flag: "--limit <n>",
           description: "Max results",
-          parse: parseNumber,
+          parse: parsePositiveInteger,
           sdkKey: "limit",
         },
         {
@@ -2760,9 +2777,9 @@ const payoutsResource: ResourceDef = {
       params: [
         {
           flag: "--amount <n>",
-          description: "Amount in cents (USD, minimum 1000)",
+          description: "Amount in USD cents (minimum 1000 = $10.00)",
           required: true,
-          parse: parseNumber,
+          parse: parsePositiveInteger,
           sdkKey: "amount",
         },
         {
@@ -2875,8 +2892,8 @@ const testClockResource: ResourceDef = {
       params: [
         {
           flag: "--advance-days <n>",
-          description: "Days to move the clock forward",
-          parse: parseNumber,
+          description: "Positive whole days to move the clock forward",
+          parse: parsePositiveInteger,
           sdkKey: "advanceDays",
         },
         {
@@ -2923,7 +2940,7 @@ const quotaResource: ResourceDef = {
         {
           flag: "--count <n>",
           description: "Amount to add (defaults to 1)",
-          parse: parseNumber,
+          parse: parsePositiveInteger,
           sdkKey: "count",
         },
         {
@@ -2948,7 +2965,7 @@ const quotaResource: ResourceDef = {
           flag: "--count <n>",
           description: "Exact allowance value",
           required: true,
-          parse: parseNumber,
+          parse: parseNonNegativeInteger,
           sdkKey: "count",
         },
         {
@@ -2992,7 +3009,7 @@ const quotaResource: ResourceDef = {
         {
           flag: "--count <n>",
           description: "Amount to remove (defaults to 1)",
-          parse: parseNumber,
+          parse: parsePositiveInteger,
           sdkKey: "count",
         },
         {

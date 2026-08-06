@@ -1,11 +1,11 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
-import type { BillingConfig, Feature, FeatureDef } from "@commet/node";
 import { confirm } from "@inquirer/prompts";
 import chalk from "chalk";
 import { Command } from "commander";
 import ora from "ora";
 import { findConfigFile, loadBillingConfig } from "../utils/config-loader";
+import { remoteStateToBillingConfig } from "../utils/config-mapping";
 import { computeDiff, formatDiff, type RemoteState } from "../utils/diff";
 import { generateConfigFile } from "../utils/generator";
 import { isAgentMode, requireOrgContext } from "../utils/output";
@@ -15,30 +15,6 @@ interface PullOptions {
   yes?: boolean;
   dryRun?: boolean;
   output?: string;
-}
-
-function toFeatureDef(feature: Feature): FeatureDef {
-  if (feature.type === "boolean") {
-    return {
-      name: feature.name,
-      type: "boolean",
-      ...(feature.description ? { description: feature.description } : {}),
-    };
-  }
-  if (feature.type === "seats") {
-    return {
-      name: feature.name,
-      type: "seats",
-      ...(feature.unitName ? { unitName: feature.unitName } : {}),
-      ...(feature.description ? { description: feature.description } : {}),
-    };
-  }
-  return {
-    name: feature.name,
-    type: "usage",
-    ...(feature.unitName ? { unitName: feature.unitName } : {}),
-    ...(feature.description ? { description: feature.description } : {}),
-  };
 }
 
 export const pullCommand = new Command("pull")
@@ -182,56 +158,49 @@ Examples:
 
     const localConfig = localLoaded.config;
 
-    const remoteAsConfig: BillingConfig = {
-      features: Object.fromEntries(
-        features.map((f) => [f.code, toFeatureDef(f)]),
-      ),
-      plans: Object.fromEntries(
-        plans.map((p) => [
-          p.code,
-          {
-            name: p.name,
-            ...(p.description ? { description: p.description } : {}),
-            ...(p.consumptionModel
-              ? { consumptionModel: p.consumptionModel }
-              : {}),
-            ...(p.isFree ? { isFree: true } : {}),
-            ...(p.isPublic === false ? { isPublic: false } : {}),
-            ...(p.sortOrder ? { sortOrder: p.sortOrder } : {}),
-            ...(() => {
-              const planPrices = p.prices ?? [];
-              const defaultPrice = planPrices.find((pr) => pr.isDefault);
-              const defaultInterval =
-                defaultPrice?.billingInterval ?? planPrices[0]?.billingInterval;
-              return defaultInterval ? { defaultInterval } : {};
-            })(),
-            prices: (p.prices ?? []).map((pr) => ({
-              interval: pr.billingInterval,
-              amount: pr.price,
-              ...(pr.trialDays ? { trialDays: pr.trialDays } : {}),
-            })),
-          },
-        ]),
-      ),
-    };
+    const remoteAsConfig = remoteStateToBillingConfig(features, plans);
 
     const localAsRemote: RemoteState = {
       features: Object.entries(localConfig.features).map(([code, f]) => ({
         code,
         name: f.name,
         type: f.type,
+        description: f.description ?? null,
         unitName: "unitName" in f ? (f.unitName ?? null) : null,
       })),
       plans: Object.entries(localConfig.plans).map(([code, p]) => ({
         code,
         name: p.name,
+        description: p.description ?? null,
+        consumptionModel: p.consumptionModel ?? null,
+        isFree: p.isFree ?? false,
+        isPublic: p.isPublic ?? true,
+        sortOrder: p.sortOrder ?? 0,
         prices: p.prices.map((pr) => ({
           billingInterval: pr.interval,
-          price: pr.amount,
+          price: pr.amountInCents,
+          trialDays: pr.trialDays ?? 0,
+          isDefault: pr.interval === p.defaultInterval,
         })),
         features: p.features
-          ? Object.keys(p.features).map((featureCode) => ({
+          ? Object.entries(p.features).map(([featureCode, featureValue]) => ({
               code: featureCode,
+              enabled: typeof featureValue === "boolean" ? featureValue : true,
+              includedAmount:
+                typeof featureValue === "boolean"
+                  ? 0
+                  : (featureValue.included ?? 0),
+              unlimited:
+                typeof featureValue === "boolean"
+                  ? false
+                  : (featureValue.unlimited ?? false),
+              overage:
+                typeof featureValue !== "boolean" && featureValue.overage
+                  ? {
+                      enabled: true,
+                      unitPrice: featureValue.overage.unitPrice,
+                    }
+                  : { enabled: false, unitPrice: 0 },
             }))
           : [],
       })),
