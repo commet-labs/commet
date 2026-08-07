@@ -177,6 +177,7 @@ export {
 } from "./types/common";
 export type {
   BillingConfig,
+  BillingConfigIssue,
   FeatureDef,
   InferFeatureCodes,
   InferPlanCodes,
@@ -186,7 +187,18 @@ export type {
   PlanFeatureValue,
   PriceDef,
 } from "./types/config";
-export { defineConfig } from "./types/config";
+export {
+  BILLING_CONFIG_SCHEMA_VERSION,
+  BILLING_CONFIG_STRUCTURAL_JSON_SCHEMA,
+  BillingConfigSchema,
+  defineConfig,
+  FeatureDefSchema,
+  getBillingConfigIssues,
+  PlanDefSchema,
+  PlanFeatureValueSchema,
+  PriceDefSchema,
+  parseBillingConfig,
+} from "./types/config";
 export type {
   BillingInterval,
   ConsumptionModel,

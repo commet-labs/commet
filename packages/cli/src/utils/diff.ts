@@ -4,14 +4,41 @@ import chalk from "chalk";
 type SdkPlanPrice = NonNullable<Plan["prices"]>[number];
 type SdkPlanFeature = NonNullable<Plan["features"]>[number];
 
-type RemoteFeature = Pick<Feature, "code" | "name" | "type" | "unitName">;
-type RemotePlanPrice = Pick<SdkPlanPrice, "billingInterval" | "price"> &
-  Partial<Pick<SdkPlanPrice, "isDefault">>;
-type RemotePlanFeature = Pick<SdkPlanFeature, "code">;
+type RemoteFeature = Pick<
+  Feature,
+  "code" | "name" | "type" | "unitName" | "description"
+>;
+type RemotePlanPrice = Pick<
+  SdkPlanPrice,
+  | "billingInterval"
+  | "price"
+  | "isDefault"
+  | "trialDays"
+  | "inheritsFromPriceId"
+>;
+interface RemotePlanFeature
+  extends Pick<
+    SdkPlanFeature,
+    "code" | "enabled" | "includedAmount" | "unlimited"
+  > {
+  overage: { enabled: boolean; unitPrice: number | null } | null;
+}
+
+function formatUsdCents(amountInCents: number): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(amountInCents / 100);
+}
 
 interface RemotePlan {
   code: string;
   name: string;
+  description: string | null;
+  consumptionModel: Plan["consumptionModel"];
+  isFree: boolean;
+  isPublic: boolean;
+  sortOrder: number;
   prices?: RemotePlanPrice[];
   features?: RemotePlanFeature[];
 }
@@ -69,12 +96,16 @@ export function computeDiff(
         `type: "${remoteFeature.type}" → "${localFeature.type}" (BLOCKED)`,
       );
     }
-    if (
-      "unitName" in localFeature &&
-      (remoteFeature.unitName ?? undefined) !== localFeature.unitName
-    ) {
+    const localUnitName =
+      "unitName" in localFeature ? (localFeature.unitName ?? null) : null;
+    if ((remoteFeature.unitName ?? null) !== localUnitName) {
       changes.push(
-        `unitName: "${remoteFeature.unitName ?? ""}" → "${localFeature.unitName}"`,
+        `unitName: "${remoteFeature.unitName ?? ""}" → "${localUnitName ?? ""}"`,
+      );
+    }
+    if ((remoteFeature.description ?? undefined) !== localFeature.description) {
+      changes.push(
+        `description: "${remoteFeature.description ?? ""}" → "${localFeature.description ?? ""}"`,
       );
     }
 
@@ -101,8 +132,40 @@ export function computeDiff(
     if (remotePlan.name !== localPlan.name) {
       changes.push(`name: "${remotePlan.name}" → "${localPlan.name}"`);
     }
+    if ((remotePlan.description ?? undefined) !== localPlan.description) {
+      changes.push(
+        `description: "${remotePlan.description ?? ""}" → "${localPlan.description ?? ""}"`,
+      );
+    }
+    if (remotePlan.consumptionModel !== (localPlan.consumptionModel ?? null)) {
+      changes.push(
+        `consumptionModel: "${remotePlan.consumptionModel ?? "none"}" → "${localPlan.consumptionModel ?? "none"}"`,
+      );
+    }
+    if (
+      localPlan.isFree !== undefined &&
+      remotePlan.isFree !== localPlan.isFree
+    ) {
+      changes.push(`isFree: ${remotePlan.isFree} → ${localPlan.isFree}`);
+    }
+    if (
+      localPlan.isPublic !== undefined &&
+      remotePlan.isPublic !== localPlan.isPublic
+    ) {
+      changes.push(`isPublic: ${remotePlan.isPublic} → ${localPlan.isPublic}`);
+    }
+    if (
+      localPlan.sortOrder !== undefined &&
+      remotePlan.sortOrder !== localPlan.sortOrder
+    ) {
+      changes.push(
+        `sortOrder: ${remotePlan.sortOrder} → ${localPlan.sortOrder}`,
+      );
+    }
 
-    const remotePrices = remotePlan.prices ?? [];
+    const remotePrices = (remotePlan.prices ?? []).filter(
+      (price) => price.inheritsFromPriceId === null,
+    );
     const remoteDefaultInterval =
       remotePrices.find((p) => p.isDefault)?.billingInterval ?? null;
     if (
@@ -123,11 +186,19 @@ export function computeDiff(
       const remotePrice = remotePriceMap.get(interval);
       if (!remotePrice) {
         changes.push(
-          `price ${interval}: new ($${(localPrice.amount / 10000).toFixed(2)})`,
+          `price ${interval}: new (${formatUsdCents(localPrice.amountInCents)})`,
         );
-      } else if (remotePrice.price !== localPrice.amount) {
+      } else if (remotePrice.price !== localPrice.amountInCents) {
         changes.push(
-          `price ${interval}: $${(remotePrice.price / 10000).toFixed(2)} → $${(localPrice.amount / 10000).toFixed(2)}`,
+          `price ${interval}: ${formatUsdCents(remotePrice.price)} → ${formatUsdCents(localPrice.amountInCents)}`,
+        );
+      }
+      if (
+        remotePrice &&
+        remotePrice.trialDays !== (localPrice.trialDays ?? 0)
+      ) {
+        changes.push(
+          `price ${interval} trialDays: ${remotePrice.trialDays} → ${localPrice.trialDays ?? 0}`,
         );
       }
     }
@@ -137,8 +208,42 @@ export function computeDiff(
         (remotePlan.features ?? []).map((f) => [f.code, f]),
       );
       for (const featureCode of Object.keys(localPlan.features)) {
-        if (!remotePlanFeatureMap.has(featureCode)) {
+        const remotePlanFeature = remotePlanFeatureMap.get(featureCode);
+        if (!remotePlanFeature) {
           changes.push(`feature ${featureCode}: new`);
+          continue;
+        }
+
+        const localFeatureValue = localPlan.features[featureCode];
+        if (localFeatureValue === undefined) continue;
+        const localFeatureState =
+          typeof localFeatureValue === "boolean"
+            ? {
+                enabled: localFeatureValue,
+                includedAmount: 0,
+                unlimited: false,
+                overageEnabled: false,
+                overageUnitPrice: 0,
+              }
+            : {
+                enabled: true,
+                includedAmount: localFeatureValue.included ?? 0,
+                unlimited: localFeatureValue.unlimited ?? false,
+                overageEnabled: localFeatureValue.overage !== undefined,
+                overageUnitPrice: localFeatureValue.overage?.unitPrice ?? 0,
+              };
+        const remoteFeatureState = {
+          enabled: remotePlanFeature.enabled,
+          includedAmount: remotePlanFeature.includedAmount ?? 0,
+          unlimited: remotePlanFeature.unlimited,
+          overageEnabled: remotePlanFeature.overage?.enabled ?? false,
+          overageUnitPrice: remotePlanFeature.overage?.unitPrice ?? 0,
+        };
+        if (
+          JSON.stringify(remoteFeatureState) !==
+          JSON.stringify(localFeatureState)
+        ) {
+          changes.push(`feature ${featureCode}: configuration changed`);
         }
       }
     }

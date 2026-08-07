@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { BILLING_CONFIG_SCHEMA_VERSION } from "@commet/node";
 import chalk from "chalk";
 import { Command } from "commander";
 import packageJson from "../package.json" with { type: "json" };
@@ -154,6 +155,23 @@ function printAgentInfo() {
     config: {
       exists: configPath !== null,
       path: configPath?.split("/").pop() ?? null,
+      contract: {
+        schemaVersion: BILLING_CONFIG_SCHEMA_VERSION,
+        runtimeSchemaExport: "@commet/node.BillingConfigSchema",
+        structuralJsonSchemaExport:
+          "@commet/node.BILLING_CONFIG_STRUCTURAL_JSON_SCHEMA",
+        basePrice: {
+          field: "amountInCents",
+          unit: "USD minor units",
+          example: { amountInCents: 499, formatted: "$4.99" },
+        },
+        overageUnitPrice: {
+          unit: "rate scale",
+          example: { unitPrice: 10_000, formatted: "$1.00 per unit" },
+        },
+        migrate:
+          "Commit or back up commet.config.ts; add schemaVersion: 1; rename integer amount values to amountInCents or convert decimal USD amounts to exact cents; then run `commet push --dry-run`.",
+      },
     },
     mcp: {
       url: "https://commet.co/mcp",

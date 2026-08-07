@@ -32,6 +32,7 @@ describe("SDK update check", () => {
   });
 
   it("only enables checks during local development", () => {
+    vi.stubEnv("CI", "");
     vi.stubEnv("NODE_ENV", "development");
     expect(shouldCheckForSdkUpdates()).toBe(true);
 
@@ -95,6 +96,7 @@ describe("SDK update check", () => {
 
   it("schedules at most one registry request per process", async () => {
     vi.resetModules();
+    vi.stubEnv("CI", "");
     vi.stubEnv("NODE_ENV", "development");
     const fetchMock = vi.fn().mockResolvedValue(distTagsResponse("7.7.0"));
     vi.stubGlobal("fetch", fetchMock);

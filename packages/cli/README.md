@@ -70,6 +70,37 @@ commet plans list      # List plans
 commet customers list  # List customers
 ```
 
+## Config as Code
+
+```typescript
+import { defineConfig } from "@commet/node";
+
+export default defineConfig({
+  schemaVersion: 1,
+  features: {
+    api_calls: { name: "API calls", type: "usage", unitName: "call" },
+  },
+  plans: {
+    pro: {
+      name: "Pro",
+      consumptionModel: "metered",
+      defaultInterval: "monthly",
+      prices: [{ interval: "monthly", amountInCents: 499 }],
+      features: {
+        api_calls: {
+          included: 1_000,
+          overage: { unitPrice: 10_000 },
+        },
+      },
+    },
+  },
+});
+```
+
+`amountInCents` is an integer USD amount (`499` = `$4.99`). Overage `unitPrice` uses rate scale (`10_000` = `$1.00` per unit).
+
+To migrate an older config, commit or back up the file first, add `schemaVersion: 1`, then replace each `amount`. Rename generated integer values directly (`amount: 499` becomes `amountInCents: 499`); convert hand-written decimal USD values to exact cents (`amount: 4.99` becomes `amountInCents: 499`). Run `commet push --dry-run` before applying it.
+
 ## Documentation
 
 Visit [commet.co/docs](https://commet.co/docs) for:

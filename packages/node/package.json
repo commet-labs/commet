@@ -23,6 +23,7 @@
     "lint:fix": "biome lint --write src/",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "test:unit": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "clean": "rm -rf .turbo node_modules dist"
@@ -38,6 +39,9 @@
   ],
   "author": "Commet Team",
   "license": "MIT",
+  "dependencies": {
+    "zod": "4.4.3"
+  },
   "devDependencies": {
     "@types/node": "24.13.1",
     "@vitest/coverage-v8": "4.1.8",
