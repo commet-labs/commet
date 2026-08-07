@@ -157,7 +157,9 @@ function printAgentInfo() {
       path: configPath?.split("/").pop() ?? null,
       contract: {
         schemaVersion: BILLING_CONFIG_SCHEMA_VERSION,
-        jsonSchemaExport: "@commet/node.BILLING_CONFIG_JSON_SCHEMA",
+        runtimeSchemaExport: "@commet/node.BillingConfigSchema",
+        structuralJsonSchemaExport:
+          "@commet/node.BILLING_CONFIG_STRUCTURAL_JSON_SCHEMA",
         basePrice: {
           field: "amountInCents",
           unit: "USD minor units",
@@ -167,7 +169,8 @@ function printAgentInfo() {
           unit: "rate scale",
           example: { unitPrice: 10_000, formatted: "$1.00 per unit" },
         },
-        migrate: "Run `commet pull --yes` to regenerate an older config",
+        migrate:
+          "Commit or back up commet.config.ts; add schemaVersion: 1; rename integer amount values to amountInCents or convert decimal USD amounts to exact cents; then run `commet push --dry-run`.",
       },
     },
     mcp: {

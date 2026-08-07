@@ -14,6 +14,7 @@ import {
   parseNumber,
   parsePositiveInteger,
   parsePositivePostgresInteger,
+  parsePostgresInteger,
   parseSafeInteger,
 } from "../commands/resources/param-types";
 import {
@@ -162,6 +163,14 @@ describe("config generation and sync", () => {
               price: 500,
               trialDays: 0,
               isDefault: true,
+              inheritsFromPriceId: null,
+            },
+            {
+              billingInterval: "monthly",
+              price: 999,
+              trialDays: 0,
+              isDefault: false,
+              inheritsFromPriceId: "price_123",
             },
           ],
           features: [],
@@ -194,6 +203,7 @@ describe("config generation and sync", () => {
               price: 499,
               trialDays: 0,
               isDefault: true,
+              inheritsFromPriceId: null,
             },
           ],
           features: [],
@@ -207,6 +217,32 @@ describe("config generation and sync", () => {
       action: "update",
       changes: ["price monthly trialDays: 0 → 14"],
     });
+  });
+
+  test("preserves optional existing plan settings when config omits them", () => {
+    const localConfig = config();
+    delete localConfig.plans.pro!.defaultInterval;
+    localConfig.plans.pro!.prices = [];
+    const remoteState: RemoteState = {
+      features: [],
+      plans: [
+        {
+          code: "pro",
+          name: "Pro",
+          description: null,
+          consumptionModel: null,
+          isFree: true,
+          isPublic: false,
+          sortOrder: 7,
+          prices: [],
+          features: [],
+        },
+      ],
+    };
+
+    expect(
+      computeDiff(localConfig, remoteState).plans.changes[0],
+    ).toMatchObject({ action: "unchanged" });
   });
 
   test("sends the complete versioned config", () => {
@@ -266,6 +302,8 @@ describe("resource number parsing", () => {
     expect(parseNonNegativeInteger("499")).toBe(499);
     expect(() => parseNonNegativePostgresInteger("2147483648")).toThrow();
     expect(() => parsePositivePostgresInteger("2147483648")).toThrow();
+    expect(parsePostgresInteger("-2147483648")).toBe(-2_147_483_648);
+    expect(() => parsePostgresInteger("-2147483649")).toThrow();
     expect(parseNonNegativePostgresInteger("2147483647")).toBe(2_147_483_647);
   });
 });

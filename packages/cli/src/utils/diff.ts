@@ -10,7 +10,11 @@ type RemoteFeature = Pick<
 >;
 type RemotePlanPrice = Pick<
   SdkPlanPrice,
-  "billingInterval" | "price" | "isDefault" | "trialDays"
+  | "billingInterval"
+  | "price"
+  | "isDefault"
+  | "trialDays"
+  | "inheritsFromPriceId"
 >;
 interface RemotePlanFeature
   extends Pick<
@@ -138,23 +142,30 @@ export function computeDiff(
         `consumptionModel: "${remotePlan.consumptionModel ?? "none"}" → "${localPlan.consumptionModel ?? "none"}"`,
       );
     }
-    if (remotePlan.isFree !== (localPlan.isFree ?? false)) {
-      changes.push(
-        `isFree: ${remotePlan.isFree} → ${localPlan.isFree ?? false}`,
-      );
+    if (
+      localPlan.isFree !== undefined &&
+      remotePlan.isFree !== localPlan.isFree
+    ) {
+      changes.push(`isFree: ${remotePlan.isFree} → ${localPlan.isFree}`);
     }
-    if (remotePlan.isPublic !== (localPlan.isPublic ?? true)) {
-      changes.push(
-        `isPublic: ${remotePlan.isPublic} → ${localPlan.isPublic ?? true}`,
-      );
+    if (
+      localPlan.isPublic !== undefined &&
+      remotePlan.isPublic !== localPlan.isPublic
+    ) {
+      changes.push(`isPublic: ${remotePlan.isPublic} → ${localPlan.isPublic}`);
     }
-    if (remotePlan.sortOrder !== (localPlan.sortOrder ?? 0)) {
+    if (
+      localPlan.sortOrder !== undefined &&
+      remotePlan.sortOrder !== localPlan.sortOrder
+    ) {
       changes.push(
-        `sortOrder: ${remotePlan.sortOrder} → ${localPlan.sortOrder ?? 0}`,
+        `sortOrder: ${remotePlan.sortOrder} → ${localPlan.sortOrder}`,
       );
     }
 
-    const remotePrices = remotePlan.prices ?? [];
+    const remotePrices = (remotePlan.prices ?? []).filter(
+      (price) => price.inheritsFromPriceId === null,
+    );
     const remoteDefaultInterval =
       remotePrices.find((p) => p.isDefault)?.billingInterval ?? null;
     if (

@@ -46,7 +46,7 @@ export function parsePositiveInteger(value: string): number {
   return number;
 }
 
-function parsePostgresInteger(value: string): number {
+export function parsePostgresInteger(value: string): number {
   const number = parseSafeInteger(value);
   if (number < -2_147_483_648 || number > 2_147_483_647) {
     throw new Error(`Invalid PostgreSQL integer: ${value}`);

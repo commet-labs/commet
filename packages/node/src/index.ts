@@ -188,8 +188,8 @@ export type {
   PriceDef,
 } from "./types/config";
 export {
-  BILLING_CONFIG_JSON_SCHEMA,
   BILLING_CONFIG_SCHEMA_VERSION,
+  BILLING_CONFIG_STRUCTURAL_JSON_SCHEMA,
   BillingConfigSchema,
   defineConfig,
   FeatureDefSchema,

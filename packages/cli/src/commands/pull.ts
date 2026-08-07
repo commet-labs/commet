@@ -147,6 +147,19 @@ Examples:
         }
       }
 
+      if (!options.yes && agentMode) {
+        console.log(
+          JSON.stringify({
+            action: "blocked",
+            reason: localLoaded.parseError,
+            applied: false,
+            requiresYes: true,
+          }),
+        );
+        process.exitCode = 1;
+        return;
+      }
+
       fs.writeFileSync(outputPath, configContent, "utf8");
       if (agentMode) {
         console.log(JSON.stringify({ action: "overwrite", applied: true }));
@@ -181,6 +194,7 @@ Examples:
           price: pr.amountInCents,
           trialDays: pr.trialDays ?? 0,
           isDefault: pr.interval === p.defaultInterval,
+          inheritsFromPriceId: null,
         })),
         features: p.features
           ? Object.entries(p.features).map(([featureCode, featureValue]) => ({

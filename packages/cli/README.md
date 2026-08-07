@@ -97,7 +97,9 @@ export default defineConfig({
 });
 ```
 
-`amountInCents` is an integer USD amount (`499` = `$4.99`). Overage `unitPrice` uses rate scale (`10_000` = `$1.00` per unit). Run `commet pull --yes` to regenerate configs that still use the removed `amount` field.
+`amountInCents` is an integer USD amount (`499` = `$4.99`). Overage `unitPrice` uses rate scale (`10_000` = `$1.00` per unit).
+
+To migrate an older config, commit or back up the file first, add `schemaVersion: 1`, then replace each `amount`. Rename generated integer values directly (`amount: 499` becomes `amountInCents: 499`); convert hand-written decimal USD values to exact cents (`amount: 4.99` becomes `amountInCents: 499`). Run `commet push --dry-run` before applying it.
 
 ## Documentation
 

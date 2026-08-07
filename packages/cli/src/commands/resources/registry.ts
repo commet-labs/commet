@@ -7,6 +7,7 @@ import {
   parseNonNegativePostgresInteger,
   parsePositiveInteger,
   parsePositivePostgresInteger,
+  parsePostgresInteger,
   parseSafeInteger,
 } from "./param-types";
 
@@ -216,7 +217,7 @@ const subscriptionsResource: ResourceDef = {
         {
           flag: "--custom-trial-days <n>",
           description: "Override the catalog trial duration in whole days",
-          parse: parseNonNegativeInteger,
+          parse: parseNonNegativePostgresInteger,
           sdkKey: "customTrialDays",
         },
         {
@@ -263,7 +264,7 @@ const subscriptionsResource: ResourceDef = {
           params.initialSeats = parseJson(options.initialSeats);
         if (options.skipTrial) params.skipTrial = parseBool(options.skipTrial);
         if (options.customTrialDays)
-          params.customTrialDays = parseNonNegativeInteger(
+          params.customTrialDays = parseNonNegativePostgresInteger(
             options.customTrialDays,
           );
         if (options.offerId) params.offerId = options.offerId;
@@ -758,13 +759,13 @@ const plansResource: ResourceDef = {
         {
           flag: "--margin <n>",
           description: "Margin in basis points (2000 = 20%)",
-          parse: parseNonNegativeInteger,
+          parse: parseNonNegativePostgresInteger,
           sdkKey: "margin",
         },
         {
           flag: "--credits-per-unit <n>",
           description: "Whole credits consumed per unit",
-          parse: parseNonNegativeInteger,
+          parse: parseNonNegativePostgresInteger,
           sdkKey: "creditsPerUnit",
         },
       ],
@@ -818,7 +819,7 @@ const plansResource: ResourceDef = {
         {
           flag: "--credits-per-unit <n>",
           description: "Whole credits consumed per unit",
-          parse: parseNonNegativeInteger,
+          parse: parseNonNegativePostgresInteger,
           sdkKey: "creditsPerUnit",
         },
       ],
@@ -890,7 +891,7 @@ const plansResource: ResourceDef = {
         {
           flag: "--included-credits <n>",
           description: "Included whole credits",
-          parse: parseNonNegativeInteger,
+          parse: parseNonNegativePostgresInteger,
           sdkKey: "includedCredits",
         },
         {
@@ -950,7 +951,7 @@ const plansResource: ResourceDef = {
         {
           flag: "--included-credits <n>",
           description: "Included whole credits",
-          parse: parseNonNegativeInteger,
+          parse: parseNonNegativePostgresInteger,
           sdkKey: "includedCredits",
         },
         {
@@ -1576,7 +1577,7 @@ const addonsResource: ResourceDef = {
         {
           flag: "--credit-cost <n>",
           description: "Credit cost (credits)",
-          parse: parseNonNegativeInteger,
+          parse: parseNonNegativePostgresInteger,
           sdkKey: "creditCost",
         },
       ],
@@ -2588,7 +2589,7 @@ const planGroupsResource: ResourceDef = {
         {
           flag: "--sort-order <n>",
           description: "Sort order",
-          parse: parseNonNegativePostgresInteger,
+          parse: parsePostgresInteger,
           sdkKey: "sortOrder",
         },
       ],

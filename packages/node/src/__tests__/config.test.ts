@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import {
-  BILLING_CONFIG_JSON_SCHEMA,
+  BILLING_CONFIG_STRUCTURAL_JSON_SCHEMA,
   BillingConfigSchema,
   getBillingConfigIssues,
 } from "../index";
@@ -161,9 +161,10 @@ describe("billing config contract", () => {
     );
   });
 
-  test("publishes machine-readable schema metadata", () => {
-    const schema = JSON.stringify(BILLING_CONFIG_JSON_SCHEMA);
-    expect(schema).toContain("amountInCents");
-    expect(schema).toContain("schemaVersion");
+  test("publishes structural schema metadata for fields and scalar domains", () => {
+    const schema = JSON.stringify(BILLING_CONFIG_STRUCTURAL_JSON_SCHEMA);
+    expect(schema).toContain('"schemaVersion"');
+    expect(schema).toContain('"amountInCents":{"type":"integer"');
+    expect(schema).not.toContain('"amount":');
   });
 });

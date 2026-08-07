@@ -253,7 +253,8 @@ export const BillingConfigSchema = z
     }
   });
 
-export const BILLING_CONFIG_JSON_SCHEMA = z.toJSONSchema(BillingConfigSchema);
+export const BILLING_CONFIG_STRUCTURAL_JSON_SCHEMA =
+  z.toJSONSchema(BillingConfigSchema);
 
 export type FeatureDef = z.infer<typeof FeatureDefSchema>;
 export type PriceDef = z.infer<typeof PriceDefSchema>;
