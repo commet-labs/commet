@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import type { InstalledCommetPackage } from "../utils/agent-project";
-import { evaluatePackageCompatibility } from "./doctor";
+import {
+  evaluatePackageCompatibility,
+  findRequiredEnvironmentVariables,
+} from "./doctor";
 
 function installedPackage(
   name: string,
@@ -52,4 +55,22 @@ test("doctor rejects an integration outside its declared Node range", () => {
   });
   assert.equal(typeof mismatch?.impact, "string");
   assert.equal(typeof mismatch?.action, "string");
+});
+
+test("doctor recognizes only executable Commet environment access", () => {
+  const textualExamples = `
+    // process.env.COMMET_API_KEY
+    /* import.meta.env.COMMET_WEBHOOK_SECRET */
+    export const doubleQuoted = "process.env.COMMET_API_KEY";
+    export const singleQuoted = 'import.meta.env["COMMET_WEBHOOK_SECRET"]';
+    export const template = \`process.env.COMMET_API_KEY\`;
+  `;
+  assert.deepEqual(findRequiredEnvironmentVariables(textualExamples), []);
+  assert.deepEqual(
+    findRequiredEnvironmentVariables(`
+      const apiKey = process.env.COMMET_API_KEY;
+      const webhookSecret = import.meta.env["COMMET_WEBHOOK_SECRET"];
+    `),
+    ["COMMET_API_KEY", "COMMET_WEBHOOK_SECRET"],
+  );
 });

@@ -343,25 +343,16 @@ function inspectSourceConfiguration(projectRoot: string): SourceConfiguration {
       if (/\.(?:spec|test)\.[cm]?[jt]sx?$/.test(entry.name)) continue;
 
       const source = readFileSync(path, "utf8");
-      const activeSource = source
-        .split(/\r?\n/)
-        .filter((line) => !/^\s*(?:\/\/|\/\*|\*)/.test(line))
-        .join("\n");
-      for (const match of activeSource.matchAll(
-        /(?:process|import\.meta)\.env(?:\.([A-Z_][A-Z0-9_]*)|\[["']([A-Z_][A-Z0-9_]*)["']\])/g,
-      )) {
-        const variableName = match[1] ?? match[2];
-        if (!variableName) continue;
-        if (REQUIRED_COMMET_ENVIRONMENT_VARIABLES.has(variableName)) {
-          environmentVariables.add(variableName);
-        }
+      for (const variableName of findRequiredEnvironmentVariables(source)) {
+        environmentVariables.add(variableName);
       }
+      const importSource = sanitizeSource(source, true);
       for (const packageName of RECOGNIZED_INTEGRATION_PACKAGES) {
         const escapedPackageName = packageName.replace("/", "\\/");
         const importPattern = new RegExp(
           `(?:from\\s*|import\\s*\\(\\s*|require\\s*\\(\\s*|import\\s*)["']${escapedPackageName}(?:\\/[^"']*)?["']`,
         );
-        if (!importPattern.test(activeSource)) continue;
+        if (!importPattern.test(importSource)) continue;
         integrationPackages.add(packageName);
         if (!integrationPaths.has(packageName)) {
           integrationPaths.set(packageName, relative(projectRoot, path));
@@ -375,6 +366,105 @@ function inspectSourceConfiguration(projectRoot: string): SourceConfiguration {
     integrationPackages: [...integrationPackages].sort(),
     integrationPaths,
   };
+}
+
+export function findRequiredEnvironmentVariables(source: string): string[] {
+  const normalizedSource = source.replace(
+    /((?:process|import\.meta)\.env)\[\s*["']([A-Z_][A-Z0-9_]*)["']\s*\]/g,
+    "$1.$2",
+  );
+  const executableSource = sanitizeSource(normalizedSource, false);
+  const environmentVariables = new Set<string>();
+  for (const match of executableSource.matchAll(
+    /(?:process|import\.meta)\.env\.([A-Z_][A-Z0-9_]*)/g,
+  )) {
+    const variableName = match[1];
+    if (
+      variableName &&
+      REQUIRED_COMMET_ENVIRONMENT_VARIABLES.has(variableName)
+    ) {
+      environmentVariables.add(variableName);
+    }
+  }
+  return [...environmentVariables].sort();
+}
+
+function sanitizeSource(source: string, preserveStrings: boolean): string {
+  let result = "";
+  let state: "code" | "single" | "double" | "template" | "line" | "block" =
+    "code";
+  let escaped = false;
+
+  for (let index = 0; index < source.length; index += 1) {
+    const character = source[index];
+    const nextCharacter = source[index + 1];
+    if (!character) continue;
+
+    if (state === "line") {
+      if (character === "\n") {
+        state = "code";
+        result += "\n";
+      } else {
+        result += " ";
+      }
+      continue;
+    }
+    if (state === "block") {
+      if (character === "*" && nextCharacter === "/") {
+        result += "  ";
+        index += 1;
+        state = "code";
+      } else {
+        result += character === "\n" ? "\n" : " ";
+      }
+      continue;
+    }
+    if (state !== "code") {
+      result += preserveStrings || character === "\n" ? character : " ";
+      if (escaped) {
+        escaped = false;
+        continue;
+      }
+      if (character === "\\") {
+        escaped = true;
+        continue;
+      }
+      if (
+        (state === "single" && character === "'") ||
+        (state === "double" && character === '"') ||
+        (state === "template" && character === "`")
+      ) {
+        state = "code";
+      }
+      continue;
+    }
+
+    if (character === "/" && nextCharacter === "/") {
+      result += "  ";
+      index += 1;
+      state = "line";
+      continue;
+    }
+    if (character === "/" && nextCharacter === "*") {
+      result += "  ";
+      index += 1;
+      state = "block";
+      continue;
+    }
+    if (character === "'" || character === '"' || character === "`") {
+      result += preserveStrings ? character : " ";
+      state =
+        character === "'"
+          ? "single"
+          : character === '"'
+            ? "double"
+            : "template";
+      continue;
+    }
+    result += character;
+  }
+
+  return result;
 }
 
 function extension(fileName: string): string {

@@ -19,6 +19,7 @@ import {
   generateResourceSchema,
 } from "./commands/resources/factory";
 import { resourceDefinitions } from "./commands/resources/registry";
+import { resolveCliCommand } from "./utils/command-name";
 import {
   authExists,
   loadProjectConfig,
@@ -101,7 +102,7 @@ installCrashHandler();
 markCommandStart();
 scheduleUpdateCheck(packageJson.version);
 
-const commandName = process.argv[2] || "(default)";
+const commandName = resolveCliCommand(process.argv.slice(2));
 
 program.hook("postAction", () => {
   reportCommand(commandName, "success");

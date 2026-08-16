@@ -1,3 +1,4 @@
+import { resolveCliCommand } from "./command-name";
 import { loadProjectConfig } from "./config";
 
 declare const __CLI_VERSION__: string;
@@ -66,7 +67,8 @@ function isTelemetryDisabled(): boolean {
 }
 
 function isLocalOnlyCommand(): boolean {
-  return process.argv[2] === "doctor" || process.argv[2] === "agents";
+  const command = resolveCliCommand(process.argv.slice(2));
+  return command === "doctor" || command === "agents";
 }
 
 function resolveOrgId(): string | null {

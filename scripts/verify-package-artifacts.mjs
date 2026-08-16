@@ -323,6 +323,21 @@ try {
   if (projectState(consumerRoot) !== beforeDoctor) {
     throw new Error("Installed doctor changed project files");
   }
+  const doctorWithGlobalOptionFirst = runCli([
+    "--output",
+    "agent",
+    "doctor",
+    "--directory",
+    consumerRoot,
+  ]);
+  if (
+    doctorWithGlobalOptionFirst.status !== doctor.status ||
+    doctorWithGlobalOptionFirst.stderr.trim()
+  ) {
+    throw new Error(
+      `Installed doctor depends on global option ordering: ${doctorWithGlobalOptionFirst.stderr}`,
+    );
+  }
 
   const removed = runCli([
     "agents",

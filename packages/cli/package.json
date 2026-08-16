@@ -17,7 +17,7 @@
     "lint:fix": "biome lint --write src/",
     "validate:registry": "tsx scripts/validate-resource-registry.ts",
     "typecheck": "tsc --noEmit && pnpm validate:registry",
-    "test:unit": "tsx --test src/commands/agents.test.ts src/commands/doctor.test.ts",
+    "test:unit": "tsx --test src/commands/agents.test.ts src/commands/doctor.test.ts src/utils/command-name.test.ts",
     "clean": "rm -rf .turbo node_modules dist"
   },
   "keywords": [
