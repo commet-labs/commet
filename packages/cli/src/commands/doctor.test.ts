@@ -70,6 +70,13 @@ test("doctor recognizes only executable Commet environment access", () => {
   assert.deepEqual(findRequiredEnvironmentVariables(textualExamples), []);
   assert.deepEqual(
     findRequiredEnvironmentVariables(`
+      const COMMET_API_KEY = "OTHER_KEY";
+      const dynamic = process.env[COMMET_API_KEY];
+    `),
+    [],
+  );
+  assert.deepEqual(
+    findRequiredEnvironmentVariables(`
       const apiKey = process.env.COMMET_API_KEY;
       const webhookSecret = import.meta.env["COMMET_WEBHOOK_SECRET"];
       const authorization = \`Bearer \${process.env.COMMET_API_KEY}\`;
@@ -77,4 +84,14 @@ test("doctor recognizes only executable Commet environment access", () => {
     `),
     ["COMMET_API_KEY", "COMMET_WEBHOOK_SECRET"],
   );
+  assert.deepEqual(
+    findRequiredEnvironmentVariables(`
+      @sealed
+      class Config {
+        key = process.env.COMMET_API_KEY;
+      }
+    `),
+    ["COMMET_API_KEY"],
+  );
+  assert.throws(() => findRequiredEnvironmentVariables("const = ;"));
 });

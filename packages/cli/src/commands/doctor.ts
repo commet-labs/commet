@@ -177,6 +177,18 @@ export function runDoctor(startDirectory: string): DoctorReport {
     );
   }
 
+  if (sourceConfiguration.scanFailures.length > 0) {
+    checks.push({
+      code: "SOURCE_CONFIGURATION_SCAN_INCOMPLETE",
+      status: "warning",
+      message: `Could not parse ${sourceConfiguration.scanFailures.length} source file${sourceConfiguration.scanFailures.length === 1 ? "" : "s"}`,
+      evidence: { paths: sourceConfiguration.scanFailures.join(", ") },
+      impact:
+        "Environment-variable and integration checks may be incomplete for these files",
+      action: "Fix their syntax errors and run commet doctor again",
+    });
+  }
+
   if (packages.length > 0) {
     const agentsPath = join(projectRoot, "AGENTS.md");
     try {
@@ -322,12 +334,14 @@ interface SourceConfiguration {
   environmentVariables: string[];
   integrationPackages: string[];
   integrationPaths: Map<string, string>;
+  scanFailures: string[];
 }
 
 function inspectSourceConfiguration(projectRoot: string): SourceConfiguration {
   const environmentVariables = new Set<string>();
   const integrationPackages = new Set<string>();
   const integrationPaths = new Map<string, string>();
+  const scanFailures: string[] = [];
   const directories = [projectRoot];
 
   while (directories.length > 0) {
@@ -344,11 +358,15 @@ function inspectSourceConfiguration(projectRoot: string): SourceConfiguration {
       if (/\.(?:spec|test)\.[cm]?[jt]sx?$/.test(entry.name)) continue;
 
       const source = readFileSync(path, "utf8");
-      for (const variableName of findRequiredEnvironmentVariables(
-        source,
-        entry.name,
-      )) {
-        environmentVariables.add(variableName);
+      try {
+        for (const variableName of findRequiredEnvironmentVariables(
+          source,
+          entry.name,
+        )) {
+          environmentVariables.add(variableName);
+        }
+      } catch {
+        scanFailures.push(relative(projectRoot, path));
       }
       const importSource = stripComments(source);
       for (const packageName of RECOGNIZED_INTEGRATION_PACKAGES) {
@@ -369,6 +387,7 @@ function inspectSourceConfiguration(projectRoot: string): SourceConfiguration {
     environmentVariables: [...environmentVariables].sort(),
     integrationPackages: [...integrationPackages].sort(),
     integrationPaths,
+    scanFailures: scanFailures.sort(),
   };
 }
 
@@ -377,22 +396,17 @@ export function findRequiredEnvironmentVariables(
   fileName = "source.tsx",
 ): string[] {
   const environmentVariables = new Set<string>();
-  let syntaxTree: unknown;
-  try {
-    syntaxTree = /\.[cm]?[jt]sx$/.test(fileName)
-      ? parse(source, {
-          sourceType: "unambiguous",
-          errorRecovery: true,
-          plugins: ["typescript", "jsx"],
-        })
-      : parse(source, {
-          sourceType: "unambiguous",
-          errorRecovery: true,
-          plugins: ["typescript"],
-        });
-  } catch {
-    return [];
-  }
+  const syntaxTree: unknown = /\.[cm]?[jt]sx$/.test(fileName)
+    ? parse(source, {
+        sourceType: "unambiguous",
+        errorRecovery: true,
+        plugins: ["decorators-legacy", "typescript", "jsx"],
+      })
+    : parse(source, {
+        sourceType: "unambiguous",
+        errorRecovery: true,
+        plugins: ["decorators-legacy", "typescript"],
+      });
 
   const visit = (value: unknown): void => {
     if (Array.isArray(value)) {
@@ -421,11 +435,12 @@ function memberPropertyName(value: object): string | undefined {
   const property = Reflect.get(value, "property");
   if (typeof property !== "object" || property === null) return undefined;
   const propertyType = Reflect.get(property, "type");
-  if (propertyType === "Identifier") {
+  const computed = Reflect.get(value, "computed") === true;
+  if (propertyType === "Identifier" && !computed) {
     const name = Reflect.get(property, "name");
     return typeof name === "string" ? name : undefined;
   }
-  if (propertyType === "StringLiteral") {
+  if (propertyType === "StringLiteral" && computed) {
     const stringValue = Reflect.get(property, "value");
     return typeof stringValue === "string" ? stringValue : undefined;
   }
