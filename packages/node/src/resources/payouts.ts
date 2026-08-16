@@ -1,9 +1,5 @@
 import type { RequestOptions } from "../types/common";
-import type {
-  Payout,
-  PayoutBankAccount,
-  PayoutVerification,
-} from "../types/models";
+import type { Payout, PayoutBankAccount } from "../types/models";
 import type { CommetHTTPClient } from "../utils/http";
 
 export interface AddPayoutBankAccountParams {
@@ -18,66 +14,6 @@ export interface RequestPayoutParams {
   amount: number;
   description?: string;
 }
-
-export type CompletePayoutVerificationParams =
-  | {
-      email: string;
-      businessUrl: string;
-      documentUrl: string;
-      bank: {
-        accountNumber: string;
-        accountHolderName: string;
-        routingNumber?: string;
-        accountType?: "checking" | "savings";
-      };
-      businessType: "individual";
-      individual: {
-        firstName: string;
-        lastName: string;
-        phone: string;
-        dateOfBirth: string;
-        ssnLast4?: string;
-        idNumber?: string;
-        address: {
-          line1: string;
-          line2?: string;
-          city: string;
-          state?: string;
-          postalCode: string;
-          country: string;
-        };
-      };
-    }
-  | {
-      email: string;
-      businessUrl: string;
-      documentUrl: string;
-      bank: {
-        accountNumber: string;
-        accountHolderName: string;
-        routingNumber?: string;
-        accountType?: "checking" | "savings";
-      };
-      businessType: "company";
-      company: {
-        name: string;
-        taxId: string;
-        address: {
-          line1: string;
-          line2?: string;
-          city: string;
-          state?: string;
-          postalCode: string;
-          country: string;
-        };
-        representative: {
-          firstName: string;
-          lastName: string;
-          phone?: string;
-          email?: string;
-        };
-      };
-    };
 
 export class PayoutsResource {
   constructor(private httpClient: CommetHTTPClient) {}
@@ -98,11 +34,11 @@ export class PayoutsResource {
     return this.httpClient.post("/payouts", params, options);
   }
 
-  /** Provision the organization's payout account in a single call with the full KYC + bank payload. Uploads the identity document, persists the destination bank, and creates the connected account through the org's payout provider. The account starts `pending_verification` and flips to `verified` via the provider's webhook. Idempotent: returns the existing account if the org already has one. */
-  async completeVerification(
-    params: CompletePayoutVerificationParams,
-    options?: RequestOptions,
-  ): Promise<PayoutVerification> {
-    return this.httpClient.post("/payouts/verification", params, options);
+  /**
+   * Deprecated. Complete business and identity verification in the Commet dashboard. This endpoint no longer accepts or processes KYC data.
+   * @deprecated
+   */
+  async completeVerification(options?: RequestOptions): Promise<void> {
+    return this.httpClient.post("/payouts/verification", {}, options);
   }
 }

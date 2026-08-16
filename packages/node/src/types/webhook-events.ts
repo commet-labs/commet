@@ -400,6 +400,8 @@ export interface PaymentFailedData {
   customerId: string;
   /** The subscription ID, if the invoice is linked to a subscription. */
   subscriptionId: string | null;
+  /** The payment provider the charge was routed to: stripe, commet, or dlocal. */
+  provider: "stripe" | "commet" | "dlocal";
   /** The failure code from the payment processor. */
   failureCode: string;
   /** A human-readable failure message. */
@@ -420,6 +422,8 @@ export interface PaymentRecoveredData {
   customerId: string;
   /** The subscription ID, if the invoice is linked to a subscription. */
   subscriptionId: string | null;
+  /** The payment provider that recovered the payment, or null when the invoice was recovered without a processor charge. */
+  provider: "stripe" | "commet" | "dlocal" | null;
 }
 
 /** Fired when all dunning retries are exhausted and the subscription is canceled. This is the terminal event of the dunning flow — payment.recovered will not follow. Revoke access when you receive this. */
@@ -432,6 +436,8 @@ export interface PaymentRetryFailedData {
   customerId: string;
   /** The subscription ID. */
   subscriptionId: string;
+  /** The payment provider the charge was routed to: stripe, commet, or dlocal. */
+  provider: "stripe" | "commet" | "dlocal";
   /** Terminal dunning reason, usually the last processor decline code or "dunning_exhausted". */
   reason: string;
 }

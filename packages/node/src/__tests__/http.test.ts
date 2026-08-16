@@ -10,10 +10,14 @@ function createClient(overrides: Record<string, unknown> = {}) {
   });
 }
 
-function jsonResponse(body: unknown, status = 200): Response {
+function jsonResponse(
+  body: unknown,
+  status = 200,
+  headers?: Record<string, string>,
+): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...headers },
   });
 }
 
@@ -165,6 +169,38 @@ describe("CommetHTTPClient", () => {
         expect(apiErr.statusCode).toBe(403);
         expect(apiErr.code).toBe("forbidden");
         expect(apiErr.message).toBe("Forbidden");
+      }
+    });
+
+    it("preserves the server request ID and explicit retryability", async () => {
+      const client = createClient({ retries: 0 });
+      vi.mocked(fetch).mockResolvedValueOnce(
+        jsonResponse(
+          {
+            error: {
+              type: "internal_error",
+              message: "The write outcome is unknown",
+              code: "internal_error",
+              doc_url:
+                "https://commet.co/docs/api-reference/2026-07-31/errors/internal_error.md",
+            },
+          },
+          500,
+          {
+            "x-request-id": "req_server_123",
+            "x-commet-idempotency-retryable": "true",
+          },
+        ),
+      );
+
+      try {
+        await client.post("/subscriptions", {});
+        expect.unreachable("should have thrown");
+      } catch (error) {
+        if (!(error instanceof CommetAPIError)) throw error;
+        expect(error.requestId).toBe("req_server_123");
+        expect(error.retryable).toBe(true);
+        expect(error.docUrl).toContain("/internal_error.md");
       }
     });
 

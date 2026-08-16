@@ -1,0 +1,463 @@
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { dirname, join, relative, resolve } from "node:path";
+import chalk from "chalk";
+import { Command } from "commander";
+import { satisfies, valid } from "semver";
+import {
+  findCommetPackages,
+  findProjectRoot,
+  type InstalledCommetPackage,
+} from "../utils/agent-project";
+import { AGENT_RULES_BEGIN } from "./agents";
+
+export interface DoctorCheck {
+  code: string;
+  status: "pass" | "warning" | "fail";
+  message: string;
+  evidence?: Record<string, string>;
+  impact?: string;
+  action?: string;
+}
+
+export interface DoctorReport {
+  schemaVersion: 1;
+  status: "ok" | "warnings" | "issues";
+  projectRoot: string;
+  apiVersion?: string;
+  checks: DoctorCheck[];
+}
+
+interface DoctorOptions {
+  directory?: string;
+  output?: string;
+}
+
+export function evaluatePackageCompatibility(
+  packages: InstalledCommetPackage[],
+): DoctorCheck[] {
+  const checks: DoctorCheck[] = [];
+  const nodePackage = packages.find(
+    (packageInfo) => packageInfo.name === "@commet/node",
+  );
+  const nodeVersion = nodePackage?.manifest?.version;
+
+  for (const packageInfo of packages) {
+    const manifest = packageInfo.manifest;
+    const version = manifest?.version;
+    if (!(manifest && version)) {
+      checks.push({
+        code: "PACKAGE_NOT_INSTALLED",
+        status: "fail",
+        message: `${packageInfo.name} is declared but not installed`,
+        evidence: packageInfo.declaredRange
+          ? { declaredRange: packageInfo.declaredRange }
+          : undefined,
+        impact:
+          "The installed SDK surface and its documentation cannot be verified",
+        action: "Install project dependencies",
+      });
+      continue;
+    }
+    checks.push({
+      code: "PACKAGE_INSTALLED",
+      status: "pass",
+      message: `${packageInfo.name} ${version} is installed`,
+      evidence: { package: packageInfo.name, version },
+    });
+
+    if (!packageInfo.documentationPath) {
+      checks.push({
+        code: "PACKAGE_DOCUMENTATION_MISSING",
+        status: "fail",
+        message: `${packageInfo.name} does not contain its installed documentation`,
+        impact:
+          "Agents may implement against documentation that does not match the installed package",
+        action: `Upgrade ${packageInfo.name} to a release that ships agent documentation`,
+      });
+    } else {
+      checks.push({
+        code: "PACKAGE_DOCUMENTATION_AVAILABLE",
+        status: "pass",
+        message: `${packageInfo.name} documentation is installed`,
+        evidence: { path: packageInfo.documentationPath },
+      });
+    }
+
+    if (packageInfo.name === "@commet/node") continue;
+    const nodeRange = manifest.peerDependencies["@commet/node"];
+    if (!nodeRange) continue;
+    if (!nodeVersion) {
+      checks.push({
+        code: "NODE_SDK_REQUIRED",
+        status: "fail",
+        message: `${packageInfo.name} requires @commet/node`,
+        evidence: { supportedRange: normalizeWorkspaceRange(nodeRange) },
+        impact: "The integration cannot load its required Commet SDK peer",
+        action: "Install a supported @commet/node version",
+      });
+      continue;
+    }
+    const normalizedRange = normalizeWorkspaceRange(nodeRange);
+    if (!(valid(nodeVersion) && satisfies(nodeVersion, normalizedRange))) {
+      checks.push({
+        code: "PACKAGE_VERSION_MISMATCH",
+        status: "fail",
+        message: `${packageInfo.name} ${version} does not support @commet/node ${nodeVersion}`,
+        evidence: {
+          installedNodeVersion: nodeVersion,
+          supportedNodeRange: normalizedRange,
+        },
+        impact:
+          "The integration may call SDK APIs outside its supported contract",
+        action: `Install an @commet/node version in ${normalizedRange} or upgrade ${packageInfo.name}`,
+      });
+    } else {
+      checks.push({
+        code: "PACKAGE_VERSION_COMPATIBLE",
+        status: "pass",
+        message: `${packageInfo.name} supports @commet/node ${nodeVersion}`,
+        evidence: { supportedNodeRange: normalizedRange },
+      });
+    }
+  }
+
+  return checks;
+}
+
+export function runDoctor(startDirectory: string): DoctorReport {
+  const projectRoot = findProjectRoot(startDirectory);
+  const packages = findCommetPackages(projectRoot);
+  const checks = evaluatePackageCompatibility(packages);
+  const sourceConfiguration = inspectSourceConfiguration(projectRoot);
+
+  if (packages.length === 0) {
+    checks.push({
+      code: "COMMET_PACKAGES_NOT_FOUND",
+      status: "fail",
+      message: "No Commet packages are declared or installed in this project",
+      impact:
+        "Commet integration diagnostics cannot be resolved for this project",
+      action: "Install @commet/node or a Commet integration package",
+    });
+  }
+
+  for (const packageName of sourceConfiguration.integrationPackages) {
+    checks.push({
+      code: "INTEGRATION_CONFIGURATION_DETECTED",
+      status: "pass",
+      message: `${packageName} is referenced by project source`,
+      evidence: {
+        package: packageName,
+        path:
+          sourceConfiguration.integrationPaths.get(packageName) ?? projectRoot,
+      },
+    });
+  }
+
+  for (const variableName of sourceConfiguration.environmentVariables) {
+    const source = findEnvironmentVariableSource(projectRoot, variableName);
+    checks.push(
+      source
+        ? {
+            code: "ENVIRONMENT_VARIABLE_AVAILABLE",
+            status: "pass",
+            message: `${variableName} is available locally`,
+            evidence: { variable: variableName, source },
+          }
+        : {
+            code: "ENVIRONMENT_VARIABLE_MISSING",
+            status: "fail",
+            message: `${variableName} is referenced by project source but is not available locally`,
+            evidence: { variable: variableName },
+            impact:
+              "The detected Commet integration cannot initialize this configuration locally",
+            action: `Set ${variableName} in the process environment or an active .env file`,
+          },
+    );
+  }
+
+  const agentsPath = join(projectRoot, "AGENTS.md");
+  const hasManagedRules =
+    existsSync(agentsPath) &&
+    readFileSync(agentsPath, "utf8").includes(AGENT_RULES_BEGIN);
+  checks.push(
+    hasManagedRules
+      ? {
+          code: "AGENT_RULES_CURRENT",
+          status: "pass",
+          message: "AGENTS.md contains Commet instructions",
+          evidence: { path: agentsPath },
+        }
+      : {
+          code: "AGENT_RULES_MISSING",
+          status: "warning",
+          message: "AGENTS.md does not contain Commet instructions",
+          impact:
+            "Coding agents may miss the documentation that matches the installed packages",
+          action: "Run commet agents setup",
+        },
+  );
+
+  const apiVersion = readInstalledApiVersion(packages);
+  if (apiVersion) {
+    checks.push({
+      code: "API_VERSION_RESOLVED",
+      status: "pass",
+      message: `Installed API documentation targets ${apiVersion}`,
+      evidence: { apiVersion },
+    });
+  }
+
+  const projectConfigPath = join(projectRoot, ".commet", "config.json");
+  if (existsSync(projectConfigPath)) {
+    const context = readProjectContext(projectConfigPath);
+    checks.push(
+      context
+        ? {
+            code: "PROJECT_CONTEXT_VALID",
+            status: "pass",
+            message: `Project context is ${context.organizationName} · ${context.mode}`,
+            evidence: {
+              organizationId: context.organizationId,
+              organizationName: context.organizationName,
+              mode: context.mode,
+              path: projectConfigPath,
+            },
+          }
+        : {
+            code: "PROJECT_CONTEXT_INVALID",
+            status: "fail",
+            message: ".commet/config.json does not contain a valid mode",
+            evidence: { path: projectConfigPath },
+            impact:
+              "The CLI cannot determine whether operations target sandbox or live mode",
+            action: "Run commet link again",
+          },
+    );
+  }
+
+  const status = checks.some((check) => check.status === "fail")
+    ? "issues"
+    : checks.some((check) => check.status === "warning")
+      ? "warnings"
+      : "ok";
+  return { schemaVersion: 1, status, projectRoot, apiVersion, checks };
+}
+
+function normalizeWorkspaceRange(range: string): string {
+  return range.startsWith("workspace:")
+    ? range.slice("workspace:".length)
+    : range;
+}
+
+const SOURCE_EXTENSIONS = new Set([
+  ".cjs",
+  ".cts",
+  ".js",
+  ".jsx",
+  ".mjs",
+  ".mts",
+  ".ts",
+  ".tsx",
+]);
+const IGNORED_SOURCE_DIRECTORIES = new Set([
+  ".git",
+  ".next",
+  ".turbo",
+  "build",
+  "coverage",
+  "dist",
+  "node_modules",
+]);
+const OPTIONAL_COMMET_ENVIRONMENT_VARIABLES = new Set([
+  "COMMET_NO_UPDATE_CHECK",
+]);
+const RECOGNIZED_INTEGRATION_PACKAGES = [
+  "@commet/ai-sdk",
+  "@commet/better-auth",
+  "@commet/next",
+] as const;
+
+interface SourceConfiguration {
+  environmentVariables: string[];
+  integrationPackages: string[];
+  integrationPaths: Map<string, string>;
+}
+
+function inspectSourceConfiguration(projectRoot: string): SourceConfiguration {
+  const environmentVariables = new Set<string>();
+  const integrationPackages = new Set<string>();
+  const integrationPaths = new Map<string, string>();
+  const directories = [projectRoot];
+
+  while (directories.length > 0) {
+    const directory = directories.pop();
+    if (!directory) continue;
+    for (const entry of readdirSync(directory, { withFileTypes: true })) {
+      if (entry.isSymbolicLink()) continue;
+      const path = join(directory, entry.name);
+      if (entry.isDirectory()) {
+        if (!IGNORED_SOURCE_DIRECTORIES.has(entry.name)) directories.push(path);
+        continue;
+      }
+      if (!SOURCE_EXTENSIONS.has(extension(entry.name))) continue;
+
+      const source = readFileSync(path, "utf8");
+      for (const match of source.matchAll(/\bCOMMET_[A-Z0-9_]+\b/g)) {
+        const variableName = match[0];
+        if (!OPTIONAL_COMMET_ENVIRONMENT_VARIABLES.has(variableName)) {
+          environmentVariables.add(variableName);
+        }
+      }
+      for (const packageName of RECOGNIZED_INTEGRATION_PACKAGES) {
+        if (!source.includes(packageName)) continue;
+        integrationPackages.add(packageName);
+        if (!integrationPaths.has(packageName)) {
+          integrationPaths.set(packageName, relative(projectRoot, path));
+        }
+      }
+    }
+  }
+
+  return {
+    environmentVariables: [...environmentVariables].sort(),
+    integrationPackages: [...integrationPackages].sort(),
+    integrationPaths,
+  };
+}
+
+function extension(fileName: string): string {
+  const dot = fileName.lastIndexOf(".");
+  return dot === -1 ? "" : fileName.slice(dot);
+}
+
+function findEnvironmentVariableSource(
+  projectRoot: string,
+  variableName: string,
+): string | undefined {
+  if (process.env[variableName]?.trim()) return "process environment";
+
+  const nodeEnvironment = process.env.NODE_ENV?.trim() || "development";
+  const environmentFiles = [
+    `.env.${nodeEnvironment}.local`,
+    ...(nodeEnvironment === "test" ? [] : [".env.local"]),
+    `.env.${nodeEnvironment}`,
+    ".env",
+  ];
+  for (const environmentFile of environmentFiles) {
+    const envPath = join(projectRoot, environmentFile);
+    if (!existsSync(envPath)) continue;
+    const value = readEnvironmentVariable(
+      readFileSync(envPath, "utf8"),
+      variableName,
+    );
+    if (value?.trim()) return environmentFile;
+  }
+  return undefined;
+}
+
+function readEnvironmentVariable(
+  content: string,
+  variableName: string,
+): string | undefined {
+  for (const line of content.split(/\r?\n/)) {
+    const match = line.match(
+      /^\s*(?:export\s+)?([A-Z_][A-Z0-9_]*)\s*=\s*(.*)\s*$/,
+    );
+    if (match?.[1] !== variableName) continue;
+    const rawValue = match[2]?.trim();
+    if (!rawValue) return undefined;
+    if (
+      (rawValue.startsWith('"') && rawValue.endsWith('"')) ||
+      (rawValue.startsWith("'") && rawValue.endsWith("'"))
+    ) {
+      return rawValue.slice(1, -1);
+    }
+    return rawValue.replace(/\s+#.*$/, "").trim();
+  }
+  return undefined;
+}
+
+function readInstalledApiVersion(
+  packages: InstalledCommetPackage[],
+): string | undefined {
+  const nodePackage = packages.find(
+    (packageInfo) => packageInfo.name === "@commet/node",
+  );
+  if (!nodePackage?.manifestPath) return undefined;
+  const manifestPath = join(
+    dirname(nodePackage.manifestPath),
+    "docs",
+    "manifest.json",
+  );
+  if (!existsSync(manifestPath)) return undefined;
+  try {
+    const parsed: unknown = JSON.parse(readFileSync(manifestPath, "utf8"));
+    if (typeof parsed !== "object" || parsed === null) return undefined;
+    const apiVersion = Reflect.get(parsed, "apiVersion");
+    return typeof apiVersion === "string" ? apiVersion : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function readProjectContext(configPath: string):
+  | {
+      organizationId: string;
+      organizationName: string;
+      mode: "live" | "sandbox";
+    }
+  | undefined {
+  try {
+    const parsed: unknown = JSON.parse(readFileSync(configPath, "utf8"));
+    if (typeof parsed !== "object" || parsed === null) return undefined;
+    const organizationId = Reflect.get(parsed, "orgId");
+    const organizationName = Reflect.get(parsed, "orgName");
+    const mode = Reflect.get(parsed, "mode");
+    if (
+      typeof organizationId !== "string" ||
+      organizationId.length === 0 ||
+      typeof organizationName !== "string" ||
+      organizationName.length === 0 ||
+      (mode !== "live" && mode !== "sandbox")
+    ) {
+      return undefined;
+    }
+    return { organizationId, organizationName, mode };
+  } catch {
+    return undefined;
+  }
+}
+
+export const doctorCommand = new Command("doctor")
+  .description("Diagnose the local Commet installation without changing it")
+  .option("--directory <path>", "Project directory", process.cwd())
+  .option(
+    "--output <format>",
+    "Output format: human (default) or agent",
+    "human",
+  )
+  .action((options: DoctorOptions) => {
+    const report = runDoctor(resolve(options.directory ?? process.cwd()));
+    if (options.output === "agent") {
+      console.log(JSON.stringify(report));
+    } else {
+      console.log(
+        chalk.bold(
+          `Commet doctor · ${relative(process.cwd(), report.projectRoot) || "."}`,
+        ),
+      );
+      for (const check of report.checks) {
+        const marker =
+          check.status === "pass"
+            ? chalk.green("✓")
+            : check.status === "warning"
+              ? chalk.yellow("⚠")
+              : chalk.red("✗");
+        console.log(`${marker} ${check.message}`);
+        if (check.impact) console.log(chalk.dim(`  Impact: ${check.impact}`));
+        if (check.action) console.log(chalk.dim(`  Action: ${check.action}`));
+      }
+    }
+    if (report.status === "issues") process.exitCode = 1;
+  });

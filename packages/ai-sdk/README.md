@@ -85,9 +85,11 @@ Tracking runs in the stream's `flush` phase — it completes before the HTTP con
 ## Requirements
 
 - `ai` >= 6.0.0
-- `@commet/node` >= 7.0.0
+- `@commet/node` >= 9.1.0 and < 10.0.0
 
 ## Documentation
+
+Read the common API reference at `node_modules/@commet/node/docs/README.md`; this README remains the version-matched AI SDK integration guide.
 
 Visit [commet.co/docs](https://commet.co/docs) for the full guide.
 

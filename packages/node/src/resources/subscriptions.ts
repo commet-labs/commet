@@ -58,6 +58,17 @@ export interface PurchaseCreditsParams {
   creditPackId: string;
 }
 
+export interface ApplySubscriptionOfferParams {
+  id: string;
+  offerId: string;
+  /** @format date-time */
+  expiresAt?: string;
+}
+
+export interface RemoveSubscriptionOfferParams {
+  id: string;
+}
+
 export interface UpdatePaymentMethodParams {
   id: string;
   successUrl?: string;
@@ -109,8 +120,8 @@ export type CreateSubscriptionParams =
       /** Public price ID. When omitted, Commet selects the default price for the billing interval and still applies its market pricing. */
       priceId?: string;
       initialSeats?: Record<string, number>;
-      /** Payment provider for the initial checkout. Overrides country routing when present. */
-      provider?: "stripe" | "commet" | "dlocal";
+      /** Payment provider name or exact public payment connection ID for the initial checkout. Overrides country routing when present. */
+      provider?: "stripe" | "commet" | "dlocal" | string;
       name?: string;
       /** @format date-time */
       startDate?: string;
@@ -133,8 +144,8 @@ export type CreateSubscriptionParams =
       /** Public price ID. When omitted, Commet selects the default price for the billing interval and still applies its market pricing. */
       priceId?: string;
       initialSeats?: Record<string, number>;
-      /** Payment provider for the initial checkout. Overrides country routing when present. */
-      provider?: "stripe" | "commet" | "dlocal";
+      /** Payment provider name or exact public payment connection ID for the initial checkout. Overrides country routing when present. */
+      provider?: "stripe" | "commet" | "dlocal" | string;
       name?: string;
       /** @format date-time */
       startDate?: string;
@@ -157,8 +168,8 @@ export type CreateSubscriptionParams =
       /** Public price ID. When omitted, Commet selects the default price for the billing interval and still applies its market pricing. */
       priceId?: string;
       initialSeats?: Record<string, number>;
-      /** Payment provider for the initial checkout. Overrides country routing when present. */
-      provider?: "stripe" | "commet" | "dlocal";
+      /** Payment provider name or exact public payment connection ID for the initial checkout. Overrides country routing when present. */
+      provider?: "stripe" | "commet" | "dlocal" | string;
       name?: string;
       /** @format date-time */
       startDate?: string;
@@ -181,13 +192,65 @@ export type CreateSubscriptionParams =
       /** Public price ID. When omitted, Commet selects the default price for the billing interval and still applies its market pricing. */
       priceId?: string;
       initialSeats?: Record<string, number>;
-      /** Payment provider for the initial checkout. Overrides country routing when present. */
-      provider?: "stripe" | "commet" | "dlocal";
+      /** Payment provider name or exact public payment connection ID for the initial checkout. Overrides country routing when present. */
+      provider?: "stripe" | "commet" | "dlocal" | string;
       name?: string;
       /** @format date-time */
       startDate?: string;
       successUrl?: string;
       offerId: string;
+      promoCode?: never;
+      customTrialDays?: never;
+      skipTrial?: false;
+      planCode: string;
+    }
+  | {
+      customerId: string;
+      billingInterval?:
+        | "weekly"
+        | "monthly"
+        | "quarterly"
+        | "yearly"
+        | "one_time"
+        | null;
+      /** Public price ID. When omitted, Commet selects the default price for the billing interval and still applies its market pricing. */
+      priceId?: string;
+      initialSeats?: Record<string, number>;
+      /** Payment provider name or exact public payment connection ID for the initial checkout. Overrides country routing when present. */
+      provider?: "stripe" | "commet" | "dlocal" | string;
+      name?: string;
+      /** @format date-time */
+      startDate?: string;
+      successUrl?: string;
+      offerId?: never;
+      /** Public card promotion ID. The offer is shown immediately and remains conditional on card eligibility until checkout confirmation. */
+      cardPromotionId: string;
+      promoCode?: never;
+      customTrialDays?: never;
+      skipTrial?: false;
+      planId: string;
+    }
+  | {
+      customerId: string;
+      billingInterval?:
+        | "weekly"
+        | "monthly"
+        | "quarterly"
+        | "yearly"
+        | "one_time"
+        | null;
+      /** Public price ID. When omitted, Commet selects the default price for the billing interval and still applies its market pricing. */
+      priceId?: string;
+      initialSeats?: Record<string, number>;
+      /** Payment provider name or exact public payment connection ID for the initial checkout. Overrides country routing when present. */
+      provider?: "stripe" | "commet" | "dlocal" | string;
+      name?: string;
+      /** @format date-time */
+      startDate?: string;
+      successUrl?: string;
+      offerId?: never;
+      /** Public card promotion ID. The offer is shown immediately and remains conditional on card eligibility until checkout confirmation. */
+      cardPromotionId: string;
       promoCode?: never;
       customTrialDays?: never;
       skipTrial?: false;
@@ -276,6 +339,28 @@ export class SubscriptionsResource {
     return this.httpClient.post(`/subscriptions/${id}/credits`, rest, options);
   }
 
+  /** Apply or replace a direct Offer on a subscription's pending payment checkout. The existing checkout URL remains unchanged. Offers whose first phase is a free trial cannot be applied after checkout creation. */
+  async applyOffer(
+    params: ApplySubscriptionOfferParams,
+    options?: RequestOptions,
+  ): Promise<Subscription> {
+    const { id, ...rest } = params;
+    return this.httpClient.put(`/subscriptions/${id}/offer`, rest, options);
+  }
+
+  /** Remove the quoted direct Offer from a subscription's pending payment checkout. The existing checkout URL remains unchanged and returns to its undiscounted price. */
+  async removeOffer(
+    params: RemoveSubscriptionOfferParams,
+    options?: RequestOptions,
+  ): Promise<Subscription> {
+    const { id } = params;
+    return this.httpClient.delete(
+      `/subscriptions/${id}/offer`,
+      undefined,
+      options,
+    );
+  }
+
   /** Creates a hosted checkout session for the customer to update the subscription's default payment method. */
   async updatePaymentMethod(
     params: UpdatePaymentMethodParams,
@@ -289,7 +374,7 @@ export class SubscriptionsResource {
     );
   }
 
-  /** Preview proration details for an immediate plan change without applying it. Interval direction takes precedence: a longer interval is immediate and a shorter interval is scheduled. When the interval is unchanged, a higher-sort-order plan is immediate and a lower-sort-order plan is scheduled. A paid-to-free change is always scheduled. Returns credit, charge, and net amount. The target plan must belong to the same plan group as the current plan, otherwise a 400 with code `plans_not_in_same_group` is returned. A change between two free plans has nothing to prorate and returns a zero-amount estimate. Scheduled changes return a 400 with code `plan_change_scheduled`; apply those via the change-plan endpoint. Pass offerId to quote the destination plan with an Offer. */
+  /** Preview proration details for an immediate plan change without applying it. Free-to-paid changes are never scheduled and the change-plan endpoint always returns hosted checkout for them. For paid plans, interval direction takes precedence: a longer interval is immediate and a shorter interval is scheduled. When the interval is unchanged, a higher-sort-order plan is immediate and a lower-sort-order plan is scheduled. A paid-to-free change is always scheduled. Returns credit, charge, and net amount. The target plan must belong to the same plan group as the current plan, otherwise a 400 with code `plans_not_in_same_group` is returned. A change between two free plans has nothing to prorate and returns a zero-amount estimate. Scheduled changes return a 400 with code `plan_change_scheduled`; apply those via the change-plan endpoint. Pass offerId to quote the destination plan with an Offer. */
   async previewChange(
     params: PreviewChangePlanParams,
     options?: RequestOptions,
@@ -367,7 +452,7 @@ export class SubscriptionsResource {
     return this.httpClient.get("/subscriptions", params, options);
   }
 
-  /** Create a subscription for a customer. Commet selects the default price when priceId is omitted and resolves its market from the customer's billing country. Without an offer override, Commet applies the price's automatic introductory Offer. Pass offerId to apply any active compatible Offer directly; the Offer does not need a prior plan-price association. */
+  /** Create a subscription for a customer. Commet selects the default price when priceId is omitted and resolves its market from the customer's billing country. Without an offer override, Commet applies the price's automatic introductory Offer. Pass offerId to apply an active compatible Offer directly, or cardPromotionId to preselect a card-eligible Promotional Offer for the initial checkout when card promotions are enabled for the organization. For the initial checkout, provider accepts either a processor name or an exact payment connection ID. */
   async create(
     params: CreateSubscriptionParams,
     options?: RequestOptions,

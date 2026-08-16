@@ -11,6 +11,7 @@
     "clean": "turbo clean && rm -rf node_modules .turbo",
     "format": "biome format --write .",
     "format:check": "biome format .",
+    "verify:packages": "node scripts/verify-package-artifacts.mjs",
     "changeset": "changeset",
     "changeset:add": "changeset add",
     "version-packages": "changeset version",

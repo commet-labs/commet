@@ -70,6 +70,18 @@ commet plans list      # List plans
 commet customers list  # List customers
 ```
 
+## Agent setup and diagnostics
+
+```bash
+commet agents setup
+commet agents setup --check --output agent
+commet doctor --output agent
+```
+
+`agents setup` manages only the delimited Commet block in `AGENTS.md` and preserves project-owned instructions. `doctor` reads the local installation, package compatibility, installed documentation, API version, and project mode without contacting Commet or changing files.
+
+Commet packages do not declare `preinstall`, `install`, or `postinstall` scripts. Agent setup is always an explicit command, except when `commet create` is already explicitly scaffolding a new project.
+
 ## Documentation
 
 Visit [commet.co/docs](https://commet.co/docs) for:

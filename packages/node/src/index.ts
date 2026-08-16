@@ -19,9 +19,12 @@ export type {
 } from "./resources/credit-packs";
 export type {
   BatchCreateCustomersParams,
+  CreateCustomerCreditParams,
   CreateCustomerParams,
   GetCustomerParams,
+  ListCustomerCreditsParams,
   ListCustomersParams,
+  RevokeCustomerCreditParams,
   UpdateCustomerParams,
 } from "./resources/customers";
 export type {
@@ -72,7 +75,6 @@ export type {
 } from "./resources/payments";
 export type {
   AddPayoutBankAccountParams,
-  CompletePayoutVerificationParams,
   RequestPayoutParams,
 } from "./resources/payouts";
 export type {
@@ -128,6 +130,7 @@ export type {
 export type {
   ActivateAddonParams,
   AdjustBalanceParams,
+  ApplySubscriptionOfferParams,
   CancelSubscriptionParams,
   ChangePlanParams,
   CreateSubscriptionParams,
@@ -139,6 +142,7 @@ export type {
   PreviewChangePlanParams,
   PurchaseCreditsParams,
   ReactivateSubscriptionParams,
+  RemoveSubscriptionOfferParams,
   TopupBalanceParams,
   UncancelSubscriptionParams,
   UpdatePaymentMethodParams,
@@ -164,6 +168,7 @@ export { Webhooks } from "./resources/webhooks";
 export type {
   ApiErrorDetail,
   CommetClientOptions,
+  CommetErrorContext,
   RequestOptions,
   ResolvedFeatureCode,
   ResolvedPlanCode,
@@ -213,6 +218,8 @@ export type {
   CreditPackListItem,
   Customer,
   CustomerBatch,
+  CustomerCredit,
+  CustomerCreditRevocation,
   DeletedObject,
   DeletedOffer,
   DeletedPlanRegionalPricing,
@@ -228,7 +235,6 @@ export type {
   PaymentMethodUpdateCheckout,
   Payout,
   PayoutBankAccount,
-  PayoutVerification,
   Plan,
   PlanChange,
   PlanFeature,
@@ -256,7 +262,7 @@ export type {
   SubscriptionOfferApplicationPhase,
   SubscriptionSummary,
   TestClock,
-  TestClockBilling,
+  TestClockRun,
   Transaction,
   TransactionListItem,
   TransactionRetry,

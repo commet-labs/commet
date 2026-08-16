@@ -104,17 +104,12 @@ describe("TestClock — wire behavior", () => {
         }),
       );
 
-      const result = await client().testClock.processBilling();
+      await client().testClock.processBilling();
 
       const { url, init } = lastCall();
       expect(url).toContain("/test-clock/process-billing");
       expect(init.method).toBe("POST");
-      // explicit empty object body — never undefined, never the previous params
       expect(init.body).toBe(JSON.stringify({}));
-      const data = result;
-      expect(data.customersFound).toBe(3);
-      expect(data.enqueued).toBe(3);
-      expect(data.failed).toBe(0);
     });
   });
 });

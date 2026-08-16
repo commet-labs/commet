@@ -1,5 +1,5 @@
 import type { RequestOptions } from "../types/common";
-import type { TestClock, TestClockBilling } from "../types/models";
+import type { TestClock, TestClockRun } from "../types/models";
 import type { CommetHTTPClient } from "../utils/http";
 
 export type AdvanceTestClockParams =
@@ -14,21 +14,24 @@ export type AdvanceTestClockParams =
 export class TestClockResource {
   constructor(private httpClient: CommetHTTPClient) {}
 
-  /** Discovers customers due for billing at the org's current (simulated) time and enqueues a billing cycle for each — renewals, expired trials, pending cancellations. Also fires any dunning retry whose scheduled time has passed. Enqueueing is asynchronous. Sandbox only. */
-  async processBilling(options?: RequestOptions): Promise<TestClockBilling> {
+  /**
+   * Deprecated. POST /test-clock now advances time and processes every due billing deadline in one durable run.
+   * @deprecated
+   */
+  async processBilling(options?: RequestOptions): Promise<void> {
     return this.httpClient.post("/test-clock/process-billing", {}, options);
   }
 
-  /** Returns the organization's current test clock state. Sandbox only. */
+  /** Returns the organization's current test clock state and latest durable run. Sandbox only. */
   async get(): Promise<TestClock> {
     return this.httpClient.get("/test-clock");
   }
 
-  /** Moves the test clock forward, by a number of days (advanceDays) or to an absolute instant (frozenTime). The clock can only move forward. Sandbox only. */
+  /** Starts a durable run that moves the test clock forward and processes every billing deadline due before the target time. Poll GET /test-clock for progress and terminal results. Sandbox only. */
   async advance(
     params?: AdvanceTestClockParams,
     options?: RequestOptions,
-  ): Promise<TestClock> {
+  ): Promise<TestClockRun> {
     return this.httpClient.post("/test-clock", params, options);
   }
 }

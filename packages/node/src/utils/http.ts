@@ -175,6 +175,17 @@ export class CommetHTTPClient {
 
       const requestStart = Date.now();
       const response = await fetch(url, requestConfig);
+      const requestId = response.headers.get("x-request-id") ?? undefined;
+      const idempotencyRetryableHeader = response.headers.get(
+        "x-commet-idempotency-retryable",
+      );
+      const responseContext = {
+        requestId,
+        retryable:
+          idempotencyRetryableHeader === null
+            ? undefined
+            : idempotencyRetryableHeader === "true",
+      };
 
       if (this.config.debug) {
         console.log(
@@ -206,6 +217,8 @@ export class CommetHTTPClient {
           response.status,
           "INVALID_JSON",
           { responseText },
+          undefined,
+          responseContext,
         );
       }
 
@@ -237,24 +250,17 @@ export class CommetHTTPClient {
           );
         }
 
-        const parsed =
-          typeof responseData === "object" && responseData !== null
-            ? (responseData as Record<string, unknown>)
-            : {};
-        const errorObj =
-          typeof parsed.error === "object" && parsed.error !== null
-            ? (parsed.error as Record<string, unknown>)
-            : {};
+        const errorObj = readObjectProperty(responseData, "error");
 
         const errorDetail: ApiErrorDetail = {
-          type: (errorObj.type as string) ?? "api_error",
-          code: (errorObj.code as string) ?? "unknown",
+          type: readStringProperty(errorObj, "type") ?? "api_error",
+          code: readStringProperty(errorObj, "code") ?? "unknown",
           message:
-            (errorObj.message as string) ??
+            readStringProperty(errorObj, "message") ??
             `Request failed with status ${response.status}`,
-          param: errorObj.param as string | undefined,
-          details: errorObj.details,
-          doc_url: errorObj.doc_url as string | undefined,
+          param: readStringProperty(errorObj, "param"),
+          details: Reflect.get(errorObj, "details"),
+          doc_url: readStringProperty(errorObj, "doc_url"),
         };
 
         if (
@@ -262,14 +268,20 @@ export class CommetHTTPClient {
           Array.isArray(errorDetail.details)
         ) {
           const errors: Record<string, string[]> = {};
-          for (const detail of errorDetail.details as Array<{
-            field: string;
-            message: string;
-          }>) {
-            if (!errors[detail.field]) errors[detail.field] = [];
-            errors[detail.field].push(detail.message);
+          for (const detail of errorDetail.details) {
+            const field = readStringProperty(detail, "field");
+            const message = readStringProperty(detail, "message");
+            if (!(field && message)) continue;
+            if (!errors[field]) errors[field] = [];
+            errors[field].push(message);
           }
-          throw new CommetValidationError(errorDetail.message, errors);
+          throw new CommetValidationError(
+            errorDetail.message,
+            errors,
+            response.status,
+            errorDetail,
+            responseContext,
+          );
         }
 
         throw new CommetAPIError(
@@ -278,6 +290,7 @@ export class CommetHTTPClient {
           errorDetail.code,
           errorDetail.details,
           errorDetail,
+          responseContext,
         );
       }
 
@@ -285,10 +298,9 @@ export class CommetHTTPClient {
         console.log("[Commet SDK] Response:", responseData);
       }
 
-      if (this.telemetryEnabled) {
+      if (this.telemetryEnabled && requestId) {
         this.lastRequestMetrics = {
-          requestId:
-            response.headers.get("x-request-id") ?? `req_${Date.now()}`,
+          requestId,
           durationMs: Date.now() - requestStart,
         };
       }
@@ -391,4 +403,21 @@ export class CommetHTTPClient {
   private sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
+}
+
+function readObjectProperty(value: unknown, property: string): object {
+  if (typeof value !== "object" || value === null) return {};
+  const propertyValue = Reflect.get(value, property);
+  return typeof propertyValue === "object" && propertyValue !== null
+    ? propertyValue
+    : {};
+}
+
+function readStringProperty(
+  value: unknown,
+  property: string,
+): string | undefined {
+  if (typeof value !== "object" || value === null) return undefined;
+  const propertyValue = Reflect.get(value, property);
+  return typeof propertyValue === "string" ? propertyValue : undefined;
 }

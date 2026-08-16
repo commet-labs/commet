@@ -3,8 +3,10 @@
 import chalk from "chalk";
 import { Command } from "commander";
 import packageJson from "../package.json" with { type: "json" };
+import { agentsCommand } from "./commands/agents";
 import { apiKeyCommand } from "./commands/api-key";
 import { createCommand } from "./commands/create";
+import { doctorCommand } from "./commands/doctor";
 import { linkCommand } from "./commands/link";
 import { listenCommand } from "./commands/listen";
 import { loginCommand } from "./commands/login";
@@ -60,6 +62,8 @@ Run commet <command> --help for detailed usage and examples.
   );
 
 program.addCommand(createCommand);
+program.addCommand(agentsCommand);
+program.addCommand(doctorCommand);
 program.addCommand(loginCommand);
 program.addCommand(logoutCommand);
 program.addCommand(linkCommand);
@@ -135,7 +139,7 @@ function printAgentInfo() {
   }
   if (authenticated && !projectConfig && !process.env.COMMET_API_KEY) {
     setup.push(
-      "No project linked. Run 'commet link --org <slug>' or 'commet orgs --json' to find organizations.",
+      "No project linked. Run 'commet link --org <slug>' or 'commet orgs --output agent' to find organizations.",
     );
   }
 
@@ -156,7 +160,7 @@ function printAgentInfo() {
       path: configPath?.split("/").pop() ?? null,
     },
     mcp: {
-      url: "https://commet.co/mcp",
+      url: "https://commet.co/mcp/v2",
       hint: "For full billing CRUD (plans, features, customers, subscriptions), connect to the MCP server. The organization behind your credentials determines sandbox vs live mode.",
     },
     auth: {
@@ -192,6 +196,17 @@ function printAgentInfo() {
       create: {
         description: "Scaffold a new Commet app from template",
         usage: "commet create [name] -t <template> --org <slug> -y",
+      },
+      agents: {
+        description:
+          "Install or verify version-matched instructions in AGENTS.md",
+        usage: "commet agents setup --output agent",
+        check: "commet agents setup --check --output agent",
+      },
+      doctor: {
+        description:
+          "Diagnose the local Commet installation without changing it",
+        usage: "commet doctor --output agent",
       },
       login: {
         description:
@@ -268,7 +283,9 @@ function printDefaultScreen() {
   }
 
   console.log(dim("\n  Setup"));
+  console.log(`    ${cmd("agents setup")}${dim("Install agent instructions")}`);
   console.log(`    ${cmd("create")}${dim("Scaffold a new Commet app")}`);
+  console.log(`    ${cmd("doctor")}${dim("Diagnose local integration")}`);
   console.log(`    ${cmd("login")}${dim("Authenticate")}`);
   console.log(`    ${cmd("logout")}${dim("Log out")}`);
 

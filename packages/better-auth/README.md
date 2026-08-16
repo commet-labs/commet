@@ -93,6 +93,8 @@ export const authClient = createAuthClient({
 });
 ```
 
+This package requires `@commet/node` >= 9.1.0 and < 10.0.0. Read the common API reference at `node_modules/@commet/node/docs/README.md`; this README remains the version-matched Better Auth integration guide.
+
 ## Note About Webhooks
 
 **Webhooks are completely optional in Commet.** Unlike some billing platforms where you need webhooks to keep state synchronized, with Commet you can always query the current state directly:

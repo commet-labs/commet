@@ -1,7 +1,50 @@
 import type { RequestOptions } from "../types/common";
 import type { Timezone } from "../types/enums";
-import type { Customer, CustomerBatch } from "../types/models";
+import type {
+  Customer,
+  CustomerBatch,
+  CustomerCredit,
+  CustomerCreditRevocation,
+} from "../types/models";
 import type { CommetHTTPClient } from "../utils/http";
+
+export interface RevokeCustomerCreditParams {
+  id: string;
+  creditId: string;
+}
+
+export interface ListCustomerCreditsParams {
+  id: string;
+}
+
+export interface CreateCustomerCreditParams {
+  id: string;
+  /** Amount in the currency's smallest unit. */
+  amount: number;
+  currency:
+    | "usd"
+    | "ars"
+    | "brl"
+    | "clp"
+    | "cop"
+    | "pen"
+    | "uyu"
+    | "pyg"
+    | "bob"
+    | "mxn"
+    | "cad"
+    | "eur"
+    | "jpy"
+    | "cny"
+    | "krw"
+    | "hkd"
+    | "sgd"
+    | "twd"
+    | "inr"
+    | "thb";
+  reason: string;
+  expiresAt?: string | null;
+}
 
 export interface GetCustomerParams {
   id: string;
@@ -75,6 +118,42 @@ export interface CreateCustomerParams {
 
 export class CustomersResource {
   constructor(private httpClient: CommetHTTPClient) {}
+
+  /** Revoke the unallocated remainder of a customer credit grant. Applied invoice history is unchanged. */
+  async revokeCredit(
+    params: RevokeCustomerCreditParams,
+    options?: RequestOptions,
+  ): Promise<CustomerCreditRevocation> {
+    const { id, creditId } = params;
+    return this.httpClient.post(
+      `/customers/${id}/credits/${creditId}/revoke`,
+      {},
+      options,
+    );
+  }
+
+  /** List currency-specific invoice credit grants and their remaining balances for a customer. */
+  async listCredits(
+    params: ListCustomerCreditsParams,
+    options?: RequestOptions,
+  ): Promise<{
+    object: "list";
+    data: Array<CustomerCredit>;
+    hasMore: boolean;
+    nextCursor?: string;
+  }> {
+    const { id } = params;
+    return this.httpClient.get(`/customers/${id}/credits`, undefined, options);
+  }
+
+  /** Grant monetary credit in one currency. Credit is applied FIFO before tax to eligible recurring invoices. */
+  async createCredit(
+    params: CreateCustomerCreditParams,
+    options?: RequestOptions,
+  ): Promise<CustomerCredit> {
+    const { id, ...rest } = params;
+    return this.httpClient.post(`/customers/${id}/credits`, rest, options);
+  }
 
   /** Retrieve a customer by their public ID, including subscription status and metadata. */
   async get(
