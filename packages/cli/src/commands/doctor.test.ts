@@ -64,12 +64,16 @@ test("doctor recognizes only executable Commet environment access", () => {
     export const doubleQuoted = "process.env.COMMET_API_KEY";
     export const singleQuoted = 'import.meta.env["COMMET_WEBHOOK_SECRET"]';
     export const template = \`process.env.COMMET_API_KEY\`;
+    export const matcher = /process.env.COMMET_API_KEY/;
+    export const jsxText = <code>process.env.COMMET_API_KEY</code>;
   `;
   assert.deepEqual(findRequiredEnvironmentVariables(textualExamples), []);
   assert.deepEqual(
     findRequiredEnvironmentVariables(`
       const apiKey = process.env.COMMET_API_KEY;
       const webhookSecret = import.meta.env["COMMET_WEBHOOK_SECRET"];
+      const authorization = \`Bearer \${process.env.COMMET_API_KEY}\`;
+      const jsxExpression = <code>{process.env.COMMET_API_KEY}</code>;
     `),
     ["COMMET_API_KEY", "COMMET_WEBHOOK_SECRET"],
   );

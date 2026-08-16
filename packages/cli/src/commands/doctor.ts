@@ -1,5 +1,6 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
+import { parse } from "@babel/parser";
 import chalk from "chalk";
 import { Command } from "commander";
 import { satisfies, valid } from "semver";
@@ -343,10 +344,13 @@ function inspectSourceConfiguration(projectRoot: string): SourceConfiguration {
       if (/\.(?:spec|test)\.[cm]?[jt]sx?$/.test(entry.name)) continue;
 
       const source = readFileSync(path, "utf8");
-      for (const variableName of findRequiredEnvironmentVariables(source)) {
+      for (const variableName of findRequiredEnvironmentVariables(
+        source,
+        entry.name,
+      )) {
         environmentVariables.add(variableName);
       }
-      const importSource = sanitizeSource(source, true);
+      const importSource = stripComments(source);
       for (const packageName of RECOGNIZED_INTEGRATION_PACKAGES) {
         const escapedPackageName = packageName.replace("/", "\\/");
         const importPattern = new RegExp(
@@ -368,28 +372,94 @@ function inspectSourceConfiguration(projectRoot: string): SourceConfiguration {
   };
 }
 
-export function findRequiredEnvironmentVariables(source: string): string[] {
-  const normalizedSource = source.replace(
-    /((?:process|import\.meta)\.env)\[\s*["']([A-Z_][A-Z0-9_]*)["']\s*\]/g,
-    "$1.$2",
-  );
-  const executableSource = sanitizeSource(normalizedSource, false);
+export function findRequiredEnvironmentVariables(
+  source: string,
+  fileName = "source.tsx",
+): string[] {
   const environmentVariables = new Set<string>();
-  for (const match of executableSource.matchAll(
-    /(?:process|import\.meta)\.env\.([A-Z_][A-Z0-9_]*)/g,
-  )) {
-    const variableName = match[1];
-    if (
-      variableName &&
-      REQUIRED_COMMET_ENVIRONMENT_VARIABLES.has(variableName)
-    ) {
-      environmentVariables.add(variableName);
-    }
+  let syntaxTree: unknown;
+  try {
+    syntaxTree = /\.[cm]?[jt]sx$/.test(fileName)
+      ? parse(source, {
+          sourceType: "unambiguous",
+          errorRecovery: true,
+          plugins: ["typescript", "jsx"],
+        })
+      : parse(source, {
+          sourceType: "unambiguous",
+          errorRecovery: true,
+          plugins: ["typescript"],
+        });
+  } catch {
+    return [];
   }
+
+  const visit = (value: unknown): void => {
+    if (Array.isArray(value)) {
+      for (const item of value) visit(item);
+      return;
+    }
+    if (typeof value !== "object" || value === null) return;
+    const type = Reflect.get(value, "type");
+    if (type === "MemberExpression" || type === "OptionalMemberExpression") {
+      const variableName = memberPropertyName(value);
+      if (
+        variableName &&
+        REQUIRED_COMMET_ENVIRONMENT_VARIABLES.has(variableName) &&
+        isEnvironmentObject(Reflect.get(value, "object"))
+      ) {
+        environmentVariables.add(variableName);
+      }
+    }
+    for (const child of Object.values(value)) visit(child);
+  };
+  visit(syntaxTree);
   return [...environmentVariables].sort();
 }
 
-function sanitizeSource(source: string, preserveStrings: boolean): string {
+function memberPropertyName(value: object): string | undefined {
+  const property = Reflect.get(value, "property");
+  if (typeof property !== "object" || property === null) return undefined;
+  const propertyType = Reflect.get(property, "type");
+  if (propertyType === "Identifier") {
+    const name = Reflect.get(property, "name");
+    return typeof name === "string" ? name : undefined;
+  }
+  if (propertyType === "StringLiteral") {
+    const stringValue = Reflect.get(property, "value");
+    return typeof stringValue === "string" ? stringValue : undefined;
+  }
+  return undefined;
+}
+
+function isEnvironmentObject(value: unknown): boolean {
+  if (typeof value !== "object" || value === null) return false;
+  const type = Reflect.get(value, "type");
+  if (type !== "MemberExpression" && type !== "OptionalMemberExpression") {
+    return false;
+  }
+  if (memberPropertyName(value) !== "env") return false;
+  const environmentOwner = Reflect.get(value, "object");
+  if (typeof environmentOwner !== "object" || environmentOwner === null) {
+    return false;
+  }
+  if (Reflect.get(environmentOwner, "type") === "Identifier") {
+    return Reflect.get(environmentOwner, "name") === "process";
+  }
+  if (Reflect.get(environmentOwner, "type") !== "MetaProperty") return false;
+  const meta = Reflect.get(environmentOwner, "meta");
+  const property = Reflect.get(environmentOwner, "property");
+  return (
+    typeof meta === "object" &&
+    meta !== null &&
+    Reflect.get(meta, "name") === "import" &&
+    typeof property === "object" &&
+    property !== null &&
+    Reflect.get(property, "name") === "meta"
+  );
+}
+
+function stripComments(source: string): string {
   let result = "";
   let state: "code" | "single" | "double" | "template" | "line" | "block" =
     "code";
@@ -420,7 +490,7 @@ function sanitizeSource(source: string, preserveStrings: boolean): string {
       continue;
     }
     if (state !== "code") {
-      result += preserveStrings || character === "\n" ? character : " ";
+      result += character;
       if (escaped) {
         escaped = false;
         continue;
@@ -452,7 +522,7 @@ function sanitizeSource(source: string, preserveStrings: boolean): string {
       continue;
     }
     if (character === "'" || character === '"' || character === "`") {
-      result += preserveStrings ? character : " ";
+      result += character;
       state =
         character === "'"
           ? "single"
