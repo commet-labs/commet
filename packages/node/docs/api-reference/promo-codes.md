@@ -58,7 +58,7 @@ List promo codes with cursor-based pagination.
 
 ### Returns
 
-`object`
+`{ object: "list"; data: Array<PromoCode>; hasMore: boolean; nextCursor?: string }`
 
 ## create
 

@@ -150,16 +150,4 @@ describe("Payouts — wire serialization", () => {
       expect(data.description).toBeNull();
     });
   });
-
-  describe("completeVerification", () => {
-    it("keeps the deprecated endpoint as an empty compatibility request", async () => {
-      vi.mocked(fetch).mockResolvedValueOnce(jsonResponse({ success: true }));
-
-      await client().payouts.completeVerification();
-
-      const { url, body } = lastRequest();
-      expect(url).toContain("/payouts/verification");
-      expect(body).toEqual({});
-    });
-  });
 });

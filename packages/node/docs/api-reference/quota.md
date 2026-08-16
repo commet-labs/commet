@@ -16,7 +16,7 @@ Get all quota allowances for a customer across every quota feature in their plan
 
 ### Returns
 
-`object`
+`{ object: "list"; data: Array<UsageQuota>; hasMore: boolean; nextCursor?: string }`
 
 ## remove
 

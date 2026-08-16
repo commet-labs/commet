@@ -4,7 +4,7 @@ API version: `2026-07-31`
 
 ## getUrl
 
-`commet.portal.getUrl(params?, options?)`
+`commet.portal.getUrl(params, options?)`
 
 `POST /portal/sessions` · operation `request-portal-access`
 

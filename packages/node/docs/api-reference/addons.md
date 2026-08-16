@@ -16,7 +16,7 @@ List all active add-ons for a customer's subscription.
 
 ### Returns
 
-`object`
+`{ object: "list"; data: Array<ActiveAddon>; hasMore: boolean; nextCursor?: string }`
 
 ## get
 
@@ -90,7 +90,7 @@ List all add-ons with cursor-based pagination.
 
 ### Returns
 
-`object`
+`{ object: "list"; data: Array<Addon>; hasMore: boolean; nextCursor?: string }`
 
 ## create
 

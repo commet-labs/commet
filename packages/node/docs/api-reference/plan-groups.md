@@ -132,7 +132,7 @@ List plan groups with cursor-based pagination.
 
 ### Returns
 
-`object`
+`{ object: "list"; data: Array<PlanGroup>; hasMore: boolean; nextCursor?: string }`
 
 ## create
 

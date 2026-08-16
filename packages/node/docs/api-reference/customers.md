@@ -37,7 +37,7 @@ List currency-specific invoice credit grants and their remaining balances for a 
 
 ### Returns
 
-`object`
+`{ object: "list"; data: Array<CustomerCredit>; hasMore: boolean; nextCursor?: string }`
 
 ## createCredit
 
@@ -96,7 +96,7 @@ Update a customer's name, external ID, or metadata.
 - `externalId` (`string`, optional)
 - `timezone` (`Timezone`, optional)
 - `metadata` (`Record<string, unknown>`, optional)
-- `address` (`object`, optional)
+- `address` (`{ line1: string; line2?: string; city: string; state?: string; postalCode: string; country: string; region?: string }`, optional)
 
 ### Request options
 
@@ -116,7 +116,7 @@ Create up to 100 customers in a single request.
 
 ### Parameters
 
-- `customers` (`Array<object>`, required)
+- `customers` (`Array<{ email: string; id?: string; externalId?: string; fullName?: string; taxDocument?: string; timezone?: Timezone; metadata?: Record<string, unknown>; address?: { line1: string; line2?: string; city: string; state?: string; postalCode: string; country: string; region?: string } }>`, required)
 
 ### Request options
 
@@ -142,7 +142,7 @@ List customers with cursor-based pagination.
 
 ### Returns
 
-`object`
+`{ object: "list"; data: Array<Customer>; hasMore: boolean; nextCursor?: string }`
 
 ## create
 
@@ -158,7 +158,7 @@ Create a new customer. Idempotent when customerId is provided.
 - `externalId` (`string`, optional)
 - `fullName` (`string`, optional)
 - `taxDocument` (`string`, optional)
-- `address` (`object`, optional)
+- `address` (`{ line1: string; line2?: string; city: string; state?: string; postalCode: string; country: string; region?: string }`, optional)
 - `addressId` (`string`, optional)
 - `email` (`string`, required)
 - `timezone` (`Timezone`, optional)

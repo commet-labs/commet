@@ -94,7 +94,7 @@ List webhook endpoints with cursor-based pagination.
 
 ### Returns
 
-`object`
+`{ object: "list"; data: Array<Webhook>; hasMore: boolean; nextCursor?: string }`
 
 ## create
 

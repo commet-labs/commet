@@ -13,7 +13,6 @@ try {
   if (error instanceof CommetAPIError) {
     console.error(error.code);
     console.error(error.requestId);
-    console.error(error.retryable);
     console.error(error.docUrl);
   }
 }
@@ -28,9 +27,8 @@ Error fields:
 - `param`: invalid request parameter when provided.
 - `details`: structured diagnostic data when provided.
 - `requestId`: exact `x-request-id` returned by Platform. It is absent if no server identifier was received and is never fabricated locally.
-- `retryable`: whether Platform explicitly marked the failed idempotent write as safe to retry.
 - `docUrl`: versioned Markdown reference for the error code.
 
 `JSON.stringify(error)` serializes the fields above without adding stack traces, credentials, request headers, or request bodies. It preserves API-provided `details` because they are part of the public diagnostic contract.
 
-Do not retry a write merely because its HTTP status is usually transient. Respect `retryable`, preserve the same idempotency key, and inspect the current resource state when the outcome is uncertain.
+Do not retry a write merely because its HTTP status is usually transient. Follow the version-matched retry guidance at `docUrl`, preserve the same idempotency key when a retry is permitted, and inspect the current resource state when the outcome is uncertain.

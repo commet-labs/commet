@@ -155,10 +155,11 @@ export function createResourceCommand(def: ResourceDef): Command {
 
         spinner?.succeed(`${def.name} ${actionName}`);
 
+        const serializedResult = result === undefined ? null : result;
         if (agentMode) {
-          console.log(JSON.stringify(result));
+          console.log(JSON.stringify(serializedResult));
         } else {
-          console.log(JSON.stringify(result, null, 2));
+          console.log(JSON.stringify(serializedResult, null, 2));
         }
       } catch (error) {
         if (error instanceof CommetValidationError) {
@@ -254,6 +255,10 @@ export function generateResourceSchema(
         usage: `commet ${def.name} ${actionName}`,
         description: actionDef.description,
         params,
+        requiredAlternatives:
+          actionDef.requiredAlternatives?.map((alternative) =>
+            alternative.map((sdkKey) => `--${toFlag(sdkKey)}`),
+          ) ?? [],
       };
     }
 

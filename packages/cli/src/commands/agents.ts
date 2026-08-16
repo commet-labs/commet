@@ -47,21 +47,13 @@ export function updateManagedAgentRules(
   existingContent: string,
   managedBlock: string,
 ): { content: string; status: "created" | "updated" | "unchanged" } {
-  const begin = existingContent.indexOf(AGENT_RULES_BEGIN);
-  const end = existingContent.indexOf(AGENT_RULES_END);
-  if ((begin === -1) !== (end === -1)) {
-    throw new Error("AGENTS.md contains an incomplete Commet managed block");
-  }
-  if (begin === -1) {
+  const existingBlock = findManagedAgentRules(existingContent);
+  if (!existingBlock) {
     const prefix =
       existingContent.length > 0 ? `${existingContent.trimEnd()}\n\n` : "";
     return { content: `${prefix}${managedBlock}\n`, status: "created" };
   }
-  if (end < begin) {
-    throw new Error("AGENTS.md contains an invalid Commet managed block");
-  }
-  const blockEnd = end + AGENT_RULES_END.length;
-  const content = `${existingContent.slice(0, begin)}${managedBlock}${existingContent.slice(blockEnd)}`;
+  const content = `${existingContent.slice(0, existingBlock.begin)}${managedBlock}${existingContent.slice(existingBlock.end)}`;
   return {
     content,
     status: content === existingContent ? "unchanged" : "updated",
@@ -69,18 +61,31 @@ export function updateManagedAgentRules(
 }
 
 export function removeManagedAgentRules(existingContent: string): string {
-  const begin = existingContent.indexOf(AGENT_RULES_BEGIN);
-  const end = existingContent.indexOf(AGENT_RULES_END);
-  if (begin === -1 && end === -1) return existingContent;
-  if (begin === -1 || end < begin) {
-    throw new Error("AGENTS.md contains an invalid Commet managed block");
-  }
-  const blockEnd = end + AGENT_RULES_END.length;
-  const before = existingContent.slice(0, begin).trimEnd();
-  const after = existingContent.slice(blockEnd).trimStart();
+  const existingBlock = findManagedAgentRules(existingContent);
+  if (!existingBlock) return existingContent;
+  const before = existingContent.slice(0, existingBlock.begin).trimEnd();
+  const after = existingContent.slice(existingBlock.end).trimStart();
   if (before && after) return `${before}\n\n${after}`;
   if (before) return `${before}\n`;
   return after;
+}
+
+function findManagedAgentRules(
+  content: string,
+): { begin: number; end: number } | undefined {
+  const begin = content.indexOf(AGENT_RULES_BEGIN);
+  const end = content.indexOf(AGENT_RULES_END);
+  if (begin === -1 && end === -1) return undefined;
+  if (
+    begin === -1 ||
+    end < begin ||
+    content.indexOf(AGENT_RULES_BEGIN, begin + AGENT_RULES_BEGIN.length) !==
+      -1 ||
+    content.indexOf(AGENT_RULES_END, end + AGENT_RULES_END.length) !== -1
+  ) {
+    throw new Error("AGENTS.md contains an invalid Commet managed block");
+  }
+  return { begin, end: end + AGENT_RULES_END.length };
 }
 
 export function setupAgentRules(
@@ -93,17 +98,6 @@ export function setupAgentRules(
     ? readFileSync(agentsPath, "utf8")
     : "";
   const packages = findCommetPackages(projectRoot);
-  if (packages.length === 0) {
-    throw new Error(`No Commet packages found in ${projectRoot}`);
-  }
-  const packageDocs = packages.map((packageInfo) => ({
-    name: packageInfo.name,
-    documentation: packageInfo.documentationPath
-      ? relative(projectRoot, packageInfo.documentationPath)
-      : packageInfo.name === "@commet/node"
-        ? "node_modules/@commet/node/docs/README.md"
-        : `node_modules/${packageInfo.name}/README.md`,
-  }));
 
   if (options.remove) {
     const content = removeManagedAgentRules(existingContent);
@@ -117,15 +111,25 @@ export function setupAgentRules(
     };
   }
 
+  if (packages.length === 0) {
+    throw new Error(`No Commet packages found in ${projectRoot}`);
+  }
+  const packageDocs = packages.map((packageInfo) => ({
+    name: packageInfo.name,
+    documentation: packageInfo.documentationPath
+      ? relative(projectRoot, packageInfo.documentationPath)
+      : packageInfo.name === "@commet/node"
+        ? "node_modules/@commet/node/docs/README.md"
+        : `node_modules/${packageInfo.name}/README.md`,
+  }));
+
   const managedBlock = renderAgentRules(packageDocs);
   const update = updateManagedAgentRules(existingContent, managedBlock);
-  const status =
-    options.check && update.status !== "unchanged" ? "missing" : update.status;
   if (!(options.check || options.dryRun) && update.status !== "unchanged") {
     writeFileSync(agentsPath, update.content);
   }
   return {
-    status,
+    status: update.status,
     path: agentsPath,
     packages: packages.map(({ name }) => name),
   };
@@ -158,7 +162,7 @@ const setupCommand = new Command("setup")
         console.log(chalk.green(`✓ ${path} is current`));
       } else if (result.status === "removed") {
         console.log(chalk.green(`✓ Removed Commet instructions from ${path}`));
-      } else if (result.status === "missing" && options.check) {
+      } else if (options.check) {
         console.log(chalk.yellow(`⚠ ${path} needs Commet instructions`));
       } else {
         const verb = options.dryRun ? "Would update" : "Updated";

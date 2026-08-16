@@ -34,7 +34,7 @@ Returns the organization's current test clock state and latest durable run. Sand
 
 ## advance
 
-`commet.testClock.advance(params?, options?)`
+`commet.testClock.advance(params, options?)`
 
 `POST /test-clock` · operation `advance-test-clock`
 

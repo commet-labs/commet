@@ -1,14 +1,10 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
 import test from "node:test";
 import {
   AGENT_RULES_BEGIN,
   AGENT_RULES_END,
   removeManagedAgentRules,
   renderAgentRules,
-  setupAgentRules,
   updateManagedAgentRules,
 } from "./agents";
 
@@ -47,46 +43,16 @@ test("removing managed rules leaves project-owned content intact", () => {
   );
 });
 
-test("setup is detectable, idempotent, dry-run safe, and reversible", () => {
-  const projectRoot = mkdtempSync(join(tmpdir(), "commet-agents-"));
-  const agentsPath = join(projectRoot, "AGENTS.md");
-  try {
-    writeFileSync(
-      join(projectRoot, "package.json"),
-      JSON.stringify({ dependencies: { "@commet/node": "^9.1.0" } }),
-    );
-    writeFileSync(agentsPath, "# Project\n\nKeep this rule.\n");
+test("duplicate managed blocks are rejected", () => {
+  const block = renderAgentRules([
+    {
+      name: "@commet/node",
+      documentation: "node_modules/@commet/node/docs/README.md",
+    },
+  ]);
 
-    assert.equal(
-      setupAgentRules(projectRoot, { dryRun: true }).status,
-      "created",
-    );
-    assert.equal(
-      readFileSync(agentsPath, "utf8"),
-      "# Project\n\nKeep this rule.\n",
-    );
-
-    assert.equal(setupAgentRules(projectRoot).status, "created");
-    assert.equal(setupAgentRules(projectRoot).status, "unchanged");
-    assert.equal(
-      setupAgentRules(projectRoot, { check: true }).status,
-      "unchanged",
-    );
-    assert.equal(
-      setupAgentRules(projectRoot, { remove: true, dryRun: true }).status,
-      "removed",
-    );
-    assert.match(readFileSync(agentsPath, "utf8"), /commet-agent-rules/);
-
-    assert.equal(
-      setupAgentRules(projectRoot, { remove: true }).status,
-      "removed",
-    );
-    assert.equal(
-      readFileSync(agentsPath, "utf8"),
-      "# Project\n\nKeep this rule.\n",
-    );
-  } finally {
-    rmSync(projectRoot, { recursive: true, force: true });
-  }
+  assert.throws(
+    () => updateManagedAgentRules(`${block}\n\n${block}\n`, block),
+    /invalid Commet managed block/,
+  );
 });

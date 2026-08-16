@@ -33,7 +33,7 @@ List API keys with cursor-based pagination. Keys are returned without the full s
 
 ### Returns
 
-`object`
+`{ object: "list"; data: Array<ApiKey>; hasMore: boolean; nextCursor?: string }`
 
 ## create
 

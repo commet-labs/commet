@@ -97,7 +97,7 @@ List invoices with cursor-based pagination. Filter by customer, status, or subsc
 
 ### Returns
 
-`object`
+`{ object: "list"; data: Array<InvoiceListItem>; hasMore: boolean; nextCursor?: string }`
 
 ## createAdjustment
 

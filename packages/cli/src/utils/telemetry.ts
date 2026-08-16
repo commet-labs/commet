@@ -59,9 +59,14 @@ export function getUserAgent(): string {
 
 function isTelemetryDisabled(): boolean {
   return (
+    isLocalOnlyCommand() ||
     process.env.COMMET_TELEMETRY_DISABLED === "1" ||
     process.env.DO_NOT_TRACK === "1"
   );
+}
+
+function isLocalOnlyCommand(): boolean {
+  return process.argv[2] === "doctor" || process.argv[2] === "agents";
 }
 
 function resolveOrgId(): string | null {

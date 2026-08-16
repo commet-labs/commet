@@ -67,7 +67,7 @@ List reusable country groups that resolve market-specific prices independently f
 
 ### Returns
 
-`object`
+`{ object: "list"; data: Array<Market>; hasMore: boolean; nextCursor?: string }`
 
 ## create
 

@@ -53,7 +53,7 @@ List all active credit packs.
 
 ### Returns
 
-`object`
+`{ object: "list"; data: Array<CreditPackListItem>; hasMore: boolean; nextCursor?: string }`
 
 ## create
 

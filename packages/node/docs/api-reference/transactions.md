@@ -75,4 +75,4 @@ List payment transactions with cursor-based pagination. Filter by status or cust
 
 ### Returns
 
-`object`
+`{ object: "list"; data: Array<TransactionListItem>; hasMore: boolean; nextCursor?: string }`

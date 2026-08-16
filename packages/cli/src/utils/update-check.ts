@@ -37,8 +37,10 @@ function writeCache(cache: UpdateCache): void {
 }
 
 function shouldSkip(): boolean {
+  const command = process.argv[2];
   if (process.env.COMMET_NO_UPDATE_CHECK === "1") return true;
   if (process.env.CI) return true;
+  if (command === "doctor" || command === "agents") return true;
   const idx = process.argv.indexOf("--output");
   if (idx !== -1 && process.argv[idx + 1] === "agent") return true;
   return false;

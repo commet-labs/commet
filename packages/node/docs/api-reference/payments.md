@@ -78,7 +78,7 @@ List payments with cursor-based pagination. Filter by customer.
 
 ### Returns
 
-`object`
+`{ object: "list"; data: Array<Payment>; hasMore: boolean; nextCursor?: string }`
 
 ## create
 

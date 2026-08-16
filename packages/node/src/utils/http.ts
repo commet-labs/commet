@@ -1,6 +1,7 @@
 import type {
   ApiErrorDetail,
   CommetClientOptions,
+  CommetErrorContext,
   RequestOptions,
 } from "../types/common";
 import { CommetAPIError, CommetValidationError } from "../types/common";
@@ -175,17 +176,7 @@ export class CommetHTTPClient {
 
       const requestStart = Date.now();
       const response = await fetch(url, requestConfig);
-      const requestId = response.headers.get("x-request-id") ?? undefined;
-      const idempotencyRetryableHeader = response.headers.get(
-        "x-commet-idempotency-retryable",
-      );
-      const responseContext = {
-        requestId,
-        retryable:
-          idempotencyRetryableHeader === null
-            ? undefined
-            : idempotencyRetryableHeader === "true",
-      };
+      const responseContext = readResponseContext(response.headers);
 
       if (this.config.debug) {
         console.log(
@@ -298,9 +289,9 @@ export class CommetHTTPClient {
         console.log("[Commet SDK] Response:", responseData);
       }
 
-      if (this.telemetryEnabled && requestId) {
+      if (this.telemetryEnabled && responseContext.requestId) {
         this.lastRequestMetrics = {
-          requestId,
+          requestId: responseContext.requestId,
           durationMs: Date.now() - requestStart,
         };
       }
@@ -403,6 +394,12 @@ export class CommetHTTPClient {
   private sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
+}
+
+export function readResponseContext(
+  headers: Headers,
+): Pick<CommetErrorContext, "requestId"> {
+  return { requestId: headers.get("x-request-id") ?? undefined };
 }
 
 function readObjectProperty(value: unknown, property: string): object {

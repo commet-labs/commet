@@ -20,7 +20,6 @@ export interface CommetErrorContext {
   type?: string;
   param?: string;
   requestId?: string;
-  retryable?: boolean;
   docUrl?: string;
 }
 
@@ -28,7 +27,6 @@ export class CommetError extends Error {
   public type?: string;
   public param?: string;
   public requestId?: string;
-  public retryable?: boolean;
   public docUrl?: string;
 
   constructor(
@@ -43,7 +41,6 @@ export class CommetError extends Error {
     this.type = context?.type;
     this.param = context?.param;
     this.requestId = context?.requestId;
-    this.retryable = context?.retryable;
     this.docUrl = context?.docUrl;
   }
 
@@ -57,7 +54,6 @@ export class CommetError extends Error {
       param: this.param,
       details: this.details,
       requestId: this.requestId,
-      retryable: this.retryable,
       docUrl: this.docUrl,
     };
   }
@@ -70,13 +66,12 @@ export class CommetAPIError extends CommetError {
     code?: string,
     details?: unknown,
     errorDetail?: ApiErrorDetail,
-    responseContext?: Pick<CommetErrorContext, "requestId" | "retryable">,
+    responseContext?: Pick<CommetErrorContext, "requestId">,
   ) {
     super(message, code, statusCode, details, {
       type: errorDetail?.type,
       param: errorDetail?.param,
       requestId: responseContext?.requestId,
-      retryable: responseContext?.retryable,
       docUrl: errorDetail?.doc_url,
     });
     this.name = "CommetAPIError";
@@ -89,7 +84,7 @@ export class CommetValidationError extends CommetAPIError {
     public validationErrors: Record<string, string[]>,
     statusCode = 422,
     errorDetail?: ApiErrorDetail,
-    responseContext?: Pick<CommetErrorContext, "requestId" | "retryable">,
+    responseContext?: Pick<CommetErrorContext, "requestId">,
   ) {
     super(
       message,

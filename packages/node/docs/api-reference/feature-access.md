@@ -33,4 +33,4 @@ List a customer's feature access and current usage.
 
 ### Returns
 
-`object`
+`{ object: "list"; data: Array<FeatureAccess>; hasMore: boolean; nextCursor?: string }`

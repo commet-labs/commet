@@ -58,7 +58,7 @@ describe("Error classes", () => {
           doc_url:
             "https://commet.co/docs/api-reference/2026-07-31/errors/customer_not_found.md",
         },
-        { requestId: "req_server_123", retryable: false },
+        { requestId: "req_server_123" },
       );
 
       expect(error.toJSON()).toEqual({
@@ -70,7 +70,6 @@ describe("Error classes", () => {
         param: "customerId",
         details: { customerId: "cus_missing" },
         requestId: "req_server_123",
-        retryable: false,
         docUrl:
           "https://commet.co/docs/api-reference/2026-07-31/errors/customer_not_found.md",
       });

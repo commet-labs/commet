@@ -54,7 +54,7 @@ Set all seat types at once.
 
 ### Returns
 
-`object`
+`{ object: "list"; data: Array<SeatEvent>; hasMore: boolean; nextCursor?: string }`
 
 ## remove
 

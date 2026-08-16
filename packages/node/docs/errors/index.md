@@ -1,0 +1,89 @@
+# API error reference
+
+Generated from Commet API version `2026-07-31`.
+
+Use the response `code` to open the matching local reference. Preserve `x-request-id` when reporting or investigating an error.
+
+- [`validation_error`](./validation_error.md) — The request failed validation. The response message, param, and details identify the invalid field, value, or field combination.
+- [`invalid_json`](./invalid_json.md) — The request body is not valid JSON.
+- [`unauthorized`](./unauthorized.md) — The request does not contain a valid Commet API key.
+- [`forbidden`](./forbidden.md) — The caller is authenticated but cannot perform this operation in the current organization or state.
+- [`sandbox_only`](./sandbox_only.md) — This operation is available only to sandbox organizations.
+- [`payouts_not_available_in_sandbox`](./payouts_not_available_in_sandbox.md) — Payout operations are not available in sandbox mode.
+- [`not_found`](./not_found.md) — The requested endpoint or resource could not be found in the current organization, mode, or API version.
+- [`customer_not_found`](./customer_not_found.md) — The requested customer does not exist in this organization.
+- [`feature_not_found`](./feature_not_found.md) — The requested feature, seat feature, or quota feature does not exist in this organization.
+- [`plan_not_found`](./plan_not_found.md) — The requested plan does not exist or is not available in this organization.
+- [`subscription_not_found`](./subscription_not_found.md) — The requested subscription does not exist in this organization.
+- [`no_active_subscription`](./no_active_subscription.md) — The customer has no subscription that is active for this operation.
+- [`no_prices_configured`](./no_prices_configured.md) — The selected plan has no price available for the request.
+- [`already_has_active_subscription`](./already_has_active_subscription.md) — The customer already has a draft, trialing, active, or past-due subscription that blocks creating another subscription.
+- [`subscription_not_active`](./subscription_not_active.md) — The subscription status does not permit the requested operation.
+- [`subscription_has_open_dispute`](./subscription_has_open_dispute.md) — The subscription has an unresolved payment dispute that blocks the requested billing change.
+- [`subscription_required`](./subscription_required.md) — The requested operation requires a chargeable subscription.
+- [`provider_unsupported`](./provider_unsupported.md) — The configured payment connection does not support the requested operation.
+- [`no_payment_method`](./no_payment_method.md) — The subscription has no reusable payment method for this operation.
+- [`duplicate`](./duplicate.md) — The request conflicts with an existing resource, unique value, or previously recorded event.
+- [`already_scheduled`](./already_scheduled.md) — The requested subscription action is already scheduled.
+- [`feature_not_in_plan`](./feature_not_in_plan.md) — The requested feature is not included in the customer's plan or subscription.
+- [`feature_disabled`](./feature_disabled.md) — The requested feature is disabled for the customer's subscription.
+- [`insufficient_balance`](./insufficient_balance.md) — The operation cannot be charged against the available balance, or the required regional overage price is missing.
+- [`insufficient_credits`](./insufficient_credits.md) — The subscription does not have enough credits for the usage event.
+- [`insufficient_seats`](./insufficient_seats.md) — The requested seat removal exceeds the subscription's available seat balance.
+- [`included_limit_reached`](./included_limit_reached.md) — The requested usage exceeds the plan's included usage limit.
+- [`missing_regional_price`](./missing_regional_price.md) — The plan has no price for the subscription's currency or resolved market.
+- [`payment_failed`](./payment_failed.md) — The operation could not complete its payment or required tax calculation.
+- [`payment_not_found`](./payment_not_found.md) — The requested payment does not exist in this organization.
+- [`payment_method_not_found`](./payment_method_not_found.md) — The requested or required payment method could not be found.
+- [`payment_not_cancelable`](./payment_not_cancelable.md) — The payment's current state does not allow cancellation.
+- [`invalid_subscription_status`](./invalid_subscription_status.md) — The subscription's current status is incompatible with the requested operation.
+- [`one_time_subscription_not_cancelable`](./one_time_subscription_not_cancelable.md) — A one-time subscription cannot be canceled as a recurring subscription.
+- [`not_scheduled_for_cancellation`](./not_scheduled_for_cancellation.md) — The subscription has no scheduled cancellation to remove.
+- [`subscription_already_canceled`](./subscription_already_canceled.md) — The subscription is already canceled.
+- [`subscription_creation_failed`](./subscription_creation_failed.md) — Platform could not complete subscription creation.
+- [`subscription_activation_failed`](./subscription_activation_failed.md) — The subscription was created or saved, but its initial activation or checkout could not be completed.
+- [`subscription_cancel_failed`](./subscription_cancel_failed.md) — Platform could not complete subscription cancellation.
+- [`subscription_uncancel_failed`](./subscription_uncancel_failed.md) — Platform could not remove the subscription's scheduled cancellation.
+- [`plan_unavailable`](./plan_unavailable.md) — The subscription's plan is no longer available for this operation.
+- [`no_outstanding_invoice`](./no_outstanding_invoice.md) — The subscription has no outstanding invoice to charge or recover.
+- [`charge_in_progress`](./charge_in_progress.md) — A charge or payment retry is already running for the subscription.
+- [`charge_failed`](./charge_failed.md) — The charge required by the subscription operation failed.
+- [`idempotency_key_mismatch`](./idempotency_key_mismatch.md) — The Idempotency-Key was already used with a different request payload or operation.
+- [`idempotency_in_progress`](./idempotency_in_progress.md) — A request with this Idempotency-Key is still being processed.
+- [`idempotency_unavailable`](./idempotency_unavailable.md) — Platform could not safely establish, release, or persist the idempotent response for this operation.
+- [`seat_limit_exceeded`](./seat_limit_exceeded.md) — The requested plan change would exceed the available seat limit.
+- [`no_change_requested`](./no_change_requested.md) — The request would not change the current subscription state.
+- [`plans_not_in_same_group`](./plans_not_in_same_group.md) — The current and target plans do not belong to the same plan group.
+- [`free_plan_change_not_supported`](./free_plan_change_not_supported.md) — This plan-change operation does not support the selected free plan.
+- [`plan_change_scheduled`](./plan_change_scheduled.md) — The requested plan change takes effect at the end of the current billing period instead of being prorated immediately.
+- [`addon_not_found`](./addon_not_found.md) — The requested add-on does not exist in this organization.
+- [`addon_already_active`](./addon_already_active.md) — The add-on is already active on this subscription.
+- [`addon_not_active`](./addon_not_active.md) — The add-on is not active on this subscription.
+- [`addon_has_activations`](./addon_has_activations.md) — The add-on cannot be deleted while subscriptions use it.
+- [`feature_already_exists`](./feature_already_exists.md) — A feature with the same code or name already exists, or the feature is already assigned where uniqueness is required.
+- [`feature_in_use`](./feature_in_use.md) — The feature cannot be deleted while a plan or add-on uses it.
+- [`model_not_found`](./model_not_found.md) — The requested AI model does not exist in the current model catalog.
+- [`pricing_mode_mismatch`](./pricing_mode_mismatch.md) — The submitted usage shape does not match the feature's configured pricing mode.
+- [`credit_pack_not_found`](./credit_pack_not_found.md) — The requested credit pack does not exist in this organization.
+- [`plan_group_not_found`](./plan_group_not_found.md) — The requested plan group does not exist in this organization.
+- [`offer_not_found`](./offer_not_found.md) — The requested offer does not exist or is not compatible with the selected operation.
+- [`offer_not_applicable`](./offer_not_applicable.md) — The selected offer does not satisfy the eligibility or lifecycle conditions for this operation.
+- [`card_promotions_not_available`](./card_promotions_not_available.md) — Card promotions are not available for this organization.
+- [`promo_code_not_found`](./promo_code_not_found.md) — The requested promo code does not exist in this organization.
+- [`promo_code_expired`](./promo_code_expired.md) — The promo code is no longer within its valid redemption period.
+- [`webhook_not_found`](./webhook_not_found.md) — The requested webhook endpoint does not exist in this organization.
+- [`api_key_not_found`](./api_key_not_found.md) — The requested API key does not exist in this organization.
+- [`invoice_not_found`](./invoice_not_found.md) — The requested invoice does not exist in this organization.
+- [`transaction_not_found`](./transaction_not_found.md) — The requested transaction does not exist in this organization.
+- [`price_not_found`](./price_not_found.md) — The requested price does not exist on the selected plan or no price matches the operation.
+- [`price_in_use`](./price_in_use.md) — The price cannot be removed or changed while it is in use.
+- [`market_not_found`](./market_not_found.md) — The requested market does not exist in this organization.
+- [`market_in_use`](./market_in_use.md) — The market cannot be deleted while a price or subscription uses it.
+- [`market_group_not_found`](./market_group_not_found.md) — The requested market group does not exist in this organization.
+- [`market_group_in_use`](./market_group_in_use.md) — The market group cannot be deleted while a price or subscription uses it.
+- [`endpoint_not_available`](./endpoint_not_available.md) — This endpoint is not available in the resolved API version.
+- [`endpoint_deprecated`](./endpoint_deprecated.md) — The endpoint has been retired and returns HTTP 410 Gone.
+- [`organization_already_claimed`](./organization_already_claimed.md) — The organization has already completed its claim flow.
+- [`claim_not_pending`](./claim_not_pending.md) — The organization has no pending claim to complete.
+- [`rate_limited`](./rate_limited.md) — The caller exceeded the request allowance for the current window.
+- [`internal_error`](./internal_error.md) — Platform could not complete the operation because an internal execution path or dependency failed.

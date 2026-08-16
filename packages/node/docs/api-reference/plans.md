@@ -17,7 +17,7 @@ Update limits, overage, or enabled status of a feature on a plan.
 - `enabled` (`boolean`, optional)
 - `includedAmount` (`number`, optional)
 - `unlimited` (`boolean`, optional)
-- `overage` (`object`, optional)
+- `overage` (`{ enabled?: boolean; unitPrice?: number }`, optional)
 - `creditsPerUnit` (`number | null`, optional)
 
 ### Request options
@@ -60,7 +60,7 @@ Attach a feature to a plan with limits, overage, and credits configuration.
 - `enabled` (`boolean`, optional)
 - `includedAmount` (`number`, optional)
 - `unlimited` (`boolean`, optional)
-- `overage` (`object`, optional)
+- `overage` (`{ enabled?: boolean; unitPrice?: number }`, optional)
 - `creditsPerUnit` (`number | null`, optional)
 - `pricingMode` (`"fixed" | "ai_model"`, optional)
 - `margin` (`number | null`, optional)
@@ -106,7 +106,7 @@ Create or update regional currency price overrides for a plan price.
 
 - `id` (`string`, required)
 - `priceId` (`string`, required)
-- `overrides` (`Array<object>`, required)
+- `overrides` (`Array<{ currency: string; price: number; includedBalance?: number }>`, required)
 
 ### Request options
 
@@ -151,7 +151,7 @@ Update a base price or market price variant. Removing a base market override is 
 - `includedBalance` (`number | null`, optional)
 - `includedCredits` (`number | null`, optional)
 - `metadata` (`Record<string, unknown>`, optional) — Metadata keys to merge into the existing price metadata.
-- `marketPrices` (`Array<object>`, optional)
+- `marketPrices` (`Array<{ marketGroupId: string; currency: "usd" | "ars" | "brl" | "clp" | "cop" | "pen" | "uyu" | "pyg" | "bob" | "mxn" | "cad" | "eur" | "jpy" | "cny" | "krw" | "hkd" | "sgd" | "twd" | "inr" | "thb"; price: number }>`, optional)
 
 ### Request options
 
@@ -196,7 +196,7 @@ Add a base price or a selectable market price variant. Variants inherit their ba
 - `isDefault` (`boolean`, optional)
 - `includedBalance` (`number | null`, optional)
 - `includedCredits` (`number | null`, optional)
-- `marketPrices` (`Array<object>`, optional)
+- `marketPrices` (`Array<{ marketGroupId: string; currency: "usd" | "ars" | "brl" | "clp" | "cop" | "pen" | "uyu" | "pyg" | "bob" | "mxn" | "cad" | "eur" | "jpy" | "cny" | "krw" | "hkd" | "sgd" | "twd" | "inr" | "thb"; price: number }>`, optional)
 - `inheritsFromPriceId` (`string`, optional)
 
 ### Valid parameter combinations
@@ -225,8 +225,8 @@ Configure regional prices and feature overage values for one currency. Currency-
 - `id` (`string`, required)
 - `currency` (`"usd" | "ars" | "brl" | "clp" | "cop" | "pen" | "uyu" | "pyg" | "bob" | "mxn" | "cad" | "eur" | "jpy" | "cny" | "krw" | "hkd" | "sgd" | "twd" | "inr" | "thb"`, required)
 - `exchangeRate` (`number`, required)
-- `prices` (`Array<object>`, optional)
-- `features` (`Array<object>`, optional)
+- `prices` (`Array<{ priceId: string; price: number; includedBalance?: number }>`, optional)
+- `features` (`Array<{ featureId: string; overageUnitPrice: number }>`, optional)
 
 ### Request options
 
@@ -327,7 +327,7 @@ List plans with public price IDs and their automatic introductory offer IDs.
 
 ### Returns
 
-`object`
+`{ object: "list"; data: Array<Plan>; hasMore: boolean; nextCursor?: string }`
 
 ## create
 

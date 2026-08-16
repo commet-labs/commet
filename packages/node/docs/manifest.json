@@ -6,7 +6,512 @@
   "gettingStarted": "getting-started.md",
   "errors": "errors.md",
   "apiReference": "api-reference/index.md",
+  "schemas": "schemas.md",
   "webhooks": "webhooks.md",
+  "errorReferences": {
+    "index": "errors/index.md",
+    "count": 83,
+    "entries": [
+      {
+        "code": "validation_error",
+        "type": "validation_error",
+        "documentation": "errors/validation_error.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/validation_error.md"
+      },
+      {
+        "code": "invalid_json",
+        "type": "validation_error",
+        "documentation": "errors/invalid_json.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/invalid_json.md"
+      },
+      {
+        "code": "unauthorized",
+        "type": "authentication_error",
+        "documentation": "errors/unauthorized.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/unauthorized.md"
+      },
+      {
+        "code": "forbidden",
+        "type": "authentication_error",
+        "documentation": "errors/forbidden.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/forbidden.md"
+      },
+      {
+        "code": "sandbox_only",
+        "type": "authentication_error",
+        "documentation": "errors/sandbox_only.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/sandbox_only.md"
+      },
+      {
+        "code": "payouts_not_available_in_sandbox",
+        "type": "authentication_error",
+        "documentation": "errors/payouts_not_available_in_sandbox.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/payouts_not_available_in_sandbox.md"
+      },
+      {
+        "code": "not_found",
+        "type": "not_found_error",
+        "documentation": "errors/not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/not_found.md"
+      },
+      {
+        "code": "customer_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/customer_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/customer_not_found.md"
+      },
+      {
+        "code": "feature_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/feature_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/feature_not_found.md"
+      },
+      {
+        "code": "plan_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/plan_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/plan_not_found.md"
+      },
+      {
+        "code": "subscription_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/subscription_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/subscription_not_found.md"
+      },
+      {
+        "code": "no_active_subscription",
+        "type": "not_found_error",
+        "documentation": "errors/no_active_subscription.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/no_active_subscription.md"
+      },
+      {
+        "code": "no_prices_configured",
+        "type": "conflict_error",
+        "documentation": "errors/no_prices_configured.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/no_prices_configured.md"
+      },
+      {
+        "code": "already_has_active_subscription",
+        "type": "conflict_error",
+        "documentation": "errors/already_has_active_subscription.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/already_has_active_subscription.md"
+      },
+      {
+        "code": "subscription_not_active",
+        "type": "conflict_error",
+        "documentation": "errors/subscription_not_active.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/subscription_not_active.md"
+      },
+      {
+        "code": "subscription_has_open_dispute",
+        "type": "internal_error",
+        "documentation": "errors/subscription_has_open_dispute.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/subscription_has_open_dispute.md"
+      },
+      {
+        "code": "subscription_required",
+        "type": "conflict_error",
+        "documentation": "errors/subscription_required.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/subscription_required.md"
+      },
+      {
+        "code": "provider_unsupported",
+        "type": "conflict_error",
+        "documentation": "errors/provider_unsupported.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/provider_unsupported.md"
+      },
+      {
+        "code": "no_payment_method",
+        "type": "conflict_error",
+        "documentation": "errors/no_payment_method.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/no_payment_method.md"
+      },
+      {
+        "code": "duplicate",
+        "type": "conflict_error",
+        "documentation": "errors/duplicate.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/duplicate.md"
+      },
+      {
+        "code": "already_scheduled",
+        "type": "conflict_error",
+        "documentation": "errors/already_scheduled.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/already_scheduled.md"
+      },
+      {
+        "code": "feature_not_in_plan",
+        "type": "billing_error",
+        "documentation": "errors/feature_not_in_plan.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/feature_not_in_plan.md"
+      },
+      {
+        "code": "feature_disabled",
+        "type": "billing_error",
+        "documentation": "errors/feature_disabled.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/feature_disabled.md"
+      },
+      {
+        "code": "insufficient_balance",
+        "type": "billing_error",
+        "documentation": "errors/insufficient_balance.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/insufficient_balance.md"
+      },
+      {
+        "code": "insufficient_credits",
+        "type": "billing_error",
+        "documentation": "errors/insufficient_credits.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/insufficient_credits.md"
+      },
+      {
+        "code": "insufficient_seats",
+        "type": "billing_error",
+        "documentation": "errors/insufficient_seats.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/insufficient_seats.md"
+      },
+      {
+        "code": "included_limit_reached",
+        "type": "billing_error",
+        "documentation": "errors/included_limit_reached.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/included_limit_reached.md"
+      },
+      {
+        "code": "missing_regional_price",
+        "type": "billing_error",
+        "documentation": "errors/missing_regional_price.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/missing_regional_price.md"
+      },
+      {
+        "code": "payment_failed",
+        "type": "billing_error",
+        "documentation": "errors/payment_failed.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/payment_failed.md"
+      },
+      {
+        "code": "payment_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/payment_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/payment_not_found.md"
+      },
+      {
+        "code": "payment_method_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/payment_method_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/payment_method_not_found.md"
+      },
+      {
+        "code": "payment_not_cancelable",
+        "type": "conflict_error",
+        "documentation": "errors/payment_not_cancelable.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/payment_not_cancelable.md"
+      },
+      {
+        "code": "invalid_subscription_status",
+        "type": "conflict_error",
+        "documentation": "errors/invalid_subscription_status.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/invalid_subscription_status.md"
+      },
+      {
+        "code": "one_time_subscription_not_cancelable",
+        "type": "conflict_error",
+        "documentation": "errors/one_time_subscription_not_cancelable.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/one_time_subscription_not_cancelable.md"
+      },
+      {
+        "code": "not_scheduled_for_cancellation",
+        "type": "conflict_error",
+        "documentation": "errors/not_scheduled_for_cancellation.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/not_scheduled_for_cancellation.md"
+      },
+      {
+        "code": "subscription_already_canceled",
+        "type": "conflict_error",
+        "documentation": "errors/subscription_already_canceled.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/subscription_already_canceled.md"
+      },
+      {
+        "code": "subscription_creation_failed",
+        "type": "internal_error",
+        "documentation": "errors/subscription_creation_failed.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/subscription_creation_failed.md"
+      },
+      {
+        "code": "subscription_activation_failed",
+        "type": "internal_error",
+        "documentation": "errors/subscription_activation_failed.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/subscription_activation_failed.md"
+      },
+      {
+        "code": "subscription_cancel_failed",
+        "type": "internal_error",
+        "documentation": "errors/subscription_cancel_failed.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/subscription_cancel_failed.md"
+      },
+      {
+        "code": "subscription_uncancel_failed",
+        "type": "internal_error",
+        "documentation": "errors/subscription_uncancel_failed.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/subscription_uncancel_failed.md"
+      },
+      {
+        "code": "plan_unavailable",
+        "type": "conflict_error",
+        "documentation": "errors/plan_unavailable.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/plan_unavailable.md"
+      },
+      {
+        "code": "no_outstanding_invoice",
+        "type": "conflict_error",
+        "documentation": "errors/no_outstanding_invoice.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/no_outstanding_invoice.md"
+      },
+      {
+        "code": "charge_in_progress",
+        "type": "conflict_error",
+        "documentation": "errors/charge_in_progress.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/charge_in_progress.md"
+      },
+      {
+        "code": "charge_failed",
+        "type": "billing_error",
+        "documentation": "errors/charge_failed.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/charge_failed.md"
+      },
+      {
+        "code": "idempotency_key_mismatch",
+        "type": "conflict_error",
+        "documentation": "errors/idempotency_key_mismatch.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/idempotency_key_mismatch.md"
+      },
+      {
+        "code": "idempotency_in_progress",
+        "type": "conflict_error",
+        "documentation": "errors/idempotency_in_progress.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/idempotency_in_progress.md"
+      },
+      {
+        "code": "idempotency_unavailable",
+        "type": "internal_error",
+        "documentation": "errors/idempotency_unavailable.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/idempotency_unavailable.md"
+      },
+      {
+        "code": "seat_limit_exceeded",
+        "type": "billing_error",
+        "documentation": "errors/seat_limit_exceeded.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/seat_limit_exceeded.md"
+      },
+      {
+        "code": "no_change_requested",
+        "type": "validation_error",
+        "documentation": "errors/no_change_requested.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/no_change_requested.md"
+      },
+      {
+        "code": "plans_not_in_same_group",
+        "type": "validation_error",
+        "documentation": "errors/plans_not_in_same_group.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/plans_not_in_same_group.md"
+      },
+      {
+        "code": "free_plan_change_not_supported",
+        "type": "validation_error",
+        "documentation": "errors/free_plan_change_not_supported.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/free_plan_change_not_supported.md"
+      },
+      {
+        "code": "plan_change_scheduled",
+        "type": "validation_error",
+        "documentation": "errors/plan_change_scheduled.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/plan_change_scheduled.md"
+      },
+      {
+        "code": "addon_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/addon_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/addon_not_found.md"
+      },
+      {
+        "code": "addon_already_active",
+        "type": "conflict_error",
+        "documentation": "errors/addon_already_active.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/addon_already_active.md"
+      },
+      {
+        "code": "addon_not_active",
+        "type": "billing_error",
+        "documentation": "errors/addon_not_active.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/addon_not_active.md"
+      },
+      {
+        "code": "addon_has_activations",
+        "type": "conflict_error",
+        "documentation": "errors/addon_has_activations.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/addon_has_activations.md"
+      },
+      {
+        "code": "feature_already_exists",
+        "type": "conflict_error",
+        "documentation": "errors/feature_already_exists.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/feature_already_exists.md"
+      },
+      {
+        "code": "feature_in_use",
+        "type": "conflict_error",
+        "documentation": "errors/feature_in_use.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/feature_in_use.md"
+      },
+      {
+        "code": "model_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/model_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/model_not_found.md"
+      },
+      {
+        "code": "pricing_mode_mismatch",
+        "type": "billing_error",
+        "documentation": "errors/pricing_mode_mismatch.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/pricing_mode_mismatch.md"
+      },
+      {
+        "code": "credit_pack_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/credit_pack_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/credit_pack_not_found.md"
+      },
+      {
+        "code": "plan_group_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/plan_group_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/plan_group_not_found.md"
+      },
+      {
+        "code": "offer_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/offer_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/offer_not_found.md"
+      },
+      {
+        "code": "offer_not_applicable",
+        "type": "validation_error",
+        "documentation": "errors/offer_not_applicable.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/offer_not_applicable.md"
+      },
+      {
+        "code": "card_promotions_not_available",
+        "type": "conflict_error",
+        "documentation": "errors/card_promotions_not_available.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/card_promotions_not_available.md"
+      },
+      {
+        "code": "promo_code_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/promo_code_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/promo_code_not_found.md"
+      },
+      {
+        "code": "promo_code_expired",
+        "type": "conflict_error",
+        "documentation": "errors/promo_code_expired.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/promo_code_expired.md"
+      },
+      {
+        "code": "webhook_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/webhook_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/webhook_not_found.md"
+      },
+      {
+        "code": "api_key_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/api_key_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/api_key_not_found.md"
+      },
+      {
+        "code": "invoice_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/invoice_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/invoice_not_found.md"
+      },
+      {
+        "code": "transaction_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/transaction_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/transaction_not_found.md"
+      },
+      {
+        "code": "price_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/price_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/price_not_found.md"
+      },
+      {
+        "code": "price_in_use",
+        "type": "conflict_error",
+        "documentation": "errors/price_in_use.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/price_in_use.md"
+      },
+      {
+        "code": "market_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/market_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/market_not_found.md"
+      },
+      {
+        "code": "market_in_use",
+        "type": "conflict_error",
+        "documentation": "errors/market_in_use.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/market_in_use.md"
+      },
+      {
+        "code": "market_group_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/market_group_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/market_group_not_found.md"
+      },
+      {
+        "code": "market_group_in_use",
+        "type": "conflict_error",
+        "documentation": "errors/market_group_in_use.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/market_group_in_use.md"
+      },
+      {
+        "code": "endpoint_not_available",
+        "type": "not_found_error",
+        "documentation": "errors/endpoint_not_available.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/endpoint_not_available.md"
+      },
+      {
+        "code": "endpoint_deprecated",
+        "type": "not_found_error",
+        "documentation": "errors/endpoint_deprecated.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/endpoint_deprecated.md"
+      },
+      {
+        "code": "organization_already_claimed",
+        "type": "conflict_error",
+        "documentation": "errors/organization_already_claimed.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/organization_already_claimed.md"
+      },
+      {
+        "code": "claim_not_pending",
+        "type": "not_found_error",
+        "documentation": "errors/claim_not_pending.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/claim_not_pending.md"
+      },
+      {
+        "code": "rate_limited",
+        "type": "rate_limit_error",
+        "documentation": "errors/rate_limited.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/rate_limited.md"
+      },
+      {
+        "code": "internal_error",
+        "type": "internal_error",
+        "documentation": "errors/internal_error.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/internal_error.md"
+      }
+    ]
+  },
   "resources": [
     {
       "name": "addons",

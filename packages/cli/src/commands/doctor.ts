@@ -8,7 +8,7 @@ import {
   findProjectRoot,
   type InstalledCommetPackage,
 } from "../utils/agent-project";
-import { AGENT_RULES_BEGIN } from "./agents";
+import { setupAgentRules } from "./agents";
 
 export interface DoctorCheck {
   code: string;
@@ -176,27 +176,46 @@ export function runDoctor(startDirectory: string): DoctorReport {
     );
   }
 
-  const agentsPath = join(projectRoot, "AGENTS.md");
-  const hasManagedRules =
-    existsSync(agentsPath) &&
-    readFileSync(agentsPath, "utf8").includes(AGENT_RULES_BEGIN);
-  checks.push(
-    hasManagedRules
-      ? {
-          code: "AGENT_RULES_CURRENT",
-          status: "pass",
-          message: "AGENTS.md contains Commet instructions",
-          evidence: { path: agentsPath },
-        }
-      : {
-          code: "AGENT_RULES_MISSING",
-          status: "warning",
-          message: "AGENTS.md does not contain Commet instructions",
-          impact:
-            "Coding agents may miss the documentation that matches the installed packages",
-          action: "Run commet agents setup",
-        },
-  );
+  if (packages.length > 0) {
+    const agentsPath = join(projectRoot, "AGENTS.md");
+    try {
+      const agentRules = setupAgentRules(projectRoot, {
+        check: true,
+        dryRun: true,
+      });
+      checks.push(
+        agentRules.status === "unchanged"
+          ? {
+              code: "AGENT_RULES_CURRENT",
+              status: "pass",
+              message: "AGENTS.md contains current Commet instructions",
+              evidence: { path: agentsPath },
+            }
+          : {
+              code: "AGENT_RULES_STALE",
+              status: "warning",
+              message: "AGENTS.md does not match the installed Commet packages",
+              evidence: { path: agentsPath },
+              impact:
+                "Coding agents may miss the documentation that matches the installed packages",
+              action: "Run commet agents setup",
+            },
+      );
+    } catch (error) {
+      checks.push({
+        code: "AGENT_RULES_INVALID",
+        status: "fail",
+        message:
+          error instanceof Error
+            ? error.message
+            : "AGENTS.md contains invalid Commet instructions",
+        evidence: { path: agentsPath },
+        impact:
+          "Commet cannot safely update agent instructions without risking project-owned content",
+        action: "Repair or remove the incomplete Commet managed block",
+      });
+    }
+  }
 
   const apiVersion = readInstalledApiVersion(packages);
   if (apiVersion) {
@@ -205,6 +224,21 @@ export function runDoctor(startDirectory: string): DoctorReport {
       status: "pass",
       message: `Installed API documentation targets ${apiVersion}`,
       evidence: { apiVersion },
+    });
+  } else if (
+    packages.some(
+      (packageInfo) =>
+        packageInfo.name === "@commet/node" && packageInfo.manifest,
+    )
+  ) {
+    checks.push({
+      code: "API_VERSION_UNRESOLVED",
+      status: "fail",
+      message:
+        "The installed @commet/node documentation has no valid API version",
+      impact:
+        "Agents cannot determine which API contract matches the installed SDK",
+      action: "Reinstall or upgrade @commet/node",
     });
   }
 
@@ -227,7 +261,8 @@ export function runDoctor(startDirectory: string): DoctorReport {
         : {
             code: "PROJECT_CONTEXT_INVALID",
             status: "fail",
-            message: ".commet/config.json does not contain a valid mode",
+            message:
+              ".commet/config.json does not contain a valid organization and mode",
             evidence: { path: projectConfigPath },
             impact:
               "The CLI cannot determine whether operations target sandbox or live mode",
@@ -268,9 +303,13 @@ const IGNORED_SOURCE_DIRECTORIES = new Set([
   "coverage",
   "dist",
   "node_modules",
+  "test",
+  "tests",
+  "__tests__",
 ]);
-const OPTIONAL_COMMET_ENVIRONMENT_VARIABLES = new Set([
-  "COMMET_NO_UPDATE_CHECK",
+const REQUIRED_COMMET_ENVIRONMENT_VARIABLES = new Set([
+  "COMMET_API_KEY",
+  "COMMET_WEBHOOK_SECRET",
 ]);
 const RECOGNIZED_INTEGRATION_PACKAGES = [
   "@commet/ai-sdk",
@@ -301,16 +340,28 @@ function inspectSourceConfiguration(projectRoot: string): SourceConfiguration {
         continue;
       }
       if (!SOURCE_EXTENSIONS.has(extension(entry.name))) continue;
+      if (/\.(?:spec|test)\.[cm]?[jt]sx?$/.test(entry.name)) continue;
 
       const source = readFileSync(path, "utf8");
-      for (const match of source.matchAll(/\bCOMMET_[A-Z0-9_]+\b/g)) {
-        const variableName = match[0];
-        if (!OPTIONAL_COMMET_ENVIRONMENT_VARIABLES.has(variableName)) {
+      const activeSource = source
+        .split(/\r?\n/)
+        .filter((line) => !/^\s*(?:\/\/|\/\*|\*)/.test(line))
+        .join("\n");
+      for (const match of activeSource.matchAll(
+        /(?:process|import\.meta)\.env(?:\.([A-Z_][A-Z0-9_]*)|\[["']([A-Z_][A-Z0-9_]*)["']\])/g,
+      )) {
+        const variableName = match[1] ?? match[2];
+        if (!variableName) continue;
+        if (REQUIRED_COMMET_ENVIRONMENT_VARIABLES.has(variableName)) {
           environmentVariables.add(variableName);
         }
       }
       for (const packageName of RECOGNIZED_INTEGRATION_PACKAGES) {
-        if (!source.includes(packageName)) continue;
+        const escapedPackageName = packageName.replace("/", "\\/");
+        const importPattern = new RegExp(
+          `(?:from\\s*|import\\s*\\(\\s*|require\\s*\\(\\s*|import\\s*)["']${escapedPackageName}(?:\\/[^"']*)?["']`,
+        );
+        if (!importPattern.test(activeSource)) continue;
         integrationPackages.add(packageName);
         if (!integrationPaths.has(packageName)) {
           integrationPaths.set(packageName, relative(projectRoot, path));
@@ -395,7 +446,10 @@ function readInstalledApiVersion(
     const parsed: unknown = JSON.parse(readFileSync(manifestPath, "utf8"));
     if (typeof parsed !== "object" || parsed === null) return undefined;
     const apiVersion = Reflect.get(parsed, "apiVersion");
-    return typeof apiVersion === "string" ? apiVersion : undefined;
+    return typeof apiVersion === "string" &&
+      /^\d{4}-\d{2}-\d{2}$/.test(apiVersion)
+      ? apiVersion
+      : undefined;
   } catch {
     return undefined;
   }
@@ -416,9 +470,9 @@ function readProjectContext(configPath: string):
     const mode = Reflect.get(parsed, "mode");
     if (
       typeof organizationId !== "string" ||
-      organizationId.length === 0 ||
+      organizationId.trim().length === 0 ||
       typeof organizationName !== "string" ||
-      organizationName.length === 0 ||
+      organizationName.trim().length === 0 ||
       (mode !== "live" && mode !== "sandbox")
     ) {
       return undefined;

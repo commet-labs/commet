@@ -67,7 +67,7 @@ List every feature defined in the organization. This is the organization's featu
 
 ### Returns
 
-`object`
+`{ object: "list"; data: Array<Feature>; hasMore: boolean; nextCursor?: string }`
 
 ## create
 

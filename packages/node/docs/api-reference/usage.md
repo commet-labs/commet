@@ -38,7 +38,7 @@ Track a usage event for a metered feature. Deducts from balance/credits if appli
 - `customerId` (`string`, required)
 - `eventId` (`string`, optional)
 - `timestamp` (`string`, optional)
-- `properties` (`Array<object>`, optional)
+- `properties` (`Array<{ property: string; value: string }>`, optional)
 - `model` (`string`, optional)
 - `inputTokens` (`number`, optional)
 - `outputTokens` (`number`, optional)

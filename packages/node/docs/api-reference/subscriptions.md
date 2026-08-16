@@ -341,7 +341,7 @@ List all subscriptions. Filter by customer ID or status.
 
 ### Returns
 
-`object`
+`{ object: "list"; data: Array<SubscriptionSummary>; hasMore: boolean; nextCursor?: string }`
 
 ## create
 
