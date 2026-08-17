@@ -1,5 +1,21 @@
 # commet
 
+## 5.1.1
+
+### Patch Changes
+
+- 1c9d0d3: Align the Plan Grant contract with temporary Feature Access overlays.
+
+  A Plan Grant expands an active subscription's feature access using a higher plan in the same plan group. It does not change the base plan, price, billing interval, invoices, or seats.
+
+  - `customers.createPlanGrant` takes `subscriptionId` instead of `billingInterval`.
+  - `PlanGrant` exposes `basePlanId` and `planReleaseId` instead of `planPriceId` and `billingInterval`.
+  - The `plan_grant` invoice line type is removed.
+  - CLI: `commet customers create-plan-grant` takes `--subscription-id` instead of `--billing-interval`.
+
+- Updated dependencies [1c9d0d3]
+  - @commet/node@9.1.1
+
 ## 5.1.0
 
 ### Minor Changes
