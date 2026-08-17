@@ -160,6 +160,8 @@ During local development, the SDK checks npm once per process and warns when a n
 
 ## Documentation
 
+The version-matched reference is installed at `node_modules/@commet/node/docs/README.md`. It includes the generated API and webhook contracts used by this release.
+
 Visit [commet.co/docs](https://commet.co/docs) for:
 
 - Complete API reference

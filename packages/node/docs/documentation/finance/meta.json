@@ -1,0 +1,13 @@
+{
+  "title": "Finance",
+  "description": "Payouts, account verification, and Merchant of Record",
+  "pages": [
+    "finance-overview",
+    "payouts",
+    "payouts-verification",
+    "supported-countries",
+    "merchant-of-record",
+    "local-currency-taxes",
+    "acceptable-use"
+  ]
+}

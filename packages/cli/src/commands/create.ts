@@ -11,6 +11,7 @@ import { apiRequest, BASE_URL } from "../utils/api";
 import { authExists } from "../utils/config";
 import { performLogin } from "../utils/login-flow";
 import { commetColor, promptTheme } from "../utils/prompt-theme";
+import { setupAgentRules } from "./agents";
 
 const GITHUB_REPO = "commet-labs/commet";
 
@@ -457,6 +458,8 @@ export const createCommand = new Command("create")
       }
       return;
     }
+
+    setupAgentRules(dest);
 
     // 8. Create plans in platform
     const planSpinner = ora("Creating plans...").start();

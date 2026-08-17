@@ -42,6 +42,39 @@ describe("Error classes", () => {
       );
       expect(error.details).toEqual(details);
     });
+
+    it("serializes actionable diagnostics without a stack", () => {
+      const error = new CommetAPIError(
+        "Customer not found",
+        404,
+        "customer_not_found",
+        { customerId: "cus_missing" },
+        {
+          type: "not_found_error",
+          code: "customer_not_found",
+          message: "Customer not found",
+          param: "customerId",
+          details: { customerId: "cus_missing" },
+          doc_url:
+            "https://commet.co/docs/api-reference/2026-07-31/errors/customer_not_found.md",
+        },
+        { requestId: "req_server_123" },
+      );
+
+      expect(error.toJSON()).toEqual({
+        name: "CommetAPIError",
+        message: "Customer not found",
+        type: "not_found_error",
+        code: "customer_not_found",
+        statusCode: 404,
+        param: "customerId",
+        details: { customerId: "cus_missing" },
+        requestId: "req_server_123",
+        docUrl:
+          "https://commet.co/docs/api-reference/2026-07-31/errors/customer_not_found.md",
+      });
+      expect(JSON.stringify(error)).not.toContain("stack");
+    });
   });
 
   describe("CommetValidationError", () => {
@@ -56,6 +89,7 @@ describe("Error classes", () => {
       expect(error.message).toBe("Validation failed");
       expect(error.validationErrors).toEqual(fieldErrors);
       expect(error).toBeInstanceOf(CommetError);
+      expect(error).toBeInstanceOf(CommetAPIError);
     });
   });
 });

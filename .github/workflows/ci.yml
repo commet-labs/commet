@@ -32,3 +32,15 @@ jobs:
       
       - name: Lint
         run: pnpm lint
+
+      - name: Node SDK unit tests
+        run: pnpm --filter @commet/node test
+
+      - name: Next.js integration unit tests
+        run: pnpm --filter @commet/next test
+
+      - name: CLI unit tests
+        run: pnpm --filter commet test:unit
+
+      - name: Verify package artifacts
+        run: pnpm verify:packages

@@ -111,15 +111,15 @@ function claimSdkUpdateCheck(): boolean {
   return true;
 }
 
-export function shouldCheckForSdkUpdates(): boolean {
-  if (process.env.NODE_ENV !== "development") return false;
-  if (process.env.CI) return false;
-  return process.env.COMMET_NO_UPDATE_CHECK !== "1";
+export function shouldCheckForSdkUpdates(
+  environment: NodeJS.ProcessEnv = process.env,
+): boolean {
+  if (environment.NODE_ENV !== "development") return false;
+  if (environment.CI) return false;
+  return environment.COMMET_NO_UPDATE_CHECK !== "1";
 }
 
-export async function checkForSdkUpdate(
-  installedVersion: string,
-): Promise<void> {
+async function checkForSdkUpdate(installedVersion: string): Promise<void> {
   try {
     const response = await fetch(NPM_DIST_TAGS_URL, {
       signal: AbortSignal.timeout(UPDATE_CHECK_TIMEOUT_MS),

@@ -52,8 +52,10 @@ function assignSdkKeyPath(
 export interface ActionDef {
   method: string;
   description: string;
+  hasParams?: boolean;
   params: ParamDef[];
   buildParams?: (options: Record<string, string>) => unknown;
+  requiredAlternatives?: string[][];
 }
 
 export interface ResourceDef {
@@ -128,32 +130,42 @@ export function createResourceCommand(def: ResourceDef): Command {
           params = built;
         }
 
-        const result = await method.call(
-          resource,
-          params,
-          Object.keys(requestOptions).length > 0 ? requestOptions : undefined,
-        );
+        if (
+          actionDef.requiredAlternatives &&
+          !actionDef.requiredAlternatives.some((alternative) =>
+            alternative.every((sdkKey) => hasSdkKeyPath(params, sdkKey)),
+          )
+        ) {
+          const alternatives = actionDef.requiredAlternatives
+            .map((alternative) =>
+              alternative.map((key) => `--${toFlag(key)}`).join(" + "),
+            )
+            .join(" or ");
+          throw new Error(`Provide ${alternatives}`);
+        }
+
+        const hasParams =
+          actionDef.hasParams ??
+          actionDef.params.some((parameter) => !parameter.requestOption);
+        const resolvedRequestOptions =
+          Object.keys(requestOptions).length > 0 ? requestOptions : undefined;
+        const result = hasParams
+          ? await method.call(resource, params, resolvedRequestOptions)
+          : await method.call(resource, resolvedRequestOptions);
 
         spinner?.succeed(`${def.name} ${actionName}`);
 
+        const serializedResult = result === undefined ? null : result;
         if (agentMode) {
-          console.log(JSON.stringify(result));
+          console.log(JSON.stringify(serializedResult));
         } else {
-          console.log(JSON.stringify(result, null, 2));
+          console.log(JSON.stringify(serializedResult, null, 2));
         }
       } catch (error) {
         if (error instanceof CommetValidationError) {
           spinner?.fail(`Validation error`);
           if (agentMode) {
-            console.log(
-              JSON.stringify({
-                error: {
-                  code: "validation_error",
-                  message: error.message,
-                  validationErrors: error.validationErrors,
-                },
-              }),
-            );
+            console.log(JSON.stringify({ error: error.toJSON() }));
           } else {
             console.error(chalk.red(`✗ ${error.message}`));
             for (const [field, messages] of Object.entries(
@@ -170,19 +182,17 @@ export function createResourceCommand(def: ResourceDef): Command {
         if (error instanceof CommetAPIError) {
           spinner?.fail(`API error`);
           if (agentMode) {
-            console.log(
-              JSON.stringify({
-                error: {
-                  code: error.code ?? `http_${error.statusCode}`,
-                  message: error.message,
-                  statusCode: error.statusCode,
-                },
-              }),
-            );
+            console.log(JSON.stringify({ error: error.toJSON() }));
           } else {
             console.error(
               chalk.red(`✗ ${error.message} (${error.statusCode})`),
             );
+            if (error.requestId) {
+              console.error(chalk.dim(`  Request ID: ${error.requestId}`));
+            }
+            if (error.docUrl) {
+              console.error(chalk.dim(`  Documentation: ${error.docUrl}`));
+            }
           }
           process.exit(1);
         }
@@ -202,6 +212,22 @@ export function createResourceCommand(def: ResourceDef): Command {
   }
 
   return command;
+}
+
+function hasSdkKeyPath(value: unknown, sdkKey: string): boolean {
+  let current = value;
+  for (const segment of sdkKey.split(".")) {
+    if (typeof current !== "object" || current === null) return false;
+    if (Object.getOwnPropertyDescriptor(current, segment) === undefined) {
+      return false;
+    }
+    current = Reflect.get(current, segment);
+  }
+  return current !== undefined;
+}
+
+function toFlag(sdkKey: string): string {
+  return sdkKey.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
 }
 
 export function generateResourceSchema(
@@ -229,6 +255,10 @@ export function generateResourceSchema(
         usage: `commet ${def.name} ${actionName}`,
         description: actionDef.description,
         params,
+        requiredAlternatives:
+          actionDef.requiredAlternatives?.map((alternative) =>
+            alternative.map((sdkKey) => `--${toFlag(sdkKey)}`),
+          ) ?? [],
       };
     }
 

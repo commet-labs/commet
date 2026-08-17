@@ -1,0 +1,29 @@
+{
+  "title": "Knowledge Base",
+  "description": "How billing decisions work in Commet",
+  "icon": "Lightbulb",
+  "root": true,
+  "pages": [
+    "---Billing fundamentals---",
+    "how-does-billing-work",
+    "what-happens-when-you-change-your-prices",
+    "how-do-monthly-quarterly-and-yearly-billing-work",
+    "what-invoices-do-customers-receive-and-when",
+    "---Subscriptions---",
+    "what-happens-when-a-customer-changes-plans",
+    "how-is-proration-calculated-when-changing-plans",
+    "how-do-trial-periods-work",
+    "how-do-free-plans-work-without-payment",
+    "what-happens-when-a-payment-fails",
+    "---Consumption and pricing---",
+    "how-does-seat-based-billing-work",
+    "how-does-quota-based-billing-work",
+    "how-do-discounts-work",
+    "how-do-credits-credit-packs-and-customer-credits-differ",
+    "how-do-balance-and-top-ups-work",
+    "how-do-offers-promo-codes-and-card-promotions-work-together",
+    "---Payments---",
+    "how-does-payment-routing-work",
+    "what-happens-when-you-refund-or-retry-a-transaction"
+  ]
+}

@@ -1,0 +1,1677 @@
+{
+  "schemaVersion": 1,
+  "package": "@commet/node",
+  "apiVersion": "2026-07-31",
+  "entrypoint": "README.md",
+  "gettingStarted": "getting-started.md",
+  "errors": "errors.md",
+  "apiReference": "api-reference/index.md",
+  "schemas": "schemas.md",
+  "webhooks": "webhooks.md",
+  "platformDocumentation": {
+    "source": "apps/web/content/docs/en",
+    "index": "platform-documentation.md",
+    "count": 171,
+    "entries": [
+      "ai-onboarding/ai-onboarding.md",
+      "ai-onboarding/billing-best-practices-skill.md",
+      "ai-onboarding/commet-skill.md",
+      "ai-onboarding/mcp-server.md",
+      "ai-onboarding/meta.json",
+      "ai-onboarding/pricing-models-skill.md",
+      "ai-onboarding/subscription-patterns-skill.md",
+      "api-reference/meta.json",
+      "documentation/api-versioning.md",
+      "documentation/better-auth.md",
+      "documentation/choose-a-billing-model.md",
+      "documentation/cli.md",
+      "documentation/create-api-key.md",
+      "documentation/customers/customer-credits.md",
+      "documentation/customers/customer-portal.md",
+      "documentation/customers/manage-customers.md",
+      "documentation/customers/meta.json",
+      "documentation/error-handling.md",
+      "documentation/examples.md",
+      "documentation/finance/acceptable-use.md",
+      "documentation/finance/finance-overview.md",
+      "documentation/finance/local-currency-taxes.md",
+      "documentation/finance/merchant-of-record.md",
+      "documentation/finance/meta.json",
+      "documentation/finance/payouts-verification.md",
+      "documentation/finance/payouts.md",
+      "documentation/finance/supported-countries.md",
+      "documentation/go/integrate-with-encore.md",
+      "documentation/go/integrate-with-go.md",
+      "documentation/go/meta.json",
+      "documentation/introduction.md",
+      "documentation/invoicing/handle-failed-payments.md",
+      "documentation/invoicing/invoices-and-billing-cycles.md",
+      "documentation/invoicing/manage-invoices.md",
+      "documentation/invoicing/meta.json",
+      "documentation/java/integrate-with-java.md",
+      "documentation/java/meta.json",
+      "documentation/meta.json",
+      "documentation/nodejs/integrate-with-astro.md",
+      "documentation/nodejs/integrate-with-bun.md",
+      "documentation/nodejs/integrate-with-express.md",
+      "documentation/nodejs/integrate-with-hono.md",
+      "documentation/nodejs/integrate-with-nextjs.md",
+      "documentation/nodejs/integrate-with-nuxt.md",
+      "documentation/nodejs/integrate-with-remix.md",
+      "documentation/nodejs/integrate-with-sveltekit.md",
+      "documentation/nodejs/meta.json",
+      "documentation/payments/accept-one-time-payments.md",
+      "documentation/payments/meta.json",
+      "documentation/payments/payment-orchestration.md",
+      "documentation/payments/payment-providers.md",
+      "documentation/payments/transactions-refunds-and-retries.md",
+      "documentation/php/integrate-with-laravel.md",
+      "documentation/php/integrate-with-php.md",
+      "documentation/php/integrate-with-symfony.md",
+      "documentation/php/meta.json",
+      "documentation/plans/add-ons.md",
+      "documentation/plans/balance-and-top-ups.md",
+      "documentation/plans/configure-features.md",
+      "documentation/plans/consumption-models.md",
+      "documentation/plans/create-plans.md",
+      "documentation/plans/credit-packs.md",
+      "documentation/plans/meta.json",
+      "documentation/plans/one-time-payments.md",
+      "documentation/plans/plan-groups.md",
+      "documentation/platform/custom-domains.md",
+      "documentation/platform/dashboard-metrics-and-events.md",
+      "documentation/platform/members-and-permissions.md",
+      "documentation/platform/meta.json",
+      "documentation/platform/organization-settings.md",
+      "documentation/python/integrate-with-django.md",
+      "documentation/python/integrate-with-fastapi.md",
+      "documentation/python/integrate-with-flask.md",
+      "documentation/python/integrate-with-python.md",
+      "documentation/python/meta.json",
+      "documentation/sales/card-promotions.md",
+      "documentation/sales/introductory-offers.md",
+      "documentation/sales/meta.json",
+      "documentation/sales/offers.md",
+      "documentation/sales/promo-codes.md",
+      "documentation/sales/promotional-offers.md",
+      "documentation/sales/regional-prices.md",
+      "documentation/sales/trial-periods.md",
+      "documentation/sdk-reference.md",
+      "documentation/subscriptions/manage-subscriptions.md",
+      "documentation/subscriptions/meta.json",
+      "documentation/subscriptions/plan-grants.md",
+      "documentation/subscriptions/upgrade-and-downgrade-plans.md",
+      "documentation/testing-sandbox.md",
+      "documentation/usage/ai-token-billing.md",
+      "documentation/usage/meta.json",
+      "documentation/usage/quota-management.md",
+      "documentation/usage/seat-management.md",
+      "documentation/usage/track-usage.md",
+      "knowledge-base/how-do-balance-and-top-ups-work.md",
+      "knowledge-base/how-do-credits-credit-packs-and-customer-credits-differ.md",
+      "knowledge-base/how-do-discounts-work.md",
+      "knowledge-base/how-do-free-plans-work-without-payment.md",
+      "knowledge-base/how-do-monthly-quarterly-and-yearly-billing-work.md",
+      "knowledge-base/how-do-offers-promo-codes-and-card-promotions-work-together.md",
+      "knowledge-base/how-do-trial-periods-work.md",
+      "knowledge-base/how-does-billing-work.md",
+      "knowledge-base/how-does-payment-routing-work.md",
+      "knowledge-base/how-does-quota-based-billing-work.md",
+      "knowledge-base/how-does-seat-based-billing-work.md",
+      "knowledge-base/how-is-proration-calculated-when-changing-plans.md",
+      "knowledge-base/meta.json",
+      "knowledge-base/what-happens-when-a-customer-changes-plans.md",
+      "knowledge-base/what-happens-when-a-payment-fails.md",
+      "knowledge-base/what-happens-when-you-change-your-prices.md",
+      "knowledge-base/what-happens-when-you-refund-or-retry-a-transaction.md",
+      "knowledge-base/what-invoices-do-customers-receive-and-when.md",
+      "meta.json",
+      "webhooks/addon-activated.md",
+      "webhooks/addon-deactivated.md",
+      "webhooks/balance-depleted.md",
+      "webhooks/balance-low.md",
+      "webhooks/balance-topped-up.md",
+      "webhooks/checkout-ready.md",
+      "webhooks/credits-depleted.md",
+      "webhooks/credits-expired.md",
+      "webhooks/credits-granted.md",
+      "webhooks/credits-low.md",
+      "webhooks/credits-purchased.md",
+      "webhooks/customer-created.md",
+      "webhooks/customer-state-changed.md",
+      "webhooks/customer-updated.md",
+      "webhooks/introduction.md",
+      "webhooks/invoice-created.md",
+      "webhooks/invoice-overdue.md",
+      "webhooks/invoice-upcoming.md",
+      "webhooks/invoice-voided.md",
+      "webhooks/meta.json",
+      "webhooks/payment-dispute-resolved.md",
+      "webhooks/payment-disputed.md",
+      "webhooks/payment-failed.md",
+      "webhooks/payment-link-canceled.md",
+      "webhooks/payment-link-completed.md",
+      "webhooks/payment-link-created.md",
+      "webhooks/payment-link-failed.md",
+      "webhooks/payment-method-attached.md",
+      "webhooks/payment-method-updated.md",
+      "webhooks/payment-received.md",
+      "webhooks/payment-recovered.md",
+      "webhooks/payment-refunded.md",
+      "webhooks/payment-retry-failed.md",
+      "webhooks/payout-available.md",
+      "webhooks/payout-created.md",
+      "webhooks/payout-failed.md",
+      "webhooks/payout-paid.md",
+      "webhooks/quota-exceeded.md",
+      "webhooks/quota-threshold-reached.md",
+      "webhooks/seats-limit-reached.md",
+      "webhooks/seats-updated.md",
+      "webhooks/subscription-activated.md",
+      "webhooks/subscription-canceled.md",
+      "webhooks/subscription-cancellation-revoked.md",
+      "webhooks/subscription-cancellation-scheduled.md",
+      "webhooks/subscription-created.md",
+      "webhooks/subscription-past-due.md",
+      "webhooks/subscription-plan-change-revoked.md",
+      "webhooks/subscription-plan-change-scheduled.md",
+      "webhooks/subscription-plan-changed.md",
+      "webhooks/subscription-reactivated.md",
+      "webhooks/subscription-updated.md",
+      "webhooks/trial-checkout-ready.md",
+      "webhooks/trial-converted.md",
+      "webhooks/trial-expired.md",
+      "webhooks/trial-started.md",
+      "webhooks/trial-will-end.md",
+      "webhooks/usage-recorded.md"
+    ]
+  },
+  "errorReferences": {
+    "index": "errors/index.md",
+    "count": 83,
+    "entries": [
+      {
+        "code": "validation_error",
+        "type": "validation_error",
+        "documentation": "errors/validation_error.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/validation_error.md"
+      },
+      {
+        "code": "invalid_json",
+        "type": "validation_error",
+        "documentation": "errors/invalid_json.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/invalid_json.md"
+      },
+      {
+        "code": "unauthorized",
+        "type": "authentication_error",
+        "documentation": "errors/unauthorized.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/unauthorized.md"
+      },
+      {
+        "code": "forbidden",
+        "type": "authentication_error",
+        "documentation": "errors/forbidden.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/forbidden.md"
+      },
+      {
+        "code": "sandbox_only",
+        "type": "authentication_error",
+        "documentation": "errors/sandbox_only.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/sandbox_only.md"
+      },
+      {
+        "code": "payouts_not_available_in_sandbox",
+        "type": "authentication_error",
+        "documentation": "errors/payouts_not_available_in_sandbox.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/payouts_not_available_in_sandbox.md"
+      },
+      {
+        "code": "not_found",
+        "type": "not_found_error",
+        "documentation": "errors/not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/not_found.md"
+      },
+      {
+        "code": "customer_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/customer_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/customer_not_found.md"
+      },
+      {
+        "code": "feature_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/feature_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/feature_not_found.md"
+      },
+      {
+        "code": "plan_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/plan_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/plan_not_found.md"
+      },
+      {
+        "code": "subscription_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/subscription_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/subscription_not_found.md"
+      },
+      {
+        "code": "no_active_subscription",
+        "type": "not_found_error",
+        "documentation": "errors/no_active_subscription.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/no_active_subscription.md"
+      },
+      {
+        "code": "no_prices_configured",
+        "type": "conflict_error",
+        "documentation": "errors/no_prices_configured.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/no_prices_configured.md"
+      },
+      {
+        "code": "already_has_active_subscription",
+        "type": "conflict_error",
+        "documentation": "errors/already_has_active_subscription.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/already_has_active_subscription.md"
+      },
+      {
+        "code": "subscription_not_active",
+        "type": "conflict_error",
+        "documentation": "errors/subscription_not_active.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/subscription_not_active.md"
+      },
+      {
+        "code": "subscription_has_open_dispute",
+        "type": "internal_error",
+        "documentation": "errors/subscription_has_open_dispute.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/subscription_has_open_dispute.md"
+      },
+      {
+        "code": "subscription_required",
+        "type": "conflict_error",
+        "documentation": "errors/subscription_required.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/subscription_required.md"
+      },
+      {
+        "code": "provider_unsupported",
+        "type": "conflict_error",
+        "documentation": "errors/provider_unsupported.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/provider_unsupported.md"
+      },
+      {
+        "code": "no_payment_method",
+        "type": "conflict_error",
+        "documentation": "errors/no_payment_method.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/no_payment_method.md"
+      },
+      {
+        "code": "duplicate",
+        "type": "conflict_error",
+        "documentation": "errors/duplicate.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/duplicate.md"
+      },
+      {
+        "code": "already_scheduled",
+        "type": "conflict_error",
+        "documentation": "errors/already_scheduled.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/already_scheduled.md"
+      },
+      {
+        "code": "feature_not_in_plan",
+        "type": "billing_error",
+        "documentation": "errors/feature_not_in_plan.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/feature_not_in_plan.md"
+      },
+      {
+        "code": "feature_disabled",
+        "type": "billing_error",
+        "documentation": "errors/feature_disabled.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/feature_disabled.md"
+      },
+      {
+        "code": "insufficient_balance",
+        "type": "billing_error",
+        "documentation": "errors/insufficient_balance.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/insufficient_balance.md"
+      },
+      {
+        "code": "insufficient_credits",
+        "type": "billing_error",
+        "documentation": "errors/insufficient_credits.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/insufficient_credits.md"
+      },
+      {
+        "code": "insufficient_seats",
+        "type": "billing_error",
+        "documentation": "errors/insufficient_seats.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/insufficient_seats.md"
+      },
+      {
+        "code": "included_limit_reached",
+        "type": "billing_error",
+        "documentation": "errors/included_limit_reached.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/included_limit_reached.md"
+      },
+      {
+        "code": "missing_regional_price",
+        "type": "billing_error",
+        "documentation": "errors/missing_regional_price.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/missing_regional_price.md"
+      },
+      {
+        "code": "payment_failed",
+        "type": "billing_error",
+        "documentation": "errors/payment_failed.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/payment_failed.md"
+      },
+      {
+        "code": "payment_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/payment_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/payment_not_found.md"
+      },
+      {
+        "code": "payment_method_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/payment_method_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/payment_method_not_found.md"
+      },
+      {
+        "code": "payment_not_cancelable",
+        "type": "conflict_error",
+        "documentation": "errors/payment_not_cancelable.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/payment_not_cancelable.md"
+      },
+      {
+        "code": "invalid_subscription_status",
+        "type": "conflict_error",
+        "documentation": "errors/invalid_subscription_status.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/invalid_subscription_status.md"
+      },
+      {
+        "code": "one_time_subscription_not_cancelable",
+        "type": "conflict_error",
+        "documentation": "errors/one_time_subscription_not_cancelable.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/one_time_subscription_not_cancelable.md"
+      },
+      {
+        "code": "not_scheduled_for_cancellation",
+        "type": "conflict_error",
+        "documentation": "errors/not_scheduled_for_cancellation.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/not_scheduled_for_cancellation.md"
+      },
+      {
+        "code": "subscription_already_canceled",
+        "type": "conflict_error",
+        "documentation": "errors/subscription_already_canceled.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/subscription_already_canceled.md"
+      },
+      {
+        "code": "subscription_creation_failed",
+        "type": "internal_error",
+        "documentation": "errors/subscription_creation_failed.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/subscription_creation_failed.md"
+      },
+      {
+        "code": "subscription_activation_failed",
+        "type": "internal_error",
+        "documentation": "errors/subscription_activation_failed.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/subscription_activation_failed.md"
+      },
+      {
+        "code": "subscription_cancel_failed",
+        "type": "internal_error",
+        "documentation": "errors/subscription_cancel_failed.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/subscription_cancel_failed.md"
+      },
+      {
+        "code": "subscription_uncancel_failed",
+        "type": "internal_error",
+        "documentation": "errors/subscription_uncancel_failed.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/subscription_uncancel_failed.md"
+      },
+      {
+        "code": "plan_unavailable",
+        "type": "conflict_error",
+        "documentation": "errors/plan_unavailable.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/plan_unavailable.md"
+      },
+      {
+        "code": "no_outstanding_invoice",
+        "type": "conflict_error",
+        "documentation": "errors/no_outstanding_invoice.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/no_outstanding_invoice.md"
+      },
+      {
+        "code": "charge_in_progress",
+        "type": "conflict_error",
+        "documentation": "errors/charge_in_progress.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/charge_in_progress.md"
+      },
+      {
+        "code": "charge_failed",
+        "type": "billing_error",
+        "documentation": "errors/charge_failed.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/charge_failed.md"
+      },
+      {
+        "code": "idempotency_key_mismatch",
+        "type": "conflict_error",
+        "documentation": "errors/idempotency_key_mismatch.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/idempotency_key_mismatch.md"
+      },
+      {
+        "code": "idempotency_in_progress",
+        "type": "conflict_error",
+        "documentation": "errors/idempotency_in_progress.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/idempotency_in_progress.md"
+      },
+      {
+        "code": "idempotency_unavailable",
+        "type": "internal_error",
+        "documentation": "errors/idempotency_unavailable.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/idempotency_unavailable.md"
+      },
+      {
+        "code": "seat_limit_exceeded",
+        "type": "billing_error",
+        "documentation": "errors/seat_limit_exceeded.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/seat_limit_exceeded.md"
+      },
+      {
+        "code": "no_change_requested",
+        "type": "validation_error",
+        "documentation": "errors/no_change_requested.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/no_change_requested.md"
+      },
+      {
+        "code": "plans_not_in_same_group",
+        "type": "validation_error",
+        "documentation": "errors/plans_not_in_same_group.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/plans_not_in_same_group.md"
+      },
+      {
+        "code": "free_plan_change_not_supported",
+        "type": "validation_error",
+        "documentation": "errors/free_plan_change_not_supported.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/free_plan_change_not_supported.md"
+      },
+      {
+        "code": "plan_change_scheduled",
+        "type": "validation_error",
+        "documentation": "errors/plan_change_scheduled.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/plan_change_scheduled.md"
+      },
+      {
+        "code": "addon_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/addon_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/addon_not_found.md"
+      },
+      {
+        "code": "addon_already_active",
+        "type": "conflict_error",
+        "documentation": "errors/addon_already_active.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/addon_already_active.md"
+      },
+      {
+        "code": "addon_not_active",
+        "type": "billing_error",
+        "documentation": "errors/addon_not_active.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/addon_not_active.md"
+      },
+      {
+        "code": "addon_has_activations",
+        "type": "conflict_error",
+        "documentation": "errors/addon_has_activations.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/addon_has_activations.md"
+      },
+      {
+        "code": "feature_already_exists",
+        "type": "conflict_error",
+        "documentation": "errors/feature_already_exists.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/feature_already_exists.md"
+      },
+      {
+        "code": "feature_in_use",
+        "type": "conflict_error",
+        "documentation": "errors/feature_in_use.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/feature_in_use.md"
+      },
+      {
+        "code": "model_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/model_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/model_not_found.md"
+      },
+      {
+        "code": "pricing_mode_mismatch",
+        "type": "billing_error",
+        "documentation": "errors/pricing_mode_mismatch.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/pricing_mode_mismatch.md"
+      },
+      {
+        "code": "credit_pack_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/credit_pack_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/credit_pack_not_found.md"
+      },
+      {
+        "code": "plan_group_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/plan_group_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/plan_group_not_found.md"
+      },
+      {
+        "code": "offer_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/offer_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/offer_not_found.md"
+      },
+      {
+        "code": "offer_not_applicable",
+        "type": "validation_error",
+        "documentation": "errors/offer_not_applicable.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/offer_not_applicable.md"
+      },
+      {
+        "code": "card_promotions_not_available",
+        "type": "conflict_error",
+        "documentation": "errors/card_promotions_not_available.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/card_promotions_not_available.md"
+      },
+      {
+        "code": "promo_code_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/promo_code_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/promo_code_not_found.md"
+      },
+      {
+        "code": "promo_code_expired",
+        "type": "conflict_error",
+        "documentation": "errors/promo_code_expired.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/promo_code_expired.md"
+      },
+      {
+        "code": "webhook_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/webhook_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/webhook_not_found.md"
+      },
+      {
+        "code": "api_key_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/api_key_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/api_key_not_found.md"
+      },
+      {
+        "code": "invoice_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/invoice_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/invoice_not_found.md"
+      },
+      {
+        "code": "transaction_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/transaction_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/transaction_not_found.md"
+      },
+      {
+        "code": "price_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/price_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/price_not_found.md"
+      },
+      {
+        "code": "price_in_use",
+        "type": "conflict_error",
+        "documentation": "errors/price_in_use.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/price_in_use.md"
+      },
+      {
+        "code": "market_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/market_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/market_not_found.md"
+      },
+      {
+        "code": "market_in_use",
+        "type": "conflict_error",
+        "documentation": "errors/market_in_use.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/market_in_use.md"
+      },
+      {
+        "code": "market_group_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/market_group_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/market_group_not_found.md"
+      },
+      {
+        "code": "market_group_in_use",
+        "type": "conflict_error",
+        "documentation": "errors/market_group_in_use.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/market_group_in_use.md"
+      },
+      {
+        "code": "endpoint_not_available",
+        "type": "not_found_error",
+        "documentation": "errors/endpoint_not_available.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/endpoint_not_available.md"
+      },
+      {
+        "code": "endpoint_deprecated",
+        "type": "not_found_error",
+        "documentation": "errors/endpoint_deprecated.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/endpoint_deprecated.md"
+      },
+      {
+        "code": "organization_already_claimed",
+        "type": "conflict_error",
+        "documentation": "errors/organization_already_claimed.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/organization_already_claimed.md"
+      },
+      {
+        "code": "claim_not_pending",
+        "type": "not_found_error",
+        "documentation": "errors/claim_not_pending.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/claim_not_pending.md"
+      },
+      {
+        "code": "rate_limited",
+        "type": "rate_limit_error",
+        "documentation": "errors/rate_limited.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/rate_limited.md"
+      },
+      {
+        "code": "internal_error",
+        "type": "internal_error",
+        "documentation": "errors/internal_error.md",
+        "canonicalUrl": "/docs/api-reference/2026-07-31/errors/internal_error.md"
+      }
+    ]
+  },
+  "resources": [
+    {
+      "name": "addons",
+      "documentation": "api-reference/addons.md",
+      "operations": [
+        {
+          "name": "listActive",
+          "operationId": "list-active-addons",
+          "method": "GET",
+          "path": "/active-addons"
+        },
+        {
+          "name": "get",
+          "operationId": "get-addon",
+          "method": "GET",
+          "path": "/addons/{id}"
+        },
+        {
+          "name": "update",
+          "operationId": "update-addon",
+          "method": "PATCH",
+          "path": "/addons/{id}"
+        },
+        {
+          "name": "delete",
+          "operationId": "delete-addon",
+          "method": "DELETE",
+          "path": "/addons/{id}"
+        },
+        {
+          "name": "list",
+          "operationId": "list-addons",
+          "method": "GET",
+          "path": "/addons"
+        },
+        {
+          "name": "create",
+          "operationId": "create-addon",
+          "method": "POST",
+          "path": "/addons"
+        }
+      ]
+    },
+    {
+      "name": "apiKeys",
+      "documentation": "api-reference/api-keys.md",
+      "operations": [
+        {
+          "name": "delete",
+          "operationId": "delete-api-key",
+          "method": "DELETE",
+          "path": "/api-keys/{id}"
+        },
+        {
+          "name": "list",
+          "operationId": "list-api-keys",
+          "method": "GET",
+          "path": "/api-keys"
+        },
+        {
+          "name": "create",
+          "operationId": "create-api-key",
+          "method": "POST",
+          "path": "/api-keys"
+        }
+      ]
+    },
+    {
+      "name": "provisioning",
+      "documentation": "api-reference/provisioning.md",
+      "operations": [
+        {
+          "name": "createClaimLink",
+          "operationId": "create-claim-link",
+          "method": "POST",
+          "path": "/claim-link"
+        }
+      ]
+    },
+    {
+      "name": "creditPacks",
+      "documentation": "api-reference/credit-packs.md",
+      "operations": [
+        {
+          "name": "update",
+          "operationId": "update-credit-pack",
+          "method": "PATCH",
+          "path": "/credit-packs/{id}"
+        },
+        {
+          "name": "delete",
+          "operationId": "delete-credit-pack",
+          "method": "DELETE",
+          "path": "/credit-packs/{id}"
+        },
+        {
+          "name": "list",
+          "operationId": "list-credit-packs",
+          "method": "GET",
+          "path": "/credit-packs"
+        },
+        {
+          "name": "create",
+          "operationId": "create-credit-pack",
+          "method": "POST",
+          "path": "/credit-packs"
+        }
+      ]
+    },
+    {
+      "name": "customers",
+      "documentation": "api-reference/customers.md",
+      "operations": [
+        {
+          "name": "revokeCredit",
+          "operationId": "revoke-customer-credit",
+          "method": "POST",
+          "path": "/customers/{id}/credits/{creditId}/revoke"
+        },
+        {
+          "name": "listCredits",
+          "operationId": "list-customer-credits",
+          "method": "GET",
+          "path": "/customers/{id}/credits"
+        },
+        {
+          "name": "createCredit",
+          "operationId": "create-customer-credit",
+          "method": "POST",
+          "path": "/customers/{id}/credits"
+        },
+        {
+          "name": "revokePlanGrant",
+          "operationId": "revoke-plan-grant",
+          "method": "POST",
+          "path": "/customers/{id}/plan-grants/{grantId}/revoke"
+        },
+        {
+          "name": "updatePlanGrant",
+          "operationId": "update-plan-grant",
+          "method": "PATCH",
+          "path": "/customers/{id}/plan-grants/{grantId}"
+        },
+        {
+          "name": "listPlanGrants",
+          "operationId": "list-plan-grants",
+          "method": "GET",
+          "path": "/customers/{id}/plan-grants"
+        },
+        {
+          "name": "createPlanGrant",
+          "operationId": "create-plan-grant",
+          "method": "POST",
+          "path": "/customers/{id}/plan-grants"
+        },
+        {
+          "name": "get",
+          "operationId": "get-customer",
+          "method": "GET",
+          "path": "/customers/{id}"
+        },
+        {
+          "name": "update",
+          "operationId": "update-customer",
+          "method": "PATCH",
+          "path": "/customers/{id}"
+        },
+        {
+          "name": "createBatch",
+          "operationId": "batch-create-customers",
+          "method": "POST",
+          "path": "/customers/batch"
+        },
+        {
+          "name": "list",
+          "operationId": "list-customers",
+          "method": "GET",
+          "path": "/customers"
+        },
+        {
+          "name": "create",
+          "operationId": "create-customer",
+          "method": "POST",
+          "path": "/customers"
+        }
+      ]
+    },
+    {
+      "name": "featureAccess",
+      "documentation": "api-reference/feature-access.md",
+      "operations": [
+        {
+          "name": "get",
+          "operationId": "get-feature-access",
+          "method": "GET",
+          "path": "/feature-access/{code}"
+        },
+        {
+          "name": "list",
+          "operationId": "list-feature-access",
+          "method": "GET",
+          "path": "/feature-access"
+        }
+      ]
+    },
+    {
+      "name": "features",
+      "documentation": "api-reference/features.md",
+      "operations": [
+        {
+          "name": "get",
+          "operationId": "get-feature",
+          "method": "GET",
+          "path": "/features/{code}"
+        },
+        {
+          "name": "update",
+          "operationId": "update-feature",
+          "method": "PATCH",
+          "path": "/features/{code}"
+        },
+        {
+          "name": "delete",
+          "operationId": "delete-feature",
+          "method": "DELETE",
+          "path": "/features/{code}"
+        },
+        {
+          "name": "list",
+          "operationId": "list-features",
+          "method": "GET",
+          "path": "/features"
+        },
+        {
+          "name": "create",
+          "operationId": "create-feature",
+          "method": "POST",
+          "path": "/features"
+        }
+      ]
+    },
+    {
+      "name": "invoices",
+      "documentation": "api-reference/invoices.md",
+      "operations": [
+        {
+          "name": "getDownloadUrl",
+          "operationId": "download-invoice",
+          "method": "POST",
+          "path": "/invoices/{id}/download-links"
+        },
+        {
+          "name": "get",
+          "operationId": "get-invoice",
+          "method": "GET",
+          "path": "/invoices/{id}"
+        },
+        {
+          "name": "send",
+          "operationId": "send-invoice",
+          "method": "POST",
+          "path": "/invoices/{id}/send"
+        },
+        {
+          "name": "updateStatus",
+          "operationId": "update-invoice-status",
+          "method": "PATCH",
+          "path": "/invoices/{id}/status"
+        },
+        {
+          "name": "list",
+          "operationId": "list-invoices",
+          "method": "GET",
+          "path": "/invoices"
+        },
+        {
+          "name": "createAdjustment",
+          "operationId": "create-adjustment-invoice",
+          "method": "POST",
+          "path": "/invoices"
+        }
+      ]
+    },
+    {
+      "name": "markets",
+      "documentation": "api-reference/markets.md",
+      "operations": [
+        {
+          "name": "get",
+          "operationId": "get-market",
+          "method": "GET",
+          "path": "/markets/{id}"
+        },
+        {
+          "name": "update",
+          "operationId": "update-market",
+          "method": "PATCH",
+          "path": "/markets/{id}"
+        },
+        {
+          "name": "delete",
+          "operationId": "delete-market",
+          "method": "DELETE",
+          "path": "/markets/{id}"
+        },
+        {
+          "name": "list",
+          "operationId": "list-markets",
+          "method": "GET",
+          "path": "/markets"
+        },
+        {
+          "name": "create",
+          "operationId": "create-market",
+          "method": "POST",
+          "path": "/markets"
+        }
+      ]
+    },
+    {
+      "name": "offers",
+      "documentation": "api-reference/offers.md",
+      "operations": [
+        {
+          "name": "get",
+          "operationId": "get-offer",
+          "method": "GET",
+          "path": "/offers/{id}"
+        },
+        {
+          "name": "update",
+          "operationId": "update-offer",
+          "method": "PATCH",
+          "path": "/offers/{id}"
+        },
+        {
+          "name": "delete",
+          "operationId": "delete-offer",
+          "method": "DELETE",
+          "path": "/offers/{id}"
+        },
+        {
+          "name": "list",
+          "operationId": "list-offers",
+          "method": "GET",
+          "path": "/offers"
+        },
+        {
+          "name": "create",
+          "operationId": "create-offer",
+          "method": "POST",
+          "path": "/offers"
+        }
+      ]
+    },
+    {
+      "name": "payments",
+      "documentation": "api-reference/payments.md",
+      "operations": [
+        {
+          "name": "cancel",
+          "operationId": "cancel-payment",
+          "method": "POST",
+          "path": "/payments/{id}/cancel"
+        },
+        {
+          "name": "get",
+          "operationId": "get-payment",
+          "method": "GET",
+          "path": "/payments/{id}"
+        },
+        {
+          "name": "charge",
+          "operationId": "charge-payment",
+          "method": "POST",
+          "path": "/payments/charge"
+        },
+        {
+          "name": "list",
+          "operationId": "list-payments",
+          "method": "GET",
+          "path": "/payments"
+        },
+        {
+          "name": "create",
+          "operationId": "create-payment",
+          "method": "POST",
+          "path": "/payments"
+        }
+      ]
+    },
+    {
+      "name": "payouts",
+      "documentation": "api-reference/payouts.md",
+      "operations": [
+        {
+          "name": "addBankAccount",
+          "operationId": "add-payout-bank-account",
+          "method": "POST",
+          "path": "/payouts/bank-accounts"
+        },
+        {
+          "name": "request",
+          "operationId": "request-payout",
+          "method": "POST",
+          "path": "/payouts"
+        },
+        {
+          "name": "completeVerification",
+          "operationId": "complete-payout-verification",
+          "method": "POST",
+          "path": "/payouts/verification"
+        }
+      ]
+    },
+    {
+      "name": "planGroups",
+      "documentation": "api-reference/plan-groups.md",
+      "operations": [
+        {
+          "name": "removePlan",
+          "operationId": "remove-plan-from-group",
+          "method": "DELETE",
+          "path": "/plan-groups/{id}/plans/{planId}"
+        },
+        {
+          "name": "reorderPlans",
+          "operationId": "reorder-plans-in-group",
+          "method": "PUT",
+          "path": "/plan-groups/{id}/plans/reorder"
+        },
+        {
+          "name": "addPlan",
+          "operationId": "add-plan-to-group",
+          "method": "POST",
+          "path": "/plan-groups/{id}/plans"
+        },
+        {
+          "name": "get",
+          "operationId": "get-plan-group",
+          "method": "GET",
+          "path": "/plan-groups/{id}"
+        },
+        {
+          "name": "update",
+          "operationId": "update-plan-group",
+          "method": "PATCH",
+          "path": "/plan-groups/{id}"
+        },
+        {
+          "name": "delete",
+          "operationId": "delete-plan-group",
+          "method": "DELETE",
+          "path": "/plan-groups/{id}"
+        },
+        {
+          "name": "list",
+          "operationId": "list-plan-groups",
+          "method": "GET",
+          "path": "/plan-groups"
+        },
+        {
+          "name": "create",
+          "operationId": "create-plan-group",
+          "method": "POST",
+          "path": "/plan-groups"
+        }
+      ]
+    },
+    {
+      "name": "plans",
+      "documentation": "api-reference/plans.md",
+      "operations": [
+        {
+          "name": "updateFeature",
+          "operationId": "update-plan-feature",
+          "method": "PATCH",
+          "path": "/plans/{id}/features/{featureId}"
+        },
+        {
+          "name": "removeFeature",
+          "operationId": "remove-plan-feature",
+          "method": "DELETE",
+          "path": "/plans/{id}/features/{featureId}"
+        },
+        {
+          "name": "addFeature",
+          "operationId": "add-plan-feature",
+          "method": "POST",
+          "path": "/plans/{id}/features"
+        },
+        {
+          "name": "setDefaultPrice",
+          "operationId": "set-default-plan-price",
+          "method": "PUT",
+          "path": "/plans/{id}/prices/{priceId}/default"
+        },
+        {
+          "name": "setRegionalPrices",
+          "operationId": "upsert-regional-prices",
+          "method": "PUT",
+          "path": "/plans/{id}/prices/{priceId}/regional"
+        },
+        {
+          "name": "deleteRegionalPrices",
+          "operationId": "delete-regional-prices",
+          "method": "DELETE",
+          "path": "/plans/{id}/prices/{priceId}/regional"
+        },
+        {
+          "name": "updatePrice",
+          "operationId": "update-plan-price",
+          "method": "PATCH",
+          "path": "/plans/{id}/prices/{priceId}"
+        },
+        {
+          "name": "deletePrice",
+          "operationId": "delete-plan-price",
+          "method": "DELETE",
+          "path": "/plans/{id}/prices/{priceId}"
+        },
+        {
+          "name": "addPrice",
+          "operationId": "add-plan-price",
+          "method": "POST",
+          "path": "/plans/{id}/prices"
+        },
+        {
+          "name": "setRegionalPricing",
+          "operationId": "set-plan-regional-pricing",
+          "method": "PUT",
+          "path": "/plans/{id}/regional"
+        },
+        {
+          "name": "get",
+          "operationId": "get-plan",
+          "method": "GET",
+          "path": "/plans/{id}"
+        },
+        {
+          "name": "update",
+          "operationId": "update-plan",
+          "method": "PATCH",
+          "path": "/plans/{id}"
+        },
+        {
+          "name": "delete",
+          "operationId": "delete-plan",
+          "method": "DELETE",
+          "path": "/plans/{id}"
+        },
+        {
+          "name": "setVisibility",
+          "operationId": "set-plan-visibility",
+          "method": "PUT",
+          "path": "/plans/{id}/visibility"
+        },
+        {
+          "name": "list",
+          "operationId": "list-plans",
+          "method": "GET",
+          "path": "/plans"
+        },
+        {
+          "name": "create",
+          "operationId": "create-plan",
+          "method": "POST",
+          "path": "/plans"
+        }
+      ]
+    },
+    {
+      "name": "portal",
+      "documentation": "api-reference/portal.md",
+      "operations": [
+        {
+          "name": "getUrl",
+          "operationId": "request-portal-access",
+          "method": "POST",
+          "path": "/portal/sessions"
+        }
+      ]
+    },
+    {
+      "name": "promoCodes",
+      "documentation": "api-reference/promo-codes.md",
+      "operations": [
+        {
+          "name": "get",
+          "operationId": "get-promo-code",
+          "method": "GET",
+          "path": "/promo-codes/{id}"
+        },
+        {
+          "name": "update",
+          "operationId": "update-promo-code",
+          "method": "PATCH",
+          "path": "/promo-codes/{id}"
+        },
+        {
+          "name": "list",
+          "operationId": "list-promo-codes",
+          "method": "GET",
+          "path": "/promo-codes"
+        },
+        {
+          "name": "create",
+          "operationId": "create-promo-code",
+          "method": "POST",
+          "path": "/promo-codes"
+        }
+      ]
+    },
+    {
+      "name": "seats",
+      "documentation": "api-reference/seats.md",
+      "operations": [
+        {
+          "name": "getBalance",
+          "operationId": "get-seat-balance",
+          "method": "GET",
+          "path": "/seats/balance"
+        },
+        {
+          "name": "getAllBalances",
+          "operationId": "get-all-seat-balances",
+          "method": "GET",
+          "path": "/seats/balances"
+        },
+        {
+          "name": "setAll",
+          "operationId": "bulk-set-seats",
+          "method": "PUT",
+          "path": "/seats/bulk"
+        },
+        {
+          "name": "remove",
+          "operationId": "remove-seats",
+          "method": "POST",
+          "path": "/seats/remove"
+        },
+        {
+          "name": "add",
+          "operationId": "add-seats",
+          "method": "POST",
+          "path": "/seats"
+        },
+        {
+          "name": "set",
+          "operationId": "set-seats",
+          "method": "PUT",
+          "path": "/seats"
+        }
+      ]
+    },
+    {
+      "name": "subscriptions",
+      "documentation": "api-reference/subscriptions.md",
+      "operations": [
+        {
+          "name": "deactivateAddon",
+          "operationId": "deactivate-addon",
+          "method": "DELETE",
+          "path": "/subscriptions/{id}/addons/{addonId}"
+        },
+        {
+          "name": "activateAddon",
+          "operationId": "activate-addon",
+          "method": "POST",
+          "path": "/subscriptions/{id}/addons"
+        },
+        {
+          "name": "adjustBalance",
+          "operationId": "adjust-balance",
+          "method": "POST",
+          "path": "/subscriptions/{id}/balance/adjust"
+        },
+        {
+          "name": "topupBalance",
+          "operationId": "topup-balance",
+          "method": "POST",
+          "path": "/subscriptions/{id}/balance/topup"
+        },
+        {
+          "name": "cancel",
+          "operationId": "cancel-subscription",
+          "method": "POST",
+          "path": "/subscriptions/{id}/cancel"
+        },
+        {
+          "name": "changePlan",
+          "operationId": "change-plan",
+          "method": "POST",
+          "path": "/subscriptions/{id}/change-plan"
+        },
+        {
+          "name": "purchaseCredits",
+          "operationId": "purchase-credits",
+          "method": "POST",
+          "path": "/subscriptions/{id}/credits"
+        },
+        {
+          "name": "applyOffer",
+          "operationId": "apply-subscription-offer",
+          "method": "PUT",
+          "path": "/subscriptions/{id}/offer"
+        },
+        {
+          "name": "removeOffer",
+          "operationId": "remove-subscription-offer",
+          "method": "DELETE",
+          "path": "/subscriptions/{id}/offer"
+        },
+        {
+          "name": "updatePaymentMethod",
+          "operationId": "update-payment-method",
+          "method": "POST",
+          "path": "/subscriptions/{id}/payment-method/update"
+        },
+        {
+          "name": "previewChange",
+          "operationId": "preview-change-plan",
+          "method": "POST",
+          "path": "/subscriptions/{id}/preview-change"
+        },
+        {
+          "name": "reactivate",
+          "operationId": "reactivate-subscription",
+          "method": "POST",
+          "path": "/subscriptions/{id}/reactivate"
+        },
+        {
+          "name": "createRecoveryLink",
+          "operationId": "create-subscription-recovery-link",
+          "method": "POST",
+          "path": "/subscriptions/{id}/recovery-links"
+        },
+        {
+          "name": "get",
+          "operationId": "get-subscription",
+          "method": "GET",
+          "path": "/subscriptions/{id}"
+        },
+        {
+          "name": "uncancel",
+          "operationId": "uncancel-subscription",
+          "method": "POST",
+          "path": "/subscriptions/{id}/uncancel"
+        },
+        {
+          "name": "getActive",
+          "operationId": "get-active-subscription",
+          "method": "GET",
+          "path": "/subscriptions/active"
+        },
+        {
+          "name": "list",
+          "operationId": "list-subscriptions",
+          "method": "GET",
+          "path": "/subscriptions"
+        },
+        {
+          "name": "create",
+          "operationId": "create-subscription",
+          "method": "POST",
+          "path": "/subscriptions"
+        }
+      ]
+    },
+    {
+      "name": "testClock",
+      "documentation": "api-reference/test-clock.md",
+      "operations": [
+        {
+          "name": "processBilling",
+          "operationId": "process-test-clock-billing",
+          "method": "POST",
+          "path": "/test-clock/process-billing"
+        },
+        {
+          "name": "get",
+          "operationId": "get-test-clock",
+          "method": "GET",
+          "path": "/test-clock"
+        },
+        {
+          "name": "advance",
+          "operationId": "advance-test-clock",
+          "method": "POST",
+          "path": "/test-clock"
+        }
+      ]
+    },
+    {
+      "name": "transactions",
+      "documentation": "api-reference/transactions.md",
+      "operations": [
+        {
+          "name": "refund",
+          "operationId": "refund-transaction",
+          "method": "POST",
+          "path": "/transactions/{id}/refund"
+        },
+        {
+          "name": "retry",
+          "operationId": "retry-transaction",
+          "method": "POST",
+          "path": "/transactions/{id}/retry"
+        },
+        {
+          "name": "get",
+          "operationId": "get-transaction",
+          "method": "GET",
+          "path": "/transactions/{id}"
+        },
+        {
+          "name": "list",
+          "operationId": "list-transactions",
+          "method": "GET",
+          "path": "/transactions"
+        }
+      ]
+    },
+    {
+      "name": "usage",
+      "documentation": "api-reference/usage.md",
+      "operations": [
+        {
+          "name": "check",
+          "operationId": "check-usage-availability",
+          "method": "POST",
+          "path": "/usage/check"
+        },
+        {
+          "name": "track",
+          "operationId": "track-usage",
+          "method": "POST",
+          "path": "/usage/events"
+        },
+        {
+          "name": "set",
+          "operationId": "set-usage",
+          "method": "PUT",
+          "path": "/usage"
+        }
+      ]
+    },
+    {
+      "name": "quota",
+      "documentation": "api-reference/quota.md",
+      "operations": [
+        {
+          "name": "getAll",
+          "operationId": "get-all-quota-allowances",
+          "method": "GET",
+          "path": "/usage/quota/all"
+        },
+        {
+          "name": "remove",
+          "operationId": "remove-quota",
+          "method": "POST",
+          "path": "/usage/quota/remove"
+        },
+        {
+          "name": "get",
+          "operationId": "get-quota-allowance",
+          "method": "GET",
+          "path": "/usage/quota"
+        },
+        {
+          "name": "add",
+          "operationId": "add-quota",
+          "method": "POST",
+          "path": "/usage/quota"
+        },
+        {
+          "name": "set",
+          "operationId": "set-quota",
+          "method": "PUT",
+          "path": "/usage/quota"
+        }
+      ]
+    },
+    {
+      "name": "webhooks",
+      "documentation": "api-reference/generated-webhooks.md",
+      "operations": [
+        {
+          "name": "get",
+          "operationId": "get-webhook-endpoint",
+          "method": "GET",
+          "path": "/webhooks/{id}"
+        },
+        {
+          "name": "update",
+          "operationId": "update-webhook-endpoint",
+          "method": "PATCH",
+          "path": "/webhooks/{id}"
+        },
+        {
+          "name": "delete",
+          "operationId": "delete-webhook-endpoint",
+          "method": "DELETE",
+          "path": "/webhooks/{id}"
+        },
+        {
+          "name": "test",
+          "operationId": "test-webhook-endpoint",
+          "method": "POST",
+          "path": "/webhooks/{id}/test"
+        },
+        {
+          "name": "list",
+          "operationId": "list-webhook-endpoints",
+          "method": "GET",
+          "path": "/webhooks"
+        },
+        {
+          "name": "create",
+          "operationId": "create-webhook-endpoint",
+          "method": "POST",
+          "path": "/webhooks"
+        }
+      ]
+    }
+  ],
+  "webhookEvents": [
+    "subscription.created",
+    "subscription.activated",
+    "subscription.reactivated",
+    "subscription.canceled",
+    "subscription.updated",
+    "subscription.plan_changed",
+    "subscription.cancellation_scheduled",
+    "subscription.cancellation_revoked",
+    "subscription.plan_change_scheduled",
+    "subscription.plan_change_revoked",
+    "subscription.past_due",
+    "trial.started",
+    "trial.converted",
+    "trial.expired",
+    "trial.will_end",
+    "trial.checkout_ready",
+    "checkout.ready",
+    "payment.received",
+    "payment.failed",
+    "payment.recovered",
+    "payment.retry_failed",
+    "payment.refunded",
+    "payment.disputed",
+    "payment.dispute_resolved",
+    "payment_link.created",
+    "payment_link.completed",
+    "payment_link.failed",
+    "payment_link.canceled",
+    "invoice.created",
+    "invoice.voided",
+    "invoice.overdue",
+    "invoice.upcoming",
+    "payment_method.attached",
+    "payment_method.updated",
+    "customer.created",
+    "customer.updated",
+    "customer.state_changed",
+    "credits.granted",
+    "credits.purchased",
+    "credits.low",
+    "credits.depleted",
+    "credits.expired",
+    "balance.topped_up",
+    "balance.low",
+    "balance.depleted",
+    "quota.threshold_reached",
+    "quota.exceeded",
+    "seats.updated",
+    "seats.limit_reached",
+    "addon.activated",
+    "addon.deactivated",
+    "usage.recorded",
+    "payout.available",
+    "payout.created",
+    "payout.paid",
+    "payout.failed"
+  ]
+}

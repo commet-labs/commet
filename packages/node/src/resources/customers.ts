@@ -1,7 +1,110 @@
 import type { RequestOptions } from "../types/common";
 import type { Timezone } from "../types/enums";
-import type { Customer, CustomerBatch } from "../types/models";
+import type {
+  Customer,
+  CustomerBatch,
+  CustomerCredit,
+  CustomerCreditRevocation,
+  PlanGrant,
+} from "../types/models";
 import type { CommetHTTPClient } from "../utils/http";
+
+export interface RevokeCustomerCreditParams {
+  id: string;
+  creditId: string;
+}
+
+export interface ListCustomerCreditsParams {
+  id: string;
+}
+
+export interface CreateCustomerCreditParams {
+  id: string;
+  /** Amount in the currency's smallest unit. */
+  amount: number;
+  currency:
+    | "usd"
+    | "ars"
+    | "brl"
+    | "clp"
+    | "cop"
+    | "pen"
+    | "uyu"
+    | "pyg"
+    | "bob"
+    | "mxn"
+    | "cad"
+    | "eur"
+    | "jpy"
+    | "cny"
+    | "krw"
+    | "hkd"
+    | "sgd"
+    | "twd"
+    | "inr"
+    | "thb";
+  reason: string;
+  expiresAt?: string | null;
+}
+
+export interface RevokePlanGrantParams {
+  id: string;
+  grantId: string;
+  reason: string;
+}
+
+export type UpdatePlanGrantParams =
+  | {
+      id: string;
+      grantId: string;
+      reason: string;
+      duration: "cycles";
+      durationCycles: number;
+    }
+  | {
+      id: string;
+      grantId: string;
+      reason: string;
+      duration: "until_date";
+      /** @format date-time */
+      expiresAt: string;
+    }
+  | {
+      id: string;
+      grantId: string;
+      reason: string;
+      duration: "until_revoked";
+    };
+
+export interface ListPlanGrantsParams {
+  id: string;
+}
+
+export type CreatePlanGrantParams =
+  | {
+      id: string;
+      planId: string;
+      billingInterval: "weekly" | "monthly" | "quarterly" | "yearly";
+      reason: string;
+      duration: "cycles";
+      durationCycles: number;
+    }
+  | {
+      id: string;
+      planId: string;
+      billingInterval: "weekly" | "monthly" | "quarterly" | "yearly";
+      reason: string;
+      duration: "until_date";
+      /** @format date-time */
+      expiresAt: string;
+    }
+  | {
+      id: string;
+      planId: string;
+      billingInterval: "weekly" | "monthly" | "quarterly" | "yearly";
+      reason: string;
+      duration: "until_revoked";
+    };
 
 export interface GetCustomerParams {
   id: string;
@@ -75,6 +178,95 @@ export interface CreateCustomerParams {
 
 export class CustomersResource {
   constructor(private httpClient: CommetHTTPClient) {}
+
+  /** Revoke the unallocated remainder of a customer credit grant. Applied invoice history is unchanged. */
+  async revokeCredit(
+    params: RevokeCustomerCreditParams,
+    options?: RequestOptions,
+  ): Promise<CustomerCreditRevocation> {
+    const { id, creditId } = params;
+    return this.httpClient.post(
+      `/customers/${id}/credits/${creditId}/revoke`,
+      {},
+      options,
+    );
+  }
+
+  /** List currency-specific invoice credit grants and their remaining balances for a customer. */
+  async listCredits(
+    params: ListCustomerCreditsParams,
+    options?: RequestOptions,
+  ): Promise<{
+    object: "list";
+    data: Array<CustomerCredit>;
+    hasMore: boolean;
+    nextCursor?: string;
+  }> {
+    const { id } = params;
+    return this.httpClient.get(`/customers/${id}/credits`, undefined, options);
+  }
+
+  /** Grant monetary credit in one currency. Credit is applied FIFO before tax to eligible recurring invoices. */
+  async createCredit(
+    params: CreateCustomerCreditParams,
+    options?: RequestOptions,
+  ): Promise<CustomerCredit> {
+    const { id, ...rest } = params;
+    return this.httpClient.post(`/customers/${id}/credits`, rest, options);
+  }
+
+  /** End complimentary access immediately. The next full-price period becomes pending payment and requires checkout; no past period is billed retroactively. */
+  async revokePlanGrant(
+    params: RevokePlanGrantParams,
+    options?: RequestOptions,
+  ): Promise<PlanGrant> {
+    const { id, grantId, ...rest } = params;
+    return this.httpClient.post(
+      `/customers/${id}/plan-grants/${grantId}/revoke`,
+      rest,
+      options,
+    );
+  }
+
+  /** Give the grant a remaining number of billing cycles, set an exact deadline, or keep it active until revoked. */
+  async updatePlanGrant(
+    params: UpdatePlanGrantParams,
+    options?: RequestOptions,
+  ): Promise<PlanGrant> {
+    const { id, grantId, ...rest } = params;
+    return this.httpClient.patch(
+      `/customers/${id}/plan-grants/${grantId}`,
+      rest,
+      options,
+    );
+  }
+
+  /** List the independent audit timeline for paid-plan access granted without checkout or payment credentials. */
+  async listPlanGrants(
+    params: ListPlanGrantsParams,
+    options?: RequestOptions,
+  ): Promise<{
+    object: "list";
+    data: Array<PlanGrant>;
+    hasMore: boolean;
+    nextCursor?: string;
+  }> {
+    const { id } = params;
+    return this.httpClient.get(
+      `/customers/${id}/plan-grants`,
+      undefined,
+      options,
+    );
+  }
+
+  /** Move an active free subscription to an eligible paid plan immediately without checkout, a card, or customer credit. The grant may last for exact billing cycles, until a date, or until revoked. */
+  async createPlanGrant(
+    params: CreatePlanGrantParams,
+    options?: RequestOptions,
+  ): Promise<PlanGrant> {
+    const { id, ...rest } = params;
+    return this.httpClient.post(`/customers/${id}/plan-grants`, rest, options);
+  }
 
   /** Retrieve a customer by their public ID, including subscription status and metadata. */
   async get(

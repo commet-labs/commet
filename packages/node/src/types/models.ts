@@ -243,6 +243,33 @@ export interface CustomerBatch {
   livemode: boolean;
 }
 
+export interface CustomerCredit {
+  id: string;
+  /** Original grant amount in the currency's smallest unit. */
+  amount: number;
+  appliedAmount: number;
+  reversedAmount: number;
+  revokedAmount: number;
+  remainingAmount: number;
+  currency: string;
+  reason: string;
+  source: "dashboard" | "api" | "plan_change" | "migration";
+  expiresAt: string | null;
+  /** @format date-time */
+  createdAt: string;
+  object: "customer_credit";
+  livemode: boolean;
+}
+
+export interface CustomerCreditRevocation {
+  id: string;
+  remainingAmount: number;
+  revokedAmount: number;
+  currency: string;
+  object: "customer_credit";
+  livemode: boolean;
+}
+
 export interface DeletedObject {
   id: string;
   deleted: true;
@@ -560,6 +587,7 @@ export interface Invoice {
       | "feature_quota"
       | "discount"
       | "promo_code_discount"
+      | "plan_grant"
       | "credit"
       | "balance_overage"
       | "addon_base"
@@ -643,12 +671,16 @@ export interface Offer {
     | {
         type: "percentage";
         durationCycles: number | null;
+        /** Unit the phase duration is counted in. Only a fixed-price phase may set it, because its amount is declared rather than derived from the plan. Defaults to the plan's own billing interval. */
+        durationInterval: "weekly" | "monthly" | "quarterly" | "yearly" | null;
         /** Discount in basis points. 5000 means 50%. */
         percentage: number;
       }
     | {
         type: "amount_off";
         durationCycles: number | null;
+        /** Unit the phase duration is counted in. Only a fixed-price phase may set it, because its amount is declared rather than derived from the plan. Defaults to the plan's own billing interval. */
+        durationInterval: "weekly" | "monthly" | "quarterly" | "yearly" | null;
         amounts: Array<{
           currency: string;
           /** Amount in the currency's minor unit (for example, cents for USD). */
@@ -658,6 +690,8 @@ export interface Offer {
     | {
         type: "fixed_price";
         durationCycles: number | null;
+        /** Unit the phase duration is counted in. Only a fixed-price phase may set it, because its amount is declared rather than derived from the plan. Defaults to the plan's own billing interval. */
+        durationInterval: "weekly" | "monthly" | "quarterly" | "yearly" | null;
         prices: Array<{
           currency: string;
           /** Amount in the currency's minor unit (for example, cents for USD). */
@@ -742,26 +776,6 @@ export interface PayoutBankAccount {
   object: "payout_bank_account";
   livemode: boolean;
 }
-
-export type PayoutVerification =
-  | {
-      providerAccountId: string;
-      status: "pending_verification" | "verified" | "restricted" | "disabled";
-      transfersEnabled: boolean;
-      outcome: "existing";
-      object: "payout_account";
-      livemode: boolean;
-    }
-  | {
-      providerAccountId: string;
-      status: "pending_verification" | "verified" | "restricted" | "disabled";
-      transfersEnabled: boolean;
-      outcome: "created";
-      businessType: "individual" | "company";
-      country: string;
-      object: "payout_account";
-      livemode: boolean;
-    };
 
 export interface Plan {
   id: string;
@@ -865,6 +879,12 @@ export type PlanChange =
           | {
               type: "percentage";
               durationCycles: number | null;
+              durationInterval:
+                | "weekly"
+                | "monthly"
+                | "quarterly"
+                | "yearly"
+                | null;
               startsAt: string | null;
               endsAt: string | null;
               /** Discount in basis points. 5000 means 50%. */
@@ -873,6 +893,12 @@ export type PlanChange =
           | {
               type: "amount_off";
               durationCycles: number | null;
+              durationInterval:
+                | "weekly"
+                | "monthly"
+                | "quarterly"
+                | "yearly"
+                | null;
               startsAt: string | null;
               endsAt: string | null;
               /** Discount in the application currency's minor unit. */
@@ -881,6 +907,12 @@ export type PlanChange =
           | {
               type: "fixed_price";
               durationCycles: number | null;
+              durationInterval:
+                | "weekly"
+                | "monthly"
+                | "quarterly"
+                | "yearly"
+                | null;
               startsAt: string | null;
               endsAt: string | null;
               /** Fixed price in the application currency's minor unit. */
@@ -976,6 +1008,12 @@ export type PlanChange =
           | {
               type: "percentage";
               durationCycles: number | null;
+              durationInterval:
+                | "weekly"
+                | "monthly"
+                | "quarterly"
+                | "yearly"
+                | null;
               startsAt: string | null;
               endsAt: string | null;
               /** Discount in basis points. 5000 means 50%. */
@@ -984,6 +1022,12 @@ export type PlanChange =
           | {
               type: "amount_off";
               durationCycles: number | null;
+              durationInterval:
+                | "weekly"
+                | "monthly"
+                | "quarterly"
+                | "yearly"
+                | null;
               startsAt: string | null;
               endsAt: string | null;
               /** Discount in the application currency's minor unit. */
@@ -992,6 +1036,12 @@ export type PlanChange =
           | {
               type: "fixed_price";
               durationCycles: number | null;
+              durationInterval:
+                | "weekly"
+                | "monthly"
+                | "quarterly"
+                | "yearly"
+                | null;
               startsAt: string | null;
               endsAt: string | null;
               /** Fixed price in the application currency's minor unit. */
@@ -1030,6 +1080,43 @@ export interface PlanFeature {
   pricingMode: "fixed" | "ai_model";
   margin: number | null;
   object: "plan_feature";
+  livemode: boolean;
+}
+
+export interface PlanGrant {
+  id: string;
+  customerId: string;
+  subscriptionId: string;
+  planId: string;
+  planPriceId: string;
+  billingInterval: "weekly" | "monthly" | "quarterly" | "yearly";
+  status: "active" | "expired" | "revoked";
+  duration: "cycles" | "until_date" | "until_revoked";
+  durationCycles: number | null;
+  /** @format date-time */
+  startsAt: string;
+  expiresAt: string | null;
+  reason: string;
+  source: "dashboard" | "api";
+  revokedAt: string | null;
+  /** @format date-time */
+  createdAt: string;
+  /** @format date-time */
+  updatedAt: string;
+  events: Array<{
+    id: string;
+    type: "created" | "updated" | "expired" | "revoked";
+    reason: string;
+    source: "dashboard" | "api" | "system";
+    previousExpiresAt: string | null;
+    expiresAt: string | null;
+    duration: "cycles" | "until_date" | "until_revoked" | null;
+    durationCycles: number | null;
+    requestedExpiresAt: string | null;
+    /** @format date-time */
+    createdAt: string;
+  }>;
+  object: "plan_grant";
   livemode: boolean;
 }
 
@@ -1156,6 +1243,12 @@ export interface PreviewChange {
       | {
           type: "percentage";
           durationCycles: number | null;
+          durationInterval:
+            | "weekly"
+            | "monthly"
+            | "quarterly"
+            | "yearly"
+            | null;
           startsAt: string | null;
           endsAt: string | null;
           /** Discount in basis points. 5000 means 50%. */
@@ -1164,6 +1257,12 @@ export interface PreviewChange {
       | {
           type: "amount_off";
           durationCycles: number | null;
+          durationInterval:
+            | "weekly"
+            | "monthly"
+            | "quarterly"
+            | "yearly"
+            | null;
           startsAt: string | null;
           endsAt: string | null;
           /** Discount in the application currency's minor unit. */
@@ -1172,6 +1271,12 @@ export interface PreviewChange {
       | {
           type: "fixed_price";
           durationCycles: number | null;
+          durationInterval:
+            | "weekly"
+            | "monthly"
+            | "quarterly"
+            | "yearly"
+            | null;
           startsAt: string | null;
           endsAt: string | null;
           /** Fixed price in the application currency's minor unit. */
@@ -1238,6 +1343,12 @@ export interface ReactivatedSubscription {
       | {
           type: "percentage";
           durationCycles: number | null;
+          durationInterval:
+            | "weekly"
+            | "monthly"
+            | "quarterly"
+            | "yearly"
+            | null;
           startsAt: string | null;
           endsAt: string | null;
           /** Discount in basis points. 5000 means 50%. */
@@ -1246,6 +1357,12 @@ export interface ReactivatedSubscription {
       | {
           type: "amount_off";
           durationCycles: number | null;
+          durationInterval:
+            | "weekly"
+            | "monthly"
+            | "quarterly"
+            | "yearly"
+            | null;
           startsAt: string | null;
           endsAt: string | null;
           /** Discount in the application currency's minor unit. */
@@ -1254,6 +1371,12 @@ export interface ReactivatedSubscription {
       | {
           type: "fixed_price";
           durationCycles: number | null;
+          durationInterval:
+            | "weekly"
+            | "monthly"
+            | "quarterly"
+            | "yearly"
+            | null;
           startsAt: string | null;
           endsAt: string | null;
           /** Fixed price in the application currency's minor unit. */
@@ -1483,7 +1606,12 @@ export interface SubscriptionOfferApplication {
         id: string;
       };
   offerId: string | null;
-  source: "direct" | "introductory" | "promo_code" | "custom";
+  source:
+    | "direct"
+    | "introductory"
+    | "promo_code"
+    | "card_promotion"
+    | "custom";
   status: "quoted" | "applied" | "failed" | "expired";
   currency: string | null;
   subtotal: number | null;
@@ -1492,6 +1620,7 @@ export interface SubscriptionOfferApplication {
   phases: Array<SubscriptionOfferApplicationPhase>;
   /** @format date-time */
   quotedAt: string;
+  expiresAt: string | null;
   appliedAt: string | null;
 }
 
@@ -1499,12 +1628,14 @@ export type SubscriptionOfferApplicationPhase =
   | {
       type: "free_trial";
       durationDays: number;
+      durationInterval: "weekly" | "monthly" | "quarterly" | "yearly" | null;
       startsAt: string | null;
       endsAt: string | null;
     }
   | {
       type: "percentage";
       durationCycles: number | null;
+      durationInterval: "weekly" | "monthly" | "quarterly" | "yearly" | null;
       percentage: number;
       startsAt: string | null;
       endsAt: string | null;
@@ -1512,6 +1643,7 @@ export type SubscriptionOfferApplicationPhase =
   | {
       type: "amount_off";
       durationCycles: number | null;
+      durationInterval: "weekly" | "monthly" | "quarterly" | "yearly" | null;
       amount: number;
       startsAt: string | null;
       endsAt: string | null;
@@ -1519,6 +1651,7 @@ export type SubscriptionOfferApplicationPhase =
   | {
       type: "fixed_price";
       durationCycles: number | null;
+      durationInterval: "weekly" | "monthly" | "quarterly" | "yearly" | null;
       price: number;
       startsAt: string | null;
       endsAt: string | null;
@@ -1580,16 +1713,59 @@ export interface TestClock {
   isActive: boolean;
   /** @format date-time */
   now: string;
+  latestRun: {
+    id: string;
+    status: "pending" | "running" | "completed" | "failed";
+    /** @format date-time */
+    startedAtTime: string;
+    /** @format date-time */
+    targetTime: string;
+    estimatedDeadlineCount: number;
+    completedDeadlineCount: number;
+    failedDeadlineCount: number;
+    error: string | null;
+    items: Array<{
+      kind: "billing_cycle" | "dunning_retry";
+      status: "pending" | "processing" | "completed" | "failed";
+      /** @format date-time */
+      dueAt: string;
+      subscriptionId: string;
+      customerName: string | null;
+      invoiceNumber: string | null;
+      invoiceId: string | null;
+      outcome: string | null;
+      detail: string | null;
+      error: string | null;
+    }>;
+  } | null;
   object: "test_clock";
   livemode: boolean;
 }
 
-export interface TestClockBilling {
-  customersFound: number;
-  enqueued: number;
-  failed: number;
-  dunningRetried: number;
-  dunningFailed: number;
+export interface TestClockRun {
+  id: string;
+  status: "pending" | "running" | "completed" | "failed";
+  /** @format date-time */
+  startedAtTime: string;
+  /** @format date-time */
+  targetTime: string;
+  estimatedDeadlineCount: number;
+  completedDeadlineCount: number;
+  failedDeadlineCount: number;
+  error: string | null;
+  items: Array<{
+    kind: "billing_cycle" | "dunning_retry";
+    status: "pending" | "processing" | "completed" | "failed";
+    /** @format date-time */
+    dueAt: string;
+    subscriptionId: string;
+    customerName: string | null;
+    invoiceNumber: string | null;
+    invoiceId: string | null;
+    outcome: string | null;
+    detail: string | null;
+    error: string | null;
+  }>;
   object: "test_clock_run";
   livemode: boolean;
 }

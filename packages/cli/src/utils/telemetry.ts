@@ -1,3 +1,4 @@
+import { resolveCliCommand } from "./command-name";
 import { loadProjectConfig } from "./config";
 
 declare const __CLI_VERSION__: string;
@@ -59,9 +60,15 @@ export function getUserAgent(): string {
 
 function isTelemetryDisabled(): boolean {
   return (
+    isLocalOnlyCommand() ||
     process.env.COMMET_TELEMETRY_DISABLED === "1" ||
     process.env.DO_NOT_TRACK === "1"
   );
+}
+
+function isLocalOnlyCommand(): boolean {
+  const command = resolveCliCommand(process.argv.slice(2));
+  return command === "doctor" || command === "agents";
 }
 
 function resolveOrgId(): string | null {

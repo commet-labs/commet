@@ -91,30 +91,4 @@ describe("TestClock — wire behavior", () => {
       expect(body).not.toHaveProperty("advanceDays");
     });
   });
-
-  describe("processBilling", () => {
-    it("posts an empty body to the process-billing endpoint (no params)", async () => {
-      vi.mocked(fetch).mockResolvedValueOnce(
-        jsonResponse({
-          customersFound: 3,
-          enqueued: 3,
-          failed: 0,
-          object: "test_clock",
-          livemode: false,
-        }),
-      );
-
-      const result = await client().testClock.processBilling();
-
-      const { url, init } = lastCall();
-      expect(url).toContain("/test-clock/process-billing");
-      expect(init.method).toBe("POST");
-      // explicit empty object body — never undefined, never the previous params
-      expect(init.body).toBe(JSON.stringify({}));
-      const data = result;
-      expect(data.customersFound).toBe(3);
-      expect(data.enqueued).toBe(3);
-      expect(data.failed).toBe(0);
-    });
-  });
 });

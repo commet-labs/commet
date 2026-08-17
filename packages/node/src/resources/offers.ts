@@ -17,12 +17,16 @@ export interface UpdateOfferParams {
     | {
         type: "percentage";
         durationCycles: number | null;
+        /** Unit the phase duration is counted in. Only a fixed-price phase may set it, because its amount is declared rather than derived from the plan. Defaults to the plan's own billing interval. */
+        durationInterval?: "weekly" | "monthly" | "quarterly" | "yearly" | null;
         /** Discount in basis points. 5000 means 50%. */
         percentage: number;
       }
     | {
         type: "amount_off";
         durationCycles: number | null;
+        /** Unit the phase duration is counted in. Only a fixed-price phase may set it, because its amount is declared rather than derived from the plan. Defaults to the plan's own billing interval. */
+        durationInterval?: "weekly" | "monthly" | "quarterly" | "yearly" | null;
         amounts: Array<{
           currency: string;
           /** Amount in the currency's minor unit (for example, cents for USD). */
@@ -32,6 +36,8 @@ export interface UpdateOfferParams {
     | {
         type: "fixed_price";
         durationCycles: number | null;
+        /** Unit the phase duration is counted in. Only a fixed-price phase may set it, because its amount is declared rather than derived from the plan. Defaults to the plan's own billing interval. */
+        durationInterval?: "weekly" | "monthly" | "quarterly" | "yearly" | null;
         prices: Array<{
           currency: string;
           /** Amount in the currency's minor unit (for example, cents for USD). */
@@ -65,12 +71,16 @@ export interface CreateOfferParams {
     | {
         type: "percentage";
         durationCycles: number | null;
+        /** Unit the phase duration is counted in. Only a fixed-price phase may set it, because its amount is declared rather than derived from the plan. Defaults to the plan's own billing interval. */
+        durationInterval?: "weekly" | "monthly" | "quarterly" | "yearly" | null;
         /** Discount in basis points. 5000 means 50%. */
         percentage: number;
       }
     | {
         type: "amount_off";
         durationCycles: number | null;
+        /** Unit the phase duration is counted in. Only a fixed-price phase may set it, because its amount is declared rather than derived from the plan. Defaults to the plan's own billing interval. */
+        durationInterval?: "weekly" | "monthly" | "quarterly" | "yearly" | null;
         amounts: Array<{
           currency: string;
           /** Amount in the currency's minor unit (for example, cents for USD). */
@@ -80,6 +90,8 @@ export interface CreateOfferParams {
     | {
         type: "fixed_price";
         durationCycles: number | null;
+        /** Unit the phase duration is counted in. Only a fixed-price phase may set it, because its amount is declared rather than derived from the plan. Defaults to the plan's own billing interval. */
+        durationInterval?: "weekly" | "monthly" | "quarterly" | "yearly" | null;
         prices: Array<{
           currency: string;
           /** Amount in the currency's minor unit (for example, cents for USD). */

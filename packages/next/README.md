@@ -100,10 +100,6 @@ const features = await commet.featureAccess.list({ customerId: userId });
 
 Webhooks are useful when you want to react immediately to changes — send emails, update your database, revoke access, etc.
 
-## Documentation
-
-Visit [commet.co/docs](https://commet.co/docs) for the full guide on webhooks, portal customization, and more.
-
 ## License
 
 MIT

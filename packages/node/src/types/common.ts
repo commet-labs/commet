@@ -16,46 +16,89 @@ export interface ApiErrorDetail {
   doc_url?: string;
 }
 
-// Error types
+export interface CommetErrorContext {
+  type?: string;
+  param?: string;
+  requestId?: string;
+  docUrl?: string;
+}
+
 export class CommetError extends Error {
+  public type?: string;
+  public param?: string;
+  public requestId?: string;
+  public docUrl?: string;
+
   constructor(
     message: string,
     public code?: string,
     public statusCode?: number,
     public details?: unknown,
+    context?: CommetErrorContext,
   ) {
     super(message);
     this.name = "CommetError";
+    this.type = context?.type;
+    this.param = context?.param;
+    this.requestId = context?.requestId;
+    this.docUrl = context?.docUrl;
+  }
+
+  toJSON(): Record<string, unknown> {
+    return {
+      name: this.name,
+      message: this.message,
+      type: this.type,
+      code: this.code,
+      statusCode: this.statusCode,
+      param: this.param,
+      details: this.details,
+      requestId: this.requestId,
+      docUrl: this.docUrl,
+    };
   }
 }
 
 export class CommetAPIError extends CommetError {
-  public type?: string;
-  public param?: string;
-  public docUrl?: string;
-
   constructor(
     message: string,
-    public statusCode: number,
-    public code?: string,
-    public details?: unknown,
+    statusCode: number,
+    code?: string,
+    details?: unknown,
     errorDetail?: ApiErrorDetail,
+    responseContext?: Pick<CommetErrorContext, "requestId">,
   ) {
-    super(message, code, statusCode, details);
+    super(message, code, statusCode, details, {
+      type: errorDetail?.type,
+      param: errorDetail?.param,
+      requestId: responseContext?.requestId,
+      docUrl: errorDetail?.doc_url,
+    });
     this.name = "CommetAPIError";
-    this.type = errorDetail?.type;
-    this.param = errorDetail?.param;
-    this.docUrl = errorDetail?.doc_url;
   }
 }
 
-export class CommetValidationError extends CommetError {
+export class CommetValidationError extends CommetAPIError {
   constructor(
     message: string,
     public validationErrors: Record<string, string[]>,
+    statusCode = 422,
+    errorDetail?: ApiErrorDetail,
+    responseContext?: Pick<CommetErrorContext, "requestId">,
   ) {
-    super(message);
+    super(
+      message,
+      statusCode,
+      errorDetail?.code ?? "validation_error",
+      errorDetail?.details,
+      errorDetail,
+      responseContext,
+    );
     this.name = "CommetValidationError";
+  }
+
+  override toJSON(): Record<string, unknown> {
+    return { ...super.toJSON(), validationErrors: this.validationErrors };
   }
 }
 

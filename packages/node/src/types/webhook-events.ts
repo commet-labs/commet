@@ -400,6 +400,8 @@ export interface PaymentFailedData {
   customerId: string;
   /** The subscription ID, if the invoice is linked to a subscription. */
   subscriptionId: string | null;
+  /** The payment provider the charge was routed to: stripe, commet, or dlocal. */
+  provider: "stripe" | "commet" | "dlocal";
   /** The failure code from the payment processor. */
   failureCode: string;
   /** A human-readable failure message. */
@@ -420,6 +422,8 @@ export interface PaymentRecoveredData {
   customerId: string;
   /** The subscription ID, if the invoice is linked to a subscription. */
   subscriptionId: string | null;
+  /** The payment provider that recovered the payment, or null when the invoice was recovered without a processor charge. */
+  provider: "stripe" | "commet" | "dlocal" | null;
 }
 
 /** Fired when all dunning retries are exhausted and the subscription is canceled. This is the terminal event of the dunning flow — payment.recovered will not follow. Revoke access when you receive this. */
@@ -432,6 +436,8 @@ export interface PaymentRetryFailedData {
   customerId: string;
   /** The subscription ID. */
   subscriptionId: string;
+  /** The payment provider the charge was routed to: stripe, commet, or dlocal. */
+  provider: "stripe" | "commet" | "dlocal";
   /** Terminal dunning reason, usually the last processor decline code or "dunning_exhausted". */
   reason: string;
 }
@@ -754,7 +760,7 @@ export interface CustomerUpdatedData {
 export interface CustomerStateChangedData {
   /** The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId. */
   customerId: string;
-  /** What caused the transition. One of: subscription_created, subscription_activated, subscription_canceled, plan_change, past_due, trial_started, trial_converted, trial_expired, cancellation_scheduled, cancellation_revoked, seats_updated, addon_activated, addon_deactivated, credits_depleted, balance_depleted, quota_exceeded. */
+  /** What caused the transition. One of: subscription_created, subscription_activated, subscription_canceled, plan_change, past_due, trial_started, trial_converted, trial_expired, cancellation_scheduled, cancellation_revoked, seats_updated, addon_activated, addon_deactivated, credits_depleted, balance_depleted, quota_exceeded, plan_access_granted, plan_access_ended. */
   trigger: string;
   /** The customer's current subscription status, or "none" when no live subscription exists. Access is granted while trialing, active, or past_due — past_due is a permissive grace window during dunning. */
   status: string;

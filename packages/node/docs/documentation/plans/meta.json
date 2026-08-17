@@ -1,0 +1,14 @@
+{
+  "title": "Plans",
+  "description": "Configure pricing plans, features, consumption models, and add-ons",
+  "pages": [
+    "create-plans",
+    "configure-features",
+    "consumption-models",
+    "balance-and-top-ups",
+    "add-ons",
+    "credit-packs",
+    "plan-groups",
+    "one-time-payments"
+  ]
+}
