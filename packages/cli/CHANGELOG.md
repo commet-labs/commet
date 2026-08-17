@@ -1,5 +1,16 @@
 # commet
 
+## 5.1.0
+
+### Minor Changes
+
+- 36f8771: Ship the complete generated API surface, including customer plan grants, the complete serialized documentation, actionable SDK errors, generated CLI resources, agent setup, and local compatibility diagnostics.
+
+### Patch Changes
+
+- Updated dependencies [36f8771]
+  - @commet/node@9.1.0
+
 ## 5.0.1
 
 ### Patch Changes

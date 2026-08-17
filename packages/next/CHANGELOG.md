@@ -1,5 +1,11 @@
 # @commet/next
 
+## 1.2.0
+
+### Minor Changes
+
+- 36f8771: Ship the complete generated API surface, including customer plan grants, the complete serialized documentation, actionable SDK errors, generated CLI resources, agent setup, and local compatibility diagnostics.
+
 ## 1.1.10
 
 ### Patch Changes
