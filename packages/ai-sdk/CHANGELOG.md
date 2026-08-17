@@ -1,5 +1,11 @@
 # @commet/ai-sdk
 
+## 6.1.0
+
+### Minor Changes
+
+- 36f8771: Ship the complete generated API surface, including customer plan grants, the complete serialized documentation, actionable SDK errors, generated CLI resources, agent setup, and local compatibility diagnostics.
+
 ## 6.0.1
 
 ### Patch Changes
