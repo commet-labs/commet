@@ -151,7 +151,6 @@ try {
     throw new Error("Installed error reference manifest is inconsistent");
   }
   if (
-    installedManifest.platformDocumentation?.language !== "en" ||
     installedManifest.platformDocumentation?.count !==
       installedManifest.platformDocumentation?.entries?.length
   ) {

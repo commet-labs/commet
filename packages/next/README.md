@@ -102,7 +102,7 @@ Webhooks are useful when you want to react immediately to changes — send email
 
 ## Documentation
 
-This package requires `@commet/node` >= 9.1.0 and < 10.0.0. Read the common API reference at `node_modules/@commet/node/docs/README.md`; this README remains the version-matched Next.js integration guide.
+This package requires `@commet/node` >= 9.1.0 and < 10.0.0. All Commet documentation is installed once by `@commet/node` at `node_modules/@commet/node/docs/README.md`. This README covers only the Next.js integration.
 
 Visit [commet.co/docs](https://commet.co/docs) for the full guide on webhooks, portal customization, and more.
 

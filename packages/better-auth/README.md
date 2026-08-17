@@ -93,7 +93,7 @@ export const authClient = createAuthClient({
 });
 ```
 
-This package requires `@commet/node` >= 9.1.0 and < 10.0.0. Read the common API reference at `node_modules/@commet/node/docs/README.md`; this README remains the version-matched Better Auth integration guide.
+This package requires `@commet/node` >= 9.1.0 and < 10.0.0. All Commet documentation is installed once by `@commet/node` at `node_modules/@commet/node/docs/README.md`. This README covers only the Better Auth integration.
 
 ## Note About Webhooks
 

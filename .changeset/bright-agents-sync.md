@@ -6,4 +6,4 @@
 "commet": minor
 ---
 
-Ship the complete generated API surface, including customer plan grants, the complete serialized English documentation, actionable SDK errors, generated CLI resources, agent setup, and local compatibility diagnostics.
+Ship the complete generated API surface, including customer plan grants, the complete serialized documentation, actionable SDK errors, generated CLI resources, agent setup, and local compatibility diagnostics.

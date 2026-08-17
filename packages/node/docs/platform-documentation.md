@@ -1,6 +1,6 @@
 # Complete Commet documentation
 
-This English documentation snapshot is serialized from the same Platform source used by commet.co and installed with this SDK release.
+This documentation snapshot is serialized from the same Platform source used by commet.co and installed with this SDK release.
 
 - [ai-onboarding/ai-onboarding.md](./ai-onboarding/ai-onboarding.md)
 - [ai-onboarding/billing-best-practices-skill.md](./ai-onboarding/billing-best-practices-skill.md)

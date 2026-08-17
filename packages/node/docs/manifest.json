@@ -9,7 +9,6 @@
   "schemas": "schemas.md",
   "webhooks": "webhooks.md",
   "platformDocumentation": {
-    "language": "en",
     "source": "apps/web/content/docs/en",
     "index": "platform-documentation.md",
     "count": 171,
