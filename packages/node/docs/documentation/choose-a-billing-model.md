@@ -1,5 +1,5 @@
 ---
-lastModified: 2026-08-16
+lastModified: 2026-08-17
 title: Choose a Billing Model
 description: Choose between a recurring plan, usage, credits, balance, seats, quota, and one-time payments.
 ---
@@ -26,7 +26,7 @@ Start with the value your customer buys, not with an API method. Commet can comb
 - Use an **add-on** for an optional recurring capability attached to a subscription.
 - Use a **credit pack** for customer-purchased credits that persist across resets.
 - Use an **Offer** or **Promo Code** to change the price or phases of a sale without cloning the plan.
-- Use a **plan grant** when you want to provide paid-plan access without checkout or invoices.
+- Use a **plan grant** when you want to temporarily expand access without changing the subscription's billing.
 - Use a **customer credit** for a specific monetary adjustment, not as the plan's normal allowance.
 
 ## Model the smallest complete version

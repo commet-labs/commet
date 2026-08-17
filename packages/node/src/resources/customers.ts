@@ -83,16 +83,16 @@ export interface ListPlanGrantsParams {
 export type CreatePlanGrantParams =
   | {
       id: string;
+      subscriptionId: string;
       planId: string;
-      billingInterval: "weekly" | "monthly" | "quarterly" | "yearly";
       reason: string;
       duration: "cycles";
       durationCycles: number;
     }
   | {
       id: string;
+      subscriptionId: string;
       planId: string;
-      billingInterval: "weekly" | "monthly" | "quarterly" | "yearly";
       reason: string;
       duration: "until_date";
       /** @format date-time */
@@ -100,8 +100,8 @@ export type CreatePlanGrantParams =
     }
   | {
       id: string;
+      subscriptionId: string;
       planId: string;
-      billingInterval: "weekly" | "monthly" | "quarterly" | "yearly";
       reason: string;
       duration: "until_revoked";
     };
@@ -215,7 +215,7 @@ export class CustomersResource {
     return this.httpClient.post(`/customers/${id}/credits`, rest, options);
   }
 
-  /** End complimentary access immediately. The next full-price period becomes pending payment and requires checkout; no past period is billed retroactively. */
+  /** End expanded access immediately and restore the base plan's limits. The subscription, billing cycle, invoices, and payment state remain unchanged. */
   async revokePlanGrant(
     params: RevokePlanGrantParams,
     options?: RequestOptions,
@@ -228,7 +228,7 @@ export class CustomersResource {
     );
   }
 
-  /** Give the grant a remaining number of billing cycles, set an exact deadline, or keep it active until revoked. */
+  /** Keep the overlay for a number of the subscription's existing billing cycles, set an exact deadline, or leave it active until revoked. The billing anchor is never reset. */
   async updatePlanGrant(
     params: UpdatePlanGrantParams,
     options?: RequestOptions,
@@ -259,7 +259,7 @@ export class CustomersResource {
     );
   }
 
-  /** Move an active free subscription to an eligible paid plan immediately without checkout, a card, or customer credit. The grant may last for exact billing cycles, until a date, or until revoked. */
+  /** Temporarily expand an active subscription's feature access using a higher plan in the same plan group. Billing, prices, periods, invoices, and the base subscription remain unchanged. */
   async createPlanGrant(
     params: CreatePlanGrantParams,
     options?: RequestOptions,

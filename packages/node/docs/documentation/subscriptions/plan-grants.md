@@ -1,62 +1,75 @@
 ---
-lastModified: 2026-08-16
-title: Grant Paid-Plan Access Without Checkout
-description: Give selected customers paid-plan entitlements for a fixed number of cycles, until a date, or until you revoke access.
+lastModified: 2026-08-17
+title: Grant Temporary Plan Access
+description: Temporarily expand a subscription's features and limits without changing its plan, price, invoice, or billing cycle.
 ---
 
-Plan Grants move a customer from an active Free subscription to a paid plan without checkout, card details, or Invoice Credit. Use them when you want a selected customer to evaluate the real paid plan rather than a separate promotional plan.
+A Plan Grant temporarily expands an active subscription's access. It does not change the subscription's plan, price, currency, billing anchor, period, invoice, payment method, or status.
 
-The customer receives the target plan's features and limits. Commet keeps the grant and every duration change in a separate audit timeline.
+Use a Plan Grant when a selected customer needs higher limits or additional features for an evaluation, migration, support exception, or negotiated access period without changing what they are billed.
 
-## Before you create a grant
+## How access is resolved
 
-The customer must have an active Free subscription. The target must be a paid plan with a default recurring price for the selected billing interval.
+The subscription keeps its immutable base-plan contract. The grant pins an immutable release of a higher plan and combines both contracts:
 
-The grant is eligible when:
+- boolean features are enabled when either contract enables them;
+- included usage, quota, and seat limits use the higher allowance;
+- unlimited access applies when either contract is unlimited; and
+- paid overage is never introduced by the grant.
 
-- the customer has no active add-ons;
-- paid non-seat feature overage is disabled;
-- a Balance plan blocks usage when its balance is exhausted; and
-- the customer's current seats do not already exceed the target plan's included allowance.
+When the grant ends, Commet immediately evaluates access against the base subscription again. Existing seats and recorded usage are not deleted. If the customer is already above a base-plan hard limit, further use is blocked until usage resets, capacity falls below the limit, or the subscription is upgraded normally.
 
-One-time prices cannot receive Plan Grants.
+## Eligibility
+
+The base subscription must be active and recurring. The target plan must belong to the same Plan Group and have a higher `sortOrder` than the base plan.
+
+The initial release supports metered plans with boolean features and hard-capped usage, quota, or seat limits. Commet rejects a grant when either plan uses:
+
+- Credits or Balance consumption;
+- paid overage;
+- AI model pricing; or
+- active subscription add-ons.
+
+The target plan may itself be free or paid. Its prices and billing intervals are irrelevant because the grant does not use them.
 
 ## Choose a duration
 
-| Duration        | Behavior                                                                                                                  |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `cycles`        | Grants an exact number of the target price's weekly, monthly, quarterly, or yearly billing cycles.                        |
-| `until_date`    | Ends access at the exact ISO timestamp you provide. The Dashboard treats the selected date as the end of that day in UTC. |
-| `until_revoked` | Continues until you revoke it or replace it with a finite duration.                                                       |
+| Duration        | Behavior                                                                                                                                                   |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `cycles`        | Ends on an existing subscription billing boundary. One cycle means the current `currentPeriodEnd`; additional cycles advance from the same billing anchor. |
+| `until_date`    | Ends at the exact ISO timestamp provided. The Dashboard treats the selected date as the end of that day in UTC.                                            |
+| `until_revoked` | Continues until it is revoked or changed to a finite duration.                                                                                             |
 
-You can change the duration of an active grant. For example, an unlimited evaluation can later become “one remaining month” by updating it to one monthly cycle.
+Creating or updating a grant never restarts the billing cycle.
 
 ## Grant access
 
-Create the grant with the customer's public ID and the paid plan's public ID:
+Create the grant with the customer, active subscription, and target plan public IDs:
 
 ```bash
 curl -X POST https://commet.co/api/v1/customers/cus_xxx/plan-grants \
   -H "x-api-key: $COMMET_API_KEY" \
+  -H "commet-version: 2026-07-31" \
   -H "Content-Type: application/json" \
   -d '{
-    "planId": "pln_starter",
-    "billingInterval": "monthly",
+    "subscriptionId": "sub_xxx",
+    "planId": "pln_pro",
     "duration": "cycles",
     "durationCycles": 2,
     "reason": "Selected customer evaluation"
   }'
 ```
 
-The subscription moves to the paid plan immediately. Commet creates the plan period without opening checkout or asking for payment credentials.
+Access expands immediately. No checkout, invoice, charge, credit, or subscription plan change is created.
 
 ## Update the duration
 
-Use the grant's public ID to change its remaining duration:
+Use the grant public ID to change its remaining duration:
 
 ```bash
 curl -X PATCH https://commet.co/api/v1/customers/cus_xxx/plan-grants/grt_xxx \
   -H "x-api-key: $COMMET_API_KEY" \
+  -H "commet-version: 2026-07-31" \
   -H "Content-Type: application/json" \
   -d '{
     "duration": "until_date",
@@ -65,68 +78,47 @@ curl -X PATCH https://commet.co/api/v1/customers/cus_xxx/plan-grants/grt_xxx \
   }'
 ```
 
-You can also send `until_revoked`, or a new `cycles` duration with `durationCycles`.
+You can also send `until_revoked`, or `cycles` with a new `durationCycles` value. A new cycle count is resolved from the subscription's current period and original billing anchor.
 
 ## Revoke access
 
-Revocation ends the grant at the time of the request:
+Revocation restores base-plan access immediately:
 
 ```bash
 curl -X POST https://commet.co/api/v1/customers/cus_xxx/plan-grants/grt_xxx/revoke \
   -H "x-api-key: $COMMET_API_KEY" \
+  -H "commet-version: 2026-07-31" \
   -H "Content-Type: application/json" \
   -d '{"reason":"Evaluation ended"}'
 ```
 
-## Billing lifecycle
+Revocation does not create a full-price obligation, re-anchor the subscription, or move it to `pending_payment`.
 
-While the grant is active, Commet produces normal plan periods and invoices the paid plan base at `0`. The grant does not consume Invoice Credit, and there is no retroactive charge for covered periods.
+## Plan Grants, Offers, trials, and Invoice Credit
 
-At natural expiration or revocation:
-
-1. complimentary access ends;
-2. a new full-price period starts at that instant;
-3. the subscription becomes `pending_payment`; and
-4. Commet creates checkout for the new invoice.
-
-Commet does not automatically move the customer back to Free. Your integration decides whether to send the customer to checkout or start a Free subscription through the normal [subscription lifecycle](/docs/manage-subscriptions).
-
-If the customer pays, the subscription becomes active and its paid billing cycle remains anchored to the new invoice period. If your integration chooses Free, the customer receives the Free plan's entitlements instead.
-
-## Seats, add-ons, and usage
-
-The grant covers the paid plan's base price and included entitlements. Seats added after activation keep their independent payment flow.
-
-Active add-ons and paid non-seat feature overage are not supported during a Plan Grant. Remove those obligations before granting access. A Balance plan must block when its balance is exhausted so it cannot create an uncovered charge.
-
-## Plan Grants, Offers, and Invoice Credit
-
-| Use                                                                              | Choose         |
-| -------------------------------------------------------------------------------- | -------------- |
-| Give selected customers paid-plan access without checkout or payment credentials | Plan Grant     |
-| Define reusable commercial pricing or an introductory phase selected at checkout | Offer          |
-| Reduce the monetary total of recurring invoices in one currency                  | Invoice Credit |
-
-These are separate resources: a Plan Grant changes access, an Offer changes pricing terms, and Invoice Credit pays invoice amounts.
+| Need                                                                   | Use            |
+| ---------------------------------------------------------------------- | -------------- |
+| Temporarily expand features or limits without changing billing         | Plan Grant     |
+| Temporarily change reusable commercial terms                           | Offer          |
+| Delay the first recurring charge as part of the subscription lifecycle | Trial          |
+| Reduce invoice totals in one currency                                  | Invoice Credit |
 
 ## Keep access in sync
 
-Listen for [`customer.state_changed`](/docs/webhooks/customer-state-changed). `plan_access_granted` reports activation, while `plan_access_ended` reports expiration or revocation and the resulting current state.
+Listen for [`customer.state_changed`](/docs/webhooks/customer-state-changed). `plan_access_granted` reports activation, while `plan_access_ended` reports expiration or revocation.
 
-## Audit grants
-
-List the customer's grants to inspect the current status and the complete duration-change timeline:
+List a customer's grants to inspect their status and duration-change timeline:
 
 ```bash
 curl https://commet.co/api/v1/customers/cus_xxx/plan-grants \
-  -H "x-api-key: $COMMET_API_KEY"
+  -H "x-api-key: $COMMET_API_KEY" \
+  -H "commet-version: 2026-07-31"
 ```
 
-See the [Plan Grants API reference](/docs/api-reference/customers/list-plan-grants) for the exact request and response schemas.
+See the [Plan Grants API reference](/docs/api-reference/customers/list-plan-grants) for exact request and response schemas.
 
 ## Related
 
 - [Manage Subscriptions](/docs/manage-subscriptions)
 - [Introductory Offers](/docs/introductory-offers)
 - [Customer State Changed](/docs/webhooks/customer-state-changed)
-- [Handle Failed Payments](/docs/handle-failed-payments)
