@@ -1,5 +1,5 @@
 ---
-lastModified: 2026-08-16
+lastModified: 2026-08-17
 title: Manage Subscriptions
 description: Create, retrieve, cancel, uncancel, and reactivate subscriptions with SDK v9.
 ---
@@ -497,7 +497,7 @@ The selected price is not snapshotted. Future renewals use its current catalog v
 
 ## Related
 
-- [Grant Paid-Plan Access Without Checkout](/docs/plan-grants)
+- [Grant Temporary Plan Access](/docs/plan-grants)
 - [Upgrade and Downgrade Plans](/docs/upgrade-and-downgrade-plans)
 - [Handle Failed Payments](/docs/handle-failed-payments)
 - [Regional and Market Pricing](/docs/regional-prices)
