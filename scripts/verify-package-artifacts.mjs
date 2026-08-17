@@ -19,6 +19,11 @@ const packageExpectations = [
     files: [
       "package/docs/README.md",
       "package/docs/manifest.json",
+      "package/docs/platform-documentation.md",
+      "package/docs/documentation/subscriptions/plan-grants.md",
+      "package/docs/knowledge-base/how-does-billing-work.md",
+      "package/docs/ai-onboarding/ai-onboarding.md",
+      "package/docs/webhooks/payment-received.md",
       "package/docs/api-reference/index.md",
       "package/docs/schemas.md",
       "package/docs/errors/index.md",
@@ -144,6 +149,51 @@ try {
     installedManifest.errorReferences?.entries?.length
   ) {
     throw new Error("Installed error reference manifest is inconsistent");
+  }
+  if (
+    installedManifest.platformDocumentation?.language !== "en" ||
+    installedManifest.platformDocumentation?.count !==
+      installedManifest.platformDocumentation?.entries?.length
+  ) {
+    throw new Error("Installed Platform documentation manifest is inconsistent");
+  }
+  for (const documentationPath of installedManifest.platformDocumentation
+    .entries) {
+    if (documentationPath.endsWith(".mdx")) {
+      throw new Error(`Installed documentation kept MDX path ${documentationPath}`);
+    }
+    if (
+      !existsSync(
+        join(
+          consumerRoot,
+          "node_modules",
+          "@commet",
+          "node",
+          "docs",
+          documentationPath,
+        ),
+      )
+    ) {
+      throw new Error(`Installed docs are missing ${documentationPath}`);
+    }
+  }
+  const installedWebhookDocumentation = readFileSync(
+    join(
+      consumerRoot,
+      "node_modules",
+      "@commet",
+      "node",
+      "docs",
+      "webhooks",
+      "payment-received.md",
+    ),
+    "utf8",
+  );
+  if (
+    installedWebhookDocumentation.includes("WebhookEventDoc") ||
+    !installedWebhookDocumentation.includes("```json")
+  ) {
+    throw new Error("Installed webhook documentation was not serialized");
   }
   for (const errorReference of installedManifest.errorReferences.entries) {
     if (

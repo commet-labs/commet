@@ -1,0 +1,11 @@
+{
+  "title": "Commet Documentation",
+  "description": "B2B SaaS billing platform for Latin America",
+  "pages": [
+    "documentation",
+    "knowledge-base",
+    "ai-onboarding",
+    "api-reference",
+    "webhooks"
+  ]
+}

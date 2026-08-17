@@ -1,0 +1,13 @@
+{
+  "title": "Sales",
+  "description": "Create Offers, Promo Codes, Markets, and customer acquisition strategies",
+  "pages": [
+    "offers",
+    "introductory-offers",
+    "promotional-offers",
+    "card-promotions",
+    "promo-codes",
+    "regional-prices",
+    "trial-periods"
+  ]
+}

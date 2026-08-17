@@ -1,0 +1,17 @@
+{
+  "title": "Build with AI",
+  "description": "Tools and resources for AI agents using Commet",
+  "icon": "Robot",
+  "root": true,
+  "pages": [
+    "---Getting Started---",
+    "ai-onboarding",
+    "---AI Tools---",
+    "mcp-server",
+    "---Agent Skills---",
+    "commet-skill",
+    "billing-best-practices-skill",
+    "pricing-models-skill",
+    "subscription-patterns-skill"
+  ]
+}

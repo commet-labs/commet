@@ -1,0 +1,10 @@
+{
+  "title": "Platform",
+  "description": "Organization settings, team access, branded domains, metrics, and operational events",
+  "pages": [
+    "organization-settings",
+    "members-and-permissions",
+    "custom-domains",
+    "dashboard-metrics-and-events"
+  ]
+}

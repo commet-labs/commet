@@ -1,0 +1,5 @@
+{
+  "title": "Customers",
+  "description": "Create, manage, and provide self-service portals to your customers",
+  "pages": ["manage-customers", "customer-credits", "customer-portal"]
+}

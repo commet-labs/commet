@@ -1,0 +1,10 @@
+{
+  "title": "Usage",
+  "description": "Track metered usage, AI tokens, and seat-based licenses",
+  "pages": [
+    "track-usage",
+    "ai-token-billing",
+    "seat-management",
+    "quota-management"
+  ]
+}
