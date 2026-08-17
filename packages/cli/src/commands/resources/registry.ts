@@ -479,7 +479,8 @@ export const resourceDefinitions: ResourceDef[] = [
       },
       "revoke-plan-grant": {
         method: "revokePlanGrant",
-        description: "End complimentary access immediately.",
+        description:
+          "End expanded access immediately and restore the base plan's limits.",
         hasParams: true,
         params: [
           {
@@ -512,7 +513,7 @@ export const resourceDefinitions: ResourceDef[] = [
       "update-plan-grant": {
         method: "updatePlanGrant",
         description:
-          "Give the grant a remaining number of billing cycles, set an exact deadline, or keep it active until revoked.",
+          "Keep the overlay for a number of the subscription's existing billing cycles, set an exact deadline, or leave it active until revoked.",
         hasParams: true,
         params: [
           {
@@ -581,7 +582,7 @@ export const resourceDefinitions: ResourceDef[] = [
       "create-plan-grant": {
         method: "createPlanGrant",
         description:
-          "Move an active free subscription to an eligible paid plan immediately without checkout, a card, or customer credit.",
+          "Temporarily expand an active subscription's feature access using a higher plan in the same plan group.",
         hasParams: true,
         params: [
           {
@@ -591,16 +592,16 @@ export const resourceDefinitions: ResourceDef[] = [
             sdkKey: "id",
           },
           {
+            flag: "--subscription-id <subscription-id>",
+            description: "Subscription id",
+            required: true,
+            sdkKey: "subscriptionId",
+          },
+          {
             flag: "--plan-id <plan-id>",
             description: "Plan id",
             required: true,
             sdkKey: "planId",
-          },
-          {
-            flag: "--billing-interval <billing-interval>",
-            description: "Billing interval",
-            required: true,
-            sdkKey: "billingInterval",
           },
           {
             flag: "--reason <reason>",
@@ -634,9 +635,9 @@ export const resourceDefinitions: ResourceDef[] = [
           },
         ],
         requiredAlternatives: [
-          ["planId", "billingInterval", "reason", "duration", "durationCycles"],
-          ["planId", "billingInterval", "reason", "duration", "expiresAt"],
-          ["planId", "billingInterval", "reason", "duration"],
+          ["subscriptionId", "planId", "reason", "duration", "durationCycles"],
+          ["subscriptionId", "planId", "reason", "duration", "expiresAt"],
+          ["subscriptionId", "planId", "reason", "duration"],
         ],
       },
       get: {

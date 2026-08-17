@@ -1,5 +1,5 @@
 ---
-lastModified: 2026-08-16
+lastModified: 2026-08-17
 title: "customer.state_changed"
 description: "Aggregate entitlement event — what can this customer access right now."
 full: true
@@ -124,11 +124,11 @@ Instead of handling every lifecycle event (`subscription.activated`, `subscripti
 | `credits_depleted`       | The subscription ran out of credits.                                                                         |
 | `balance_depleted`       | The subscription ran out of prepaid balance.                                                                 |
 | `quota_exceeded`         | Usage passed a feature's included quantity.                                                                  |
-| `plan_access_granted`    | A Plan Grant moved the customer from Free to a paid plan without checkout.                                   |
+| `plan_access_granted`    | A Plan Grant temporarily expanded the customer's access without changing subscription billing.               |
 | `plan_access_ended`      | A Plan Grant expired or was revoked; the payload contains the resulting current state.                       |
 
 ## Handling the payload
 
 Use `status` as the access gate (`trialing` and `active` grant access), `features` for per-feature limits, and `credits`/`balance` for consumption headroom on credits/balance plans. The payload reflects the state at delivery time — if two transitions happen back to back, the later event always carries the final state, so processing events in `timestamp` order converges to the correct result.
 
-See [Plan Grants](/docs/plan-grants) for the checkout-free paid-access lifecycle.
+See [Plan Grants](/docs/plan-grants) for the temporary access lifecycle.
