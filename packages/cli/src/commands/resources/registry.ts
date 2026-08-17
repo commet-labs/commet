@@ -477,6 +477,168 @@ export const resourceDefinitions: ResourceDef[] = [
           },
         ],
       },
+      "revoke-plan-grant": {
+        method: "revokePlanGrant",
+        description: "End complimentary access immediately.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--grant-id <grant-id>",
+            description: "Grant id",
+            required: true,
+            sdkKey: "grantId",
+          },
+          {
+            flag: "--reason <reason>",
+            description: "Reason",
+            required: true,
+            sdkKey: "reason",
+          },
+          {
+            flag: "--idempotency-key <key>",
+            description:
+              "Unique key used to safely retry this write for 24 hours without applying it twice.",
+            sdkKey: "idempotencyKey",
+            requestOption: true,
+          },
+        ],
+      },
+      "update-plan-grant": {
+        method: "updatePlanGrant",
+        description:
+          "Give the grant a remaining number of billing cycles, set an exact deadline, or keep it active until revoked.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--grant-id <grant-id>",
+            description: "Grant id",
+            required: true,
+            sdkKey: "grantId",
+          },
+          {
+            flag: "--reason <reason>",
+            description: "Reason",
+            required: true,
+            sdkKey: "reason",
+          },
+          {
+            flag: "--duration <duration>",
+            description: "Duration",
+            required: true,
+            sdkKey: "duration",
+          },
+          {
+            flag: "--duration-cycles <number>",
+            description: "Duration cycles",
+            parse: parseNumber,
+            sdkKey: "durationCycles",
+          },
+          {
+            flag: "--expires-at <expires-at>",
+            description: "Expires at",
+            sdkKey: "expiresAt",
+          },
+          {
+            flag: "--idempotency-key <key>",
+            description:
+              "Unique key used to safely retry this write for 24 hours without applying it twice.",
+            sdkKey: "idempotencyKey",
+            requestOption: true,
+          },
+        ],
+        requiredAlternatives: [
+          ["reason", "duration", "durationCycles"],
+          ["reason", "duration", "expiresAt"],
+          ["reason", "duration"],
+        ],
+      },
+      "list-plan-grants": {
+        method: "listPlanGrants",
+        description:
+          "List the independent audit timeline for paid-plan access granted without checkout or payment credentials.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+        ],
+      },
+      "create-plan-grant": {
+        method: "createPlanGrant",
+        description:
+          "Move an active free subscription to an eligible paid plan immediately without checkout, a card, or customer credit.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--plan-id <plan-id>",
+            description: "Plan id",
+            required: true,
+            sdkKey: "planId",
+          },
+          {
+            flag: "--billing-interval <billing-interval>",
+            description: "Billing interval",
+            required: true,
+            sdkKey: "billingInterval",
+          },
+          {
+            flag: "--reason <reason>",
+            description: "Reason",
+            required: true,
+            sdkKey: "reason",
+          },
+          {
+            flag: "--duration <duration>",
+            description: "Duration",
+            required: true,
+            sdkKey: "duration",
+          },
+          {
+            flag: "--duration-cycles <number>",
+            description: "Duration cycles",
+            parse: parseNumber,
+            sdkKey: "durationCycles",
+          },
+          {
+            flag: "--expires-at <expires-at>",
+            description: "Expires at",
+            sdkKey: "expiresAt",
+          },
+          {
+            flag: "--idempotency-key <key>",
+            description:
+              "Unique key used to safely retry this write for 24 hours without applying it twice.",
+            sdkKey: "idempotencyKey",
+            requestOption: true,
+          },
+        ],
+        requiredAlternatives: [
+          ["planId", "billingInterval", "reason", "duration", "durationCycles"],
+          ["planId", "billingInterval", "reason", "duration", "expiresAt"],
+          ["planId", "billingInterval", "reason", "duration"],
+        ],
+      },
       get: {
         method: "get",
         description:

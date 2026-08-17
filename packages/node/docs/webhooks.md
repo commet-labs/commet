@@ -534,7 +534,7 @@ Aggregate entitlement event answering one question: what can this customer acces
 ### Data
 
 - `customerId` (`string`, required) — The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.
-- `trigger` (`string`, required) — What caused the transition. One of: subscription_created, subscription_activated, subscription_canceled, plan_change, past_due, trial_started, trial_converted, trial_expired, cancellation_scheduled, cancellation_revoked, seats_updated, addon_activated, addon_deactivated, credits_depleted, balance_depleted, quota_exceeded.
+- `trigger` (`string`, required) — What caused the transition. One of: subscription_created, subscription_activated, subscription_canceled, plan_change, past_due, trial_started, trial_converted, trial_expired, cancellation_scheduled, cancellation_revoked, seats_updated, addon_activated, addon_deactivated, credits_depleted, balance_depleted, quota_exceeded, plan_access_granted, plan_access_ended.
 - `status` (`string`, required) — The customer's current subscription status, or "none" when no live subscription exists. Access is granted while trialing, active, or past_due — past_due is a permissive grace window during dunning.
 - `subscriptionId` (`string | null`, required) — The live subscription ID, or null when status is none.
 - `plan` (`WebhookPlanRef | null`, required) — The current plan (id and name), or null when status is none.

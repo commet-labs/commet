@@ -357,7 +357,7 @@ Variants:
 - `planName` (`string | null`, required)
 - `poNumber` (`string | null`, required)
 - `reference` (`string | null`, required)
-- `lineItems` (`Array<{ lineType: "plan_base" | "feature_overage" | "feature_seats" | "feature_quota" | "discount" | "promo_code_discount" | "credit" | "balance_overage" | "addon_base" | "one_time"; featureName: string | null; description: string; quantity: number; unitAmount: number; amount: number; includedAmount: number | null; usedAmount: number | null; overageAmount: number | null; discountType: string | null; discountValue: number | null; discountName: string | null; chargeType: "standard" | "advance" | "true_up" }>`, required)
+- `lineItems` (`Array<{ lineType: "plan_base" | "feature_overage" | "feature_seats" | "feature_quota" | "discount" | "promo_code_discount" | "plan_grant" | "credit" | "balance_overage" | "addon_base" | "one_time"; featureName: string | null; description: string; quantity: number; unitAmount: number; amount: number; includedAmount: number | null; usedAmount: number | null; overageAmount: number | null; discountType: string | null; discountValue: number | null; discountName: string | null; chargeType: "standard" | "advance" | "true_up" }>`, required)
 - `object` (`"invoice"`, required)
 - `livemode` (`boolean`, required)
 
@@ -515,6 +515,28 @@ Variants:
 - `pricingMode` (`"fixed" | "ai_model"`, required)
 - `margin` (`number | null`, required)
 - `object` (`"plan_feature"`, required)
+- `livemode` (`boolean`, required)
+
+### PlanGrant
+
+- `id` (`string`, required)
+- `customerId` (`string`, required)
+- `subscriptionId` (`string`, required)
+- `planId` (`string`, required)
+- `planPriceId` (`string`, required)
+- `billingInterval` (`"weekly" | "monthly" | "quarterly" | "yearly"`, required)
+- `status` (`"active" | "expired" | "revoked"`, required)
+- `duration` (`"cycles" | "until_date" | "until_revoked"`, required)
+- `durationCycles` (`number | null`, required)
+- `startsAt` (`string`, required)
+- `expiresAt` (`string | null`, required)
+- `reason` (`string`, required)
+- `source` (`"dashboard" | "api"`, required)
+- `revokedAt` (`string | null`, required)
+- `createdAt` (`string`, required)
+- `updatedAt` (`string`, required)
+- `events` (`Array<{ id: string; type: "created" | "updated" | "expired" | "revoked"; reason: string; source: "dashboard" | "api" | "system"; previousExpiresAt: string | null; expiresAt: string | null; duration: "cycles" | "until_date" | "until_revoked" | null; durationCycles: number | null; requestedExpiresAt: string | null; createdAt: string }>`, required)
+- `object` (`"plan_grant"`, required)
 - `livemode` (`boolean`, required)
 
 ### PlanGroup

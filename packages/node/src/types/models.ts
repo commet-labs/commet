@@ -587,6 +587,7 @@ export interface Invoice {
       | "feature_quota"
       | "discount"
       | "promo_code_discount"
+      | "plan_grant"
       | "credit"
       | "balance_overage"
       | "addon_base"
@@ -1079,6 +1080,43 @@ export interface PlanFeature {
   pricingMode: "fixed" | "ai_model";
   margin: number | null;
   object: "plan_feature";
+  livemode: boolean;
+}
+
+export interface PlanGrant {
+  id: string;
+  customerId: string;
+  subscriptionId: string;
+  planId: string;
+  planPriceId: string;
+  billingInterval: "weekly" | "monthly" | "quarterly" | "yearly";
+  status: "active" | "expired" | "revoked";
+  duration: "cycles" | "until_date" | "until_revoked";
+  durationCycles: number | null;
+  /** @format date-time */
+  startsAt: string;
+  expiresAt: string | null;
+  reason: string;
+  source: "dashboard" | "api";
+  revokedAt: string | null;
+  /** @format date-time */
+  createdAt: string;
+  /** @format date-time */
+  updatedAt: string;
+  events: Array<{
+    id: string;
+    type: "created" | "updated" | "expired" | "revoked";
+    reason: string;
+    source: "dashboard" | "api" | "system";
+    previousExpiresAt: string | null;
+    expiresAt: string | null;
+    duration: "cycles" | "until_date" | "until_revoked" | null;
+    durationCycles: number | null;
+    requestedExpiresAt: string | null;
+    /** @format date-time */
+    createdAt: string;
+  }>;
+  object: "plan_grant";
   livemode: boolean;
 }
 

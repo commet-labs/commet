@@ -644,6 +644,30 @@
           "path": "/customers/{id}/credits"
         },
         {
+          "name": "revokePlanGrant",
+          "operationId": "revoke-plan-grant",
+          "method": "POST",
+          "path": "/customers/{id}/plan-grants/{grantId}/revoke"
+        },
+        {
+          "name": "updatePlanGrant",
+          "operationId": "update-plan-grant",
+          "method": "PATCH",
+          "path": "/customers/{id}/plan-grants/{grantId}"
+        },
+        {
+          "name": "listPlanGrants",
+          "operationId": "list-plan-grants",
+          "method": "GET",
+          "path": "/customers/{id}/plan-grants"
+        },
+        {
+          "name": "createPlanGrant",
+          "operationId": "create-plan-grant",
+          "method": "POST",
+          "path": "/customers/{id}/plan-grants"
+        },
+        {
           "name": "get",
           "operationId": "get-customer",
           "method": "GET",

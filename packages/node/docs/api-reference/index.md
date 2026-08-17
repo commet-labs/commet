@@ -10,7 +10,7 @@ Use this reference for the exact resources, methods, parameters, and return type
 - [Api Keys](./api-keys.md) — 3 operations
 - [Provisioning](./provisioning.md) — 1 operations
 - [Credit Packs](./credit-packs.md) — 4 operations
-- [Customers](./customers.md) — 8 operations
+- [Customers](./customers.md) — 12 operations
 - [Feature Access](./feature-access.md) — 2 operations
 - [Features](./features.md) — 5 operations
 - [Invoices](./invoices.md) — 6 operations

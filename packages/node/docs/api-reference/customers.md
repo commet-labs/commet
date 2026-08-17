@@ -63,6 +63,107 @@ Grant monetary credit in one currency. Credit is applied FIFO before tax to elig
 
 `CustomerCredit`
 
+## revokePlanGrant
+
+`commet.customers.revokePlanGrant(params, options?)`
+
+`POST /customers/{id}/plan-grants/{grantId}/revoke` · operation `revoke-plan-grant`
+
+End complimentary access immediately. The next full-price period becomes pending payment and requires checkout; no past period is billed retroactively.
+
+### Parameters
+
+- `id` (`string`, required)
+- `grantId` (`string`, required)
+- `reason` (`string`, required)
+
+### Request options
+
+- `idempotencyKey` (`string`, optional) — Unique key used to safely retry this write for 24 hours without applying it twice.
+
+### Returns
+
+`PlanGrant`
+
+## updatePlanGrant
+
+`commet.customers.updatePlanGrant(params, options?)`
+
+`PATCH /customers/{id}/plan-grants/{grantId}` · operation `update-plan-grant`
+
+Give the grant a remaining number of billing cycles, set an exact deadline, or keep it active until revoked.
+
+### Parameters
+
+- `id` (`string`, required)
+- `grantId` (`string`, required)
+- `reason` (`string`, required)
+- `duration` (`"cycles" | "until_date" | "until_revoked"`, required)
+- `durationCycles` (`number`, optional)
+- `expiresAt` (`string`, optional)
+
+### Valid parameter combinations
+
+- `reason` + `duration` + `durationCycles`
+- `reason` + `duration` + `expiresAt`
+- `reason` + `duration`
+
+### Request options
+
+- `idempotencyKey` (`string`, optional) — Unique key used to safely retry this write for 24 hours without applying it twice.
+
+### Returns
+
+`PlanGrant`
+
+## listPlanGrants
+
+`commet.customers.listPlanGrants(params)`
+
+`GET /customers/{id}/plan-grants` · operation `list-plan-grants`
+
+List the independent audit timeline for paid-plan access granted without checkout or payment credentials.
+
+### Parameters
+
+- `id` (`string`, required)
+
+### Returns
+
+`{ object: "list"; data: Array<PlanGrant>; hasMore: boolean; nextCursor?: string }`
+
+## createPlanGrant
+
+`commet.customers.createPlanGrant(params, options?)`
+
+`POST /customers/{id}/plan-grants` · operation `create-plan-grant`
+
+Move an active free subscription to an eligible paid plan immediately without checkout, a card, or customer credit. The grant may last for exact billing cycles, until a date, or until revoked.
+
+### Parameters
+
+- `id` (`string`, required)
+- `planId` (`string`, required)
+- `billingInterval` (`"weekly" | "monthly" | "quarterly" | "yearly"`, required)
+- `reason` (`string`, required)
+- `duration` (`"cycles" | "until_date" | "until_revoked"`, required)
+- `durationCycles` (`number`, optional)
+- `expiresAt` (`string`, optional)
+
+### Valid parameter combinations
+
+- `planId` + `billingInterval` + `reason` + `duration` + `durationCycles`
+- `planId` + `billingInterval` + `reason` + `duration` + `expiresAt`
+- `planId` + `billingInterval` + `reason` + `duration`
+
+### Request options
+
+- `idempotencyKey` (`string`, optional) — Unique key used to safely retry this write for 24 hours without applying it twice.
+
+### Returns
+
+`PlanGrant`
+
 ## get
 
 `commet.customers.get(params)`

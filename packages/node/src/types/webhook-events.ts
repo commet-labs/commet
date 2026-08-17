@@ -760,7 +760,7 @@ export interface CustomerUpdatedData {
 export interface CustomerStateChangedData {
   /** The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId. */
   customerId: string;
-  /** What caused the transition. One of: subscription_created, subscription_activated, subscription_canceled, plan_change, past_due, trial_started, trial_converted, trial_expired, cancellation_scheduled, cancellation_revoked, seats_updated, addon_activated, addon_deactivated, credits_depleted, balance_depleted, quota_exceeded. */
+  /** What caused the transition. One of: subscription_created, subscription_activated, subscription_canceled, plan_change, past_due, trial_started, trial_converted, trial_expired, cancellation_scheduled, cancellation_revoked, seats_updated, addon_activated, addon_deactivated, credits_depleted, balance_depleted, quota_exceeded, plan_access_granted, plan_access_ended. */
   trigger: string;
   /** The customer's current subscription status, or "none" when no live subscription exists. Access is granted while trialing, active, or past_due — past_due is a permissive grace window during dunning. */
   status: string;

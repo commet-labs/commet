@@ -21,11 +21,15 @@ export type {
   BatchCreateCustomersParams,
   CreateCustomerCreditParams,
   CreateCustomerParams,
+  CreatePlanGrantParams,
   GetCustomerParams,
   ListCustomerCreditsParams,
   ListCustomersParams,
+  ListPlanGrantsParams,
   RevokeCustomerCreditParams,
+  RevokePlanGrantParams,
   UpdateCustomerParams,
+  UpdatePlanGrantParams,
 } from "./resources/customers";
 export type {
   GetFeatureAccessParams,
@@ -238,6 +242,7 @@ export type {
   Plan,
   PlanChange,
   PlanFeature,
+  PlanGrant,
   PlanGroup,
   PlanGroupDetail,
   PlanPrice,
