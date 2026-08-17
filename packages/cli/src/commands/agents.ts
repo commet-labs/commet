@@ -21,9 +21,7 @@ export interface AgentRulesResult {
   packages: string[];
 }
 
-export function renderAgentRules(
-  packages: Array<{ name: string; documentation: string }>,
-): string {
+export function renderAgentRules(): string {
   const lines = [
     AGENT_RULES_BEGIN,
     "",
@@ -31,10 +29,7 @@ export function renderAgentRules(
     "",
     "Before changing a Commet integration, read the version-matched documentation installed in this project:",
     "",
-    ...packages.map(
-      (packageInfo) =>
-        `- \`${packageInfo.documentation}\` for \`${packageInfo.name}\``,
-    ),
+    "- `node_modules/@commet/node/docs/README.md`",
     "",
     "Run `commet doctor --output agent` before making integration changes. The command is local and read-only.",
     "",
@@ -114,16 +109,7 @@ export function setupAgentRules(
   if (packages.length === 0) {
     throw new Error(`No Commet packages found in ${projectRoot}`);
   }
-  const packageDocs = packages.map((packageInfo) => ({
-    name: packageInfo.name,
-    documentation: packageInfo.documentationPath
-      ? relative(projectRoot, packageInfo.documentationPath)
-      : packageInfo.name === "@commet/node"
-        ? "node_modules/@commet/node/docs/README.md"
-        : `node_modules/${packageInfo.name}/README.md`,
-  }));
-
-  const managedBlock = renderAgentRules(packageDocs);
+  const managedBlock = renderAgentRules();
   const update = updateManagedAgentRules(existingContent, managedBlock);
   if (!(options.check || options.dryRun) && update.status !== "unchanged") {
     writeFileSync(agentsPath, update.content);

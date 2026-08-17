@@ -87,12 +87,6 @@ Tracking runs in the stream's `flush` phase — it completes before the HTTP con
 - `ai` >= 6.0.0
 - `@commet/node` >= 9.1.0 and < 10.0.0
 
-## Documentation
-
-All Commet documentation is installed once by the required `@commet/node` package at `node_modules/@commet/node/docs/README.md`. This README covers only the AI SDK integration.
-
-Visit [commet.co/docs](https://commet.co/docs) for the full guide.
-
 ## License
 
 MIT

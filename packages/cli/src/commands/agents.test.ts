@@ -10,12 +10,7 @@ import {
 
 test("managed agent rules preserve project-owned content", () => {
   const existing = "# Project\n\nKeep this rule.\n";
-  const block = renderAgentRules([
-    {
-      name: "@commet/node",
-      documentation: "node_modules/@commet/node/docs/README.md",
-    },
-  ]);
+  const block = renderAgentRules();
 
   const created = updateManagedAgentRules(existing, block);
   const unchanged = updateManagedAgentRules(created.content, block);
@@ -29,12 +24,7 @@ test("managed agent rules preserve project-owned content", () => {
 });
 
 test("removing managed rules leaves project-owned content intact", () => {
-  const block = renderAgentRules([
-    {
-      name: "@commet/node",
-      documentation: "node_modules/@commet/node/docs/README.md",
-    },
-  ]);
+  const block = renderAgentRules();
   const content = `# Project\n\n${block}\n\n## Local rules\n\nKeep this.\n`;
 
   assert.equal(
@@ -44,12 +34,7 @@ test("removing managed rules leaves project-owned content intact", () => {
 });
 
 test("duplicate managed blocks are rejected", () => {
-  const block = renderAgentRules([
-    {
-      name: "@commet/node",
-      documentation: "node_modules/@commet/node/docs/README.md",
-    },
-  ]);
+  const block = renderAgentRules();
 
   assert.throws(
     () => updateManagedAgentRules(`${block}\n\n${block}\n`, block),
