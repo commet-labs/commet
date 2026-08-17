@@ -17,7 +17,7 @@ export class PortalResource {
 
   /** Generate a customer portal URL. Exactly one identifier (email or customerId) is required. */
   async getUrl(
-    params: RequestPortalAccessParams,
+    params?: RequestPortalAccessParams,
     options?: RequestOptions,
   ): Promise<PortalAccess> {
     return this.httpClient.post("/portal/sessions", params, options);

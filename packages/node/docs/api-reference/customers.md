@@ -69,7 +69,7 @@ Grant monetary credit in one currency. Credit is applied FIFO before tax to elig
 
 `POST /customers/{id}/plan-grants/{grantId}/revoke` · operation `revoke-plan-grant`
 
-End complimentary access immediately. The next full-price period becomes pending payment and requires checkout; no past period is billed retroactively.
+End expanded access immediately and restore the base plan's limits. The subscription, billing cycle, invoices, and payment state remain unchanged.
 
 ### Parameters
 
@@ -91,7 +91,7 @@ End complimentary access immediately. The next full-price period becomes pending
 
 `PATCH /customers/{id}/plan-grants/{grantId}` · operation `update-plan-grant`
 
-Give the grant a remaining number of billing cycles, set an exact deadline, or keep it active until revoked.
+Keep the overlay for a number of the subscription's existing billing cycles, set an exact deadline, or leave it active until revoked. The billing anchor is never reset.
 
 ### Parameters
 
@@ -138,13 +138,13 @@ List the independent audit timeline for paid-plan access granted without checkou
 
 `POST /customers/{id}/plan-grants` · operation `create-plan-grant`
 
-Move an active free subscription to an eligible paid plan immediately without checkout, a card, or customer credit. The grant may last for exact billing cycles, until a date, or until revoked.
+Temporarily expand an active subscription's feature access using a higher plan in the same plan group. Billing, prices, periods, invoices, and the base subscription remain unchanged.
 
 ### Parameters
 
 - `id` (`string`, required)
+- `subscriptionId` (`string`, required)
 - `planId` (`string`, required)
-- `billingInterval` (`"weekly" | "monthly" | "quarterly" | "yearly"`, required)
 - `reason` (`string`, required)
 - `duration` (`"cycles" | "until_date" | "until_revoked"`, required)
 - `durationCycles` (`number`, optional)
@@ -152,9 +152,9 @@ Move an active free subscription to an eligible paid plan immediately without ch
 
 ### Valid parameter combinations
 
-- `planId` + `billingInterval` + `reason` + `duration` + `durationCycles`
-- `planId` + `billingInterval` + `reason` + `duration` + `expiresAt`
-- `planId` + `billingInterval` + `reason` + `duration`
+- `subscriptionId` + `planId` + `reason` + `duration` + `durationCycles`
+- `subscriptionId` + `planId` + `reason` + `duration` + `expiresAt`
+- `subscriptionId` + `planId` + `reason` + `duration`
 
 ### Request options
 

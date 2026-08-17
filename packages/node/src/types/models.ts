@@ -587,7 +587,6 @@ export interface Invoice {
       | "feature_quota"
       | "discount"
       | "promo_code_discount"
-      | "plan_grant"
       | "credit"
       | "balance_overage"
       | "addon_base"
@@ -1087,9 +1086,9 @@ export interface PlanGrant {
   id: string;
   customerId: string;
   subscriptionId: string;
+  basePlanId: string;
   planId: string;
-  planPriceId: string;
-  billingInterval: "weekly" | "monthly" | "quarterly" | "yearly";
+  planReleaseId: string;
   status: "active" | "expired" | "revoked";
   duration: "cycles" | "until_date" | "until_revoked";
   durationCycles: number | null;

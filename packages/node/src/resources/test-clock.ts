@@ -29,7 +29,7 @@ export class TestClockResource {
 
   /** Starts a durable run that moves the test clock forward and processes every billing deadline due before the target time. Poll GET /test-clock for progress and terminal results. Sandbox only. */
   async advance(
-    params: AdvanceTestClockParams,
+    params?: AdvanceTestClockParams,
     options?: RequestOptions,
   ): Promise<TestClockRun> {
     return this.httpClient.post("/test-clock", params, options);
