@@ -8,6 +8,23 @@ import {
   updateManagedAgentRules,
 } from "./agents";
 
+test("agent rules expose the single installed documentation entrypoint", () => {
+  assert.equal(
+    renderAgentRules(),
+    `<!-- BEGIN:commet-agent-rules -->
+
+# Commet
+
+Before changing a Commet integration, read the version-matched documentation installed in this project:
+
+- \`node_modules/@commet/node/docs/README.md\`
+
+Run \`commet doctor --output agent\` before making integration changes. The command is local and read-only.
+
+<!-- END:commet-agent-rules -->`,
+  );
+});
+
 test("managed agent rules preserve project-owned content", () => {
   const existing = "# Project\n\nKeep this rule.\n";
   const block = renderAgentRules();
