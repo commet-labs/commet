@@ -1,5 +1,11 @@
 # @commet/node
 
+## 9.2.0
+
+### Minor Changes
+
+- 005d7ea: Expose active Plan Grant access on subscriptions and features, add typed lifecycle webhook payloads for created, updated, expired, and revoked grants, and route those events through the matching Next.js webhook callbacks.
+
 ## 9.1.1
 
 ### Patch Changes
