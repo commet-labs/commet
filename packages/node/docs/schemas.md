@@ -327,10 +327,10 @@ Generated from Commet API version `2026-07-31`.
 
 Variants:
 
-- `{ code: string; name: string; unitName: string | null; allowed: boolean; type: "boolean"; enabled: boolean; object: "feature_access"; livemode: boolean }`
-- `{ code: string; name: string; unitName: string | null; allowed: boolean; type: "usage"; consumption: { model: "metered"; period: { start: string; end: string }; unitsUsed: number; includedUnits: number; remainingUnits?: number; unlimited: boolean; overage: { enabled: boolean; units: number; unitPrice?: { amount: number; currency: string; scale: 10000 } } } | { model: "credits"; period: { start: string; end: string }; unitsUsed: number; creditsPerUnit: number; creditsConsumed: number; availableUnits: number } | { model: "balance"; period: { start: string; end: string }; unitsUsed: number; spent: { amount: number; currency: string }; availableUnits?: number; unitPrice?: { amount: number; currency: string; scale: 10000 } }; object: "feature_access"; livemode: boolean }`
-- `{ code: string; name: string; unitName: string | null; allowed: boolean; type: "seats"; usage: { period: { start: string; end: string }; unitsUsed: number; includedUnits: number; remainingUnits?: number; unlimited: boolean; overage: { enabled: boolean; units: number; unitPrice?: { amount: number; currency: string; scale: 10000 } } }; object: "feature_access"; livemode: boolean }`
-- `{ code: string; name: string; unitName: string | null; allowed: boolean; type: "quota"; usage: { period: { start: string; end: string }; unitsUsed: number; includedUnits: number; remainingUnits?: number; unlimited: boolean; overage: { enabled: boolean; units: number; unitPrice?: { amount: number; currency: string; scale: 10000 } }; billedUnits: number }; object: "feature_access"; livemode: boolean }`
+- `{ code: string; name: string; unitName: string | null; allowed: boolean; type: "boolean"; enabled: boolean; baseAccess?: { enabled: boolean } | null; object: "feature_access"; livemode: boolean }`
+- `{ code: string; name: string; unitName: string | null; allowed: boolean; type: "usage"; consumption: { model: "metered"; period: { start: string; end: string }; unitsUsed: number; includedUnits: number; remainingUnits?: number; unlimited: boolean; overage: { enabled: boolean; units: number; unitPrice?: { amount: number; currency: string; scale: 10000 } } } | { model: "credits"; period: { start: string; end: string }; unitsUsed: number; creditsPerUnit: number; creditsConsumed: number; availableUnits: number } | { model: "balance"; period: { start: string; end: string }; unitsUsed: number; spent: { amount: number; currency: string }; availableUnits?: number; unitPrice?: { amount: number; currency: string; scale: 10000 } }; baseAccess?: { includedUnits: number; unlimited: boolean } | null; object: "feature_access"; livemode: boolean }`
+- `{ code: string; name: string; unitName: string | null; allowed: boolean; type: "seats"; usage: { period: { start: string; end: string }; unitsUsed: number; includedUnits: number; remainingUnits?: number; unlimited: boolean; overage: { enabled: boolean; units: number; unitPrice?: { amount: number; currency: string; scale: 10000 } } }; baseAccess?: { includedUnits: number; unlimited: boolean } | null; object: "feature_access"; livemode: boolean }`
+- `{ code: string; name: string; unitName: string | null; allowed: boolean; type: "quota"; usage: { period: { start: string; end: string }; unitsUsed: number; includedUnits: number; remainingUnits?: number; unlimited: boolean; overage: { enabled: boolean; units: number; unitPrice?: { amount: number; currency: string; scale: 10000 } }; billedUnits: number }; baseAccess?: { includedUnits: number; unlimited: boolean } | null; object: "feature_access"; livemode: boolean }`
 
 ### Invoice
 
@@ -735,8 +735,9 @@ Variants:
 - `createdAt` (`string`, required)
 - `updatedAt` (`string`, required)
 - `offerApplications` (`Array<SubscriptionOfferApplication>`, required)
+- `planGrant` (`{ id: string; plan: { id: string; name: string }; expiresAt: string | null }`, optional)
 - `consumptionModel` (`ConsumptionModel | null`, required)
-- `features` (`Array<{ code: string; name: string; type: "boolean"; enabled: boolean } | { code: string; name: string; type: "usage"; usage?: { current: number; included: number; overageQuantity: number; overageUnitPrice?: number } } | { code: string; name: string; type: "seats"; usage: { current: number; included: number; overageQuantity: number; overageUnitPrice?: number } } | { code: string; name: string; type: "quota" }>`, required)
+- `features` (`Array<{ code: string; name: string; type: "boolean"; enabled: boolean; baseAccess?: { enabled: boolean } | null } | { code: string; name: string; type: "usage"; usage?: { current: number; included: number; overageQuantity: number; overageUnitPrice?: number; unlimited?: boolean }; baseAccess?: { included: number; unlimited: boolean } | null } | { code: string; name: string; type: "seats"; usage: { current: number; included: number; overageQuantity: number; overageUnitPrice?: number; unlimited?: boolean }; baseAccess?: { included: number; unlimited: boolean } | null } | { code: string; name: string; type: "quota"; usage?: { current: number; included: number; overageQuantity: number; overageUnitPrice?: number; unlimited?: boolean }; baseAccess?: { included: number; unlimited: boolean } | null }>`, required)
 - `credits` (`{ remaining: number; included: number; purchased: number } | null`, required)
 - `balance` (`{ remaining: number; included: number; currency: string } | null`, required)
 - `priceId` (`string | null`, required)
@@ -972,6 +973,19 @@ Variants:
 - `planCredits` (`number`, required)
 - `purchasedCredits` (`number`, required)
 - `totalCredits` (`number`, required)
+
+### WebhookPlanGrantTimelineEvent
+
+- `id` (`string`, required) — The public ID of this plan grant event.
+- `type` (`"created" | "updated" | "expired" | "revoked"`, required) — The durable lifecycle transition recorded by this event.
+- `reason` (`string`, required) — The reason recorded for this transition.
+- `source` (`"dashboard" | "api" | "system"`, required) — Where this transition originated.
+- `previousExpiresAt` (`string | null`, required) — The prior expiration deadline for an update, otherwise null.
+- `expiresAt` (`string | null`, required) — The expiration deadline after this transition, if any.
+- `duration` (`"cycles" | "until_date" | "until_revoked" | null`, required) — The duration selected by a create or update event.
+- `durationCycles` (`number | null`, required) — The selected cycle count when duration is cycles.
+- `requestedExpiresAt` (`string | null`, required) — The requested deadline when duration is until_date.
+- `createdAt` (`string`, required) — When this transition occurred.
 
 ### WebhookPlanRef
 

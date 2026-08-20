@@ -8,74 +8,12 @@ import type {
   PaymentLinkFailedData,
   PaymentRetryFailedData,
   SubscriptionReactivatedData,
-  WebhookEvent,
   WebhookEventDataMap,
 } from "../types/webhook-events";
 
 function signPayload(payload: string, secret: string): string {
   return crypto.createHmac("sha256", secret).update(payload).digest("hex");
 }
-
-const PLATFORM_WEBHOOK_EVENTS = [
-  "subscription.created",
-  "subscription.activated",
-  "subscription.reactivated",
-  "subscription.canceled",
-  "subscription.updated",
-  "subscription.plan_changed",
-  "subscription.cancellation_scheduled",
-  "subscription.cancellation_revoked",
-  "subscription.plan_change_scheduled",
-  "subscription.plan_change_revoked",
-  "subscription.past_due",
-  "trial.started",
-  "trial.converted",
-  "trial.expired",
-  "trial.will_end",
-  "trial.checkout_ready",
-  "checkout.ready",
-  "payment.received",
-  "payment.failed",
-  "payment.recovered",
-  "payment.retry_failed",
-  "payment.refunded",
-  "payment.disputed",
-  "payment.dispute_resolved",
-  "payment_link.created",
-  "payment_link.completed",
-  "payment_link.failed",
-  "payment_link.canceled",
-  "invoice.created",
-  "invoice.voided",
-  "invoice.overdue",
-  "invoice.upcoming",
-  "payment_method.attached",
-  "payment_method.updated",
-  "customer.created",
-  "customer.updated",
-  "customer.state_changed",
-  "credits.granted",
-  "credits.purchased",
-  "credits.low",
-  "credits.depleted",
-  "credits.expired",
-  "balance.topped_up",
-  "balance.low",
-  "balance.depleted",
-  "quota.threshold_reached",
-  "quota.exceeded",
-  "seats.updated",
-  "seats.limit_reached",
-  "addon.activated",
-  "addon.deactivated",
-  "usage.recorded",
-  "payout.available",
-  "payout.created",
-  "payout.paid",
-  "payout.failed",
-] as const satisfies readonly WebhookEvent[];
-
-type PlatformWebhookEvent = (typeof PLATFORM_WEBHOOK_EVENTS)[number];
 
 describe("Webhooks", () => {
   const webhooks = new Webhooks();
@@ -270,11 +208,6 @@ describe("Webhooks", () => {
       expect(result?.event).toBe("customer.state_changed");
       expect(received?.features[0]?.code).toBe("api_calls");
       expect(received?.plan?.name).toBe("Pro");
-    });
-
-    it("covers the current Platform webhook catalog", () => {
-      expect(PLATFORM_WEBHOOK_EVENTS).toHaveLength(56);
-      expectTypeOf<PlatformWebhookEvent>().toEqualTypeOf<WebhookEvent>();
     });
 
     it("narrows Platform payment link and recovery additions", () => {

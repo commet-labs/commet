@@ -325,6 +325,9 @@ export type FeatureAccess =
       type: "boolean";
       /** Whether the feature is enabled. */
       enabled: boolean;
+      baseAccess?: {
+        enabled: boolean;
+      } | null;
       object: "feature_access";
       livemode: boolean;
     }
@@ -441,6 +444,10 @@ export type FeatureAccess =
               scale: 10000;
             };
           };
+      baseAccess?: {
+        includedUnits: number;
+        unlimited: boolean;
+      } | null;
       object: "feature_access";
       livemode: boolean;
     }
@@ -492,6 +499,10 @@ export type FeatureAccess =
           };
         };
       };
+      baseAccess?: {
+        includedUnits: number;
+        unlimited: boolean;
+      } | null;
       object: "feature_access";
       livemode: boolean;
     }
@@ -545,6 +556,10 @@ export type FeatureAccess =
         /** Highest quota reached during the period and used for billing. */
         billedUnits: number;
       };
+      baseAccess?: {
+        includedUnits: number;
+        unlimited: boolean;
+      } | null;
       object: "feature_access";
       livemode: boolean;
     };
@@ -1529,6 +1544,17 @@ export interface Subscription {
   /** @format date-time */
   updatedAt: string;
   offerApplications: Array<SubscriptionOfferApplication>;
+  planGrant?: {
+    /** The active Plan Grant ID. */
+    id: string;
+    /** The higher plan whose access is temporarily applied. */
+    plan: {
+      id: string;
+      name: string;
+    };
+    /** When the temporary access ends, or null when it lasts until revoked. */
+    expiresAt: string | null;
+  };
   consumptionModel: ConsumptionModel | null;
   features: Array<
     | {
@@ -1536,6 +1562,9 @@ export interface Subscription {
         name: string;
         type: "boolean";
         enabled: boolean;
+        baseAccess?: {
+          enabled: boolean;
+        } | null;
       }
     | {
         code: string;
@@ -1546,7 +1575,12 @@ export interface Subscription {
           included: number;
           overageQuantity: number;
           overageUnitPrice?: number;
+          unlimited?: boolean;
         };
+        baseAccess?: {
+          included: number;
+          unlimited: boolean;
+        } | null;
       }
     | {
         code: string;
@@ -1557,12 +1591,28 @@ export interface Subscription {
           included: number;
           overageQuantity: number;
           overageUnitPrice?: number;
+          unlimited?: boolean;
         };
+        baseAccess?: {
+          included: number;
+          unlimited: boolean;
+        } | null;
       }
     | {
         code: string;
         name: string;
         type: "quota";
+        usage?: {
+          current: number;
+          included: number;
+          overageQuantity: number;
+          overageUnitPrice?: number;
+          unlimited?: boolean;
+        };
+        baseAccess?: {
+          included: number;
+          unlimited: boolean;
+        } | null;
       }
   >;
   credits: {
@@ -1984,6 +2034,32 @@ export interface WebhookCreditsBalance {
   planCredits: number;
   purchasedCredits: number;
   totalCredits: number;
+}
+
+export interface WebhookPlanGrantTimelineEvent {
+  /** The public ID of this plan grant event. */
+  id: string;
+  /** The durable lifecycle transition recorded by this event. */
+  type: "created" | "updated" | "expired" | "revoked";
+  /** The reason recorded for this transition. */
+  reason: string;
+  /** Where this transition originated. */
+  source: "dashboard" | "api" | "system";
+  /** The prior expiration deadline for an update, otherwise null. */
+  previousExpiresAt: string | null;
+  /** The expiration deadline after this transition, if any. */
+  expiresAt: string | null;
+  /** The duration selected by a create or update event. */
+  duration: "cycles" | "until_date" | "until_revoked" | null;
+  /** The selected cycle count when duration is cycles. */
+  durationCycles: number | null;
+  /** The requested deadline when duration is until_date. */
+  requestedExpiresAt: string | null;
+  /**
+   * When this transition occurred.
+   * @format date-time
+   */
+  createdAt: string;
 }
 
 export interface WebhookPlanRef {

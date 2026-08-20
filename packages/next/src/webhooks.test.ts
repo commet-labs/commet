@@ -1,17 +1,9 @@
-import {
-  Webhooks as CommetWebhooks,
-  type WebhookEvent,
-  type WebhookEventPayload,
-} from "@commet/node";
+import crypto from "node:crypto";
+import type { WebhookEvent, WebhookEventPayload } from "@commet/node";
 import { NextRequest } from "next/server";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import type { WebhookHandlerName, WebhooksConfig } from "./types";
 import { Webhooks } from "./webhooks";
-
-// Mock @commet/node
-vi.mock("@commet/node", () => ({
-  Webhooks: vi.fn(),
-}));
 
 const webhookHandlerCases = [
   {
@@ -163,6 +155,22 @@ const webhookHandlerCases = [
     handlerName: "onCustomerStateChanged",
   },
   {
+    event: "plan_grant.created",
+    handlerName: "onPlanGrantCreated",
+  },
+  {
+    event: "plan_grant.updated",
+    handlerName: "onPlanGrantUpdated",
+  },
+  {
+    event: "plan_grant.expired",
+    handlerName: "onPlanGrantExpired",
+  },
+  {
+    event: "plan_grant.revoked",
+    handlerName: "onPlanGrantRevoked",
+  },
+  {
     event: "credits.granted",
     handlerName: "onCreditsGranted",
   },
@@ -272,17 +280,7 @@ const webhookHandlerCoverage: [
   ? true
   : never = true;
 
-const mockCommetWebhooks = vi.mocked(CommetWebhooks);
-
-// Must stay a real function (not an arrow) so vitest can call it with `new CommetWebhooks()`.
-function webhooksMock(verifyResult: boolean) {
-  // biome-ignore lint/complexity/useArrowFunction: a constructable function is required here
-  return function () {
-    return {
-      verify: vi.fn().mockReturnValue(verifyResult),
-    } as unknown as InstanceType<typeof CommetWebhooks>;
-  };
-}
+const webhookSecret = "secret_123";
 
 function createPayload(event: WebhookEvent): WebhookEventPayload {
   return {
@@ -290,32 +288,39 @@ function createPayload(event: WebhookEvent): WebhookEventPayload {
     timestamp: "2024-01-01T00:00:00Z",
     organizationId: "org_123",
     mode: "sandbox",
-    apiVersion: "2026-06-10",
+    apiVersion: "2026-07-31",
     data: {},
   } as WebhookEventPayload;
 }
 
 function createRequest(payload: WebhookEventPayload | Record<string, unknown>) {
+  return createRawRequest(JSON.stringify(payload));
+}
+
+function createRawRequest(rawBody: string, signature = signPayload(rawBody)) {
   return new NextRequest("https://example.com/webhooks", {
     method: "POST",
-    body: JSON.stringify(payload),
-    headers: { "x-commet-signature": "sig" },
+    body: rawBody,
+    headers: { "x-commet-signature": signature },
   });
 }
 
-describe("Webhooks", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    // Reset the mock to return true by default
-    mockCommetWebhooks.mockImplementation(webhooksMock(true));
-  });
+function signPayload(rawBody: string): string {
+  return crypto
+    .createHmac("sha256", webhookSecret)
+    .update(rawBody)
+    .digest("hex");
+}
 
+describe("Webhooks", () => {
   describe("signature verification", () => {
     it("should verify webhook signature and process valid payloads", async () => {
-      const mockHandler = vi.fn().mockResolvedValue(undefined);
+      let receivedPayload: WebhookEventPayload | undefined;
       const webhookHandler = Webhooks({
-        webhookSecret: "secret_123",
-        onSubscriptionActivated: mockHandler,
+        webhookSecret,
+        onSubscriptionActivated: async (payload) => {
+          receivedPayload = payload;
+        },
       });
       const payload = createPayload("subscription.activated");
 
@@ -324,28 +329,23 @@ describe("Webhooks", () => {
 
       expect(response.status).toBe(200);
       expect(data.received).toBe(true);
-      expect(mockHandler).toHaveBeenCalledWith(payload);
+      expect(receivedPayload).toEqual(payload);
     });
 
     it("should return 403 for invalid signatures", async () => {
-      // Mock verify to return false
-      mockCommetWebhooks.mockImplementation(webhooksMock(false));
-
-      const mockHandler = vi.fn();
+      let handlerCalled = false;
       const webhookHandler = Webhooks({
-        webhookSecret: "secret_123",
-        onSubscriptionActivated: mockHandler,
-      });
-
-      const request = new NextRequest("https://example.com/webhooks", {
-        method: "POST",
-        body: JSON.stringify(createPayload("subscription.activated")),
-        headers: {
-          "x-commet-signature": "invalid_signature",
+        webhookSecret,
+        onSubscriptionActivated: async () => {
+          handlerCalled = true;
         },
       });
+      const payload = createPayload("subscription.activated");
+      const rawBody = JSON.stringify(payload);
 
-      const response = await webhookHandler(request);
+      const response = await webhookHandler(
+        createRawRequest(rawBody, "invalid_signature"),
+      );
       const data = (await response.json()) as {
         received: boolean;
         error?: string;
@@ -354,15 +354,12 @@ describe("Webhooks", () => {
       expect(response.status).toBe(403);
       expect(data.received).toBe(false);
       expect(data.error).toBe("Invalid signature");
-      expect(mockHandler).not.toHaveBeenCalled();
+      expect(handlerCalled).toBe(false);
     });
 
     it("should handle missing signature header", async () => {
-      // Mock verify to return false for null signature
-      mockCommetWebhooks.mockImplementation(webhooksMock(false));
-
       const webhookHandler = Webhooks({
-        webhookSecret: "secret_123",
+        webhookSecret,
       });
 
       const request = new NextRequest("https://example.com/webhooks", {
@@ -380,9 +377,9 @@ describe("Webhooks", () => {
 
   describe("event routing", () => {
     it("should cover every typed webhook event and named handler", () => {
-      expect(webhookHandlerCases).toHaveLength(56);
+      expect(webhookHandlerCases).toHaveLength(60);
       expect(new Set(webhookHandlerCases.map(({ event }) => event)).size).toBe(
-        56,
+        60,
       );
       expect(webhookEventCoverage).toBe(true);
       expect(webhookHandlerCoverage).toBe(true);
@@ -394,81 +391,91 @@ describe("Webhooks", () => {
       event,
       handlerName,
     }) => {
-      const mockHandler = vi.fn().mockResolvedValue(undefined);
+      let receivedPayload: WebhookEventPayload | undefined;
+      let callCount = 0;
       const webhookHandler = Webhooks({
-        webhookSecret: "secret_123",
-        [handlerName]: mockHandler,
+        webhookSecret,
+        [handlerName]: async (payload: WebhookEventPayload) => {
+          receivedPayload = payload;
+          callCount += 1;
+        },
       } as WebhooksConfig);
       const payload = createPayload(event);
 
       const response = await webhookHandler(createRequest(payload));
 
       expect(response.status).toBe(200);
-      expect(mockHandler).toHaveBeenCalledWith(payload);
-      expect(mockHandler).toHaveBeenCalledTimes(1);
+      expect(receivedPayload).toEqual(payload);
+      expect(callCount).toBe(1);
     });
 
     it("should not call handler for unregistered events", async () => {
-      const activatedHandler = vi.fn().mockResolvedValue(undefined);
+      let activatedHandlerCalled = false;
       const webhookHandler = Webhooks({
-        webhookSecret: "secret_123",
-        onSubscriptionActivated: activatedHandler,
+        webhookSecret,
+        onSubscriptionActivated: async () => {
+          activatedHandlerCalled = true;
+        },
       });
       const payload = createPayload("subscription.canceled");
 
       const response = await webhookHandler(createRequest(payload));
 
       expect(response.status).toBe(200);
-      expect(activatedHandler).not.toHaveBeenCalled();
+      expect(activatedHandlerCalled).toBe(false);
     });
   });
 
   describe("catch-all handler", () => {
     it("should call onPayload for all events", async () => {
-      const onPayload = vi.fn().mockResolvedValue(undefined);
-      const specificHandler = vi.fn().mockResolvedValue(undefined);
+      let catchAllPayload: WebhookEventPayload | undefined;
+      let specificPayload: WebhookEventPayload | undefined;
 
       const webhookHandler = Webhooks({
-        webhookSecret: "secret_123",
-        onPayload,
-        onSubscriptionActivated: specificHandler,
+        webhookSecret,
+        onPayload: async (payload) => {
+          catchAllPayload = payload;
+        },
+        onSubscriptionActivated: async (payload) => {
+          specificPayload = payload;
+        },
       });
       const payload = createPayload("subscription.activated");
 
       await webhookHandler(createRequest(payload));
 
-      expect(onPayload).toHaveBeenCalledWith(payload);
-      expect(specificHandler).toHaveBeenCalledWith(payload);
+      expect(catchAllPayload).toEqual(payload);
+      expect(specificPayload).toEqual(payload);
     });
 
     it("should call onPayload even when no specific handler exists", async () => {
-      const onPayload = vi.fn().mockResolvedValue(undefined);
+      let receivedPayload: WebhookEventPayload | undefined;
 
       const webhookHandler = Webhooks({
-        webhookSecret: "secret_123",
-        onPayload,
+        webhookSecret,
+        onPayload: async (payload) => {
+          receivedPayload = payload;
+        },
       });
       const payload = createPayload("subscription.created");
 
       await webhookHandler(createRequest(payload));
 
-      expect(onPayload).toHaveBeenCalledWith(payload);
+      expect(receivedPayload).toEqual(payload);
     });
   });
 
   describe("error handling", () => {
     it("should return 400 for invalid JSON", async () => {
-      const onError = vi.fn().mockResolvedValue(undefined);
+      let capturedError: Error | undefined;
       const webhookHandler = Webhooks({
-        webhookSecret: "secret_123",
-        onError,
+        webhookSecret,
+        onError: async (error) => {
+          capturedError = error;
+        },
       });
 
-      const request = new NextRequest("https://example.com/webhooks", {
-        method: "POST",
-        body: "invalid json{",
-        headers: { "x-commet-signature": "sig" },
-      });
+      const request = createRawRequest("invalid json{");
 
       const response = await webhookHandler(request);
       const data = (await response.json()) as {
@@ -479,18 +486,23 @@ describe("Webhooks", () => {
       expect(response.status).toBe(400);
       expect(data.received).toBe(false);
       expect(data.error).toBe("Invalid payload");
-      expect(onError).toHaveBeenCalled();
+      expect(capturedError).toBeInstanceOf(Error);
     });
 
     it("should call onError when handler throws", async () => {
       const handlerError = new Error("Handler failed");
-      const mockHandler = vi.fn().mockRejectedValue(handlerError);
-      const onError = vi.fn().mockResolvedValue(undefined);
+      let capturedError: Error | undefined;
+      let capturedPayload: unknown;
 
       const webhookHandler = Webhooks({
-        webhookSecret: "secret_123",
-        onSubscriptionActivated: mockHandler,
-        onError,
+        webhookSecret,
+        onSubscriptionActivated: async () => {
+          throw handlerError;
+        },
+        onError: async (error, payload) => {
+          capturedError = error;
+          capturedPayload = payload;
+        },
       });
       const payload = createPayload("subscription.activated");
 
@@ -503,15 +515,16 @@ describe("Webhooks", () => {
       expect(response.status).toBe(500);
       expect(data.received).toBe(false);
       expect(data.error).toBe("Handler failed");
-      expect(onError).toHaveBeenCalledWith(handlerError, payload);
+      expect(capturedError).toBe(handlerError);
+      expect(capturedPayload).toEqual(payload);
     });
 
     it("should handle errors gracefully even when onError is not provided", async () => {
-      const mockHandler = vi.fn().mockRejectedValue(new Error("Handler error"));
-
       const webhookHandler = Webhooks({
-        webhookSecret: "secret_123",
-        onSubscriptionActivated: mockHandler,
+        webhookSecret,
+        onSubscriptionActivated: async () => {
+          throw new Error("Handler error");
+        },
       });
       const payload = createPayload("subscription.activated");
 
@@ -525,20 +538,20 @@ describe("Webhooks", () => {
     it("should execute onPayload and specific handler in parallel", async () => {
       const executionOrder: string[] = [];
 
-      const onPayload = vi.fn().mockImplementation(async () => {
+      const onPayload = async () => {
         executionOrder.push("onPayload-start");
         await new Promise((resolve) => setTimeout(resolve, 10));
         executionOrder.push("onPayload-end");
-      });
+      };
 
-      const specificHandler = vi.fn().mockImplementation(async () => {
+      const specificHandler = async () => {
         executionOrder.push("specific-start");
         await new Promise((resolve) => setTimeout(resolve, 10));
         executionOrder.push("specific-end");
-      });
+      };
 
       const webhookHandler = Webhooks({
-        webhookSecret: "secret_123",
+        webhookSecret,
         onPayload,
         onSubscriptionActivated: specificHandler,
       });
@@ -546,9 +559,6 @@ describe("Webhooks", () => {
 
       await webhookHandler(createRequest(payload));
 
-      expect(onPayload).toHaveBeenCalled();
-      expect(specificHandler).toHaveBeenCalled();
-      // Both should start before either ends (parallel execution)
       expect(executionOrder.indexOf("onPayload-start")).toBeLessThan(
         executionOrder.indexOf("specific-end"),
       );
@@ -561,7 +571,7 @@ describe("Webhooks", () => {
   describe("minimal configuration", () => {
     it("should work with only webhookSecret", async () => {
       const webhookHandler = Webhooks({
-        webhookSecret: "secret_123",
+        webhookSecret,
       });
       const payload = createPayload("subscription.activated");
 
