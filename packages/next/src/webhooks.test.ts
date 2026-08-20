@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { type WebhookEvent, type WebhookEventPayload } from "@commet/node";
+import type { WebhookEvent, WebhookEventPayload } from "@commet/node";
 import { NextRequest } from "next/server";
 import { describe, expect, it } from "vitest";
 import type { WebhookHandlerName, WebhooksConfig } from "./types";
@@ -280,7 +280,7 @@ const webhookHandlerCoverage: [
   ? true
   : never = true;
 
-const WEBHOOK_SECRET = "secret_123";
+const webhookSecret = "secret_123";
 
 function createPayload(event: WebhookEvent): WebhookEventPayload {
   return {
@@ -307,7 +307,7 @@ function createRawRequest(rawBody: string, signature = signPayload(rawBody)) {
 
 function signPayload(rawBody: string): string {
   return crypto
-    .createHmac("sha256", WEBHOOK_SECRET)
+    .createHmac("sha256", webhookSecret)
     .update(rawBody)
     .digest("hex");
 }
@@ -317,7 +317,7 @@ describe("Webhooks", () => {
     it("should verify webhook signature and process valid payloads", async () => {
       let receivedPayload: WebhookEventPayload | undefined;
       const webhookHandler = Webhooks({
-        webhookSecret: WEBHOOK_SECRET,
+        webhookSecret,
         onSubscriptionActivated: async (payload) => {
           receivedPayload = payload;
         },
@@ -335,7 +335,7 @@ describe("Webhooks", () => {
     it("should return 403 for invalid signatures", async () => {
       let handlerCalled = false;
       const webhookHandler = Webhooks({
-        webhookSecret: WEBHOOK_SECRET,
+        webhookSecret,
         onSubscriptionActivated: async () => {
           handlerCalled = true;
         },
@@ -359,7 +359,7 @@ describe("Webhooks", () => {
 
     it("should handle missing signature header", async () => {
       const webhookHandler = Webhooks({
-        webhookSecret: WEBHOOK_SECRET,
+        webhookSecret,
       });
 
       const request = new NextRequest("https://example.com/webhooks", {
@@ -394,7 +394,7 @@ describe("Webhooks", () => {
       let receivedPayload: WebhookEventPayload | undefined;
       let callCount = 0;
       const webhookHandler = Webhooks({
-        webhookSecret: WEBHOOK_SECRET,
+        webhookSecret,
         [handlerName]: async (payload: WebhookEventPayload) => {
           receivedPayload = payload;
           callCount += 1;
@@ -412,7 +412,7 @@ describe("Webhooks", () => {
     it("should not call handler for unregistered events", async () => {
       let activatedHandlerCalled = false;
       const webhookHandler = Webhooks({
-        webhookSecret: WEBHOOK_SECRET,
+        webhookSecret,
         onSubscriptionActivated: async () => {
           activatedHandlerCalled = true;
         },
@@ -432,7 +432,7 @@ describe("Webhooks", () => {
       let specificPayload: WebhookEventPayload | undefined;
 
       const webhookHandler = Webhooks({
-        webhookSecret: WEBHOOK_SECRET,
+        webhookSecret,
         onPayload: async (payload) => {
           catchAllPayload = payload;
         },
@@ -452,7 +452,7 @@ describe("Webhooks", () => {
       let receivedPayload: WebhookEventPayload | undefined;
 
       const webhookHandler = Webhooks({
-        webhookSecret: WEBHOOK_SECRET,
+        webhookSecret,
         onPayload: async (payload) => {
           receivedPayload = payload;
         },
@@ -469,7 +469,7 @@ describe("Webhooks", () => {
     it("should return 400 for invalid JSON", async () => {
       let capturedError: Error | undefined;
       const webhookHandler = Webhooks({
-        webhookSecret: WEBHOOK_SECRET,
+        webhookSecret,
         onError: async (error) => {
           capturedError = error;
         },
@@ -495,7 +495,7 @@ describe("Webhooks", () => {
       let capturedPayload: unknown;
 
       const webhookHandler = Webhooks({
-        webhookSecret: WEBHOOK_SECRET,
+        webhookSecret,
         onSubscriptionActivated: async () => {
           throw handlerError;
         },
@@ -521,7 +521,7 @@ describe("Webhooks", () => {
 
     it("should handle errors gracefully even when onError is not provided", async () => {
       const webhookHandler = Webhooks({
-        webhookSecret: WEBHOOK_SECRET,
+        webhookSecret,
         onSubscriptionActivated: async () => {
           throw new Error("Handler error");
         },
@@ -551,7 +551,7 @@ describe("Webhooks", () => {
       };
 
       const webhookHandler = Webhooks({
-        webhookSecret: WEBHOOK_SECRET,
+        webhookSecret,
         onPayload,
         onSubscriptionActivated: specificHandler,
       });
@@ -571,7 +571,7 @@ describe("Webhooks", () => {
   describe("minimal configuration", () => {
     it("should work with only webhookSecret", async () => {
       const webhookHandler = Webhooks({
-        webhookSecret: WEBHOOK_SECRET,
+        webhookSecret,
       });
       const payload = createPayload("subscription.activated");
 
