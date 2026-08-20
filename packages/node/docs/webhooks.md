@@ -545,6 +545,102 @@ Aggregate entitlement event answering one question: what can this customer acces
 - `credits` (`WebhookCreditsBalance | null`, required) — For credits plans: planCredits, purchasedCredits, totalCredits. Null otherwise.
 - `balance` (`WebhookBalance | null`, required) — For balance plans: currentBalance in rate scale (10000 = $1.00). Null otherwise.
 
+## plan_grant.created
+
+Fired after a plan grant is durably created. The payload is the grant snapshot at creation.
+
+### Data
+
+- `id` (`string`, required) — The public plan grant ID.
+- `customerId` (`string`, required) — The public customer ID.
+- `subscriptionId` (`string`, required) — The public subscription ID.
+- `basePlanId` (`string`, required) — The public ID of the subscribed base plan.
+- `targetPlanId` (`string`, required) — The public ID of the plan whose access was granted.
+- `targetPlanReleaseId` (`string`, required) — The public ID of the immutable target plan release.
+- `status` (`"active" | "expired" | "revoked"`, required) — The plan grant status at this transition.
+- `duration` (`"cycles" | "until_date" | "until_revoked"`, required) — How the plan grant duration is defined at this transition.
+- `durationCycles` (`number | null`, required) — The cycle count when duration is cycles.
+- `startsAt` (`string`, required) — When the plan grant started.
+- `expiresAt` (`string | null`, required) — The effective expiration deadline, if any.
+- `reason` (`string`, required) — The reason recorded for this transition.
+- `source` (`"dashboard" | "api" | "system"`, required) — Where this transition originated.
+- `revokedAt` (`string | null`, required) — When the plan grant was revoked, otherwise null.
+- `createdAt` (`string`, required) — When the plan grant was created.
+- `updatedAt` (`string`, required) — When the represented transition occurred.
+- `events` (`Array<WebhookPlanGrantTimelineEvent>`, required) — The grant timeline through the represented transition.
+
+## plan_grant.updated
+
+Fired after a plan grant duration or deadline is durably changed. The payload is the grant snapshot at that update.
+
+### Data
+
+- `id` (`string`, required) — The public plan grant ID.
+- `customerId` (`string`, required) — The public customer ID.
+- `subscriptionId` (`string`, required) — The public subscription ID.
+- `basePlanId` (`string`, required) — The public ID of the subscribed base plan.
+- `targetPlanId` (`string`, required) — The public ID of the plan whose access was granted.
+- `targetPlanReleaseId` (`string`, required) — The public ID of the immutable target plan release.
+- `status` (`"active" | "expired" | "revoked"`, required) — The plan grant status at this transition.
+- `duration` (`"cycles" | "until_date" | "until_revoked"`, required) — How the plan grant duration is defined at this transition.
+- `durationCycles` (`number | null`, required) — The cycle count when duration is cycles.
+- `startsAt` (`string`, required) — When the plan grant started.
+- `expiresAt` (`string | null`, required) — The effective expiration deadline, if any.
+- `reason` (`string`, required) — The reason recorded for this transition.
+- `source` (`"dashboard" | "api" | "system"`, required) — Where this transition originated.
+- `revokedAt` (`string | null`, required) — When the plan grant was revoked, otherwise null.
+- `createdAt` (`string`, required) — When the plan grant was created.
+- `updatedAt` (`string`, required) — When the represented transition occurred.
+- `events` (`Array<WebhookPlanGrantTimelineEvent>`, required) — The grant timeline through the represented transition.
+
+## plan_grant.expired
+
+Fired after a plan grant is durably expired, whether discovered automatically or while replacing an expired grant.
+
+### Data
+
+- `id` (`string`, required) — The public plan grant ID.
+- `customerId` (`string`, required) — The public customer ID.
+- `subscriptionId` (`string`, required) — The public subscription ID.
+- `basePlanId` (`string`, required) — The public ID of the subscribed base plan.
+- `targetPlanId` (`string`, required) — The public ID of the plan whose access was granted.
+- `targetPlanReleaseId` (`string`, required) — The public ID of the immutable target plan release.
+- `status` (`"active" | "expired" | "revoked"`, required) — The plan grant status at this transition.
+- `duration` (`"cycles" | "until_date" | "until_revoked"`, required) — How the plan grant duration is defined at this transition.
+- `durationCycles` (`number | null`, required) — The cycle count when duration is cycles.
+- `startsAt` (`string`, required) — When the plan grant started.
+- `expiresAt` (`string | null`, required) — The effective expiration deadline, if any.
+- `reason` (`string`, required) — The reason recorded for this transition.
+- `source` (`"dashboard" | "api" | "system"`, required) — Where this transition originated.
+- `revokedAt` (`string | null`, required) — When the plan grant was revoked, otherwise null.
+- `createdAt` (`string`, required) — When the plan grant was created.
+- `updatedAt` (`string`, required) — When the represented transition occurred.
+- `events` (`Array<WebhookPlanGrantTimelineEvent>`, required) — The grant timeline through the represented transition.
+
+## plan_grant.revoked
+
+Fired after an active plan grant is durably revoked. The payload is the grant snapshot at revocation.
+
+### Data
+
+- `id` (`string`, required) — The public plan grant ID.
+- `customerId` (`string`, required) — The public customer ID.
+- `subscriptionId` (`string`, required) — The public subscription ID.
+- `basePlanId` (`string`, required) — The public ID of the subscribed base plan.
+- `targetPlanId` (`string`, required) — The public ID of the plan whose access was granted.
+- `targetPlanReleaseId` (`string`, required) — The public ID of the immutable target plan release.
+- `status` (`"active" | "expired" | "revoked"`, required) — The plan grant status at this transition.
+- `duration` (`"cycles" | "until_date" | "until_revoked"`, required) — How the plan grant duration is defined at this transition.
+- `durationCycles` (`number | null`, required) — The cycle count when duration is cycles.
+- `startsAt` (`string`, required) — When the plan grant started.
+- `expiresAt` (`string | null`, required) — The effective expiration deadline, if any.
+- `reason` (`string`, required) — The reason recorded for this transition.
+- `source` (`"dashboard" | "api" | "system"`, required) — Where this transition originated.
+- `revokedAt` (`string | null`, required) — When the plan grant was revoked, otherwise null.
+- `createdAt` (`string`, required) — When the plan grant was created.
+- `updatedAt` (`string`, required) — When the represented transition occurred.
+- `events` (`Array<WebhookPlanGrantTimelineEvent>`, required) — The grant timeline through the represented transition.
+
 ## credits.granted
 
 Fired when non-purchase credits are granted to a subscription: plan-included credits at the start of each billing period, or a manual adjustment from the dashboard. Credit pack purchases fire credits.purchased instead.

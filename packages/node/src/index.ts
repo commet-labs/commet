@@ -282,6 +282,7 @@ export type {
   WebhookBankRef,
   WebhookCardInfo,
   WebhookCreditsBalance,
+  WebhookPlanGrantTimelineEvent,
   WebhookPlanRef,
   WebhookSeatSummary,
   WebhookTest,

@@ -163,6 +163,22 @@ const webhookHandlerCases = [
     handlerName: "onCustomerStateChanged",
   },
   {
+    event: "plan_grant.created",
+    handlerName: "onPlanGrantCreated",
+  },
+  {
+    event: "plan_grant.updated",
+    handlerName: "onPlanGrantUpdated",
+  },
+  {
+    event: "plan_grant.expired",
+    handlerName: "onPlanGrantExpired",
+  },
+  {
+    event: "plan_grant.revoked",
+    handlerName: "onPlanGrantRevoked",
+  },
+  {
     event: "credits.granted",
     handlerName: "onCreditsGranted",
   },

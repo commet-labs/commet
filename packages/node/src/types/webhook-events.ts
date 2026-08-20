@@ -4,6 +4,7 @@ import type {
   WebhookBankRef,
   WebhookCardInfo,
   WebhookCreditsBalance,
+  WebhookPlanGrantTimelineEvent,
   WebhookPlanRef,
   WebhookSeatSummary,
 } from "./models";
@@ -46,6 +47,10 @@ export type WebhookEvent =
   | "customer.created"
   | "customer.updated"
   | "customer.state_changed"
+  | "plan_grant.created"
+  | "plan_grant.updated"
+  | "plan_grant.expired"
+  | "plan_grant.revoked"
   | "credits.granted"
   | "credits.purchased"
   | "credits.low"
@@ -1010,6 +1015,194 @@ export interface CustomerStateChangedData {
   balance: WebhookBalance | null;
 }
 
+/** Fired after a plan grant is durably created. The payload is the grant snapshot at creation. */
+export interface PlanGrantCreatedData {
+  /** The public plan grant ID. */
+  id: string;
+  /** The public customer ID. */
+  customerId: string;
+  /** The public subscription ID. */
+  subscriptionId: string;
+  /** The public ID of the subscribed base plan. */
+  basePlanId: string;
+  /** The public ID of the plan whose access was granted. */
+  targetPlanId: string;
+  /** The public ID of the immutable target plan release. */
+  targetPlanReleaseId: string;
+  /** The plan grant status at this transition. */
+  status: "active" | "expired" | "revoked";
+  /** How the plan grant duration is defined at this transition. */
+  duration: "cycles" | "until_date" | "until_revoked";
+  /** The cycle count when duration is cycles. */
+  durationCycles: number | null;
+  /**
+   * When the plan grant started.
+   * @format date-time
+   */
+  startsAt: string;
+  /** The effective expiration deadline, if any. */
+  expiresAt: string | null;
+  /** The reason recorded for this transition. */
+  reason: string;
+  /** Where this transition originated. */
+  source: "dashboard" | "api" | "system";
+  /** When the plan grant was revoked, otherwise null. */
+  revokedAt: string | null;
+  /**
+   * When the plan grant was created.
+   * @format date-time
+   */
+  createdAt: string;
+  /**
+   * When the represented transition occurred.
+   * @format date-time
+   */
+  updatedAt: string;
+  /** The grant timeline through the represented transition. */
+  events: Array<WebhookPlanGrantTimelineEvent>;
+}
+
+/** Fired after a plan grant duration or deadline is durably changed. The payload is the grant snapshot at that update. */
+export interface PlanGrantUpdatedData {
+  /** The public plan grant ID. */
+  id: string;
+  /** The public customer ID. */
+  customerId: string;
+  /** The public subscription ID. */
+  subscriptionId: string;
+  /** The public ID of the subscribed base plan. */
+  basePlanId: string;
+  /** The public ID of the plan whose access was granted. */
+  targetPlanId: string;
+  /** The public ID of the immutable target plan release. */
+  targetPlanReleaseId: string;
+  /** The plan grant status at this transition. */
+  status: "active" | "expired" | "revoked";
+  /** How the plan grant duration is defined at this transition. */
+  duration: "cycles" | "until_date" | "until_revoked";
+  /** The cycle count when duration is cycles. */
+  durationCycles: number | null;
+  /**
+   * When the plan grant started.
+   * @format date-time
+   */
+  startsAt: string;
+  /** The effective expiration deadline, if any. */
+  expiresAt: string | null;
+  /** The reason recorded for this transition. */
+  reason: string;
+  /** Where this transition originated. */
+  source: "dashboard" | "api" | "system";
+  /** When the plan grant was revoked, otherwise null. */
+  revokedAt: string | null;
+  /**
+   * When the plan grant was created.
+   * @format date-time
+   */
+  createdAt: string;
+  /**
+   * When the represented transition occurred.
+   * @format date-time
+   */
+  updatedAt: string;
+  /** The grant timeline through the represented transition. */
+  events: Array<WebhookPlanGrantTimelineEvent>;
+}
+
+/** Fired after a plan grant is durably expired, whether discovered automatically or while replacing an expired grant. */
+export interface PlanGrantExpiredData {
+  /** The public plan grant ID. */
+  id: string;
+  /** The public customer ID. */
+  customerId: string;
+  /** The public subscription ID. */
+  subscriptionId: string;
+  /** The public ID of the subscribed base plan. */
+  basePlanId: string;
+  /** The public ID of the plan whose access was granted. */
+  targetPlanId: string;
+  /** The public ID of the immutable target plan release. */
+  targetPlanReleaseId: string;
+  /** The plan grant status at this transition. */
+  status: "active" | "expired" | "revoked";
+  /** How the plan grant duration is defined at this transition. */
+  duration: "cycles" | "until_date" | "until_revoked";
+  /** The cycle count when duration is cycles. */
+  durationCycles: number | null;
+  /**
+   * When the plan grant started.
+   * @format date-time
+   */
+  startsAt: string;
+  /** The effective expiration deadline, if any. */
+  expiresAt: string | null;
+  /** The reason recorded for this transition. */
+  reason: string;
+  /** Where this transition originated. */
+  source: "dashboard" | "api" | "system";
+  /** When the plan grant was revoked, otherwise null. */
+  revokedAt: string | null;
+  /**
+   * When the plan grant was created.
+   * @format date-time
+   */
+  createdAt: string;
+  /**
+   * When the represented transition occurred.
+   * @format date-time
+   */
+  updatedAt: string;
+  /** The grant timeline through the represented transition. */
+  events: Array<WebhookPlanGrantTimelineEvent>;
+}
+
+/** Fired after an active plan grant is durably revoked. The payload is the grant snapshot at revocation. */
+export interface PlanGrantRevokedData {
+  /** The public plan grant ID. */
+  id: string;
+  /** The public customer ID. */
+  customerId: string;
+  /** The public subscription ID. */
+  subscriptionId: string;
+  /** The public ID of the subscribed base plan. */
+  basePlanId: string;
+  /** The public ID of the plan whose access was granted. */
+  targetPlanId: string;
+  /** The public ID of the immutable target plan release. */
+  targetPlanReleaseId: string;
+  /** The plan grant status at this transition. */
+  status: "active" | "expired" | "revoked";
+  /** How the plan grant duration is defined at this transition. */
+  duration: "cycles" | "until_date" | "until_revoked";
+  /** The cycle count when duration is cycles. */
+  durationCycles: number | null;
+  /**
+   * When the plan grant started.
+   * @format date-time
+   */
+  startsAt: string;
+  /** The effective expiration deadline, if any. */
+  expiresAt: string | null;
+  /** The reason recorded for this transition. */
+  reason: string;
+  /** Where this transition originated. */
+  source: "dashboard" | "api" | "system";
+  /** When the plan grant was revoked, otherwise null. */
+  revokedAt: string | null;
+  /**
+   * When the plan grant was created.
+   * @format date-time
+   */
+  createdAt: string;
+  /**
+   * When the represented transition occurred.
+   * @format date-time
+   */
+  updatedAt: string;
+  /** The grant timeline through the represented transition. */
+  events: Array<WebhookPlanGrantTimelineEvent>;
+}
+
 /** Fired when non-purchase credits are granted to a subscription: plan-included credits at the start of each billing period, or a manual adjustment from the dashboard. Credit pack purchases fire credits.purchased instead. */
 export interface CreditsGrantedData {
   /** The subscription ID. */
@@ -1358,6 +1551,10 @@ export type WebhookEventPayload =
   | WebhookEventEnvelope<"customer.created", CustomerCreatedData>
   | WebhookEventEnvelope<"customer.updated", CustomerUpdatedData>
   | WebhookEventEnvelope<"customer.state_changed", CustomerStateChangedData>
+  | WebhookEventEnvelope<"plan_grant.created", PlanGrantCreatedData>
+  | WebhookEventEnvelope<"plan_grant.updated", PlanGrantUpdatedData>
+  | WebhookEventEnvelope<"plan_grant.expired", PlanGrantExpiredData>
+  | WebhookEventEnvelope<"plan_grant.revoked", PlanGrantRevokedData>
   | WebhookEventEnvelope<"credits.granted", CreditsGrantedData>
   | WebhookEventEnvelope<"credits.purchased", CreditsPurchasedData>
   | WebhookEventEnvelope<"credits.low", CreditsLowData>
@@ -1416,6 +1613,10 @@ export interface WebhookEventDataMap {
   "customer.created": CustomerCreatedData;
   "customer.updated": CustomerUpdatedData;
   "customer.state_changed": CustomerStateChangedData;
+  "plan_grant.created": PlanGrantCreatedData;
+  "plan_grant.updated": PlanGrantUpdatedData;
+  "plan_grant.expired": PlanGrantExpiredData;
+  "plan_grant.revoked": PlanGrantRevokedData;
   "credits.granted": CreditsGrantedData;
   "credits.purchased": CreditsPurchasedData;
   "credits.low": CreditsLowData;

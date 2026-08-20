@@ -69,6 +69,10 @@ const PLATFORM_WEBHOOK_EVENTS = [
   "addon.activated",
   "addon.deactivated",
   "usage.recorded",
+  "plan_grant.created",
+  "plan_grant.updated",
+  "plan_grant.expired",
+  "plan_grant.revoked",
   "payout.available",
   "payout.created",
   "payout.paid",
@@ -273,7 +277,7 @@ describe("Webhooks", () => {
     });
 
     it("covers the current Platform webhook catalog", () => {
-      expect(PLATFORM_WEBHOOK_EVENTS).toHaveLength(56);
+      expect(PLATFORM_WEBHOOK_EVENTS).toHaveLength(60);
       expectTypeOf<PlatformWebhookEvent>().toEqualTypeOf<WebhookEvent>();
     });
 
