@@ -396,9 +396,9 @@ describe("Webhooks", () => {
 
   describe("event routing", () => {
     it("should cover every typed webhook event and named handler", () => {
-      expect(webhookHandlerCases).toHaveLength(56);
+      expect(webhookHandlerCases).toHaveLength(60);
       expect(new Set(webhookHandlerCases.map(({ event }) => event)).size).toBe(
-        56,
+        60,
       );
       expect(webhookEventCoverage).toBe(true);
       expect(webhookHandlerCoverage).toBe(true);
