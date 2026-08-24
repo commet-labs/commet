@@ -35,6 +35,7 @@ export interface CreateCustomerCreditParams {
     | "mxn"
     | "cad"
     | "eur"
+    | "gbp"
     | "jpy"
     | "cny"
     | "krw"

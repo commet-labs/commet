@@ -51,7 +51,7 @@ Grant monetary credit in one currency. Credit is applied FIFO before tax to elig
 
 - `id` (`string`, required)
 - `amount` (`number`, required) — Amount in the currency's smallest unit.
-- `currency` (`"usd" | "ars" | "brl" | "clp" | "cop" | "pen" | "uyu" | "pyg" | "bob" | "mxn" | "cad" | "eur" | "jpy" | "cny" | "krw" | "hkd" | "sgd" | "twd" | "inr" | "thb"`, required)
+- `currency` (`"usd" | "ars" | "brl" | "clp" | "cop" | "pen" | "uyu" | "pyg" | "bob" | "mxn" | "cad" | "eur" | "gbp" | "jpy" | "cny" | "krw" | "hkd" | "sgd" | "twd" | "inr" | "thb"`, required)
 - `reason` (`string`, required)
 - `expiresAt` (`string | null`, optional)
 

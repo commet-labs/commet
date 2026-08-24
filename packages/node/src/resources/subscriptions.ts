@@ -339,7 +339,7 @@ export class SubscriptionsResource {
     return this.httpClient.post(`/subscriptions/${id}/credits`, rest, options);
   }
 
-  /** Apply or replace a direct Offer on a subscription's pending payment checkout. The existing checkout URL remains unchanged. Offers whose first phase is a free trial cannot be applied after checkout creation. */
+  /** Apply a direct Offer to a subscription. On a pending payment checkout it quotes or replaces the checkout discount and the existing checkout URL remains unchanged. On an active subscription it applies the Offer immediately with its discount phases starting at the next billing cycle; the call is rejected while another applied Offer still has active or upcoming discount phases. Offers with a free trial phase cannot be applied after checkout creation. */
   async applyOffer(
     params: ApplySubscriptionOfferParams,
     options?: RequestOptions,

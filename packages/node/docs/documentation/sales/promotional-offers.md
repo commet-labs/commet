@@ -1,5 +1,5 @@
 ---
-lastModified: 2026-07-31
+lastModified: 2026-08-21
 title: Promotional Offers
 description: Apply any compatible Offer directly for campaigns, retention, and experiments.
 ---
@@ -43,6 +43,23 @@ The Offer must be active, inside its availability window, and resolvable in the 
 An explicit `offerId` overrides automatic introductory selection. It cannot be combined with `promoCode`, `customTrialDays`, or `skipTrial: true`.
 
 Immediate plan changes, plan-change previews, and supported reactivation flows also accept `offerId`. Scheduled plan changes do not accept an Offer.
+
+## Apply it to an active subscription
+
+For retention, apply an Offer to a subscription that is already active. The discount phases start at the next billing cycle, so the current period stays untouched and the next invoice carries the discount:
+
+```typescript
+await commet.subscriptions.applyOffer({
+  id: 'sub_123',
+  offerId: retentionOffer.id,
+})
+```
+
+Only one Offer applies at a time: while an accepted Offer still has active or upcoming discount phases, a new application is rejected. Once its phases are exhausted, the subscription accepts a new Offer. Offers with a free trial phase cannot be applied to an active subscription, and the discount applies to the plan base price only.
+
+The applied Offer belongs to that subscription and plan: it ends with a cancellation and a plan change removes it.
+
+The same operation on a subscription with a pending payment checkout quotes or replaces the checkout discount instead; there it accepts an optional `expiresAt` for the quote.
 
 ## Direct application or Promo Code?
 
