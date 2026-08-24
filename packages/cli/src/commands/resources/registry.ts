@@ -3005,8 +3005,7 @@ export const resourceDefinitions: ResourceDef[] = [
       },
       "apply-offer": {
         method: "applyOffer",
-        description:
-          "Apply or replace a direct Offer on a subscription's pending payment checkout.",
+        description: "Apply a direct Offer to a subscription.",
         hasParams: true,
         params: [
           {

@@ -151,7 +151,7 @@ Update a base price or market price variant. Removing a base market override is 
 - `includedBalance` (`number | null`, optional)
 - `includedCredits` (`number | null`, optional)
 - `metadata` (`Record<string, unknown>`, optional) — Metadata keys to merge into the existing price metadata.
-- `marketPrices` (`Array<{ marketGroupId: string; currency: "usd" | "ars" | "brl" | "clp" | "cop" | "pen" | "uyu" | "pyg" | "bob" | "mxn" | "cad" | "eur" | "jpy" | "cny" | "krw" | "hkd" | "sgd" | "twd" | "inr" | "thb"; price: number }>`, optional)
+- `marketPrices` (`Array<{ marketGroupId: string; currency: "usd" | "ars" | "brl" | "clp" | "cop" | "pen" | "uyu" | "pyg" | "bob" | "mxn" | "cad" | "eur" | "gbp" | "jpy" | "cny" | "krw" | "hkd" | "sgd" | "twd" | "inr" | "thb"; price: number }>`, optional)
 
 ### Request options
 
@@ -196,7 +196,7 @@ Add a base price or a selectable market price variant. Variants inherit their ba
 - `isDefault` (`boolean`, optional)
 - `includedBalance` (`number | null`, optional)
 - `includedCredits` (`number | null`, optional)
-- `marketPrices` (`Array<{ marketGroupId: string; currency: "usd" | "ars" | "brl" | "clp" | "cop" | "pen" | "uyu" | "pyg" | "bob" | "mxn" | "cad" | "eur" | "jpy" | "cny" | "krw" | "hkd" | "sgd" | "twd" | "inr" | "thb"; price: number }>`, optional)
+- `marketPrices` (`Array<{ marketGroupId: string; currency: "usd" | "ars" | "brl" | "clp" | "cop" | "pen" | "uyu" | "pyg" | "bob" | "mxn" | "cad" | "eur" | "gbp" | "jpy" | "cny" | "krw" | "hkd" | "sgd" | "twd" | "inr" | "thb"; price: number }>`, optional)
 - `inheritsFromPriceId` (`string`, optional)
 
 ### Valid parameter combinations
@@ -223,7 +223,7 @@ Configure regional prices and feature overage values for one currency. Currency-
 ### Parameters
 
 - `id` (`string`, required)
-- `currency` (`"usd" | "ars" | "brl" | "clp" | "cop" | "pen" | "uyu" | "pyg" | "bob" | "mxn" | "cad" | "eur" | "jpy" | "cny" | "krw" | "hkd" | "sgd" | "twd" | "inr" | "thb"`, required)
+- `currency` (`"usd" | "ars" | "brl" | "clp" | "cop" | "pen" | "uyu" | "pyg" | "bob" | "mxn" | "cad" | "eur" | "gbp" | "jpy" | "cny" | "krw" | "hkd" | "sgd" | "twd" | "inr" | "thb"`, required)
 - `exchangeRate` (`number`, required)
 - `prices` (`Array<{ priceId: string; price: number; includedBalance?: number }>`, optional)
 - `features` (`Array<{ featureId: string; overageUnitPrice: number }>`, optional)
