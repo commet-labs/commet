@@ -1,5 +1,13 @@
 # commet
 
+## 5.1.3
+
+### Patch Changes
+
+- cd66974: Regenerate the Node SDK and CLI from the current API contract, including GBP currency support, active-subscription Offer behavior, and the latest canonical installed documentation.
+- Updated dependencies [cd66974]
+  - @commet/node@9.3.0
+
 ## 5.1.2
 
 ### Patch Changes
