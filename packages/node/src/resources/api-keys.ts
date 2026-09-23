@@ -14,6 +14,29 @@ export interface ListApiKeysParams {
 export interface CreateApiKeyParams {
   name: string;
   expiresInDays?: number;
+  permissions?: Partial<
+    Record<
+      | "customer"
+      | "subscription"
+      | "invoice"
+      | "usage"
+      | "seat"
+      | "plan"
+      | "plan_group"
+      | "feature"
+      | "addon"
+      | "credit_pack"
+      | "offer"
+      | "promo_code"
+      | "market_group"
+      | "payment"
+      | "transaction"
+      | "payout"
+      | "test_clock"
+      | "organization",
+      ("read" | "write")[]
+    >
+  >;
 }
 
 export class ApiKeysResource {

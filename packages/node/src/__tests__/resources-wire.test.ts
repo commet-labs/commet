@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Commet } from "../client";
+import type { CreateApiKeyParams } from "../resources/api-keys";
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -32,6 +33,25 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.restoreAllMocks();
+});
+
+describe("API keys — wire serialization", () => {
+  it("keeps omitted, empty, and underscored permission grants", async () => {
+    const cases: CreateApiKeyParams[] = [
+      { name: "Full" },
+      { name: "None", permissions: {} },
+      {
+        name: "Scoped",
+        permissions: { plan_group: ["read" as const] },
+      },
+    ];
+    for (const params of cases) {
+      vi.mocked(fetch).mockResolvedValueOnce(jsonResponse({}, 201));
+      await client().apiKeys.create(params);
+      const body = lastBody();
+      expect(body.permissions).toEqual(params.permissions);
+    }
+  });
 });
 
 describe("Seats — wire serialization", () => {
