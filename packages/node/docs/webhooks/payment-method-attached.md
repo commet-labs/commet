@@ -1,5 +1,5 @@
 ---
-lastModified: 2026-06-12
+lastModified: 2026-09-24
 title: "payment_method.attached"
 description: "A payment method was saved for a customer's subscription."
 full: true
@@ -9,6 +9,7 @@ All webhook payloads follow a consistent top-level structure with event-specific
 
 - `subscriptionId` (string) — The subscription the payment method was saved for.
 - `customerId` (string) — The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.
+- `paymentMethod` ("card" | "oxxo" | "mercado_pago" | null) — The saved instrument referenced by this event. Null when unknown.
 - `card` (WebhookCardInfo | null) — Card display metadata: brand, last4, expMonth, expYear. Null when the method is not a card or its details cannot be retrieved.
 
 ```json
@@ -19,6 +20,7 @@ All webhook payloads follow a consistent top-level structure with event-specific
   "mode": "live",
   "apiVersion": "2026-07-31",
   "data": {
+    "paymentMethod": "card",
     "subscriptionId": "sub_1a2b3c4d",
     "customerId": "user_123",
     "card": {

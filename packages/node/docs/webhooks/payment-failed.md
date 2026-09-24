@@ -1,5 +1,5 @@
 ---
-lastModified: 2026-07-10
+lastModified: 2026-09-24
 title: "payment.failed"
 description: "Fired when a recurring charge fails"
 full: true
@@ -12,6 +12,7 @@ All webhook payloads follow a consistent top-level structure with event-specific
 - `customerId` (string) — The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.
 - `subscriptionId` (string | null) — The subscription ID, if the invoice is linked to a subscription.
 - `provider` ("stripe" | "commet" | "dlocal") — The payment provider the charge was routed to: stripe, commet, or dlocal.
+- `paymentMethod` ("card" | "oxxo" | "mercado_pago" | null) — The method used for this charge. Null when unknown.
 - `failureCode` (string) — The failure code from the payment processor.
 - `failureMessage` (string) — A human-readable failure message.
 - `recoveryUrl` (string | null) — A ready-to-use link the customer can follow to retry this payment, or null when no recovery path applies. For a first failed charge (pending\_payment) it is the checkout URL; for a failed renewal (past\_due) it is a signed recovery link — no separate createRecoveryLink call needed.
@@ -24,6 +25,7 @@ All webhook payloads follow a consistent top-level structure with event-specific
   "mode": "live",
   "apiVersion": "2026-07-31",
   "data": {
+    "paymentMethod": "card",
     "invoiceId": "inv_n4o5p6",
     "invoiceNumber": "INV-0043",
     "customerId": "user_123",

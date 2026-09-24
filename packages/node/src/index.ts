@@ -201,6 +201,7 @@ export type {
   ConsumptionModel,
   FeatureType,
   InvoiceType,
+  PaymentMethod,
   PaymentProvider,
   SubscriptionStatus,
   Timezone,

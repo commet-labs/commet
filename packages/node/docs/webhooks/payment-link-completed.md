@@ -1,5 +1,5 @@
 ---
-lastModified: 2026-07-10
+lastModified: 2026-09-24
 title: "payment_link.completed"
 description: "A payment link was paid successfully."
 full: true
@@ -16,6 +16,7 @@ All webhook payloads follow a consistent top-level structure with event-specific
 - `invoiceId` (string) — The one-time invoice generated for this payment.
 - `invoiceNumber` (string) — The human-readable invoice number.
 - `paymentTransactionId` (string | null) — The payment transaction ID for the settled charge.
+- `paymentMethod` ("card" | "oxxo" | "mercado_pago" | null) — The method used for this charge. Null when unknown.
 
 ```json
 {
@@ -25,6 +26,7 @@ All webhook payloads follow a consistent top-level structure with event-specific
   "mode": "live",
   "apiVersion": "2026-07-31",
   "data": {
+    "paymentMethod": "card",
     "paymentId": "pay_l1m2n3",
     "status": "succeeded",
     "amount": 5000,

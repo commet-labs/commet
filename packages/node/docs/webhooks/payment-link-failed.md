@@ -1,5 +1,5 @@
 ---
-lastModified: 2026-07-10
+lastModified: 2026-09-24
 title: "payment_link.failed"
 description: "A payment link charge attempt failed."
 full: true
@@ -15,6 +15,7 @@ All webhook payloads follow a consistent top-level structure with event-specific
 - `customerId` (string | null) — The customer ID, or null when the link is not tied to a customer. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.
 - `failureCode` (string) — The failure code from the payment processor.
 - `failureMessage` (string) — A human-readable failure message.
+- `paymentMethod` ("card" | "oxxo" | "mercado_pago" | null) — The method used for this charge. Null when unknown.
 
 ```json
 {
@@ -24,6 +25,7 @@ All webhook payloads follow a consistent top-level structure with event-specific
   "mode": "live",
   "apiVersion": "2026-07-31",
   "data": {
+    "paymentMethod": "card",
     "paymentId": "pay_l1m2n3",
     "status": "failed",
     "amount": 5000,

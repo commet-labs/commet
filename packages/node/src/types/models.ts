@@ -3,6 +3,7 @@ import type {
   ConsumptionModel,
   FeatureType,
   InvoiceType,
+  PaymentMethod,
   PaymentProvider,
   SubscriptionStatus,
   TransactionStatus,
@@ -1832,6 +1833,8 @@ export interface Transaction {
   currency: string;
   /** The payment provider the charge was routed to: stripe, commet, or dlocal. */
   provider: PaymentProvider;
+  /** The method used for this charge: card, oxxo, or mercado_pago. Null when unknown. */
+  paymentMethod: PaymentMethod | null;
   status: TransactionStatus;
   customerEmail: string | null;
   customerName: string | null;
@@ -1858,6 +1861,8 @@ export interface TransactionListItem {
   currency: string;
   /** The payment provider the charge was routed to: stripe, commet, or dlocal. */
   provider: PaymentProvider;
+  /** The method used for this charge: card, oxxo, or mercado_pago. Null when unknown. */
+  paymentMethod: PaymentMethod | null;
   status: TransactionStatus;
   customerEmail: string | null;
   customerName: string | null;

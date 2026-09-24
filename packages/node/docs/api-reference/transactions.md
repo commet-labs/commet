@@ -1,5 +1,7 @@
 # Transactions
 
+Transaction responses include `paymentMethod` (`card`, `oxxo`, `mercado_pago`, or `null` when unknown). It records the method used for that attempt, even after the customer saves another method.
+
 API version: `2026-07-31`
 
 ## refund

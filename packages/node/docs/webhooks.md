@@ -248,6 +248,7 @@ Fired every time a payment settles successfully — the first payment and every 
 - `subscriptionId` (`string | null`, required) — The subscription ID.
 - `paymentTransactionId` (`string | null`, required) — The payment transaction ID.
 - `provider` (`"stripe" | "commet" | "dlocal" | null`, required) — The payment provider the charge was routed to: stripe, commet, or dlocal. Null for billing-only charges with no Commet ledger row.
+- `paymentMethod` (`PaymentMethod | null`, required) — The method used for this charge: card, oxxo, or mercado_pago. Null when unknown.
 - `grossAmount` (`number | null`, required) — Gross amount in cents before fees.
 - `currency` (`string | null`, required) — The payment currency code.
 - `orgNetAmount` (`number | null`, required) — Net amount after fees in cents.
@@ -265,6 +266,7 @@ Fired when a recurring charge fails. This event is for recurring charge failures
 - `customerId` (`string`, required) — The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.
 - `subscriptionId` (`string | null`, required) — The subscription ID, if the invoice is linked to a subscription.
 - `provider` (`"stripe" | "commet" | "dlocal"`, required) — The payment provider the charge was routed to: stripe, commet, or dlocal.
+- `paymentMethod` (`PaymentMethod | null`, required) — The method used for this charge: card, oxxo, or mercado_pago. Null when unknown.
 - `failureCode` (`string`, required) — The failure code from the payment processor.
 - `failureMessage` (`string`, required) — A human-readable failure message.
 - `recoveryUrl` (`string | null`, required) — A ready-to-use link the customer can follow to retry this payment, or null when no recovery path applies. For a first failed charge (pending_payment) it is the checkout URL; for a failed renewal (past_due) it is a signed recovery link — no separate createRecoveryLink call needed.
@@ -281,6 +283,7 @@ Fired when an outstanding invoice that previously failed is successfully paid �
 - `customerId` (`string`, required) — The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.
 - `subscriptionId` (`string | null`, required) — The subscription ID, if the invoice is linked to a subscription.
 - `provider` (`"stripe" | "commet" | "dlocal" | null`, required) — The payment provider that recovered the payment, or null when the invoice was recovered without a processor charge.
+- `paymentMethod` (`PaymentMethod | null`, required) — The method used for this charge: card, oxxo, or mercado_pago. Null when unknown.
 
 ## payment.retry_failed
 
@@ -374,6 +377,7 @@ Fired when a payment link is paid. The charge settled and a one-time invoice was
 - `invoiceId` (`string`, required) — The one-time invoice generated for this payment.
 - `invoiceNumber` (`string`, required) — The human-readable invoice number.
 - `paymentTransactionId` (`string | null`, required) — The payment transaction ID for the settled charge.
+- `paymentMethod` (`PaymentMethod | null`, required) — The method used for this charge: card, oxxo, or mercado_pago. Null when unknown.
 
 ## payment_link.failed
 
@@ -389,6 +393,7 @@ Fired when a payment link charge attempt is declined. The link stays open and ca
 - `customerId` (`string | null`, required) — The customer ID, or null when the link is not tied to a customer. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.
 - `failureCode` (`string`, required) — The failure code from the payment processor.
 - `failureMessage` (`string`, required) — A human-readable failure message.
+- `paymentMethod` (`PaymentMethod | null`, required) — The method used for this charge: card, oxxo, or mercado_pago. Null when unknown.
 
 ## payment_link.canceled
 
@@ -482,6 +487,7 @@ Fired when Commet records a payment method for a subscription: after a paid chec
 
 - `subscriptionId` (`string`, required) — The subscription the payment method was saved for.
 - `customerId` (`string`, required) — The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.
+- `paymentMethod` (`PaymentMethod | null`, required) — The saved instrument referenced by this event: card, oxxo, or mercado_pago. Null when unknown.
 - `card` (`WebhookCardInfo | null`, required) — Card display metadata: brand, last4, expMonth, expYear. Null when the method is not a card or its details cannot be retrieved.
 
 ## payment_method.updated
@@ -491,6 +497,7 @@ Fired when a customer replaces their default payment method through the customer
 ### Data
 
 - `customerId` (`string`, required) — The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.
+- `paymentMethod` (`PaymentMethod | null`, required) — The saved instrument referenced by this event: card, oxxo, or mercado_pago. Null when unknown.
 - `card` (`WebhookCardInfo | null`, required) — Card display metadata for the new method: brand, last4, expMonth, expYear. Null when the method is not a card or its details cannot be retrieved.
 
 ## customer.created

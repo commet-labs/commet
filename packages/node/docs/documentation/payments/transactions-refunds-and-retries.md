@@ -68,6 +68,8 @@ $transactionsListResult = $commet->transactions->list();
 
 One invoice can have multiple transactions when a renewal is retried. The original failed transaction remains immutable; a retry creates a new attempt.
 
+`provider` names the processor. `paymentMethod` names the method used for that attempt (`card`, `mercado_pago`, or `oxxo`), or is `null` when unknown. It stays tied to the transaction if the customer changes their saved method later.
+
 ## Refund a successful transaction
 
 **TypeScript**

@@ -1,5 +1,5 @@
 ---
-lastModified: 2026-06-12
+lastModified: 2026-09-24
 title: "payment.recovered"
 description: "A previously failed payment was recovered."
 full: true
@@ -13,6 +13,7 @@ All webhook payloads follow a consistent top-level structure with event-specific
 - `customerId` (string) — The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.
 - `subscriptionId` (string | null) — The subscription ID, if the invoice is linked to a subscription.
 - `provider` ("stripe" | "commet" | "dlocal" | null) — The payment provider that recovered the payment, or null when the invoice was recovered without a processor charge.
+- `paymentMethod` ("card" | "oxxo" | "mercado_pago" | null) — The method used for this charge. Null when unknown.
 
 ```json
 {
@@ -22,6 +23,7 @@ All webhook payloads follow a consistent top-level structure with event-specific
   "mode": "live",
   "apiVersion": "2026-07-31",
   "data": {
+    "paymentMethod": "card",
     "invoiceId": "inv_n4o5p6",
     "invoiceNumber": "INV-0043",
     "invoiceTotal": 9900,

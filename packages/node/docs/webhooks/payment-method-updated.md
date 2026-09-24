@@ -1,5 +1,5 @@
 ---
-lastModified: 2026-06-12
+lastModified: 2026-09-24
 title: "payment_method.updated"
 description: "A customer's default payment method was replaced."
 full: true
@@ -8,6 +8,7 @@ full: true
 All webhook payloads follow a consistent top-level structure with event-specific data nested within the `data` object.
 
 - `customerId` (string) — The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.
+- `paymentMethod` ("card" | "oxxo" | "mercado_pago" | null) — The saved instrument referenced by this event. Null when unknown.
 - `card` (WebhookCardInfo | null) — Card display metadata for the new method: brand, last4, expMonth, expYear. Null when the method is not a card or its details cannot be retrieved.
 
 ```json
@@ -18,6 +19,7 @@ All webhook payloads follow a consistent top-level structure with event-specific
   "mode": "live",
   "apiVersion": "2026-07-31",
   "data": {
+    "paymentMethod": "card",
     "customerId": "user_123",
     "card": {
       "brand": "mastercard",

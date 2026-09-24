@@ -9,6 +9,8 @@ import type {
   WebhookSeatSummary,
 } from "./models";
 
+import type { PaymentMethod } from "./enums";
+
 export type WebhookEvent =
   | "subscription.created"
   | "subscription.activated"
@@ -383,6 +385,8 @@ export interface PaymentReceivedData {
   paymentTransactionId: string | null;
   /** The payment provider the charge was routed to: stripe, commet, or dlocal. Null for billing-only charges with no Commet ledger row. */
   provider: "stripe" | "commet" | "dlocal" | null;
+  /** The payment method: card, oxxo, or mercado_pago. Null when unknown. */
+  paymentMethod: PaymentMethod | null;
   /** Gross amount in cents before fees. */
   grossAmount: number | null;
   /** The payment currency code. */
@@ -407,6 +411,8 @@ export interface PaymentFailedData {
   subscriptionId: string | null;
   /** The payment provider the charge was routed to: stripe, commet, or dlocal. */
   provider: "stripe" | "commet" | "dlocal";
+  /** The payment method: card, oxxo, or mercado_pago. Null when unknown. */
+  paymentMethod: PaymentMethod | null;
   /** The failure code from the payment processor. */
   failureCode: string;
   /** A human-readable failure message. */
@@ -429,6 +435,8 @@ export interface PaymentRecoveredData {
   subscriptionId: string | null;
   /** The payment provider that recovered the payment, or null when the invoice was recovered without a processor charge. */
   provider: "stripe" | "commet" | "dlocal" | null;
+  /** The payment method: card, oxxo, or mercado_pago. Null when unknown. */
+  paymentMethod: PaymentMethod | null;
 }
 
 /** Fired when all dunning retries are exhausted and the subscription is canceled. This is the terminal event of the dunning flow — payment.recovered will not follow. Revoke access when you receive this. */
@@ -555,6 +563,8 @@ export interface PaymentLinkCompletedData {
   invoiceNumber: string;
   /** The payment transaction ID for the settled charge. */
   paymentTransactionId: string | null;
+  /** The payment method: card, oxxo, or mercado_pago. Null when unknown. */
+  paymentMethod: PaymentMethod | null;
 }
 
 /** Fired when a payment link charge attempt is declined. The link stays open and can be paid again — a failed link is retryable. */
@@ -575,6 +585,8 @@ export interface PaymentLinkFailedData {
   failureCode: string;
   /** A human-readable failure message. */
   failureMessage: string;
+  /** The payment method: card, oxxo, or mercado_pago. Null when unknown. */
+  paymentMethod: PaymentMethod | null;
 }
 
 /** Fired when a pending payment link is canceled before being paid. A canceled link can no longer be paid. */
@@ -703,6 +715,8 @@ export interface PaymentMethodAttachedData {
   customerId: string;
   /** Card display metadata: brand, last4, expMonth, expYear. Null when the method is not a card or its details cannot be retrieved. */
   card: WebhookCardInfo | null;
+  /** The payment method: card, oxxo, or mercado_pago. Null when unknown. */
+  paymentMethod: PaymentMethod | null;
 }
 
 /** Fired when a customer replaces their default payment method through the customer portal. The new method applies to all of the customer's subscriptions. A payment method update is also a strong recovery signal for past-due subscriptions. */
@@ -711,6 +725,8 @@ export interface PaymentMethodUpdatedData {
   customerId: string;
   /** Card display metadata for the new method: brand, last4, expMonth, expYear. Null when the method is not a card or its details cannot be retrieved. */
   card: WebhookCardInfo | null;
+  /** The payment method: card, oxxo, or mercado_pago. Null when unknown. */
+  paymentMethod: PaymentMethod | null;
 }
 
 /** Fired when a customer is created, via the API (including batch create), SDK, or dashboard. The payload is the customer resource exactly as GET /customers returns it. */

@@ -20,6 +20,8 @@ export type InvoiceType =
   | "one_time_payment"
   | "reactivation";
 
+export type PaymentMethod = "card" | "oxxo" | "mercado_pago";
+
 export type PaymentProvider = "stripe" | "commet" | "dlocal";
 
 export type SubscriptionStatus =
