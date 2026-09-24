@@ -33,7 +33,8 @@ export interface CreateApiKeyParams {
       | "transaction"
       | "payout"
       | "test_clock"
-      | "organization",
+      | "organization"
+      | "api_key",
       ("read" | "write")[]
     >
   >;
