@@ -13,6 +13,7 @@ All webhook payloads follow a consistent top-level structure with event-specific
 - `subscriptionId` (string | null) — The subscription ID, if the invoice is linked to a subscription.
 - `provider` ("stripe" | "commet" | "dlocal") — The payment provider the charge was routed to: stripe, commet, or dlocal.
 - `paymentMethod` ("card" | "oxxo" | "mercado_pago" | null) — The method used for this charge. Null when unknown.
+- `subPaymentMethod` ("credit_card" | "debit_card" | "prepaid_card" | "bank_transfer" | "account_money" | null) — The source of funds for this charge, when reported by the provider. Null when unavailable or unknown.
 - `failureCode` (string) — The failure code from the payment processor.
 - `failureMessage` (string) — A human-readable failure message.
 - `recoveryUrl` (string | null) — A ready-to-use link the customer can follow to retry this payment, or null when no recovery path applies. For a first failed charge (pending\_payment) it is the checkout URL; for a failed renewal (past\_due) it is a signed recovery link — no separate createRecoveryLink call needed.
@@ -26,6 +27,7 @@ All webhook payloads follow a consistent top-level structure with event-specific
   "apiVersion": "2026-07-31",
   "data": {
     "paymentMethod": "card",
+    "subPaymentMethod": "credit_card",
     "invoiceId": "inv_n4o5p6",
     "invoiceNumber": "INV-0043",
     "customerId": "user_123",

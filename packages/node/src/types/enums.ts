@@ -22,6 +22,13 @@ export type InvoiceType =
 
 export type PaymentMethod = "card" | "oxxo" | "mercado_pago";
 
+export type SubPaymentMethod =
+  | "credit_card"
+  | "debit_card"
+  | "prepaid_card"
+  | "bank_transfer"
+  | "account_money";
+
 export type PaymentProvider = "stripe" | "commet" | "dlocal";
 
 export type SubscriptionStatus =

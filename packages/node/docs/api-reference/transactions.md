@@ -2,6 +2,8 @@
 
 Transaction responses include `paymentMethod` (`card`, `oxxo`, `mercado_pago`, or `null` when unknown). It records the method used for that attempt, even after the customer saves another method.
 
+`subPaymentMethod` identifies the source of funds for that charge (`credit_card`, `debit_card`, `prepaid_card`, `bank_transfer`, or `account_money`), or `null` when unavailable or unknown. Today, Commet populates it for Mercado Pago charges routed through dLocal when dLocal reports it.
+
 API version: `2026-07-31`
 
 ## refund

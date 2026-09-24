@@ -14,6 +14,7 @@ All webhook payloads follow a consistent top-level structure with event-specific
 - `subscriptionId` (string | null) — The subscription ID, if the invoice is linked to a subscription.
 - `provider` ("stripe" | "commet" | "dlocal" | null) — The payment provider that recovered the payment, or null when the invoice was recovered without a processor charge.
 - `paymentMethod` ("card" | "oxxo" | "mercado_pago" | null) — The method used for this charge. Null when unknown.
+- `subPaymentMethod` ("credit_card" | "debit_card" | "prepaid_card" | "bank_transfer" | "account_money" | null) — The source of funds for this charge, when reported by the provider. Null when unavailable or unknown.
 
 ```json
 {
@@ -24,6 +25,7 @@ All webhook payloads follow a consistent top-level structure with event-specific
   "apiVersion": "2026-07-31",
   "data": {
     "paymentMethod": "card",
+    "subPaymentMethod": "credit_card",
     "invoiceId": "inv_n4o5p6",
     "invoiceNumber": "INV-0043",
     "invoiceTotal": 9900,

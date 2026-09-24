@@ -1,3 +1,4 @@
+import type { PaymentMethod, SubPaymentMethod } from "./enums";
 import type {
   WebhookAddonRef,
   WebhookBalance,
@@ -8,8 +9,6 @@ import type {
   WebhookPlanRef,
   WebhookSeatSummary,
 } from "./models";
-
-import type { PaymentMethod } from "./enums";
 
 export type WebhookEvent =
   | "subscription.created"
@@ -387,6 +386,8 @@ export interface PaymentReceivedData {
   provider: "stripe" | "commet" | "dlocal" | null;
   /** The payment method: card, oxxo, or mercado_pago. Null when unknown. */
   paymentMethod: PaymentMethod | null;
+  /** The source of funds for this charge, when reported by the provider. Null when unavailable or unknown. */
+  subPaymentMethod: SubPaymentMethod | null;
   /** Gross amount in cents before fees. */
   grossAmount: number | null;
   /** The payment currency code. */
@@ -413,6 +414,8 @@ export interface PaymentFailedData {
   provider: "stripe" | "commet" | "dlocal";
   /** The payment method: card, oxxo, or mercado_pago. Null when unknown. */
   paymentMethod: PaymentMethod | null;
+  /** The source of funds for this charge, when reported by the provider. Null when unavailable or unknown. */
+  subPaymentMethod: SubPaymentMethod | null;
   /** The failure code from the payment processor. */
   failureCode: string;
   /** A human-readable failure message. */
@@ -437,6 +440,8 @@ export interface PaymentRecoveredData {
   provider: "stripe" | "commet" | "dlocal" | null;
   /** The payment method: card, oxxo, or mercado_pago. Null when unknown. */
   paymentMethod: PaymentMethod | null;
+  /** The source of funds for this charge, when reported by the provider. Null when unavailable or unknown. */
+  subPaymentMethod: SubPaymentMethod | null;
 }
 
 /** Fired when all dunning retries are exhausted and the subscription is canceled. This is the terminal event of the dunning flow — payment.recovered will not follow. Revoke access when you receive this. */
@@ -565,6 +570,8 @@ export interface PaymentLinkCompletedData {
   paymentTransactionId: string | null;
   /** The payment method: card, oxxo, or mercado_pago. Null when unknown. */
   paymentMethod: PaymentMethod | null;
+  /** The source of funds for this charge, when reported by the provider. Null when unavailable or unknown. */
+  subPaymentMethod: SubPaymentMethod | null;
 }
 
 /** Fired when a payment link charge attempt is declined. The link stays open and can be paid again — a failed link is retryable. */
@@ -587,6 +594,8 @@ export interface PaymentLinkFailedData {
   failureMessage: string;
   /** The payment method: card, oxxo, or mercado_pago. Null when unknown. */
   paymentMethod: PaymentMethod | null;
+  /** The source of funds for this charge, when reported by the provider. Null when unavailable or unknown. */
+  subPaymentMethod: SubPaymentMethod | null;
 }
 
 /** Fired when a pending payment link is canceled before being paid. A canceled link can no longer be paid. */

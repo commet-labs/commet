@@ -5,6 +5,7 @@ import type {
   InvoiceType,
   PaymentMethod,
   PaymentProvider,
+  SubPaymentMethod,
   SubscriptionStatus,
   TransactionStatus,
 } from "./enums";
@@ -1835,6 +1836,8 @@ export interface Transaction {
   provider: PaymentProvider;
   /** The method used for this charge: card, oxxo, or mercado_pago. Null when unknown. */
   paymentMethod: PaymentMethod | null;
+  /** The source of funds for this charge, when reported by the provider. Null when unavailable or unknown. */
+  subPaymentMethod: SubPaymentMethod | null;
   status: TransactionStatus;
   customerEmail: string | null;
   customerName: string | null;
@@ -1863,6 +1866,8 @@ export interface TransactionListItem {
   provider: PaymentProvider;
   /** The method used for this charge: card, oxxo, or mercado_pago. Null when unknown. */
   paymentMethod: PaymentMethod | null;
+  /** The source of funds for this charge, when reported by the provider. Null when unavailable or unknown. */
+  subPaymentMethod: SubPaymentMethod | null;
   status: TransactionStatus;
   customerEmail: string | null;
   customerName: string | null;

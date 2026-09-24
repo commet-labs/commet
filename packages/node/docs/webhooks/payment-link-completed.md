@@ -17,6 +17,7 @@ All webhook payloads follow a consistent top-level structure with event-specific
 - `invoiceNumber` (string) — The human-readable invoice number.
 - `paymentTransactionId` (string | null) — The payment transaction ID for the settled charge.
 - `paymentMethod` ("card" | "oxxo" | "mercado_pago" | null) — The method used for this charge. Null when unknown.
+- `subPaymentMethod` ("credit_card" | "debit_card" | "prepaid_card" | "bank_transfer" | "account_money" | null) — The source of funds for this charge, when reported by the provider. Null when unavailable or unknown.
 
 ```json
 {
@@ -27,6 +28,7 @@ All webhook payloads follow a consistent top-level structure with event-specific
   "apiVersion": "2026-07-31",
   "data": {
     "paymentMethod": "card",
+    "subPaymentMethod": "credit_card",
     "paymentId": "pay_l1m2n3",
     "status": "succeeded",
     "amount": 5000,

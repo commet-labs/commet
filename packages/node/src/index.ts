@@ -203,6 +203,7 @@ export type {
   InvoiceType,
   PaymentMethod,
   PaymentProvider,
+  SubPaymentMethod,
   SubscriptionStatus,
   Timezone,
   TransactionStatus,
