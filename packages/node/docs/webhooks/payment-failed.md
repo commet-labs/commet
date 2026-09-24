@@ -27,7 +27,7 @@ All webhook payloads follow a consistent top-level structure with event-specific
   "apiVersion": "2026-07-31",
   "data": {
     "paymentMethod": "card",
-    "subPaymentMethod": "credit_card",
+    "subPaymentMethod": null,
     "invoiceId": "inv_n4o5p6",
     "invoiceNumber": "INV-0043",
     "customerId": "user_123",
