@@ -1,3 +1,4 @@
+import type { PaymentMethod, SubPaymentMethod } from "./enums";
 import type {
   WebhookAddonRef,
   WebhookBalance,
@@ -8,8 +9,6 @@ import type {
   WebhookPlanRef,
   WebhookSeatSummary,
 } from "./models";
-
-import type { PaymentMethod, SubPaymentMethod } from "./enums";
 
 export type WebhookEvent =
   | "subscription.created"
