@@ -1,5 +1,10 @@
 import type { ResourceDef } from "./factory";
-import { parseBool, parseJson, parseNumber } from "./param-types";
+import {
+  parseBool,
+  parseJson,
+  parseNullableNumber,
+  parseNumber,
+} from "./param-types";
 
 export const resourceDefinitions: ResourceDef[] = [
   {
@@ -1897,9 +1902,9 @@ export const resourceDefinitions: ResourceDef[] = [
             sdkKey: "overage",
           },
           {
-            flag: "--credits-per-unit <number>",
+            flag: "--credits-per-unit <number|null>",
             description: "Credits per unit",
-            parse: parseNumber,
+            parse: parseNullableNumber,
             sdkKey: "creditsPerUnit",
           },
           {
@@ -1973,9 +1978,9 @@ export const resourceDefinitions: ResourceDef[] = [
             sdkKey: "overage",
           },
           {
-            flag: "--credits-per-unit <number>",
+            flag: "--credits-per-unit <number|null>",
             description: "Credits per unit",
-            parse: parseNumber,
+            parse: parseNullableNumber,
             sdkKey: "creditsPerUnit",
           },
           {
@@ -1984,9 +1989,9 @@ export const resourceDefinitions: ResourceDef[] = [
             sdkKey: "pricingMode",
           },
           {
-            flag: "--margin <number>",
+            flag: "--margin <number|null>",
             description: "Margin",
-            parse: parseNumber,
+            parse: parseNullableNumber,
             sdkKey: "margin",
           },
           {
@@ -2114,15 +2119,15 @@ export const resourceDefinitions: ResourceDef[] = [
             sdkKey: "trialDays",
           },
           {
-            flag: "--included-balance <number>",
+            flag: "--included-balance <number|null>",
             description: "Included balance",
-            parse: parseNumber,
+            parse: parseNullableNumber,
             sdkKey: "includedBalance",
           },
           {
-            flag: "--included-credits <number>",
+            flag: "--included-credits <number|null>",
             description: "Included credits",
-            parse: parseNumber,
+            parse: parseNullableNumber,
             sdkKey: "includedCredits",
           },
           {
@@ -2208,15 +2213,15 @@ export const resourceDefinitions: ResourceDef[] = [
             sdkKey: "isDefault",
           },
           {
-            flag: "--included-balance <number>",
+            flag: "--included-balance <number|null>",
             description: "Included balance",
-            parse: parseNumber,
+            parse: parseNullableNumber,
             sdkKey: "includedBalance",
           },
           {
-            flag: "--included-credits <number>",
+            flag: "--included-credits <number|null>",
             description: "Included credits",
-            parse: parseNumber,
+            parse: parseNullableNumber,
             sdkKey: "includedCredits",
           },
           {
@@ -2534,9 +2539,9 @@ export const resourceDefinitions: ResourceDef[] = [
             sdkKey: "billingInterval",
           },
           {
-            flag: "--max-redemptions <number>",
+            flag: "--max-redemptions <number|null>",
             description: "Max redemptions",
-            parse: parseNumber,
+            parse: parseNullableNumber,
             sdkKey: "maxRedemptions",
           },
           {
@@ -3073,10 +3078,10 @@ export const resourceDefinitions: ResourceDef[] = [
             sdkKey: "mode",
           },
           {
-            flag: "--duration-days <number>",
+            flag: "--duration-days <number|null>",
             description: "Duration days",
             required: true,
-            parse: parseNumber,
+            parse: parseNullableNumber,
             sdkKey: "durationDays",
           },
           {
@@ -3100,10 +3105,10 @@ export const resourceDefinitions: ResourceDef[] = [
             sdkKey: "id",
           },
           {
-            flag: "--duration-days <number>",
+            flag: "--duration-days <number|null>",
             description: "Duration days",
             required: true,
-            parse: parseNumber,
+            parse: parseNullableNumber,
             sdkKey: "durationDays",
           },
           {

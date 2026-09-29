@@ -11,6 +11,7 @@ Update the Node SDK and CLI to API `2026-08-27`, preserving existing methods and
 - Nullable `paymentMethod` and `subPaymentMethod` on transactions and applicable webhooks.
 - Restricted API key authentication (`rk_`) and typed permission grants when creating keys.
 - Current installed API, webhook, error, and product documentation.
+- CLI support for `null` in nullable numeric options, including `--duration-days null` for indefinite pauses.
 
 The default API pin now exposes `paused` subscription status and `resume` invoice type. Integrations that exhaustively handle these values should include the new cases. Existing explicit API overrides and webhook endpoint pins are preserved.
 
