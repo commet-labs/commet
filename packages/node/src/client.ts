@@ -17,9 +17,9 @@ export class Commet<_TConfig = unknown> extends GeneratedResources {
       throw new Error("Commet SDK: API key is required");
     }
 
-    if (!config.apiKey.startsWith("ck_")) {
+    if (!config.apiKey.startsWith("ck_") && !config.apiKey.startsWith("rk_")) {
       throw new Error(
-        "Commet SDK: Invalid API key format. Expected format: ck_xxx...",
+        "Commet SDK: Invalid API key format. Expected prefix ck_ or rk_",
       );
     }
 

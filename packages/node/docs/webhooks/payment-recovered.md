@@ -13,6 +13,8 @@ All webhook payloads follow a consistent top-level structure with event-specific
 - `customerId` (string) — The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.
 - `subscriptionId` (string | null) — The subscription ID, if the invoice is linked to a subscription.
 - `provider` ("stripe" | "commet" | "dlocal" | null) — The payment provider that recovered the payment, or null when the invoice was recovered without a processor charge.
+- `paymentMethod` (PaymentMethod | null) — The payment method: card, oxxo, or mercado\_pago. Null when unknown.
+- `subPaymentMethod` (SubPaymentMethod | null) — The source of funds for this charge, when reported by the provider. Null when unavailable or unknown.
 
 ```json
 {
@@ -20,14 +22,16 @@ All webhook payloads follow a consistent top-level structure with event-specific
   "timestamp": "2026-06-23T14:30:00.000Z",
   "organizationId": "8f14e45f-ceea-4e7a-9c3d-1c2b3a4d5e6f",
   "mode": "live",
-  "apiVersion": "2026-07-31",
+  "apiVersion": "2026-08-27",
   "data": {
     "invoiceId": "inv_n4o5p6",
     "invoiceNumber": "INV-0043",
     "invoiceTotal": 9900,
     "customerId": "user_123",
     "subscriptionId": "sub_1a2b3c4d",
-    "provider": "stripe"
+    "provider": "stripe",
+    "paymentMethod": "card",
+    "subPaymentMethod": null
   }
 }
 ```

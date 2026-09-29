@@ -1,6 +1,6 @@
 # API error reference
 
-Generated from Commet API version `2026-07-31`.
+Generated from Commet API version `2026-08-27`.
 
 Use the response `code` to open the matching local reference. Preserve `x-request-id` when reporting or investigating an error.
 

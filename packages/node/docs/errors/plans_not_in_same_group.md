@@ -4,7 +4,7 @@ The current and target plans do not belong to the same plan group.
 
 - **Error type:** `validation_error`
 - **`code`:** `plans_not_in_same_group`
-- **API version:** `2026-07-31`
+- **API version:** `2026-08-27`
 
 
 ## What to do

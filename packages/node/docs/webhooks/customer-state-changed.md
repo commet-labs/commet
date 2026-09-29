@@ -8,7 +8,7 @@ full: true
 All webhook payloads follow a consistent top-level structure with event-specific data nested within the `data` object.
 
 - `customerId` (string) — The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.
-- `trigger` (string) — What caused the transition. One of: subscription\_created, subscription\_activated, subscription\_canceled, plan\_change, past\_due, trial\_started, trial\_converted, trial\_expired, cancellation\_scheduled, cancellation\_revoked, seats\_updated, addon\_activated, addon\_deactivated, credits\_depleted, balance\_depleted, quota\_exceeded, plan\_access\_granted, plan\_access\_ended.
+- `trigger` (string) — What caused the transition. One of: subscription\_created, subscription\_activated, subscription\_canceled, subscription\_paused, subscription\_resumed, plan\_change, past\_due, trial\_started, trial\_converted, trial\_expired, cancellation\_scheduled, cancellation\_revoked, seats\_updated, addon\_activated, addon\_deactivated, credits\_depleted, balance\_depleted, quota\_exceeded, plan\_access\_granted, plan\_access\_ended.
 - `status` (string) — The customer's current subscription status, or "none" when no live subscription exists. Access is granted while trialing, active, or past\_due — past\_due is a permissive grace window during dunning.
 - `subscriptionId` (string | null) — The live subscription ID, or null when status is none.
 - `plan` (WebhookPlanRef | null) — The current plan (id and name), or null when status is none.
@@ -25,7 +25,7 @@ All webhook payloads follow a consistent top-level structure with event-specific
   "timestamp": "2026-06-23T14:30:00.000Z",
   "organizationId": "8f14e45f-ceea-4e7a-9c3d-1c2b3a4d5e6f",
   "mode": "live",
-  "apiVersion": "2026-07-31",
+  "apiVersion": "2026-08-27",
   "data": {
     "customerId": "user_123",
     "trigger": "subscription_activated",

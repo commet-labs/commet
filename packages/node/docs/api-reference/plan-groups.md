@@ -1,6 +1,6 @@
 # Plan Groups
 
-API version: `2026-07-31`
+API version: `2026-08-27`
 
 ## removePlan
 

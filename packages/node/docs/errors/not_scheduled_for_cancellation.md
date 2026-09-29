@@ -4,7 +4,7 @@ The subscription has no scheduled cancellation to remove.
 
 - **Error type:** `conflict_error`
 - **`code`:** `not_scheduled_for_cancellation`
-- **API version:** `2026-07-31`
+- **API version:** `2026-08-27`
 
 
 ## What to do

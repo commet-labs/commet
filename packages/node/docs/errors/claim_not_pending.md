@@ -4,7 +4,7 @@ The organization has no pending claim to complete.
 
 - **Error type:** `not_found_error`
 - **`code`:** `claim_not_pending`
-- **API version:** `2026-07-31`
+- **API version:** `2026-08-27`
 
 
 ## What to do

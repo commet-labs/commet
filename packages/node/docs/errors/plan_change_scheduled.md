@@ -4,7 +4,7 @@ The requested plan change takes effect at the end of the current billing period 
 
 - **Error type:** `validation_error`
 - **`code`:** `plan_change_scheduled`
-- **API version:** `2026-07-31`
+- **API version:** `2026-08-27`
 
 
 ## What to do

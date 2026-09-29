@@ -1,5 +1,5 @@
 ---
-lastModified: 2026-07-16
+lastModified: 2026-09-22
 title: "subscription.canceled"
 description: "Fired when a subscription is terminated, at period end or immediately. Revoke access here."
 full: true
@@ -11,7 +11,7 @@ All webhook payloads follow a consistent top-level structure with event-specific
 - `customerId` (string) — The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.
 - `status` (string) — Always "canceled" for this event. Revoke access when you receive this.
 - `canceledAt` (string, optional) — ISO 8601 datetime when the cancellation was requested or triggered.
-- `cancelReason` (string | null) — The reason for cancellation, if provided. Set by Commet on system-initiated terminations: "refund" (full refund of a subscription invoice) or "dunning\_exhausted" (all payment retries failed).
+- `cancelReason` (string | null) — The reason for cancellation, if provided. Set to "dunning\_exhausted" when all payment retries fail. Historical refund-triggered cancellations may have "refund".
 - `endDate` (string, optional) — ISO 8601 datetime when the subscription ended. Matches the billing period end for scheduled cancellations; for immediate terminations it is the moment of termination.
 
 ```json
@@ -20,7 +20,7 @@ All webhook payloads follow a consistent top-level structure with event-specific
   "timestamp": "2026-06-23T14:30:00.000Z",
   "organizationId": "8f14e45f-ceea-4e7a-9c3d-1c2b3a4d5e6f",
   "mode": "live",
-  "apiVersion": "2026-07-31",
+  "apiVersion": "2026-08-27",
   "data": {
     "subscriptionId": "sub_1a2b3c4d",
     "customerId": "user_123",
@@ -53,5 +53,6 @@ POST /subscriptions/{id}/cancel
 Some terminations skip the schedule: `subscription.canceled` arrives right away, with no prior `subscription.updated`, and `endDate` is the moment of termination — not a billing period boundary.
 
 - `POST /subscriptions/{id}/cancel` with `immediate: true`. Cancellations of free plans and of subscriptions in `pending_payment` or `past_due` also settle immediately — canceling inside the dunning grace window voids the unpaid renewal.
-- A full refund of a subscription invoice: fires with `cancelReason: "refund"`, alongside `payment.refunded`.
 - Exhausted dunning retries: fires with `cancelReason: "dunning_exhausted"`, alongside `payment.retry_failed`.
+
+Refunding a payment does not cancel its subscription. If you want both outcomes, request a [cancellation](/docs/manage-subscriptions) separately. Older cancellation events triggered by refunds may have `cancelReason: "refund"`.

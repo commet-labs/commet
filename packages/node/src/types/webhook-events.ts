@@ -1,3 +1,4 @@
+import type { PaymentMethod, SubPaymentMethod } from "./enums";
 import type {
   WebhookAddonRef,
   WebhookBalance,
@@ -13,6 +14,12 @@ export type WebhookEvent =
   | "subscription.created"
   | "subscription.activated"
   | "subscription.reactivated"
+  | "subscription.pause_scheduled"
+  | "subscription.pause_updated"
+  | "subscription.pause_revoked"
+  | "subscription.paused"
+  | "subscription.resumed"
+  | "subscription.resume_failed"
   | "subscription.canceled"
   | "subscription.updated"
   | "subscription.plan_changed"
@@ -141,7 +148,108 @@ export interface SubscriptionReactivatedData {
   provider: "stripe" | "commet" | "dlocal";
 }
 
-/** Fired when a subscription is actually terminated. A scheduled cancellation fires it at the end of the billing period; immediate cancellations, full refunds (cancelReason refund), and exhausted dunning retries (cancelReason dunning_exhausted) fire it right away. The status is now canceled and access should be revoked. This event is NOT fired when cancellation is scheduled — that triggers subscription.updated instead. See the cancellation lifecycle below. */
+/** Fired when a period-end pause is scheduled. Access and billing continue until effectiveAt. */
+export interface SubscriptionPauseScheduledData {
+  /** The paused subscription ID. */
+  subscriptionId: string;
+  /** The customer ID for the paused subscription. */
+  customerId: string;
+  /** Current subscription status. */
+  status: "active" | "trialing";
+  /** The scheduled pause mode. */
+  mode: "period_end";
+  /**
+   * When the pause becomes or became effective.
+   * @format date-time
+   */
+  effectiveAt: string;
+  /** When automatic resume is scheduled, or null when indefinite. */
+  resumeAt: string | null;
+}
+
+/** Fired when the finite or indefinite pause duration changes. */
+export interface SubscriptionPauseUpdatedData {
+  /** The paused subscription ID. */
+  subscriptionId: string;
+  /** The customer ID for the paused subscription. */
+  customerId: string;
+  /** Current subscription status. */
+  status: "active" | "trialing" | "paused";
+  /**
+   * When the pause becomes or became effective.
+   * @format date-time
+   */
+  effectiveAt: string;
+  /** When automatic resume is scheduled, or null when indefinite. */
+  resumeAt: string | null;
+}
+
+/** Fired when a scheduled pause is revoked before it becomes effective. */
+export interface SubscriptionPauseRevokedData {
+  /** The paused subscription ID. */
+  subscriptionId: string;
+  /** The customer ID for the paused subscription. */
+  customerId: string;
+  /** Current subscription status. */
+  status: "active" | "trialing";
+}
+
+/** Fired when a pause becomes effective and access is revoked. */
+export interface SubscriptionPausedData {
+  /** The paused subscription ID. */
+  subscriptionId: string;
+  /** The customer ID for the paused subscription. */
+  customerId: string;
+  /** The subscription status after pausing. */
+  status: "paused";
+  /** How the pause became effective. */
+  mode: "immediate" | "period_end";
+  /**
+   * When the pause becomes or became effective.
+   * @format date-time
+   */
+  effectiveAt: string;
+  /** When automatic resume is scheduled, or null when indefinite. */
+  resumeAt: string | null;
+}
+
+/** Fired after a paused subscription restores access. */
+export interface SubscriptionResumedData {
+  /** The paused subscription ID. */
+  subscriptionId: string;
+  /** The customer ID for the paused subscription. */
+  customerId: string;
+  /** The restored subscription status. */
+  status: "active" | "trialing";
+  /** The completed pause mode. */
+  mode: "immediate" | "period_end";
+  /**
+   * When access was restored.
+   * @format date-time
+   */
+  resumedAt: string;
+  /** The resume invoice ID, or null when no charge was required. */
+  invoiceId: string | null;
+}
+
+/** Fired when a period-end resume charge fails. The subscription remains paused. */
+export interface SubscriptionResumeFailedData {
+  /** The paused subscription ID. */
+  subscriptionId: string;
+  /** The customer ID for the paused subscription. */
+  customerId: string;
+  /** The unchanged subscription status. */
+  status: "paused";
+  /** The outstanding resume invoice ID. */
+  invoiceId: string;
+  /**
+   * When the resume charge failed.
+   * @format date-time
+   */
+  failedAt: string;
+}
+
+/** Fired when a subscription is actually terminated. A scheduled cancellation fires it at the end of the billing period; immediate cancellations and exhausted dunning retries (cancelReason dunning_exhausted) fire it right away. Refunds do not terminate subscriptions. The status is now canceled and access should be revoked. This event is NOT fired when cancellation is scheduled — that triggers subscription.updated instead. See the cancellation lifecycle below. */
 export interface SubscriptionCanceledData {
   /** The subscription ID. */
   subscriptionId: string;
@@ -151,7 +259,7 @@ export interface SubscriptionCanceledData {
   status: string;
   /** ISO 8601 datetime when the cancellation was requested or triggered. */
   canceledAt?: string;
-  /** The reason for cancellation, if provided. Set by Commet on system-initiated terminations: "refund" (full refund of a subscription invoice) or "dunning_exhausted" (all payment retries failed). */
+  /** The reason for cancellation, if provided. Set to "dunning_exhausted" when all payment retries fail. Historical refund-triggered cancellations may have "refund". */
   cancelReason: string | null;
   /** ISO 8601 datetime when the subscription ended. Matches the billing period end for scheduled cancellations; for immediate terminations it is the moment of termination. */
   endDate?: string;
@@ -369,6 +477,34 @@ export interface CheckoutReadyData {
 
 /** Fired every time a payment settles successfully — the first payment and every renewal alike. subscription.activated fires alongside it only on the first one. */
 export interface PaymentReceivedData {
+  /** Charge context captured for new payments. Null for historical payments with no captured context. */
+  paymentContext: {
+    /** The original reason for the charge. Recovery never replaces this reason. */
+    reason:
+      | "first_subscription_payment"
+      | "trial_conversion"
+      | "recurring_billing"
+      | "plan_change"
+      | "reactivation"
+      | "subscription_resume"
+      | "one_time_payment"
+      | "overage"
+      | "adjustment";
+    /** The public payment link ID, independently of the reason, or null when no payment link originated the charge. */
+    paymentLinkId: string | null;
+    recovery:
+      | {
+          type: "payment_recovery";
+        }
+      | {
+          type: "dunning_retry";
+          /** Current retry, starting at 1. The original decline is not a retry. */
+          attempt: number;
+          /** Total retries applicable to this charge's dunning schedule. */
+          maxAttempts: number;
+        }
+      | null;
+  } | null;
   /** The invoice ID. */
   invoiceId: string;
   /** The human-readable invoice number. */
@@ -383,6 +519,10 @@ export interface PaymentReceivedData {
   paymentTransactionId: string | null;
   /** The payment provider the charge was routed to: stripe, commet, or dlocal. Null for billing-only charges with no Commet ledger row. */
   provider: "stripe" | "commet" | "dlocal" | null;
+  /** The payment method: card, oxxo, or mercado_pago. Null when unknown. */
+  paymentMethod: PaymentMethod | null;
+  /** The source of funds for this charge, when reported by the provider. Null when unavailable or unknown. */
+  subPaymentMethod: SubPaymentMethod | null;
   /** Gross amount in cents before fees. */
   grossAmount: number | null;
   /** The payment currency code. */
@@ -395,8 +535,36 @@ export interface PaymentReceivedData {
   paidAt?: string;
 }
 
-/** Fired when a recurring charge fails. This event is for recurring charge failures only — card declines during initial checkout do not trigger this event. */
+/** Fired when an invoice-linked subscription charge fails. */
 export interface PaymentFailedData {
+  /** Charge context captured for new payments. Null for historical payments with no captured context. */
+  paymentContext: {
+    /** The original reason for the charge. Recovery never replaces this reason. */
+    reason:
+      | "first_subscription_payment"
+      | "trial_conversion"
+      | "recurring_billing"
+      | "plan_change"
+      | "reactivation"
+      | "subscription_resume"
+      | "one_time_payment"
+      | "overage"
+      | "adjustment";
+    /** The public payment link ID, independently of the reason, or null when no payment link originated the charge. */
+    paymentLinkId: string | null;
+    recovery:
+      | {
+          type: "payment_recovery";
+        }
+      | {
+          type: "dunning_retry";
+          /** Current retry, starting at 1. The original decline is not a retry. */
+          attempt: number;
+          /** Total retries applicable to this charge's dunning schedule. */
+          maxAttempts: number;
+        }
+      | null;
+  } | null;
   /** The invoice ID, if available. */
   invoiceId: string;
   /** The human-readable invoice number, if available. */
@@ -407,6 +575,10 @@ export interface PaymentFailedData {
   subscriptionId: string | null;
   /** The payment provider the charge was routed to: stripe, commet, or dlocal. */
   provider: "stripe" | "commet" | "dlocal";
+  /** The payment method: card, oxxo, or mercado_pago. Null when unknown. */
+  paymentMethod: PaymentMethod | null;
+  /** The source of funds for this charge, when reported by the provider. Null when unavailable or unknown. */
+  subPaymentMethod: SubPaymentMethod | null;
   /** The failure code from the payment processor. */
   failureCode: string;
   /** A human-readable failure message. */
@@ -429,6 +601,10 @@ export interface PaymentRecoveredData {
   subscriptionId: string | null;
   /** The payment provider that recovered the payment, or null when the invoice was recovered without a processor charge. */
   provider: "stripe" | "commet" | "dlocal" | null;
+  /** The payment method: card, oxxo, or mercado_pago. Null when unknown. */
+  paymentMethod: PaymentMethod | null;
+  /** The source of funds for this charge, when reported by the provider. Null when unavailable or unknown. */
+  subPaymentMethod: SubPaymentMethod | null;
 }
 
 /** Fired when all dunning retries are exhausted and the subscription is canceled. This is the terminal event of the dunning flow — payment.recovered will not follow. Revoke access when you receive this. */
@@ -447,7 +623,7 @@ export interface PaymentRetryFailedData {
   reason: string;
 }
 
-/** Fired when a payment is refunded, fully or partially. A full refund of a subscription invoice also cancels the subscription immediately (subscription.canceled fires with reason refund); partial refunds leave the subscription untouched. */
+/** Fired when a payment is refunded, fully or partially. A refund does not change the subscription. Cancel it separately if it should end. */
 export interface PaymentRefundedData {
   /** The refunded payment transaction ID. */
   paymentTransactionId: string;
@@ -537,6 +713,34 @@ export interface PaymentLinkCreatedData {
 
 /** Fired when a payment link is paid. The charge settled and a one-time invoice was generated. Fulfill the purchase on this event. */
 export interface PaymentLinkCompletedData {
+  /** Charge context captured for new payments. Null for historical payments with no captured context. */
+  paymentContext: {
+    /** The original reason for the charge. Recovery never replaces this reason. */
+    reason:
+      | "first_subscription_payment"
+      | "trial_conversion"
+      | "recurring_billing"
+      | "plan_change"
+      | "reactivation"
+      | "subscription_resume"
+      | "one_time_payment"
+      | "overage"
+      | "adjustment";
+    /** The public payment link ID, independently of the reason, or null when no payment link originated the charge. */
+    paymentLinkId: string | null;
+    recovery:
+      | {
+          type: "payment_recovery";
+        }
+      | {
+          type: "dunning_retry";
+          /** Current retry, starting at 1. The original decline is not a retry. */
+          attempt: number;
+          /** Total retries applicable to this charge's dunning schedule. */
+          maxAttempts: number;
+        }
+      | null;
+  } | null;
   /** The payment link ID. */
   paymentId: string;
   /** The link status. Always "succeeded" for this event. */
@@ -555,10 +759,42 @@ export interface PaymentLinkCompletedData {
   invoiceNumber: string;
   /** The payment transaction ID for the settled charge. */
   paymentTransactionId: string | null;
+  /** The payment method: card, oxxo, or mercado_pago. Null when unknown. */
+  paymentMethod: PaymentMethod | null;
+  /** The source of funds for this charge, when reported by the provider. Null when unavailable or unknown. */
+  subPaymentMethod: SubPaymentMethod | null;
 }
 
 /** Fired when a payment link charge attempt is declined. The link stays open and can be paid again — a failed link is retryable. */
 export interface PaymentLinkFailedData {
+  /** Charge context captured for new payments. Null for historical payments with no captured context. */
+  paymentContext: {
+    /** The original reason for the charge. Recovery never replaces this reason. */
+    reason:
+      | "first_subscription_payment"
+      | "trial_conversion"
+      | "recurring_billing"
+      | "plan_change"
+      | "reactivation"
+      | "subscription_resume"
+      | "one_time_payment"
+      | "overage"
+      | "adjustment";
+    /** The public payment link ID, independently of the reason, or null when no payment link originated the charge. */
+    paymentLinkId: string | null;
+    recovery:
+      | {
+          type: "payment_recovery";
+        }
+      | {
+          type: "dunning_retry";
+          /** Current retry, starting at 1. The original decline is not a retry. */
+          attempt: number;
+          /** Total retries applicable to this charge's dunning schedule. */
+          maxAttempts: number;
+        }
+      | null;
+  } | null;
   /** The payment link ID. */
   paymentId: string;
   /** The link status. Always "failed" for this event. */
@@ -575,6 +811,10 @@ export interface PaymentLinkFailedData {
   failureCode: string;
   /** A human-readable failure message. */
   failureMessage: string;
+  /** The payment method: card, oxxo, or mercado_pago. Null when unknown. */
+  paymentMethod: PaymentMethod | null;
+  /** The source of funds for this charge, when reported by the provider. Null when unavailable or unknown. */
+  subPaymentMethod: SubPaymentMethod | null;
 }
 
 /** Fired when a pending payment link is canceled before being paid. A canceled link can no longer be paid. */
@@ -701,6 +941,8 @@ export interface PaymentMethodAttachedData {
   subscriptionId: string;
   /** The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId. */
   customerId: string;
+  /** The payment method: card, oxxo, or mercado_pago. Null when unknown. */
+  paymentMethod: PaymentMethod | null;
   /** Card display metadata: brand, last4, expMonth, expYear. Null when the method is not a card or its details cannot be retrieved. */
   card: WebhookCardInfo | null;
 }
@@ -709,6 +951,8 @@ export interface PaymentMethodAttachedData {
 export interface PaymentMethodUpdatedData {
   /** The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId. */
   customerId: string;
+  /** The payment method: card, oxxo, or mercado_pago. Null when unknown. */
+  paymentMethod: PaymentMethod | null;
   /** Card display metadata for the new method: brand, last4, expMonth, expYear. Null when the method is not a card or its details cannot be retrieved. */
   card: WebhookCardInfo | null;
 }
@@ -761,11 +1005,11 @@ export interface CustomerUpdatedData {
   updatedAt: string;
 }
 
-/** Aggregate entitlement event answering one question: what can this customer access right now? Fired on every entitlement transition (subscription lifecycle, plan changes, trials, past due, scheduled cancellations) with the customer's CURRENT subscription, plan, features, seats, and credits or balance. Handle this single event to keep access in sync instead of wiring every lifecycle event. */
+/** Aggregate entitlement event answering one question: what can this customer access right now? Fired on every entitlement transition (subscription lifecycle, pauses, plan changes, trials, past due, scheduled cancellations) with the customer's CURRENT subscription, plan, features, seats, and credits or balance. Handle this single event to keep access in sync instead of wiring every lifecycle event. */
 export interface CustomerStateChangedData {
   /** The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId. */
   customerId: string;
-  /** What caused the transition. One of: subscription_created, subscription_activated, subscription_canceled, plan_change, past_due, trial_started, trial_converted, trial_expired, cancellation_scheduled, cancellation_revoked, seats_updated, addon_activated, addon_deactivated, credits_depleted, balance_depleted, quota_exceeded, plan_access_granted, plan_access_ended. */
+  /** What caused the transition. One of: subscription_created, subscription_activated, subscription_canceled, subscription_paused, subscription_resumed, plan_change, past_due, trial_started, trial_converted, trial_expired, cancellation_scheduled, cancellation_revoked, seats_updated, addon_activated, addon_deactivated, credits_depleted, balance_depleted, quota_exceeded, plan_access_granted, plan_access_ended. */
   trigger: string;
   /** The customer's current subscription status, or "none" when no live subscription exists. Access is granted while trialing, active, or past_due — past_due is a permissive grace window during dunning. */
   status: string;
@@ -1502,6 +1746,24 @@ export type WebhookEventPayload =
       "subscription.reactivated",
       SubscriptionReactivatedData
     >
+  | WebhookEventEnvelope<
+      "subscription.pause_scheduled",
+      SubscriptionPauseScheduledData
+    >
+  | WebhookEventEnvelope<
+      "subscription.pause_updated",
+      SubscriptionPauseUpdatedData
+    >
+  | WebhookEventEnvelope<
+      "subscription.pause_revoked",
+      SubscriptionPauseRevokedData
+    >
+  | WebhookEventEnvelope<"subscription.paused", SubscriptionPausedData>
+  | WebhookEventEnvelope<"subscription.resumed", SubscriptionResumedData>
+  | WebhookEventEnvelope<
+      "subscription.resume_failed",
+      SubscriptionResumeFailedData
+    >
   | WebhookEventEnvelope<"subscription.canceled", SubscriptionCanceledData>
   | WebhookEventEnvelope<"subscription.updated", SubscriptionUpdatedData>
   | WebhookEventEnvelope<
@@ -1579,6 +1841,12 @@ export interface WebhookEventDataMap {
   "subscription.created": SubscriptionCreatedData;
   "subscription.activated": SubscriptionActivatedData;
   "subscription.reactivated": SubscriptionReactivatedData;
+  "subscription.pause_scheduled": SubscriptionPauseScheduledData;
+  "subscription.pause_updated": SubscriptionPauseUpdatedData;
+  "subscription.pause_revoked": SubscriptionPauseRevokedData;
+  "subscription.paused": SubscriptionPausedData;
+  "subscription.resumed": SubscriptionResumedData;
+  "subscription.resume_failed": SubscriptionResumeFailedData;
   "subscription.canceled": SubscriptionCanceledData;
   "subscription.updated": SubscriptionUpdatedData;
   "subscription.plan_changed": SubscriptionPlanChangedData;

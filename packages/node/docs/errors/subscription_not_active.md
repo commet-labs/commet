@@ -4,7 +4,7 @@ The subscription status does not permit the requested operation.
 
 - **Error type:** `conflict_error`
 - **`code`:** `subscription_not_active`
-- **API version:** `2026-07-31`
+- **API version:** `2026-08-27`
 
 
 ## What to do

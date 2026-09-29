@@ -18,9 +18,19 @@ export type InvoiceType =
   | "balance_topup"
   | "addon_activation"
   | "one_time_payment"
-  | "reactivation";
+  | "reactivation"
+  | "resume";
+
+export type PaymentMethod = "card" | "oxxo" | "mercado_pago";
 
 export type PaymentProvider = "stripe" | "commet" | "dlocal";
+
+export type SubPaymentMethod =
+  | "credit_card"
+  | "debit_card"
+  | "prepaid_card"
+  | "bank_transfer"
+  | "account_money";
 
 export type SubscriptionStatus =
   | "draft"
@@ -28,6 +38,7 @@ export type SubscriptionStatus =
   | "trialing"
   | "active"
   | "past_due"
+  | "paused"
   | "canceled";
 
 export type Timezone =

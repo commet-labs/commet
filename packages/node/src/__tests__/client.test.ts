@@ -5,6 +5,8 @@ describe("Commet client", () => {
   it("creates client with valid key", () => {
     const client = new Commet({ apiKey: "ck_test_abc123" });
     expect(client).toBeInstanceOf(Commet);
+    expect(new Commet({ apiKey: "rk_live_abc123" })).toBeInstanceOf(Commet);
+    expect(new Commet({ apiKey: "rk_sandbox_abc123" })).toBeInstanceOf(Commet);
   });
 
   it("rejects invalid API keys", () => {

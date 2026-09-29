@@ -1,5 +1,5 @@
 ---
-lastModified: 2026-07-10
+lastModified: 2026-09-22
 title: "payment.refunded"
 description: "A payment was refunded to the customer."
 full: true
@@ -23,7 +23,7 @@ All webhook payloads follow a consistent top-level structure with event-specific
   "timestamp": "2026-06-23T14:30:00.000Z",
   "organizationId": "8f14e45f-ceea-4e7a-9c3d-1c2b3a4d5e6f",
   "mode": "live",
-  "apiVersion": "2026-07-31",
+  "apiVersion": "2026-08-27",
   "data": {
     "paymentTransactionId": "txn_q7r8s9",
     "provider": "stripe",
@@ -40,7 +40,7 @@ All webhook payloads follow a consistent top-level structure with event-specific
 
 ## When this fires
 
-When a refund is issued for a payment — full or partial — and the payment provider confirms it. A full refund of a subscription invoice also cancels the subscription immediately (`subscription.canceled` fires with reason `refund`); a partial refund leaves the subscription untouched.
+When a refund is issued for a payment — full or partial — and the payment provider confirms it. A refund does not change the subscription. If it should end, [cancel it separately](/docs/manage-subscriptions).
 
 `refundAmount` is the refunded amount in cents (100 = $1.00). The invoice fields are `null` for payments that were not tied to an invoice.
 

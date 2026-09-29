@@ -4,7 +4,7 @@ A charge or payment retry is already running for the subscription.
 
 - **Error type:** `conflict_error`
 - **`code`:** `charge_in_progress`
-- **API version:** `2026-07-31`
+- **API version:** `2026-08-27`
 
 
 ## What to do

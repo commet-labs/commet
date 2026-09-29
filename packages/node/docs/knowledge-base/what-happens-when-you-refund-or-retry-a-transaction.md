@@ -1,5 +1,5 @@
 ---
-lastModified: 2026-08-16
+lastModified: 2026-09-22
 title: Refunds and Retries
 description: Understand how refunds and renewal retries affect transactions, invoices, and product access.
 ---
@@ -10,7 +10,7 @@ A refund and a retry create different payment outcomes. Neither should be inferr
 
 A full refund is requested against a successful transaction. Commet returns the provider-neutral refund with its actual status and emits `payment.refunded` when confirmed.
 
-The refund does not automatically invent your product's access policy. Decide whether a refunded purchase revokes access, restores balance, or requires manual review, then apply that rule idempotently from the webhook.
+Commet leaves the subscription, access, and future renewals unchanged. If the customer should stop receiving the plan, cancel the subscription separately. Handle `payment.refunded` idempotently for any additional refund policy in your own product.
 
 ## Retry
 

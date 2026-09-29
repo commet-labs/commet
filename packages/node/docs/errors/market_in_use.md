@@ -4,7 +4,7 @@ The market cannot be deleted while a price or subscription uses it.
 
 - **Error type:** `conflict_error`
 - **`code`:** `market_in_use`
-- **API version:** `2026-07-31`
+- **API version:** `2026-08-27`
 
 
 ## What to do

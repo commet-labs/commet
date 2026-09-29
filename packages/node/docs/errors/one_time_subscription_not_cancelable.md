@@ -4,7 +4,7 @@ A one-time subscription cannot be canceled as a recurring subscription.
 
 - **Error type:** `conflict_error`
 - **`code`:** `one_time_subscription_not_cancelable`
-- **API version:** `2026-07-31`
+- **API version:** `2026-08-27`
 
 
 ## What to do

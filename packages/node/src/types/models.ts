@@ -3,7 +3,9 @@ import type {
   ConsumptionModel,
   FeatureType,
   InvoiceType,
+  PaymentMethod,
   PaymentProvider,
+  SubPaymentMethod,
   SubscriptionStatus,
   TransactionStatus,
 } from "./enums";
@@ -141,6 +143,26 @@ export interface CreatedSubscription {
   /** @format date-time */
   updatedAt: string;
   offerApplications: Array<SubscriptionOfferApplication>;
+  pause:
+    | {
+        status: "scheduled";
+        mode: "period_end";
+        /** @format date-time */
+        requestedAt: string;
+        /** @format date-time */
+        effectiveAt: string;
+        resumeAt: string | null;
+      }
+    | {
+        status: "active";
+        mode: "immediate" | "period_end";
+        /** @format date-time */
+        requestedAt: string;
+        /** @format date-time */
+        effectiveAt: string;
+        resumeAt: string | null;
+      }
+    | null;
   /** Payment provider resolved for this checkout when the subscription response was created. This is an informational snapshot and may differ when the checkout is loaded if its country or the organization's routing changes. */
   checkoutProvider: PaymentProvider | null;
   priceId: string | null;
@@ -726,6 +748,34 @@ export interface Offer {
 }
 
 export interface Payment {
+  /** Charge context captured for new payments. Null for historical payments with no captured context. */
+  paymentContext: {
+    /** The original reason for the charge. Recovery never replaces this reason. */
+    reason:
+      | "first_subscription_payment"
+      | "trial_conversion"
+      | "recurring_billing"
+      | "plan_change"
+      | "reactivation"
+      | "subscription_resume"
+      | "one_time_payment"
+      | "overage"
+      | "adjustment";
+    /** The public payment link ID, independently of the reason, or null when no payment link originated the charge. */
+    paymentLinkId: string | null;
+    recovery:
+      | {
+          type: "payment_recovery";
+        }
+      | {
+          type: "dunning_retry";
+          /** Current retry, starting at 1. The original decline is not a retry. */
+          attempt: number;
+          /** Total retries applicable to this charge's dunning schedule. */
+          maxAttempts: number;
+        }
+      | null;
+  } | null;
   id: string;
   customerId: string | null;
   kind: "link" | "charge";
@@ -1544,6 +1594,26 @@ export interface Subscription {
   /** @format date-time */
   updatedAt: string;
   offerApplications: Array<SubscriptionOfferApplication>;
+  pause:
+    | {
+        status: "scheduled";
+        mode: "period_end";
+        /** @format date-time */
+        requestedAt: string;
+        /** @format date-time */
+        effectiveAt: string;
+        resumeAt: string | null;
+      }
+    | {
+        status: "active";
+        mode: "immediate" | "period_end";
+        /** @format date-time */
+        requestedAt: string;
+        /** @format date-time */
+        effectiveAt: string;
+        resumeAt: string | null;
+      }
+    | null;
   planGrant?: {
     /** The active Plan Grant ID. */
     id: string;
@@ -1706,6 +1776,14 @@ export type SubscriptionOfferApplicationPhase =
       endsAt: string | null;
     };
 
+export interface SubscriptionResume {
+  subscriptionId: string;
+  invoiceId: string | null;
+  status: "processing" | "succeeded";
+  object: "subscription_resume";
+  livemode: boolean;
+}
+
 export interface SubscriptionSummary {
   id: string;
   customerId: string;
@@ -1752,6 +1830,26 @@ export interface SubscriptionSummary {
   /** @format date-time */
   updatedAt: string;
   offerApplications: Array<SubscriptionOfferApplication>;
+  pause:
+    | {
+        status: "scheduled";
+        mode: "period_end";
+        /** @format date-time */
+        requestedAt: string;
+        /** @format date-time */
+        effectiveAt: string;
+        resumeAt: string | null;
+      }
+    | {
+        status: "active";
+        mode: "immediate" | "period_end";
+        /** @format date-time */
+        requestedAt: string;
+        /** @format date-time */
+        effectiveAt: string;
+        resumeAt: string | null;
+      }
+    | null;
   priceId: string | null;
   object: "subscription";
   livemode: boolean;
@@ -1820,6 +1918,34 @@ export interface TestClockRun {
 }
 
 export interface Transaction {
+  /** Charge context captured for new payments. Null for historical payments with no captured context. */
+  paymentContext: {
+    /** The original reason for the charge. Recovery never replaces this reason. */
+    reason:
+      | "first_subscription_payment"
+      | "trial_conversion"
+      | "recurring_billing"
+      | "plan_change"
+      | "reactivation"
+      | "subscription_resume"
+      | "one_time_payment"
+      | "overage"
+      | "adjustment";
+    /** The public payment link ID, independently of the reason, or null when no payment link originated the charge. */
+    paymentLinkId: string | null;
+    recovery:
+      | {
+          type: "payment_recovery";
+        }
+      | {
+          type: "dunning_retry";
+          /** Current retry, starting at 1. The original decline is not a retry. */
+          attempt: number;
+          /** Total retries applicable to this charge's dunning schedule. */
+          maxAttempts: number;
+        }
+      | null;
+  } | null;
   id: string;
   invoiceId: string | null;
   /** Gross amount in USD cents. Null when the provider has not reported an honest USD figure; see presentmentAmount. */
@@ -1832,6 +1958,10 @@ export interface Transaction {
   currency: string;
   /** The payment provider the charge was routed to: stripe, commet, or dlocal. */
   provider: PaymentProvider;
+  /** The method used for this charge: card, oxxo, or mercado_pago. Null when unknown. */
+  paymentMethod: PaymentMethod | null;
+  /** The source of funds for this charge, when reported by the provider. Null when unavailable or unknown. */
+  subPaymentMethod: SubPaymentMethod | null;
   status: TransactionStatus;
   customerEmail: string | null;
   customerName: string | null;
@@ -1846,6 +1976,34 @@ export interface Transaction {
 }
 
 export interface TransactionListItem {
+  /** Charge context captured for new payments. Null for historical payments with no captured context. */
+  paymentContext: {
+    /** The original reason for the charge. Recovery never replaces this reason. */
+    reason:
+      | "first_subscription_payment"
+      | "trial_conversion"
+      | "recurring_billing"
+      | "plan_change"
+      | "reactivation"
+      | "subscription_resume"
+      | "one_time_payment"
+      | "overage"
+      | "adjustment";
+    /** The public payment link ID, independently of the reason, or null when no payment link originated the charge. */
+    paymentLinkId: string | null;
+    recovery:
+      | {
+          type: "payment_recovery";
+        }
+      | {
+          type: "dunning_retry";
+          /** Current retry, starting at 1. The original decline is not a retry. */
+          attempt: number;
+          /** Total retries applicable to this charge's dunning schedule. */
+          maxAttempts: number;
+        }
+      | null;
+  } | null;
   id: string;
   invoiceId: string | null;
   /** Gross amount in USD cents. Null when the provider has not reported an honest USD figure; see presentmentAmount. */
@@ -1858,6 +2016,10 @@ export interface TransactionListItem {
   currency: string;
   /** The payment provider the charge was routed to: stripe, commet, or dlocal. */
   provider: PaymentProvider;
+  /** The method used for this charge: card, oxxo, or mercado_pago. Null when unknown. */
+  paymentMethod: PaymentMethod | null;
+  /** The source of funds for this charge, when reported by the provider. Null when unavailable or unknown. */
+  subPaymentMethod: SubPaymentMethod | null;
   status: TransactionStatus;
   customerEmail: string | null;
   customerName: string | null;

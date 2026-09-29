@@ -1,5 +1,5 @@
 ---
-lastModified: 2026-08-16
+lastModified: 2026-09-23
 title: SDK Reference
 description: Configuration, environments, and pagination
 ---
@@ -20,14 +20,14 @@ The installed package includes version-matched agent documentation at `node_modu
 
 ## Options
 
-| Option       | Type    | Default                                   | Description                                                                                                         |
-| ------------ | ------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| `apiKey`     | string  | required                                  | Your API key (starts with `ck_`). The org that owns the key decides whether calls run against sandbox or live data. |
-| `apiVersion` | string  | version the SDK release was built against | API version pin, sent as the `Commet-Version` header on every request. See [API versioning](/docs/api-versioning).  |
-| `debug`      | boolean | `false`                                   | Log requests/responses                                                                                              |
-| `timeout`    | number  | `30000`                                   | Request timeout (ms)                                                                                                |
-| `retries`    | number  | `3`                                       | Max retry attempts                                                                                                  |
-| `telemetry`  | boolean | `true`                                    | Send anonymous client info (SDK version, runtime, platform) with requests. Set to `false` to disable.               |
+| Option       | Type    | Default                                   | Description                                                                                                                          |
+| ------------ | ------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `apiKey`     | string  | required                                  | Your full-access (`ck_`) or restricted (`rk_`) API key. The org that owns it decides whether calls run against sandbox or live data. |
+| `apiVersion` | string  | version the SDK release was built against | API version pin, sent as the `Commet-Version` header on every request. See [API versioning](/docs/api-versioning).                   |
+| `debug`      | boolean | `false`                                   | Log requests/responses                                                                                                               |
+| `timeout`    | number  | `30000`                                   | Request timeout (ms)                                                                                                                 |
+| `retries`    | number  | `3`                                       | Max retry attempts                                                                                                                   |
+| `telemetry`  | boolean | `true`                                    | Send anonymous client info (SDK version, runtime, platform) with requests. Set to `false` to disable.                                |
 
 ## Sandbox vs live
 

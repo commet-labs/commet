@@ -4,7 +4,7 @@ The configured payment connection does not support the requested operation.
 
 - **Error type:** `conflict_error`
 - **`code`:** `provider_unsupported`
-- **API version:** `2026-07-31`
+- **API version:** `2026-08-27`
 
 
 ## What to do

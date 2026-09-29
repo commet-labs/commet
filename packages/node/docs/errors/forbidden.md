@@ -4,7 +4,7 @@ The caller is authenticated but cannot perform this operation in the current org
 
 - **Error type:** `authentication_error`
 - **`code`:** `forbidden`
-- **API version:** `2026-07-31`
+- **API version:** `2026-08-27`
 
 
 ## What to do

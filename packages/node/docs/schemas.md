@@ -1,6 +1,6 @@
 # Schemas
 
-Generated from Commet API version `2026-07-31`.
+Generated from Commet API version `2026-08-27`.
 
 ## Enums
 
@@ -36,12 +36,27 @@ Generated from Commet API version `2026-07-31`.
 - `"addon_activation"`
 - `"one_time_payment"`
 - `"reactivation"`
+- `"resume"`
+
+### PaymentMethod
+
+- `"card"`
+- `"oxxo"`
+- `"mercado_pago"`
 
 ### PaymentProvider
 
 - `"stripe"`
 - `"commet"`
 - `"dlocal"`
+
+### SubPaymentMethod
+
+- `"credit_card"`
+- `"debit_card"`
+- `"prepaid_card"`
+- `"bank_transfer"`
+- `"account_money"`
 
 ### SubscriptionStatus
 
@@ -50,6 +65,7 @@ Generated from Commet API version `2026-07-31`.
 - `"trialing"`
 - `"active"`
 - `"past_due"`
+- `"paused"`
 - `"canceled"`
 
 ### Timezone
@@ -188,6 +204,7 @@ Generated from Commet API version `2026-07-31`.
 - `createdAt` (`string`, required)
 - `updatedAt` (`string`, required)
 - `offerApplications` (`Array<SubscriptionOfferApplication>`, required)
+- `pause` (`{ status: "scheduled"; mode: "period_end"; requestedAt: string; effectiveAt: string; resumeAt: string | null } | { status: "active"; mode: "immediate" | "period_end"; requestedAt: string; effectiveAt: string; resumeAt: string | null } | null`, required)
 - `checkoutProvider` (`PaymentProvider | null`, required) — Payment provider resolved for this checkout when the subscription response was created. This is an informational snapshot and may differ when the checkout is loaded if its country or the organization's routing changes.
 - `priceId` (`string | null`, required)
 - `object` (`"subscription"`, required)
@@ -419,6 +436,7 @@ Variants:
 
 ### Payment
 
+- `paymentContext` (`{ reason: "first_subscription_payment" | "trial_conversion" | "recurring_billing" | "plan_change" | "reactivation" | "subscription_resume" | "one_time_payment" | "overage" | "adjustment"; paymentLinkId: string | null; recovery: { type: "payment_recovery" } | { type: "dunning_retry"; attempt: number; maxAttempts: number } | null } | null`, required) — Charge context captured for new payments. Null for historical payments with no captured context.
 - `id` (`string`, required)
 - `customerId` (`string | null`, required)
 - `kind` (`"link" | "charge"`, required)
@@ -735,6 +753,7 @@ Variants:
 - `createdAt` (`string`, required)
 - `updatedAt` (`string`, required)
 - `offerApplications` (`Array<SubscriptionOfferApplication>`, required)
+- `pause` (`{ status: "scheduled"; mode: "period_end"; requestedAt: string; effectiveAt: string; resumeAt: string | null } | { status: "active"; mode: "immediate" | "period_end"; requestedAt: string; effectiveAt: string; resumeAt: string | null } | null`, required)
 - `planGrant` (`{ id: string; plan: { id: string; name: string }; expiresAt: string | null }`, optional)
 - `consumptionModel` (`ConsumptionModel | null`, required)
 - `features` (`Array<{ code: string; name: string; type: "boolean"; enabled: boolean; baseAccess?: { enabled: boolean } | null } | { code: string; name: string; type: "usage"; usage?: { current: number; included: number; overageQuantity: number; overageUnitPrice?: number; unlimited?: boolean }; baseAccess?: { included: number; unlimited: boolean } | null } | { code: string; name: string; type: "seats"; usage: { current: number; included: number; overageQuantity: number; overageUnitPrice?: number; unlimited?: boolean }; baseAccess?: { included: number; unlimited: boolean } | null } | { code: string; name: string; type: "quota"; usage?: { current: number; included: number; overageQuantity: number; overageUnitPrice?: number; unlimited?: boolean }; baseAccess?: { included: number; unlimited: boolean } | null }>`, required)
@@ -778,6 +797,14 @@ Variants:
 - `{ type: "amount_off"; durationCycles: number | null; durationInterval: "weekly" | "monthly" | "quarterly" | "yearly" | null; amount: number; startsAt: string | null; endsAt: string | null }`
 - `{ type: "fixed_price"; durationCycles: number | null; durationInterval: "weekly" | "monthly" | "quarterly" | "yearly" | null; price: number; startsAt: string | null; endsAt: string | null }`
 
+### SubscriptionResume
+
+- `subscriptionId` (`string`, required)
+- `invoiceId` (`string | null`, required)
+- `status` (`"processing" | "succeeded"`, required)
+- `object` (`"subscription_resume"`, required)
+- `livemode` (`boolean`, required)
+
 ### SubscriptionSummary
 
 - `id` (`string`, required)
@@ -800,6 +827,7 @@ Variants:
 - `createdAt` (`string`, required)
 - `updatedAt` (`string`, required)
 - `offerApplications` (`Array<SubscriptionOfferApplication>`, required)
+- `pause` (`{ status: "scheduled"; mode: "period_end"; requestedAt: string; effectiveAt: string; resumeAt: string | null } | { status: "active"; mode: "immediate" | "period_end"; requestedAt: string; effectiveAt: string; resumeAt: string | null } | null`, required)
 - `priceId` (`string | null`, required)
 - `object` (`"subscription"`, required)
 - `livemode` (`boolean`, required)
@@ -829,6 +857,7 @@ Variants:
 
 ### Transaction
 
+- `paymentContext` (`{ reason: "first_subscription_payment" | "trial_conversion" | "recurring_billing" | "plan_change" | "reactivation" | "subscription_resume" | "one_time_payment" | "overage" | "adjustment"; paymentLinkId: string | null; recovery: { type: "payment_recovery" } | { type: "dunning_retry"; attempt: number; maxAttempts: number } | null } | null`, required) — Charge context captured for new payments. Null for historical payments with no captured context.
 - `id` (`string`, required)
 - `invoiceId` (`string | null`, required)
 - `grossAmount` (`number | null`, required) — Gross amount in USD cents. Null when the provider has not reported an honest USD figure; see presentmentAmount.
@@ -837,6 +866,8 @@ Variants:
 - `presentmentAmount` (`number | null`, required) — Amount in the charge currency's smallest unit, as presented to the customer. Set for non-USD charges; null when the charge was made in USD.
 - `currency` (`string`, required)
 - `provider` (`PaymentProvider`, required) — The payment provider the charge was routed to: stripe, commet, or dlocal.
+- `paymentMethod` (`PaymentMethod | null`, required) — The method used for this charge: card, oxxo, or mercado_pago. Null when unknown.
+- `subPaymentMethod` (`SubPaymentMethod | null`, required) — The source of funds for this charge, when reported by the provider. Null when unavailable or unknown.
 - `status` (`TransactionStatus`, required)
 - `customerEmail` (`string | null`, required)
 - `customerName` (`string | null`, required)
@@ -849,6 +880,7 @@ Variants:
 
 ### TransactionListItem
 
+- `paymentContext` (`{ reason: "first_subscription_payment" | "trial_conversion" | "recurring_billing" | "plan_change" | "reactivation" | "subscription_resume" | "one_time_payment" | "overage" | "adjustment"; paymentLinkId: string | null; recovery: { type: "payment_recovery" } | { type: "dunning_retry"; attempt: number; maxAttempts: number } | null } | null`, required) — Charge context captured for new payments. Null for historical payments with no captured context.
 - `id` (`string`, required)
 - `invoiceId` (`string | null`, required)
 - `grossAmount` (`number | null`, required) — Gross amount in USD cents. Null when the provider has not reported an honest USD figure; see presentmentAmount.
@@ -857,6 +889,8 @@ Variants:
 - `presentmentAmount` (`number | null`, required) — Amount in the charge currency's smallest unit, as presented to the customer. Set for non-USD charges; null when the charge was made in USD.
 - `currency` (`string`, required)
 - `provider` (`PaymentProvider`, required) — The payment provider the charge was routed to: stripe, commet, or dlocal.
+- `paymentMethod` (`PaymentMethod | null`, required) — The method used for this charge: card, oxxo, or mercado_pago. Null when unknown.
+- `subPaymentMethod` (`SubPaymentMethod | null`, required) — The source of funds for this charge, when reported by the provider. Null when unavailable or unknown.
 - `status` (`TransactionStatus`, required)
 - `customerEmail` (`string | null`, required)
 - `customerName` (`string | null`, required)

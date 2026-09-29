@@ -1,5 +1,10 @@
 import type { ResourceDef } from "./factory";
-import { parseBool, parseJson, parseNumber } from "./param-types";
+import {
+  parseBool,
+  parseJson,
+  parseNullableNumber,
+  parseNumber,
+} from "./param-types";
 
 export const resourceDefinitions: ResourceDef[] = [
   {
@@ -223,7 +228,7 @@ export const resourceDefinitions: ResourceDef[] = [
       },
       create: {
         method: "create",
-        description: "Create a new API key.",
+        description: "Create a full-access or restricted API key.",
         hasParams: true,
         params: [
           {
@@ -237,6 +242,12 @@ export const resourceDefinitions: ResourceDef[] = [
             description: "Expires in days",
             parse: parseNumber,
             sdkKey: "expiresInDays",
+          },
+          {
+            flag: "--permissions <json>",
+            description: "Permissions",
+            parse: parseJson,
+            sdkKey: "permissions",
           },
           {
             flag: "--idempotency-key <key>",
@@ -1891,9 +1902,9 @@ export const resourceDefinitions: ResourceDef[] = [
             sdkKey: "overage",
           },
           {
-            flag: "--credits-per-unit <number>",
+            flag: "--credits-per-unit <number|null>",
             description: "Credits per unit",
-            parse: parseNumber,
+            parse: parseNullableNumber,
             sdkKey: "creditsPerUnit",
           },
           {
@@ -1967,9 +1978,9 @@ export const resourceDefinitions: ResourceDef[] = [
             sdkKey: "overage",
           },
           {
-            flag: "--credits-per-unit <number>",
+            flag: "--credits-per-unit <number|null>",
             description: "Credits per unit",
-            parse: parseNumber,
+            parse: parseNullableNumber,
             sdkKey: "creditsPerUnit",
           },
           {
@@ -1978,9 +1989,9 @@ export const resourceDefinitions: ResourceDef[] = [
             sdkKey: "pricingMode",
           },
           {
-            flag: "--margin <number>",
+            flag: "--margin <number|null>",
             description: "Margin",
-            parse: parseNumber,
+            parse: parseNullableNumber,
             sdkKey: "margin",
           },
           {
@@ -2108,15 +2119,15 @@ export const resourceDefinitions: ResourceDef[] = [
             sdkKey: "trialDays",
           },
           {
-            flag: "--included-balance <number>",
+            flag: "--included-balance <number|null>",
             description: "Included balance",
-            parse: parseNumber,
+            parse: parseNullableNumber,
             sdkKey: "includedBalance",
           },
           {
-            flag: "--included-credits <number>",
+            flag: "--included-credits <number|null>",
             description: "Included credits",
-            parse: parseNumber,
+            parse: parseNullableNumber,
             sdkKey: "includedCredits",
           },
           {
@@ -2202,15 +2213,15 @@ export const resourceDefinitions: ResourceDef[] = [
             sdkKey: "isDefault",
           },
           {
-            flag: "--included-balance <number>",
+            flag: "--included-balance <number|null>",
             description: "Included balance",
-            parse: parseNumber,
+            parse: parseNullableNumber,
             sdkKey: "includedBalance",
           },
           {
-            flag: "--included-credits <number>",
+            flag: "--included-credits <number|null>",
             description: "Included credits",
-            parse: parseNumber,
+            parse: parseNullableNumber,
             sdkKey: "includedCredits",
           },
           {
@@ -2528,9 +2539,9 @@ export const resourceDefinitions: ResourceDef[] = [
             sdkKey: "billingInterval",
           },
           {
-            flag: "--max-redemptions <number>",
+            flag: "--max-redemptions <number|null>",
             description: "Max redemptions",
-            parse: parseNumber,
+            parse: parseNullableNumber,
             sdkKey: "maxRedemptions",
           },
           {
@@ -3048,6 +3059,80 @@ export const resourceDefinitions: ResourceDef[] = [
           },
         ],
       },
+      pause: {
+        method: "pause",
+        description:
+          "Pause immediately or schedule a pause for the end of the current billing or trial period.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--mode <mode>",
+            description: "Mode",
+            required: true,
+            sdkKey: "mode",
+          },
+          {
+            flag: "--duration-days <number|null>",
+            description: "Duration days",
+            required: true,
+            parse: parseNullableNumber,
+            sdkKey: "durationDays",
+          },
+          {
+            flag: "--idempotency-key <key>",
+            description:
+              "Unique key used to safely retry this write for 24 hours without applying it twice.",
+            sdkKey: "idempotencyKey",
+            requestOption: true,
+          },
+        ],
+      },
+      "update-pause": {
+        method: "updatePause",
+        description: "Change the duration of a scheduled or active pause.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--duration-days <number|null>",
+            description: "Duration days",
+            required: true,
+            parse: parseNullableNumber,
+            sdkKey: "durationDays",
+          },
+          {
+            flag: "--idempotency-key <key>",
+            description:
+              "Unique key used to safely retry this write for 24 hours without applying it twice.",
+            sdkKey: "idempotencyKey",
+            requestOption: true,
+          },
+        ],
+      },
+      "revoke-pause": {
+        method: "revokePause",
+        description: "Revoke a pause before it becomes effective.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+        ],
+      },
       "update-payment-method": {
         method: "updatePaymentMethod",
         description:
@@ -3140,6 +3225,26 @@ export const resourceDefinitions: ResourceDef[] = [
         method: "createRecoveryLink",
         description:
           "Generates a hosted, signed recovery link that lets the customer pay the outstanding renewal charge for a past_due subscription.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--idempotency-key <key>",
+            description:
+              "Unique key used to safely retry this write for 24 hours without applying it twice.",
+            sdkKey: "idempotencyKey",
+            requestOption: true,
+          },
+        ],
+      },
+      resume: {
+        method: "resume",
+        description: "Resume a paused subscription.",
         hasParams: true,
         params: [
           {

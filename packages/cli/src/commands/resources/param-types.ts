@@ -14,6 +14,10 @@ export function parseNumber(value: string): number {
   return num;
 }
 
+export function parseNullableNumber(value: string): number | null {
+  return value === "null" ? null : parseNumber(value);
+}
+
 export function parseBool(value: string): boolean {
   if (value === "true") return true;
   if (value === "false") return false;

@@ -4,7 +4,7 @@ This operation is available only to sandbox organizations.
 
 - **Error type:** `authentication_error`
 - **`code`:** `sandbox_only`
-- **API version:** `2026-07-31`
+- **API version:** `2026-08-27`
 
 
 ## What to do
