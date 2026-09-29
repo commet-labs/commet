@@ -4,7 +4,7 @@ The requested price does not exist on the selected plan or no price matches the 
 
 - **Error type:** `not_found_error`
 - **`code`:** `price_not_found`
-- **API version:** `2026-07-31`
+- **API version:** `2026-08-27`
 
 
 ## What to do

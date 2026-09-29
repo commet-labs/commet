@@ -1,5 +1,5 @@
 ---
-lastModified: 2026-08-16
+lastModified: 2026-09-24
 title: Transactions, Refunds, and Retries
 description: Inspect provider-neutral payment attempts, refund successful charges, and retry failed renewals safely.
 ---
@@ -68,6 +68,10 @@ $transactionsListResult = $commet->transactions->list();
 
 One invoice can have multiple transactions when a renewal is retried. The original failed transaction remains immutable; a retry creates a new attempt.
 
+`provider` names the processor. `paymentMethod` names the method used for that attempt (`card`, `mercado_pago`, or `oxxo`), or is `null` when unknown. It stays tied to the transaction if the customer changes their saved method later.
+
+`subPaymentMethod` describes how a Mercado Pago charge was funded when dLocal reports it: `credit_card`, `debit_card`, `prepaid_card`, `bank_transfer`, or `account_money`. It is `null` when unavailable or unknown. The dashboard also shows the card brand and last four digits when dLocal provides them for that charge.
+
 ## Refund a successful transaction
 
 **TypeScript**
@@ -130,6 +134,8 @@ $refund = $commet->transactions->refund(id: 'transaction_xxx');
 ```
 
 The operation requests a full refund and returns its actual provider-neutral status. Do not grant the refund in your product before the result is confirmed. Handle [`payment.refunded`](/docs/webhooks/payment-refunded) idempotently for downstream access or balance changes.
+
+The subscription and its renewal schedule stay as they were, even when the payment is fully refunded. To end the subscription, [cancel it separately](/docs/manage-subscriptions).
 
 ## Retry a failed renewal
 

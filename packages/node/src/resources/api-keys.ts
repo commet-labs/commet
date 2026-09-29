@@ -14,6 +14,27 @@ export interface ListApiKeysParams {
 export interface CreateApiKeyParams {
   name: string;
   expiresInDays?: number;
+  permissions?: {
+    customer?: Array<"read"> | ["read", "write"] | ["write", "read"];
+    subscription?: Array<"read"> | ["read", "write"] | ["write", "read"];
+    invoice?: Array<"read"> | ["read", "write"] | ["write", "read"];
+    usage?: Array<"read"> | ["read", "write"] | ["write", "read"];
+    seat?: Array<"read"> | ["read", "write"] | ["write", "read"];
+    plan?: Array<"read"> | ["read", "write"] | ["write", "read"];
+    plan_group?: Array<"read"> | ["read", "write"] | ["write", "read"];
+    feature?: Array<"read"> | ["read", "write"] | ["write", "read"];
+    addon?: Array<"read"> | ["read", "write"] | ["write", "read"];
+    credit_pack?: Array<"read"> | ["read", "write"] | ["write", "read"];
+    offer?: Array<"read"> | ["read", "write"] | ["write", "read"];
+    promo_code?: Array<"read"> | ["read", "write"] | ["write", "read"];
+    market_group?: Array<"read"> | ["read", "write"] | ["write", "read"];
+    payment?: Array<"read"> | ["read", "write"] | ["write", "read"];
+    transaction?: Array<"read"> | ["read", "write"] | ["write", "read"];
+    payout?: Array<"read"> | ["read", "write"] | ["write", "read"];
+    test_clock?: Array<"read"> | ["read", "write"] | ["write", "read"];
+    organization?: Array<"read"> | ["read", "write"] | ["write", "read"];
+    api_key?: Array<"read"> | ["read", "write"] | ["write", "read"];
+  };
 }
 
 export class ApiKeysResource {
@@ -41,7 +62,7 @@ export class ApiKeysResource {
     return this.httpClient.get("/api-keys", params, options);
   }
 
-  /** Create a new API key. The full key is only returned once in the response. */
+  /** Create a full-access or restricted API key. Provide permissions to restrict access; the full key is returned only once. A restricted key with api_key: write may only create restricted keys with the same or fewer permissions, and they expire no later than the key that creates them. */
   async create(
     params: CreateApiKeyParams,
     options?: RequestOptions,

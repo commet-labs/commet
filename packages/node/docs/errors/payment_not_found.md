@@ -4,7 +4,7 @@ The requested payment does not exist in this organization.
 
 - **Error type:** `not_found_error`
 - **`code`:** `payment_not_found`
-- **API version:** `2026-07-31`
+- **API version:** `2026-08-27`
 
 
 ## What to do

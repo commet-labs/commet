@@ -4,7 +4,7 @@ The payment's current state does not allow cancellation.
 
 - **Error type:** `conflict_error`
 - **`code`:** `payment_not_cancelable`
-- **API version:** `2026-07-31`
+- **API version:** `2026-08-27`
 
 
 ## What to do

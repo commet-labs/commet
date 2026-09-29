@@ -4,7 +4,7 @@ Platform could not complete subscription cancellation.
 
 - **Error type:** `internal_error`
 - **`code`:** `subscription_cancel_failed`
-- **API version:** `2026-07-31`
+- **API version:** `2026-08-27`
 
 
 ## What to do

@@ -4,7 +4,7 @@ The customer already has a draft, trialing, active, or past-due subscription tha
 
 - **Error type:** `conflict_error`
 - **`code`:** `already_has_active_subscription`
-- **API version:** `2026-07-31`
+- **API version:** `2026-08-27`
 
 
 ## What to do

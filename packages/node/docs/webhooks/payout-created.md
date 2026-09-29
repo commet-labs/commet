@@ -22,7 +22,7 @@ All webhook payloads follow a consistent top-level structure with event-specific
   "timestamp": "2026-06-23T14:30:00.000Z",
   "organizationId": "8f14e45f-ceea-4e7a-9c3d-1c2b3a4d5e6f",
   "mode": "live",
-  "apiVersion": "2026-07-31",
+  "apiVersion": "2026-08-27",
   "data": {
     "payoutId": "8b6f2a1c-4d3e-4f5a-9b8c-7d6e5f4a3b2c",
     "amount": 20000,

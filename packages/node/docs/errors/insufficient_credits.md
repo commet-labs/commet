@@ -4,7 +4,7 @@ The subscription does not have enough credits for the usage event.
 
 - **Error type:** `billing_error`
 - **`code`:** `insufficient_credits`
-- **API version:** `2026-07-31`
+- **API version:** `2026-08-27`
 
 
 ## What to do

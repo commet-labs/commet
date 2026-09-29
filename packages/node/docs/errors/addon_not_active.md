@@ -4,7 +4,7 @@ The add-on is not active on this subscription.
 
 - **Error type:** `billing_error`
 - **`code`:** `addon_not_active`
-- **API version:** `2026-07-31`
+- **API version:** `2026-08-27`
 
 
 ## What to do

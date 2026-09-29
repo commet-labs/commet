@@ -223,7 +223,7 @@ export const resourceDefinitions: ResourceDef[] = [
       },
       create: {
         method: "create",
-        description: "Create a new API key.",
+        description: "Create a full-access or restricted API key.",
         hasParams: true,
         params: [
           {
@@ -237,6 +237,12 @@ export const resourceDefinitions: ResourceDef[] = [
             description: "Expires in days",
             parse: parseNumber,
             sdkKey: "expiresInDays",
+          },
+          {
+            flag: "--permissions <json>",
+            description: "Permissions",
+            parse: parseJson,
+            sdkKey: "permissions",
           },
           {
             flag: "--idempotency-key <key>",
@@ -3048,6 +3054,80 @@ export const resourceDefinitions: ResourceDef[] = [
           },
         ],
       },
+      pause: {
+        method: "pause",
+        description:
+          "Pause immediately or schedule a pause for the end of the current billing or trial period.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--mode <mode>",
+            description: "Mode",
+            required: true,
+            sdkKey: "mode",
+          },
+          {
+            flag: "--duration-days <number>",
+            description: "Duration days",
+            required: true,
+            parse: parseNumber,
+            sdkKey: "durationDays",
+          },
+          {
+            flag: "--idempotency-key <key>",
+            description:
+              "Unique key used to safely retry this write for 24 hours without applying it twice.",
+            sdkKey: "idempotencyKey",
+            requestOption: true,
+          },
+        ],
+      },
+      "update-pause": {
+        method: "updatePause",
+        description: "Change the duration of a scheduled or active pause.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--duration-days <number>",
+            description: "Duration days",
+            required: true,
+            parse: parseNumber,
+            sdkKey: "durationDays",
+          },
+          {
+            flag: "--idempotency-key <key>",
+            description:
+              "Unique key used to safely retry this write for 24 hours without applying it twice.",
+            sdkKey: "idempotencyKey",
+            requestOption: true,
+          },
+        ],
+      },
+      "revoke-pause": {
+        method: "revokePause",
+        description: "Revoke a pause before it becomes effective.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+        ],
+      },
       "update-payment-method": {
         method: "updatePaymentMethod",
         description:
@@ -3140,6 +3220,26 @@ export const resourceDefinitions: ResourceDef[] = [
         method: "createRecoveryLink",
         description:
           "Generates a hosted, signed recovery link that lets the customer pay the outstanding renewal charge for a past_due subscription.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--idempotency-key <key>",
+            description:
+              "Unique key used to safely retry this write for 24 hours without applying it twice.",
+            sdkKey: "idempotencyKey",
+            requestOption: true,
+          },
+        ],
+      },
+      resume: {
+        method: "resume",
+        description: "Resume a paused subscription.",
         hasParams: true,
         params: [
           {

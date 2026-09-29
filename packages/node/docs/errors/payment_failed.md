@@ -4,7 +4,7 @@ The operation could not complete its payment or required tax calculation.
 
 - **Error type:** `billing_error`
 - **`code`:** `payment_failed`
-- **API version:** `2026-07-31`
+- **API version:** `2026-08-27`
 
 
 ## What to do

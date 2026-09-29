@@ -4,7 +4,7 @@ Payout operations are not available in sandbox mode.
 
 - **Error type:** `authentication_error`
 - **`code`:** `payouts_not_available_in_sandbox`
-- **API version:** `2026-07-31`
+- **API version:** `2026-08-27`
 
 
 ## What to do

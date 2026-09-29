@@ -13,6 +13,7 @@ import type {
   RecoveryLink,
   Subscription,
   SubscriptionAddon,
+  SubscriptionResume,
   SubscriptionSummary,
 } from "../types/models";
 import type { CommetHTTPClient } from "../utils/http";
@@ -69,6 +70,21 @@ export interface RemoveSubscriptionOfferParams {
   id: string;
 }
 
+export interface PauseSubscriptionParams {
+  id: string;
+  mode: "immediate" | "period_end";
+  durationDays: number | null;
+}
+
+export interface UpdateSubscriptionPauseParams {
+  id: string;
+  durationDays: number | null;
+}
+
+export interface RevokeSubscriptionPauseParams {
+  id: string;
+}
+
 export interface UpdatePaymentMethodParams {
   id: string;
   successUrl?: string;
@@ -87,6 +103,10 @@ export interface ReactivateSubscriptionParams {
 }
 
 export interface CreateSubscriptionRecoveryLinkParams {
+  id: string;
+}
+
+export interface ResumeSubscriptionParams {
   id: string;
 }
 
@@ -361,6 +381,37 @@ export class SubscriptionsResource {
     );
   }
 
+  /** Pause immediately or schedule a pause for the end of the current billing or trial period. Set durationDays to null for an indefinite pause. */
+  async pause(
+    params: PauseSubscriptionParams,
+    options?: RequestOptions,
+  ): Promise<Subscription> {
+    const { id, ...rest } = params;
+    return this.httpClient.post(`/subscriptions/${id}/pause`, rest, options);
+  }
+
+  /** Change the duration of a scheduled or active pause. Set durationDays to null to make it indefinite. */
+  async updatePause(
+    params: UpdateSubscriptionPauseParams,
+    options?: RequestOptions,
+  ): Promise<Subscription> {
+    const { id, ...rest } = params;
+    return this.httpClient.patch(`/subscriptions/${id}/pause`, rest, options);
+  }
+
+  /** Revoke a pause before it becomes effective. Active pauses must be resumed instead. */
+  async revokePause(
+    params: RevokeSubscriptionPauseParams,
+    options?: RequestOptions,
+  ): Promise<Subscription> {
+    const { id } = params;
+    return this.httpClient.delete(
+      `/subscriptions/${id}/pause`,
+      undefined,
+      options,
+    );
+  }
+
   /** Creates a hosted checkout session for the customer to update the subscription's default payment method. */
   async updatePaymentMethod(
     params: UpdatePaymentMethodParams,
@@ -411,6 +462,15 @@ export class SubscriptionsResource {
       {},
       options,
     );
+  }
+
+  /** Resume a paused subscription. Immediate pauses continue the preserved period without a charge. Period-end pauses charge a new period before access is restored. */
+  async resume(
+    params: ResumeSubscriptionParams,
+    options?: RequestOptions,
+  ): Promise<SubscriptionResume> {
+    const { id } = params;
+    return this.httpClient.post(`/subscriptions/${id}/resume`, {}, options);
   }
 
   /** Get a subscription by its public ID, regardless of status (including pending_payment and past_due). */

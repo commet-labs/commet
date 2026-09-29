@@ -4,7 +4,7 @@ The subscription's current status is incompatible with the requested operation.
 
 - **Error type:** `conflict_error`
 - **`code`:** `invalid_subscription_status`
-- **API version:** `2026-07-31`
+- **API version:** `2026-08-27`
 
 
 ## What to do

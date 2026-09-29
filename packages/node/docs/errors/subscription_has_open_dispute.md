@@ -4,7 +4,7 @@ The subscription has an unresolved payment dispute that blocks the requested bil
 
 - **Error type:** `internal_error`
 - **`code`:** `subscription_has_open_dispute`
-- **API version:** `2026-07-31`
+- **API version:** `2026-08-27`
 
 
 ## What to do

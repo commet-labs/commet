@@ -4,7 +4,7 @@ The price cannot be removed or changed while it is in use.
 
 - **Error type:** `conflict_error`
 - **`code`:** `price_in_use`
-- **API version:** `2026-07-31`
+- **API version:** `2026-08-27`
 
 
 ## What to do

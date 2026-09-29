@@ -4,7 +4,7 @@ This plan-change operation does not support the selected free plan.
 
 - **Error type:** `validation_error`
 - **`code`:** `free_plan_change_not_supported`
-- **API version:** `2026-07-31`
+- **API version:** `2026-08-27`
 
 
 ## What to do

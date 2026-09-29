@@ -19,6 +19,30 @@ const webhookHandlerCases = [
     handlerName: "onSubscriptionReactivated",
   },
   {
+    event: "subscription.pause_scheduled",
+    handlerName: "onSubscriptionPauseScheduled",
+  },
+  {
+    event: "subscription.pause_updated",
+    handlerName: "onSubscriptionPauseUpdated",
+  },
+  {
+    event: "subscription.pause_revoked",
+    handlerName: "onSubscriptionPauseRevoked",
+  },
+  {
+    event: "subscription.paused",
+    handlerName: "onSubscriptionPaused",
+  },
+  {
+    event: "subscription.resumed",
+    handlerName: "onSubscriptionResumed",
+  },
+  {
+    event: "subscription.resume_failed",
+    handlerName: "onSubscriptionResumeFailed",
+  },
+  {
     event: "subscription.canceled",
     handlerName: "onSubscriptionCanceled",
   },
@@ -288,7 +312,7 @@ function createPayload(event: WebhookEvent): WebhookEventPayload {
     timestamp: "2024-01-01T00:00:00Z",
     organizationId: "org_123",
     mode: "sandbox",
-    apiVersion: "2026-07-31",
+    apiVersion: "2026-08-27",
     data: {},
   } as WebhookEventPayload;
 }
@@ -377,9 +401,9 @@ describe("Webhooks", () => {
 
   describe("event routing", () => {
     it("should cover every typed webhook event and named handler", () => {
-      expect(webhookHandlerCases).toHaveLength(60);
+      expect(webhookHandlerCases).toHaveLength(66);
       expect(new Set(webhookHandlerCases.map(({ event }) => event)).size).toBe(
-        60,
+        66,
       );
       expect(webhookEventCoverage).toBe(true);
       expect(webhookHandlerCoverage).toBe(true);

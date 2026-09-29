@@ -4,7 +4,7 @@ The promo code is no longer within its valid redemption period.
 
 - **Error type:** `conflict_error`
 - **`code`:** `promo_code_expired`
-- **API version:** `2026-07-31`
+- **API version:** `2026-08-27`
 
 
 ## What to do

@@ -4,7 +4,7 @@ The subscription's plan is no longer available for this operation.
 
 - **Error type:** `conflict_error`
 - **`code`:** `plan_unavailable`
-- **API version:** `2026-07-31`
+- **API version:** `2026-08-27`
 
 
 ## What to do

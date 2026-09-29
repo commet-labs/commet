@@ -7,6 +7,7 @@ full: true
 
 All webhook payloads follow a consistent top-level structure with event-specific data nested within the `data` object.
 
+- `paymentContext` (object | null) — Charge context captured for new payments. Null for historical payments with no captured context.
 - `paymentId` (string) — The payment link ID.
 - `status` (string) — The link status. Always "succeeded" for this event.
 - `amount` (number) — The collected amount in cents (100 = $1.00).
@@ -16,6 +17,40 @@ All webhook payloads follow a consistent top-level structure with event-specific
 - `invoiceId` (string) — The one-time invoice generated for this payment.
 - `invoiceNumber` (string) — The human-readable invoice number.
 - `paymentTransactionId` (string | null) — The payment transaction ID for the settled charge.
+- `paymentMethod` (PaymentMethod | null) — The payment method: card, oxxo, or mercado\_pago. Null when unknown.
+- `subPaymentMethod` (SubPaymentMethod | null) — The source of funds for this charge, when reported by the provider. Null when unavailable or unknown.
+
+### `paymentContext`
+
+The original reason for a charge and how this attempt was initiated. Recovery never replaces the original reason. Context can be null when it was not captured, including retries of historical invoices.
+
+`reason` (string): The original reason, preserved across payment attempts.
+
+`paymentLinkId` (string | null): The public payment link ID, or null when the charge did not originate from a payment link. This is independent of the reason and recovery method.
+
+`recovery` (object | null): Null when the charge does not recover a subscription. payment\_recovery identifies a manually recovered overdue subscription, a return after cancellation for non-payment, or a retry of a failed subscription resume. Initial checkout and one-time payment retries are not recovery. dunning\_retry identifies an automatic charge retry, not a webhook delivery retry.
+
+`recovery.attempt` (integer): The charge retry position in the dunning schedule, starting at 1. The original failed charge is not a retry. Present only for dunning\_retry.
+
+`recovery.maxAttempts` (integer): The total automatic retries applicable to this charge when the attempt began. It is not the number of retries remaining. Present only for dunning\_retry.
+
+`first_subscription_payment`: The initial subscription payment.
+
+`trial_conversion`: The payment when a free trial ends.
+
+`recurring_billing`: A subscription renewal.
+
+`plan_change`: A charge caused by a plan change.
+
+`reactivation`: A charge to reactivate a canceled subscription.
+
+`subscription_resume`: A charge to resume a paused subscription.
+
+`one_time_payment`: A one-time payment, including payment links.
+
+`overage`: A charge for usage beyond the included allowance.
+
+`adjustment`: A charge from an adjustment invoice.
 
 ```json
 {
@@ -23,8 +58,13 @@ All webhook payloads follow a consistent top-level structure with event-specific
   "timestamp": "2026-06-23T14:30:00.000Z",
   "organizationId": "8f14e45f-ceea-4e7a-9c3d-1c2b3a4d5e6f",
   "mode": "live",
-  "apiVersion": "2026-07-31",
+  "apiVersion": "2026-08-27",
   "data": {
+    "paymentContext": {
+      "reason": "one_time_payment",
+      "paymentLinkId": "pay_l1m2n3",
+      "recovery": null
+    },
     "paymentId": "pay_l1m2n3",
     "status": "succeeded",
     "amount": 5000,
@@ -33,7 +73,9 @@ All webhook payloads follow a consistent top-level structure with event-specific
     "customerId": "user_123",
     "invoiceId": "inv_n4o5p6",
     "invoiceNumber": "INV-0044",
-    "paymentTransactionId": "txn_q7r8s9"
+    "paymentTransactionId": "txn_q7r8s9",
+    "paymentMethod": "card",
+    "subPaymentMethod": null
   }
 }
 ```
