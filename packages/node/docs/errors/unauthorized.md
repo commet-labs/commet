@@ -4,7 +4,7 @@ The request does not contain a valid Commet API key.
 
 - **Error type:** `authentication_error`
 - **`code`:** `unauthorized`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

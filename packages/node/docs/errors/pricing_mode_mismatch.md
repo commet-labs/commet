@@ -4,7 +4,7 @@ The submitted usage shape does not match the feature's configured pricing mode.
 
 - **Error type:** `billing_error`
 - **`code`:** `pricing_mode_mismatch`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

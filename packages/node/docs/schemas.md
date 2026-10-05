@@ -1,6 +1,6 @@
 # Schemas
 
-Generated from Commet API version `2026-08-27`.
+Generated from Commet API version `2026-10-04`.
 
 ## Enums
 
@@ -616,6 +616,47 @@ Variants:
 - `object` (`"plan_regional_pricing"`, required)
 - `livemode` (`boolean`, required)
 
+### PlanVersion
+
+- `id` (`string`, required)
+- `planId` (`string`, required)
+- `number` (`number`, required)
+- `revision` (`number`, required)
+- `status` (`"draft" | "published" | "retired"`, required)
+- `publication` (`"main" | "test" | null`, required)
+- `isMain` (`boolean`, required)
+- `createdAt` (`string`, required)
+- `publishedAt` (`string | null`, required)
+- `terms` (`{ isFree: boolean; consumptionModel: "metered" | "credits" | "balance" | null; blockOnExhaustion: boolean; freeIncludedCredits: number | null; freeIncludedBalance: number | null; prices: Array<{ id?: string; billingInterval: "weekly" | "monthly" | "quarterly" | "yearly" | "one_time"; price: number; isDefault: boolean; includedBalance: number | null; includedCredits: number | null; inheritsFromPriceId: string | null; offerId: string | null; countries: Array<{ countryCode: string; price: number; includedBalance: number | null; autoSynced: boolean }> }>; features: Array<{ featureId: string; enabled: boolean; includedAmount: number | null; unlimited: boolean; overageEnabled: boolean; overageUnitPrice: number | null; overageModel: "per_unit" | null; creditsPerUnit: number | null; pricingMode: "fixed" | "ai_model"; margin: number | null; discountType: "percentage" | "amount" | null; discountValue: number | null; countries: Array<{ countryCode: string; overageUnitPrice: number; autoSynced: boolean }> }>; countries: Array<{ countryCode: string; currency: string; exchangeRateCents: number | null }>; addons: Array<{ id?: string; featureId: string; name: string; consumptionModel: "boolean" | "metered" | "credits" | "balance"; includedUnits: number | null; creditCost: number | null; prices: Array<{ currency: string; price: number; overageRate: number | null }> }>; creditPacks: Array<{ id?: string; name: string; credits: number; prices: Array<{ currency: string; price: number }> }> }`, required)
+- `object` (`"plan_version"`, required)
+- `livemode` (`boolean`, required)
+
+### PlanVersionAdoption
+
+- `id` (`string`, required)
+- `subscriptionId` (`string`, required)
+- `sourceVersionId` (`string`, required)
+- `targetVersionId` (`string`, required)
+- `timing` (`"now" | "next_cycle"`, required)
+- `status` (`"requested" | "applied" | "cancelled" | "rejected"`, required)
+- `reason` (`string | null`, required)
+- `createdAt` (`string`, required)
+- `completedAt` (`string | null`, required)
+- `object` (`"plan_version_adoption"`, required)
+- `livemode` (`boolean`, required)
+
+### PlanVersionAdoptionPreview
+
+- `subscriptionId` (`string`, required)
+- `sourceVersionId` (`string`, required)
+- `targetVersionId` (`string`, required)
+- `timing` (`"now" | "next_cycle"`, required)
+- `eligible` (`boolean`, required)
+- `evaluatedAt` (`string`, required)
+- `blockers` (`Array<{ code: "feature_limit"; featureCode: string; featureType: "usage" | "quota" | "seats"; current: number; limit: number } | { code: "addon_unavailable"; addonId: string } | { code: "allocation_exhausted"; balanceType: "plan_credits" | "money_balance"; remaining: number } | { code: "price_unavailable"; billingInterval: "weekly" | "monthly" | "quarterly" | "yearly" | "one_time" | null; currency: string }>`, required)
+- `object` (`"subscription"`, required)
+- `livemode` (`boolean`, required)
+
 ### PortalAccess
 
 - `portalUrl` (`string`, required)
@@ -796,6 +837,15 @@ Variants:
 - `{ type: "percentage"; durationCycles: number | null; durationInterval: "weekly" | "monthly" | "quarterly" | "yearly" | null; percentage: number; startsAt: string | null; endsAt: string | null }`
 - `{ type: "amount_off"; durationCycles: number | null; durationInterval: "weekly" | "monthly" | "quarterly" | "yearly" | null; amount: number; startsAt: string | null; endsAt: string | null }`
 - `{ type: "fixed_price"; durationCycles: number | null; durationInterval: "weekly" | "monthly" | "quarterly" | "yearly" | null; price: number; startsAt: string | null; endsAt: string | null }`
+
+### SubscriptionPlanVersion
+
+- `subscriptionId` (`string`, required)
+- `id` (`string`, required)
+- `planId` (`string`, required)
+- `number` (`number`, required)
+- `object` (`"subscription"`, required)
+- `livemode` (`boolean`, required)
 
 ### SubscriptionResume
 

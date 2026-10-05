@@ -4,7 +4,7 @@ The organization has already completed its claim flow.
 
 - **Error type:** `conflict_error`
 - **`code`:** `organization_already_claimed`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

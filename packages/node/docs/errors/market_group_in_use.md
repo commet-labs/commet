@@ -4,7 +4,7 @@ The market group cannot be deleted while a price or subscription uses it.
 
 - **Error type:** `conflict_error`
 - **`code`:** `market_group_in_use`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

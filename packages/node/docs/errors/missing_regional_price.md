@@ -4,7 +4,7 @@ The plan has no price for the subscription's currency or resolved market.
 
 - **Error type:** `billing_error`
 - **`code`:** `missing_regional_price`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

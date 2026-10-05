@@ -4,7 +4,7 @@ This endpoint is not available in the resolved API version.
 
 - **Error type:** `not_found_error`
 - **`code`:** `endpoint_not_available`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

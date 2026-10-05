@@ -4,7 +4,7 @@ A feature with the same code or name already exists, or the feature is already a
 
 - **Error type:** `conflict_error`
 - **`code`:** `feature_already_exists`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

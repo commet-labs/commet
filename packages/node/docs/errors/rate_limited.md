@@ -4,7 +4,7 @@ The caller exceeded the request allowance for the current window.
 
 - **Error type:** `rate_limit_error`
 - **`code`:** `rate_limited`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

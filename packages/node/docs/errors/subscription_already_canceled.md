@@ -4,7 +4,7 @@ The subscription is already canceled.
 
 - **Error type:** `conflict_error`
 - **`code`:** `subscription_already_canceled`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

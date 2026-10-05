@@ -4,7 +4,7 @@ The requested or required payment method could not be found.
 
 - **Error type:** `not_found_error`
 - **`code`:** `payment_method_not_found`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

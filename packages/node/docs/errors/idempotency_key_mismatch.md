@@ -4,7 +4,7 @@ The Idempotency-Key was already used with a different request payload or operati
 
 - **Error type:** `conflict_error`
 - **`code`:** `idempotency_key_mismatch`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

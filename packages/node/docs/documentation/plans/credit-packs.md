@@ -1,5 +1,5 @@
 ---
-lastModified: 2026-07-28
+lastModified: 2026-10-04
 title: Credit Packs
 description: Configure credit packages that customers can purchase from the Commet Customer Portal.
 ---
@@ -20,9 +20,11 @@ Credit packs can be purchased on any subscription with a payment method — incl
 
 ## Create credit packs in the dashboard
 
-Go to **Credit Packs** and click **Create Credit Pack**. Pack names must be unique within your organization. Packs are available to all credits-based plans.
+Open **Plans → your credits plan → Versions** and create a draft. Add a credit pack with its credits and explicit currency prices, then publish the version. Pack names remain unique within the organization, but purchase availability belongs to the accepted plan version. Existing purchased credits are preserved. Legacy catalog creation alone does not make a pack purchasable. See [Plan versions](/docs/versions).
 
-## List credit packs via SDK
+## List catalog identities via SDK
+
+This lists organization-level identities. Purchase availability is determined by the customer's accepted plan version.
 
 ### TypeScript
 

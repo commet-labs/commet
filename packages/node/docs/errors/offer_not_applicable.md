@@ -4,7 +4,7 @@ The selected offer does not satisfy the eligibility or lifecycle conditions for 
 
 - **Error type:** `validation_error`
 - **`code`:** `offer_not_applicable`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

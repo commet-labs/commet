@@ -57,7 +57,7 @@ The original reason for a charge and how this attempt was initiated. Recovery ne
   "timestamp": "2026-06-23T14:30:00.000Z",
   "organizationId": "8f14e45f-ceea-4e7a-9c3d-1c2b3a4d5e6f",
   "mode": "live",
-  "apiVersion": "2026-08-27",
+  "apiVersion": "2026-10-04",
   "data": {
     "paymentContext": {
       "reason": "one_time_payment",

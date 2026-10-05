@@ -4,7 +4,7 @@ The requested customer does not exist in this organization.
 
 - **Error type:** `not_found_error`
 - **`code`:** `customer_not_found`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

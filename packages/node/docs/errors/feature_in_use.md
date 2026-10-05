@@ -4,7 +4,7 @@ The feature cannot be deleted while a plan or add-on uses it.
 
 - **Error type:** `conflict_error`
 - **`code`:** `feature_in_use`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

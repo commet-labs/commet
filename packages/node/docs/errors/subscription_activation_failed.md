@@ -4,7 +4,7 @@ The subscription was created or saved, but its initial activation or checkout co
 
 - **Error type:** `internal_error`
 - **`code`:** `subscription_activation_failed`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

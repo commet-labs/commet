@@ -4,7 +4,7 @@ The request conflicts with an existing resource, unique value, or previously rec
 
 - **Error type:** `conflict_error`
 - **`code`:** `duplicate`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

@@ -4,7 +4,7 @@ The request would not change the current subscription state.
 
 - **Error type:** `validation_error`
 - **`code`:** `no_change_requested`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

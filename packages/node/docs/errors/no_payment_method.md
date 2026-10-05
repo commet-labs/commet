@@ -4,7 +4,7 @@ The subscription has no reusable payment method for this operation.
 
 - **Error type:** `conflict_error`
 - **`code`:** `no_payment_method`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

@@ -2360,6 +2360,283 @@ export const resourceDefinitions: ResourceDef[] = [
           },
         ],
       },
+      "promote-version": {
+        method: "promoteVersion",
+        description:
+          "Choose a sellable publication as the default for new subscriptions.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--version-id <version-id>",
+            description: "Version id",
+            required: true,
+            sdkKey: "versionId",
+          },
+          {
+            flag: "--expected-main-version-id <expected-main-version-id>",
+            description: "Expected main version id",
+            required: true,
+            sdkKey: "expectedMainVersionId",
+          },
+          {
+            flag: "--idempotency-key <key>",
+            description:
+              "Unique key used to safely retry this write for 24 hours without applying it twice.",
+            sdkKey: "idempotencyKey",
+            requestOption: true,
+          },
+        ],
+      },
+      "publish-version": {
+        method: "publishVersion",
+        description:
+          "Validate all commercial terms and publish as the main version or a parallel test.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--version-id <version-id>",
+            description: "Version id",
+            required: true,
+            sdkKey: "versionId",
+          },
+          {
+            flag: "--expected-revision <number>",
+            description: "Expected revision",
+            required: true,
+            parse: parseNumber,
+            sdkKey: "expectedRevision",
+          },
+          {
+            flag: "--target <target>",
+            description: "Target",
+            required: true,
+            sdkKey: "target",
+          },
+          {
+            flag: "--expected-main-version-id <expected-main-version-id>",
+            description: "Expected main version id",
+            required: true,
+            sdkKey: "expectedMainVersionId",
+          },
+          {
+            flag: "--idempotency-key <key>",
+            description:
+              "Unique key used to safely retry this write for 24 hours without applying it twice.",
+            sdkKey: "idempotencyKey",
+            requestOption: true,
+          },
+        ],
+      },
+      "retire-version": {
+        method: "retireVersion",
+        description:
+          "Stop selling this version while preserving existing subscriptions.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--version-id <version-id>",
+            description: "Version id",
+            required: true,
+            sdkKey: "versionId",
+          },
+          {
+            flag: "--expected-main-version-id <expected-main-version-id>",
+            description: "Expected main version id",
+            required: true,
+            sdkKey: "expectedMainVersionId",
+          },
+          {
+            flag: "--idempotency-key <key>",
+            description:
+              "Unique key used to safely retry this write for 24 hours without applying it twice.",
+            sdkKey: "idempotencyKey",
+            requestOption: true,
+          },
+        ],
+      },
+      "get-version": {
+        method: "getVersion",
+        description:
+          "Read the complete commercial terms of a draft or published version.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--version-id <version-id>",
+            description: "Version id",
+            required: true,
+            sdkKey: "versionId",
+          },
+        ],
+      },
+      "update-version": {
+        method: "updateVersion",
+        description: "Update an unpublished draft using its current revision.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--version-id <version-id>",
+            description: "Version id",
+            required: true,
+            sdkKey: "versionId",
+          },
+          {
+            flag: "--block-on-exhaustion <boolean>",
+            description: "Block on exhaustion",
+            parse: parseBool,
+            sdkKey: "blockOnExhaustion",
+          },
+          {
+            flag: "--free-included-credits <number|null>",
+            description: "Free included credits",
+            parse: parseNullableNumber,
+            sdkKey: "freeIncludedCredits",
+          },
+          {
+            flag: "--free-included-balance <number|null>",
+            description: "Free included balance",
+            parse: parseNullableNumber,
+            sdkKey: "freeIncludedBalance",
+          },
+          {
+            flag: "--prices <json>",
+            description: "Prices",
+            parse: parseJson,
+            sdkKey: "prices",
+          },
+          {
+            flag: "--features <json>",
+            description: "Features",
+            parse: parseJson,
+            sdkKey: "features",
+          },
+          {
+            flag: "--countries <json>",
+            description: "Countries",
+            parse: parseJson,
+            sdkKey: "countries",
+          },
+          {
+            flag: "--addons <json>",
+            description: "Addons",
+            parse: parseJson,
+            sdkKey: "addons",
+          },
+          {
+            flag: "--credit-packs <json>",
+            description: "Credit packs",
+            parse: parseJson,
+            sdkKey: "creditPacks",
+          },
+          {
+            flag: "--expected-revision <number>",
+            description: "Expected revision",
+            required: true,
+            parse: parseNumber,
+            sdkKey: "expectedRevision",
+          },
+          {
+            flag: "--idempotency-key <key>",
+            description:
+              "Unique key used to safely retry this write for 24 hours without applying it twice.",
+            sdkKey: "idempotencyKey",
+            requestOption: true,
+          },
+        ],
+      },
+      "discard-version": {
+        method: "discardVersion",
+        description: "Delete an unpublished draft.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--version-id <version-id>",
+            description: "Version id",
+            required: true,
+            sdkKey: "versionId",
+          },
+          {
+            flag: "--expected-revision <number>",
+            description: "Expected revision",
+            required: true,
+            parse: parseNumber,
+            sdkKey: "expectedRevision",
+          },
+        ],
+      },
+      "list-versions": {
+        method: "listVersions",
+        description: "List complete publications and drafts.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+        ],
+      },
+      "create-version": {
+        method: "createVersion",
+        description: "Copy a published version into an editable draft.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--source-version-id <source-version-id>",
+            description: "Source version id",
+            sdkKey: "sourceVersionId",
+          },
+          {
+            flag: "--idempotency-key <key>",
+            description:
+              "Unique key used to safely retry this write for 24 hours without applying it twice.",
+            sdkKey: "idempotencyKey",
+            requestOption: true,
+          },
+        ],
+      },
       "set-visibility": {
         method: "setVisibility",
         description:
@@ -2590,7 +2867,8 @@ export const resourceDefinitions: ResourceDef[] = [
       },
       create: {
         method: "create",
-        description: "Create a distribution code for an existing Offer.",
+        description:
+          "Create a distribution code for an existing Offer with one or more sequential discount phases and an optional leading trial.",
         hasParams: true,
         params: [
           {
@@ -3159,6 +3437,20 @@ export const resourceDefinitions: ResourceDef[] = [
           },
         ],
       },
+      "get-plan-version": {
+        method: "getPlanVersion",
+        description:
+          "Read the exact plan version accepted by this subscription.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+        ],
+      },
       "preview-change": {
         method: "previewChange",
         description:
@@ -3297,6 +3589,103 @@ export const resourceDefinitions: ResourceDef[] = [
           },
         ],
       },
+      "cancel-version-adoption": {
+        method: "cancelVersionAdoption",
+        description: "Cancel a requested move.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--adoption-id <adoption-id>",
+            description: "Adoption id",
+            required: true,
+            sdkKey: "adoptionId",
+          },
+        ],
+      },
+      "preview-version-adoption": {
+        method: "previewVersionAdoption",
+        description:
+          "Check current capacity and price compatibility without moving.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--version-id <version-id>",
+            description: "Version id",
+            required: true,
+            sdkKey: "versionId",
+          },
+          {
+            flag: "--timing <timing>",
+            description: "Timing",
+            sdkKey: "timing",
+          },
+          {
+            flag: "--idempotency-key <key>",
+            description:
+              "Unique key used to safely retry this write for 24 hours without applying it twice.",
+            sdkKey: "idempotencyKey",
+            requestOption: true,
+          },
+        ],
+      },
+      "list-version-adoptions": {
+        method: "listVersionAdoptions",
+        description:
+          "Read requested and completed moves within the subscription's plan.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+        ],
+      },
+      "create-version-adoption": {
+        method: "createVersionAdoption",
+        description:
+          "Move within the same plan, by default at the next renewal.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--version-id <version-id>",
+            description: "Version id",
+            required: true,
+            sdkKey: "versionId",
+          },
+          {
+            flag: "--timing <timing>",
+            description: "Timing",
+            sdkKey: "timing",
+          },
+          {
+            flag: "--idempotency-key <key>",
+            description:
+              "Unique key used to safely retry this write for 24 hours without applying it twice.",
+            sdkKey: "idempotencyKey",
+            requestOption: true,
+          },
+        ],
+      },
       "get-active": {
         method: "getActive",
         description: "Get the active subscription for a customer.",
@@ -3397,6 +3786,11 @@ export const resourceDefinitions: ResourceDef[] = [
             flag: "--plan-id <plan-id>",
             description: "Plan id",
             sdkKey: "planId",
+          },
+          {
+            flag: "--plan-version-id <plan-version-id>",
+            description: "Public ID of a sellable plan version.",
+            sdkKey: "planVersionId",
           },
           {
             flag: "--plan-code <plan-code>",

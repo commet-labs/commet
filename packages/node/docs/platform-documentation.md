@@ -67,6 +67,7 @@ This documentation snapshot is serialized from the same Platform source used by 
 - [documentation/plans/meta.json](./documentation/plans/meta.json)
 - [documentation/plans/one-time-payments.md](./documentation/plans/one-time-payments.md)
 - [documentation/plans/plan-groups.md](./documentation/plans/plan-groups.md)
+- [documentation/plans/versions.md](./documentation/plans/versions.md)
 - [documentation/platform/custom-domains.md](./documentation/platform/custom-domains.md)
 - [documentation/platform/dashboard-metrics-and-events.md](./documentation/platform/dashboard-metrics-and-events.md)
 - [documentation/platform/members-and-permissions.md](./documentation/platform/members-and-permissions.md)

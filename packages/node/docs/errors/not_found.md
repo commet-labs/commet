@@ -4,7 +4,7 @@ The requested endpoint or resource could not be found in the current organizatio
 
 - **Error type:** `not_found_error`
 - **`code`:** `not_found`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

@@ -1,5 +1,5 @@
 ---
-lastModified: 2026-07-31
+lastModified: 2026-09-23
 title: Trial Periods
 description: Use free-trial Offer phases for automatic onboarding or explicit campaigns.
 ---
@@ -8,14 +8,15 @@ A trial is a `free_trial` phase in an Offer. It is not a separate discount syste
 
 The phase records how long payment is delayed. The application channel decides who receives it:
 
-| Channel                | Trial behavior                                                         |
-| ---------------------- | ---------------------------------------------------------------------- |
-| Introductory placement | Applied automatically to an eligible new subscription                  |
-| Direct `offerId`       | Applied explicitly by your application                                 |
-| `customTrialDays`      | Creates customer-specific trial terms without a reusable catalog Offer |
-| `skipTrial: true`      | Bypasses the automatic trial                                           |
+| Channel                | Trial behavior                                                                             |
+| ---------------------- | ------------------------------------------------------------------------------------------ |
+| Introductory placement | Applied automatically to an eligible new subscription                                      |
+| Direct `offerId`       | Applied explicitly by your application                                                     |
+| Promo Code             | Customer enters a code for an Offer that starts with a trial and continues with a discount |
+| `customTrialDays`      | Creates customer-specific trial terms without a reusable catalog Offer                     |
+| `skipTrial: true`      | Bypasses the automatic trial                                                               |
 
-Promo Codes cannot distribute trial phases.
+Promo Code trials require at least one discount phase after the trial. A code can be pre-applied at subscription creation or entered in a pending payment checkout, which then changes to a trial setup checkout.
 
 ## Reusable trial
 

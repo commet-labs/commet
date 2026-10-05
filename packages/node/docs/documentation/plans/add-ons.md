@@ -1,5 +1,5 @@
 ---
-lastModified: 2026-07-28
+lastModified: 2026-10-04
 title: Add-ons
 description: Offer optional features customers can activate on their subscriptions for an additional price.
 ---
@@ -35,9 +35,9 @@ Add-ons declare their own consumption model. Boolean add-ons are compatible with
 
 ## Create add-ons in the dashboard
 
-Go to **Add-ons** and click **Create Add-on**. Configure the name, base price, feature, and consumption model. For metered add-ons, set included units and overage rate. For credits, set the credit cost per unit.
+Open **Plans → your plan → Versions**, create a draft, and add the extra to its Add-ons section. Configure its feature, included units, credit cost where applicable, and explicit prices for each currency. Publish the complete version to offer the add-on.
 
-The feature dropdown only shows features not already assigned to another add-on. Once created, the add-on is available to any customer whose plan is compatible.
+The add-on is available only to subscriptions whose accepted version includes it. Creating an add-on through a legacy catalog endpoint creates a pending identity that must be assigned to a version. Previously acquired add-ons retain their accepted terms. See [Plan versions](/docs/versions).
 
 ## Availability by subscription status
 
@@ -53,11 +53,11 @@ Add-ons can be activated on any subscription with a payment method:
 
 Add-ons are managed through the dashboard, the customer portal, or the API.
 
-| Action                                | Where                                                        |
-| ------------------------------------- | ------------------------------------------------------------ |
-| **Create / update / archive add-ons** | Dashboard → Add-ons, or the `addons` API resource            |
-| **Activate / deactivate**             | Dashboard (subscription detail), Customer Portal, or the API |
-| **List active add-ons**               | API, Dashboard, or Customer Portal                           |
+| Action                                | Where                                                                                   |
+| ------------------------------------- | --------------------------------------------------------------------------------------- |
+| **Create / update / archive add-ons** | Plan version draft; the legacy `addons` API resource manages pending catalog identities |
+| **Activate / deactivate**             | Dashboard (subscription detail), Customer Portal, or the API                            |
+| **List active add-ons**               | API, Dashboard, or Customer Portal                                                      |
 
 Activate or deactivate an add-on on a subscription via the SDK. Activation charges the prorated amount for the current period; deactivation stops the feature immediately with no refund.
 

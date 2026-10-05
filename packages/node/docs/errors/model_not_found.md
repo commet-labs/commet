@@ -4,7 +4,7 @@ The requested AI model does not exist in the current model catalog.
 
 - **Error type:** `not_found_error`
 - **`code`:** `model_not_found`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

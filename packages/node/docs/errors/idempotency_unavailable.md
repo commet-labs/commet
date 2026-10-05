@@ -4,7 +4,7 @@ Platform could not safely establish, release, or persist the idempotent response
 
 - **Error type:** `internal_error`
 - **`code`:** `idempotency_unavailable`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

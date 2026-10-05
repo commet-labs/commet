@@ -4,7 +4,7 @@ The request failed validation. The response message, param, and details identify
 
 - **Error type:** `validation_error`
 - **`code`:** `validation_error`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

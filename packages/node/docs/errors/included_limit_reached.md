@@ -4,7 +4,7 @@ The requested usage exceeds the plan's included usage limit.
 
 - **Error type:** `billing_error`
 - **`code`:** `included_limit_reached`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

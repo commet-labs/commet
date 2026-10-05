@@ -1,5 +1,5 @@
 ---
-lastModified: 2026-08-21
+lastModified: 2026-09-23
 title: Promotional Offers
 description: Apply any compatible Offer directly for campaigns, retention, and experiments.
 ---
@@ -65,7 +65,7 @@ The same operation on a subscription with a pending payment checkout quotes or r
 
 Use direct `offerId` when your application decides who receives the terms. Use a Promo Code when the customer should enter a code and the campaign needs redemption restrictions.
 
-A Promo Code can reference only an Offer with one `percentage` or `amount_off` phase. Multi-phase, trial, and `fixed_price` Offers remain available for direct application.
+A Promo Code can distribute multiple discount phases, including `fixed_price`, and can begin with a trial when a discount follows it. A trial-only Offer remains available for direct application.
 
 ## Related
 

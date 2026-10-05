@@ -4,7 +4,7 @@ The add-on is already active on this subscription.
 
 - **Error type:** `conflict_error`
 - **`code`:** `addon_already_active`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

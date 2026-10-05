@@ -4,7 +4,7 @@ Platform could not complete the operation because an internal execution path or 
 
 - **Error type:** `internal_error`
 - **`code`:** `internal_error`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

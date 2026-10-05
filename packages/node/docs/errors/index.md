@@ -1,6 +1,6 @@
 # API error reference
 
-Generated from Commet API version `2026-08-27`.
+Generated from Commet API version `2026-10-04`.
 
 Use the response `code` to open the matching local reference. Preserve `x-request-id` when reporting or investigating an error.
 
@@ -14,6 +14,7 @@ Use the response `code` to open the matching local reference. Preserve `x-reques
 - [`customer_not_found`](./customer_not_found.md) — The requested customer does not exist in this organization.
 - [`feature_not_found`](./feature_not_found.md) — The requested feature, seat feature, or quota feature does not exist in this organization.
 - [`plan_not_found`](./plan_not_found.md) — The requested plan does not exist or is not available in this organization.
+- [`plan_version_conflict`](./plan_version_conflict.md) — The draft revision, main version, or subscription adoption state changed before the operation completed.
 - [`subscription_not_found`](./subscription_not_found.md) — The requested subscription does not exist in this organization.
 - [`no_active_subscription`](./no_active_subscription.md) — The customer has no subscription that is active for this operation.
 - [`no_prices_configured`](./no_prices_configured.md) — The selected plan has no price available for the request.

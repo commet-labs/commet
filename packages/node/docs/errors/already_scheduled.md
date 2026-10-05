@@ -4,7 +4,7 @@ The requested subscription action is already scheduled.
 
 - **Error type:** `conflict_error`
 - **`code`:** `already_scheduled`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

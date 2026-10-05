@@ -8,11 +8,14 @@ import type {
   DeletedSubscriptionAddon,
   PaymentMethodUpdateCheckout,
   PlanChange,
+  PlanVersionAdoption,
+  PlanVersionAdoptionPreview,
   PreviewChange,
   ReactivatedSubscription,
   RecoveryLink,
   Subscription,
   SubscriptionAddon,
+  SubscriptionPlanVersion,
   SubscriptionResume,
   SubscriptionSummary,
 } from "../types/models";
@@ -90,6 +93,10 @@ export interface UpdatePaymentMethodParams {
   successUrl?: string;
 }
 
+export interface GetSubscriptionPlanVersionParams {
+  id: string;
+}
+
 export interface PreviewChangePlanParams {
   id: string;
   planId: string;
@@ -116,6 +123,27 @@ export interface GetSubscriptionParams {
 
 export interface UncancelSubscriptionParams {
   id: string;
+}
+
+export interface CancelVersionAdoptionParams {
+  id: string;
+  adoptionId: string;
+}
+
+export interface PreviewVersionAdoptionParams {
+  id: string;
+  versionId: string;
+  timing?: "now" | "next_cycle";
+}
+
+export interface ListVersionAdoptionsParams {
+  id: string;
+}
+
+export interface CreateVersionAdoptionParams {
+  id: string;
+  versionId: string;
+  timing?: "now" | "next_cycle";
 }
 
 export interface GetActiveSubscriptionParams {
@@ -151,6 +179,8 @@ export type CreateSubscriptionParams =
       customTrialDays?: number;
       skipTrial?: boolean;
       planId: string;
+      /** Public ID of a sellable plan version. Omit to purchase the current main version. */
+      planVersionId?: string;
     }
   | {
       customerId: string;
@@ -175,6 +205,8 @@ export type CreateSubscriptionParams =
       customTrialDays?: number;
       skipTrial?: boolean;
       planCode: string;
+      /** Public ID of a sellable plan version. Omit to purchase the current main version. */
+      planVersionId?: string;
     }
   | {
       customerId: string;
@@ -199,6 +231,8 @@ export type CreateSubscriptionParams =
       customTrialDays?: never;
       skipTrial?: false;
       planId: string;
+      /** Public ID of a sellable plan version. Omit to purchase the current main version. */
+      planVersionId?: string;
     }
   | {
       customerId: string;
@@ -223,6 +257,8 @@ export type CreateSubscriptionParams =
       customTrialDays?: never;
       skipTrial?: false;
       planCode: string;
+      /** Public ID of a sellable plan version. Omit to purchase the current main version. */
+      planVersionId?: string;
     }
   | {
       customerId: string;
@@ -249,6 +285,8 @@ export type CreateSubscriptionParams =
       customTrialDays?: never;
       skipTrial?: false;
       planId: string;
+      /** Public ID of a sellable plan version. Omit to purchase the current main version. */
+      planVersionId?: string;
     }
   | {
       customerId: string;
@@ -275,6 +313,8 @@ export type CreateSubscriptionParams =
       customTrialDays?: never;
       skipTrial?: false;
       planCode: string;
+      /** Public ID of a sellable plan version. Omit to purchase the current main version. */
+      planVersionId?: string;
     };
 
 export class SubscriptionsResource {
@@ -425,6 +465,19 @@ export class SubscriptionsResource {
     );
   }
 
+  /** Read the exact plan version accepted by this subscription. */
+  async getPlanVersion(
+    params: GetSubscriptionPlanVersionParams,
+    options?: RequestOptions,
+  ): Promise<SubscriptionPlanVersion> {
+    const { id } = params;
+    return this.httpClient.get(
+      `/subscriptions/${id}/plan-version`,
+      undefined,
+      options,
+    );
+  }
+
   /** Preview proration details for an immediate plan change without applying it. Free-to-paid changes are never scheduled and the change-plan endpoint always returns hosted checkout for them. For paid plans, interval direction takes precedence: a longer interval is immediate and a shorter interval is scheduled. When the interval is unchanged, a higher-sort-order plan is immediate and a lower-sort-order plan is scheduled. A paid-to-free change is always scheduled. Returns credit, charge, and net amount. The target plan must belong to the same plan group as the current plan, otherwise a 400 with code `plans_not_in_same_group` is returned. A change between two free plans has nothing to prorate and returns a zero-amount estimate. Scheduled changes return a 400 with code `plan_change_scheduled`; apply those via the change-plan endpoint. Pass offerId to quote the destination plan with an Offer. */
   async previewChange(
     params: PreviewChangePlanParams,
@@ -491,6 +544,63 @@ export class SubscriptionsResource {
     return this.httpClient.post(`/subscriptions/${id}/uncancel`, {}, options);
   }
 
+  /** Cancel a requested move. Applied moves retain their history and cannot be canceled. */
+  async cancelVersionAdoption(
+    params: CancelVersionAdoptionParams,
+    options?: RequestOptions,
+  ): Promise<PlanVersionAdoption> {
+    const { id, adoptionId } = params;
+    return this.httpClient.delete(
+      `/subscriptions/${id}/version-adoptions/${adoptionId}`,
+      undefined,
+      options,
+    );
+  }
+
+  /** Check current capacity and price compatibility without moving. A next-cycle preview assumes periodic usage resets; seats and quota remain occupied. Execution rechecks compatibility. */
+  async previewVersionAdoption(
+    params: PreviewVersionAdoptionParams,
+    options?: RequestOptions,
+  ): Promise<PlanVersionAdoptionPreview> {
+    const { id, ...rest } = params;
+    return this.httpClient.post(
+      `/subscriptions/${id}/version-adoptions/preview`,
+      rest,
+      options,
+    );
+  }
+
+  /** Read requested and completed moves within the subscription's plan. */
+  async listVersionAdoptions(
+    params: ListVersionAdoptionsParams,
+    options?: RequestOptions,
+  ): Promise<{
+    object: "list";
+    data: Array<PlanVersionAdoption>;
+    hasMore: boolean;
+    nextCursor?: string;
+  }> {
+    const { id } = params;
+    return this.httpClient.get(
+      `/subscriptions/${id}/version-adoptions`,
+      undefined,
+      options,
+    );
+  }
+
+  /** Move within the same plan, by default at the next renewal. An immediate move that exceeds occupied seats, quota or consumed allowance remains pending until compatible. This operation does not change different-plan scheduling or create a mid-period price adjustment. */
+  async createVersionAdoption(
+    params: CreateVersionAdoptionParams,
+    options?: RequestOptions,
+  ): Promise<PlanVersionAdoption> {
+    const { id, ...rest } = params;
+    return this.httpClient.post(
+      `/subscriptions/${id}/version-adoptions`,
+      rest,
+      options,
+    );
+  }
+
   /** Get the active subscription for a customer. Returns null if none. */
   async getActive(
     params: GetActiveSubscriptionParams,
@@ -512,7 +622,7 @@ export class SubscriptionsResource {
     return this.httpClient.get("/subscriptions", params, options);
   }
 
-  /** Create a subscription for a customer. Commet selects the default price when priceId is omitted and resolves its market from the customer's billing country. Without an offer override, Commet applies the price's automatic introductory Offer. Pass offerId to apply an active compatible Offer directly, or cardPromotionId to preselect a card-eligible Promotional Offer for the initial checkout when card promotions are enabled for the organization. For the initial checkout, provider accepts either a processor name or an exact payment connection ID. */
+  /** Create a subscription for a customer. Select a sellable planVersionId for an explicit version or omit it for the current main. Pending checkout retries retain accepted terms. Commet selects the default price when priceId is omitted and resolves its market from the customer's billing country. Without an offer override, Commet applies the price's automatic introductory Offer. Pass offerId to apply an active compatible Offer directly, or cardPromotionId to preselect a card-eligible Promotional Offer for the initial checkout when card promotions are enabled for the organization. For the initial checkout, provider accepts either a processor name or an exact payment connection ID. */
   async create(
     params: CreateSubscriptionParams,
     options?: RequestOptions,

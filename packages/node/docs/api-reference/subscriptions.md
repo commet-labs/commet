@@ -1,6 +1,6 @@
 # Subscriptions
 
-API version: `2026-08-27`
+API version: `2026-10-04`
 
 ## deactivateAddon
 
@@ -269,6 +269,22 @@ Creates a hosted checkout session for the customer to update the subscription's 
 
 `PaymentMethodUpdateCheckout`
 
+## getPlanVersion
+
+`commet.subscriptions.getPlanVersion(params)`
+
+`GET /subscriptions/{id}/plan-version` · operation `get-subscription-plan-version`
+
+Read the exact plan version accepted by this subscription.
+
+### Parameters
+
+- `id` (`string`, required)
+
+### Returns
+
+`SubscriptionPlanVersion`
+
 ## previewChange
 
 `commet.subscriptions.previewChange(params, options?)`
@@ -389,6 +405,83 @@ Revert a scheduled cancellation and return the updated subscription. Only works 
 
 `Subscription`
 
+## cancelVersionAdoption
+
+`commet.subscriptions.cancelVersionAdoption(params, options?)`
+
+`DELETE /subscriptions/{id}/version-adoptions/{adoptionId}` · operation `cancel-version-adoption`
+
+Cancel a requested move. Applied moves retain their history and cannot be canceled.
+
+### Parameters
+
+- `id` (`string`, required)
+- `adoptionId` (`string`, required)
+
+### Returns
+
+`PlanVersionAdoption`
+
+## previewVersionAdoption
+
+`commet.subscriptions.previewVersionAdoption(params, options?)`
+
+`POST /subscriptions/{id}/version-adoptions/preview` · operation `preview-version-adoption`
+
+Check current capacity and price compatibility without moving. A next-cycle preview assumes periodic usage resets; seats and quota remain occupied. Execution rechecks compatibility.
+
+### Parameters
+
+- `id` (`string`, required)
+- `versionId` (`string`, required)
+- `timing` (`"now" | "next_cycle"`, optional)
+
+### Request options
+
+- `idempotencyKey` (`string`, optional) — Unique key used to safely retry this write for 24 hours without applying it twice.
+
+### Returns
+
+`PlanVersionAdoptionPreview`
+
+## listVersionAdoptions
+
+`commet.subscriptions.listVersionAdoptions(params)`
+
+`GET /subscriptions/{id}/version-adoptions` · operation `list-version-adoptions`
+
+Read requested and completed moves within the subscription's plan.
+
+### Parameters
+
+- `id` (`string`, required)
+
+### Returns
+
+`{ object: "list"; data: Array<PlanVersionAdoption>; hasMore: boolean; nextCursor?: string }`
+
+## createVersionAdoption
+
+`commet.subscriptions.createVersionAdoption(params, options?)`
+
+`POST /subscriptions/{id}/version-adoptions` · operation `create-version-adoption`
+
+Move within the same plan, by default at the next renewal. An immediate move that exceeds occupied seats, quota or consumed allowance remains pending until compatible. This operation does not change different-plan scheduling or create a mid-period price adjustment.
+
+### Parameters
+
+- `id` (`string`, required)
+- `versionId` (`string`, required)
+- `timing` (`"now" | "next_cycle"`, optional)
+
+### Request options
+
+- `idempotencyKey` (`string`, optional) — Unique key used to safely retry this write for 24 hours without applying it twice.
+
+### Returns
+
+`PlanVersionAdoption`
+
 ## getActive
 
 `commet.subscriptions.getActive(params)`
@@ -428,7 +521,7 @@ List all subscriptions. Filter by customer ID or status.
 
 `POST /subscriptions` · operation `create-subscription`
 
-Create a subscription for a customer. Commet selects the default price when priceId is omitted and resolves its market from the customer's billing country. Without an offer override, Commet applies the price's automatic introductory Offer. Pass offerId to apply an active compatible Offer directly, or cardPromotionId to preselect a card-eligible Promotional Offer for the initial checkout when card promotions are enabled for the organization. For the initial checkout, provider accepts either a processor name or an exact payment connection ID.
+Create a subscription for a customer. Select a sellable planVersionId for an explicit version or omit it for the current main. Pending checkout retries retain accepted terms. Commet selects the default price when priceId is omitted and resolves its market from the customer's billing country. Without an offer override, Commet applies the price's automatic introductory Offer. Pass offerId to apply an active compatible Offer directly, or cardPromotionId to preselect a card-eligible Promotional Offer for the initial checkout when card promotions are enabled for the organization. For the initial checkout, provider accepts either a processor name or an exact payment connection ID.
 
 ### Parameters
 
@@ -445,6 +538,7 @@ Create a subscription for a customer. Commet selects the default price when pric
 - `customTrialDays` (`number`, optional)
 - `skipTrial` (`boolean`, optional)
 - `planId` (`string`, optional)
+- `planVersionId` (`string`, optional) — Public ID of a sellable plan version. Omit to purchase the current main version.
 - `planCode` (`string`, optional)
 - `cardPromotionId` (`string`, optional) — Public card promotion ID. The offer is shown immediately and remains conditional on card eligibility until checkout confirmation.
 

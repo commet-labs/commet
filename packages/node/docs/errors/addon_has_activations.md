@@ -4,7 +4,7 @@ The add-on cannot be deleted while subscriptions use it.
 
 - **Error type:** `conflict_error`
 - **`code`:** `addon_has_activations`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

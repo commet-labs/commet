@@ -4,7 +4,7 @@ The requested operation requires a chargeable subscription.
 
 - **Error type:** `conflict_error`
 - **`code`:** `subscription_required`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

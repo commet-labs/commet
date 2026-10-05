@@ -4,7 +4,7 @@ The requested feature, seat feature, or quota feature does not exist in this org
 
 - **Error type:** `not_found_error`
 - **`code`:** `feature_not_found`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

@@ -61,7 +61,7 @@ The original charge attempt, before recovery.
   "timestamp": "2026-06-23T14:30:00.000Z",
   "organizationId": "8f14e45f-ceea-4e7a-9c3d-1c2b3a4d5e6f",
   "mode": "live",
-  "apiVersion": "2026-08-27",
+  "apiVersion": "2026-10-04",
   "data": {
     "paymentContext": {
       "reason": "recurring_billing",
@@ -92,7 +92,7 @@ The customer recovers an overdue subscription. The original charge reason is pre
   "timestamp": "2026-06-23T14:30:00.000Z",
   "organizationId": "8f14e45f-ceea-4e7a-9c3d-1c2b3a4d5e6f",
   "mode": "live",
-  "apiVersion": "2026-08-27",
+  "apiVersion": "2026-10-04",
   "data": {
     "paymentContext": {
       "reason": "recurring_billing",
@@ -125,7 +125,7 @@ The second automatic retry of a subscription resume charge, out of four allowed 
   "timestamp": "2026-06-23T14:30:00.000Z",
   "organizationId": "8f14e45f-ceea-4e7a-9c3d-1c2b3a4d5e6f",
   "mode": "live",
-  "apiVersion": "2026-08-27",
+  "apiVersion": "2026-10-04",
   "data": {
     "paymentContext": {
       "reason": "subscription_resume",
@@ -160,7 +160,7 @@ The charge context was not captured. Do not infer the original reason from the s
   "timestamp": "2026-06-23T14:30:00.000Z",
   "organizationId": "8f14e45f-ceea-4e7a-9c3d-1c2b3a4d5e6f",
   "mode": "live",
-  "apiVersion": "2026-08-27",
+  "apiVersion": "2026-10-04",
   "data": {
     "paymentContext": null,
     "invoiceId": "inv_n4o5p6",

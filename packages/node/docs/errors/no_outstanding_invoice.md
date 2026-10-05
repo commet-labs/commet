@@ -4,7 +4,7 @@ The subscription has no outstanding invoice to charge or recover.
 
 - **Error type:** `conflict_error`
 - **`code`:** `no_outstanding_invoice`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

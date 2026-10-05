@@ -4,7 +4,7 @@ The request body is not valid JSON.
 
 - **Error type:** `validation_error`
 - **`code`:** `invalid_json`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

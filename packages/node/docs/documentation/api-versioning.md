@@ -10,7 +10,7 @@ Commet uses date-based API versioning inspired by Stripe. Every breaking change 
 
 Versions use the date they were released: `YYYY-MM-DD` (e.g. `2026-05-01`).
 
-The current version is **2026-08-27**.
+The current version is **2026-10-04**.
 
 ## How versions are resolved
 

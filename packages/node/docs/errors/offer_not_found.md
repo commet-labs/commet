@@ -4,7 +4,7 @@ The requested offer does not exist or is not compatible with the selected operat
 
 - **Error type:** `not_found_error`
 - **`code`:** `offer_not_found`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

@@ -4,7 +4,7 @@ The requested feature is not included in the customer's plan or subscription.
 
 - **Error type:** `billing_error`
 - **`code`:** `feature_not_in_plan`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

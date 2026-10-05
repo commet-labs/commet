@@ -7,6 +7,7 @@ import type {
   PlanPrice,
   PlanRegionalPricing,
   PlanRegionalPricingResult,
+  PlanVersion,
   RemovedPlanFeature,
 } from "../types/models";
 import type { CommetHTTPClient } from "../utils/http";
@@ -245,6 +246,117 @@ export interface DeletePlanParams {
   id: string;
 }
 
+export interface PromotePlanVersionParams {
+  id: string;
+  versionId: string;
+  expectedMainVersionId: string;
+}
+
+export interface PublishPlanVersionParams {
+  id: string;
+  versionId: string;
+  expectedRevision: number;
+  target: "main" | "test";
+  expectedMainVersionId: string;
+}
+
+export interface RetirePlanVersionParams {
+  id: string;
+  versionId: string;
+  expectedMainVersionId: string;
+}
+
+export interface GetPlanVersionParams {
+  id: string;
+  versionId: string;
+}
+
+export interface UpdatePlanVersionParams {
+  id: string;
+  versionId: string;
+  blockOnExhaustion?: boolean;
+  freeIncludedCredits?: number | null;
+  freeIncludedBalance?: number | null;
+  prices?: Array<{
+    id?: string;
+    billingInterval: "weekly" | "monthly" | "quarterly" | "yearly" | "one_time";
+    price: number;
+    isDefault: boolean;
+    includedBalance: number | null;
+    includedCredits: number | null;
+    inheritsFromPriceId: string | null;
+    offerId: string | null;
+    countries: Array<{
+      countryCode: string;
+      price: number;
+      includedBalance: number | null;
+      autoSynced: boolean;
+    }>;
+  }>;
+  features?: Array<{
+    featureId: string;
+    enabled: boolean;
+    includedAmount: number | null;
+    unlimited: boolean;
+    overageEnabled: boolean;
+    overageUnitPrice: number | null;
+    overageModel: "per_unit" | null;
+    creditsPerUnit: number | null;
+    pricingMode: "fixed" | "ai_model";
+    margin: number | null;
+    discountType: "percentage" | "amount" | null;
+    discountValue: number | null;
+    countries: Array<{
+      countryCode: string;
+      overageUnitPrice: number;
+      autoSynced: boolean;
+    }>;
+  }>;
+  countries?: Array<{
+    countryCode: string;
+    currency: string;
+    exchangeRateCents: number | null;
+  }>;
+  addons?: Array<{
+    id?: string;
+    featureId: string;
+    name: string;
+    consumptionModel: "boolean" | "metered" | "credits" | "balance";
+    includedUnits: number | null;
+    creditCost: number | null;
+    prices: Array<{
+      currency: string;
+      price: number;
+      overageRate: number | null;
+    }>;
+  }>;
+  creditPacks?: Array<{
+    id?: string;
+    name: string;
+    credits: number;
+    prices: Array<{
+      currency: string;
+      price: number;
+    }>;
+  }>;
+  expectedRevision: number;
+}
+
+export interface DiscardPlanVersionParams {
+  id: string;
+  versionId: string;
+  expectedRevision: number;
+}
+
+export interface ListPlanVersionsParams {
+  id: string;
+}
+
+export interface CreatePlanVersionParams {
+  id: string;
+  sourceVersionId?: string;
+}
+
 export interface SetPlanVisibilityParams {
   id: string;
   isPublic: boolean;
@@ -409,6 +521,107 @@ export class PlansResource {
   ): Promise<DeletedObject> {
     const { id } = params;
     return this.httpClient.delete(`/plans/${id}`, undefined, options);
+  }
+
+  /** Choose a sellable publication as the default for new subscriptions. Existing subscriptions are not moved. */
+  async promoteVersion(
+    params: PromotePlanVersionParams,
+    options?: RequestOptions,
+  ): Promise<PlanVersion> {
+    const { id, versionId, ...rest } = params;
+    return this.httpClient.post(
+      `/plans/${id}/versions/${versionId}/promote`,
+      rest,
+      options,
+    );
+  }
+
+  /** Validate all commercial terms and publish as the main version or a parallel test. Existing subscriptions are not moved. */
+  async publishVersion(
+    params: PublishPlanVersionParams,
+    options?: RequestOptions,
+  ): Promise<PlanVersion> {
+    const { id, versionId, ...rest } = params;
+    return this.httpClient.post(
+      `/plans/${id}/versions/${versionId}/publish`,
+      rest,
+      options,
+    );
+  }
+
+  /** Stop selling this version while preserving existing subscriptions. Replace the main version before retiring it. */
+  async retireVersion(
+    params: RetirePlanVersionParams,
+    options?: RequestOptions,
+  ): Promise<PlanVersion> {
+    const { id, versionId, ...rest } = params;
+    return this.httpClient.post(
+      `/plans/${id}/versions/${versionId}/retire`,
+      rest,
+      options,
+    );
+  }
+
+  /** Read the complete commercial terms of a draft or published version. */
+  async getVersion(
+    params: GetPlanVersionParams,
+    options?: RequestOptions,
+  ): Promise<PlanVersion> {
+    const { id, versionId } = params;
+    return this.httpClient.get(
+      `/plans/${id}/versions/${versionId}`,
+      undefined,
+      options,
+    );
+  }
+
+  /** Update an unpublished draft using its current revision. Each supplied array replaces that collection. Free/paid status and the consumption model are fixed at plan creation. Publishing separately validates completeness. */
+  async updateVersion(
+    params: UpdatePlanVersionParams,
+    options?: RequestOptions,
+  ): Promise<PlanVersion> {
+    const { id, versionId, ...rest } = params;
+    return this.httpClient.patch(
+      `/plans/${id}/versions/${versionId}`,
+      rest,
+      options,
+    );
+  }
+
+  /** Delete an unpublished draft. Published versions must be retired instead. */
+  async discardVersion(
+    params: DiscardPlanVersionParams,
+    options?: RequestOptions,
+  ): Promise<DeletedObject> {
+    const { id, versionId, ...rest } = params;
+    return this.httpClient.delete(
+      `/plans/${id}/versions/${versionId}`,
+      rest,
+      options,
+    );
+  }
+
+  /** List complete publications and drafts. Existing subscribers retain their accepted version. */
+  async listVersions(
+    params: ListPlanVersionsParams,
+    options?: RequestOptions,
+  ): Promise<{
+    object: "list";
+    data: Array<PlanVersion>;
+    hasMore: boolean;
+    nextCursor?: string;
+  }> {
+    const { id } = params;
+    return this.httpClient.get(`/plans/${id}/versions`, undefined, options);
+  }
+
+  /** Copy a published version into an editable draft. Omit sourceVersionId to copy the main version. This does not change availability or any subscription. */
+  async createVersion(
+    params: CreatePlanVersionParams,
+    options?: RequestOptions,
+  ): Promise<PlanVersion> {
+    const { id, ...rest } = params;
+    return this.httpClient.post(`/plans/${id}/versions`, rest, options);
   }
 
   /** Set a plan's public visibility and return the updated plan. */

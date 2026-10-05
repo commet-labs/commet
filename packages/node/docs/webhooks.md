@@ -1,6 +1,6 @@
 # Webhooks
 
-Generated from Commet API version `2026-08-27`.
+Generated from Commet API version `2026-10-04`.
 
 ## subscription.created
 

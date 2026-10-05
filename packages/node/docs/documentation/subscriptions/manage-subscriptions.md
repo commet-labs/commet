@@ -115,6 +115,8 @@ Omitting `priceId` preserves default price and Market resolution. Omitting `offe
 
 A compatible `pending_payment` checkout may be reused. An incompatible pending selection can be replaced without duplicating a paid subscription.
 
+Omitting a `promoCode` or `offerId` that the pending checkout carries, including an Offer assigned through `PUT /subscriptions/{id}/offer`, replaces it with a new subscription and checkout without that benefit. Redirect to the returned `checkoutUrl`; the previous link stops working. To keep the Offer, send it again or assign it to the returned subscription ID.
+
 ## Retrieve current or historical state
 
 **TypeScript**

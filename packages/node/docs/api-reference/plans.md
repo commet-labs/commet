@@ -1,6 +1,6 @@
 # Plans
 
-API version: `2026-08-27`
+API version: `2026-10-04`
 
 ## updateFeature
 
@@ -291,6 +291,176 @@ Soft-delete a plan.
 ### Returns
 
 `DeletedObject`
+
+## promoteVersion
+
+`commet.plans.promoteVersion(params, options?)`
+
+`POST /plans/{id}/versions/{versionId}/promote` · operation `promote-plan-version`
+
+Choose a sellable publication as the default for new subscriptions. Existing subscriptions are not moved.
+
+### Parameters
+
+- `id` (`string`, required)
+- `versionId` (`string`, required)
+- `expectedMainVersionId` (`string`, required)
+
+### Request options
+
+- `idempotencyKey` (`string`, optional) — Unique key used to safely retry this write for 24 hours without applying it twice.
+
+### Returns
+
+`PlanVersion`
+
+## publishVersion
+
+`commet.plans.publishVersion(params, options?)`
+
+`POST /plans/{id}/versions/{versionId}/publish` · operation `publish-plan-version`
+
+Validate all commercial terms and publish as the main version or a parallel test. Existing subscriptions are not moved.
+
+### Parameters
+
+- `id` (`string`, required)
+- `versionId` (`string`, required)
+- `expectedRevision` (`number`, required)
+- `target` (`"main" | "test"`, required)
+- `expectedMainVersionId` (`string`, required)
+
+### Request options
+
+- `idempotencyKey` (`string`, optional) — Unique key used to safely retry this write for 24 hours without applying it twice.
+
+### Returns
+
+`PlanVersion`
+
+## retireVersion
+
+`commet.plans.retireVersion(params, options?)`
+
+`POST /plans/{id}/versions/{versionId}/retire` · operation `retire-plan-version`
+
+Stop selling this version while preserving existing subscriptions. Replace the main version before retiring it.
+
+### Parameters
+
+- `id` (`string`, required)
+- `versionId` (`string`, required)
+- `expectedMainVersionId` (`string`, required)
+
+### Request options
+
+- `idempotencyKey` (`string`, optional) — Unique key used to safely retry this write for 24 hours without applying it twice.
+
+### Returns
+
+`PlanVersion`
+
+## getVersion
+
+`commet.plans.getVersion(params)`
+
+`GET /plans/{id}/versions/{versionId}` · operation `get-plan-version`
+
+Read the complete commercial terms of a draft or published version.
+
+### Parameters
+
+- `id` (`string`, required)
+- `versionId` (`string`, required)
+
+### Returns
+
+`PlanVersion`
+
+## updateVersion
+
+`commet.plans.updateVersion(params, options?)`
+
+`PATCH /plans/{id}/versions/{versionId}` · operation `update-plan-version`
+
+Update an unpublished draft using its current revision. Each supplied array replaces that collection. Free/paid status and the consumption model are fixed at plan creation. Publishing separately validates completeness.
+
+### Parameters
+
+- `id` (`string`, required)
+- `versionId` (`string`, required)
+- `blockOnExhaustion` (`boolean`, optional)
+- `freeIncludedCredits` (`number | null`, optional)
+- `freeIncludedBalance` (`number | null`, optional)
+- `prices` (`Array<{ id?: string; billingInterval: "weekly" | "monthly" | "quarterly" | "yearly" | "one_time"; price: number; isDefault: boolean; includedBalance: number | null; includedCredits: number | null; inheritsFromPriceId: string | null; offerId: string | null; countries: Array<{ countryCode: string; price: number; includedBalance: number | null; autoSynced: boolean }> }>`, optional)
+- `features` (`Array<{ featureId: string; enabled: boolean; includedAmount: number | null; unlimited: boolean; overageEnabled: boolean; overageUnitPrice: number | null; overageModel: "per_unit" | null; creditsPerUnit: number | null; pricingMode: "fixed" | "ai_model"; margin: number | null; discountType: "percentage" | "amount" | null; discountValue: number | null; countries: Array<{ countryCode: string; overageUnitPrice: number; autoSynced: boolean }> }>`, optional)
+- `countries` (`Array<{ countryCode: string; currency: string; exchangeRateCents: number | null }>`, optional)
+- `addons` (`Array<{ id?: string; featureId: string; name: string; consumptionModel: "boolean" | "metered" | "credits" | "balance"; includedUnits: number | null; creditCost: number | null; prices: Array<{ currency: string; price: number; overageRate: number | null }> }>`, optional)
+- `creditPacks` (`Array<{ id?: string; name: string; credits: number; prices: Array<{ currency: string; price: number }> }>`, optional)
+- `expectedRevision` (`number`, required)
+
+### Request options
+
+- `idempotencyKey` (`string`, optional) — Unique key used to safely retry this write for 24 hours without applying it twice.
+
+### Returns
+
+`PlanVersion`
+
+## discardVersion
+
+`commet.plans.discardVersion(params, options?)`
+
+`DELETE /plans/{id}/versions/{versionId}` · operation `discard-plan-version`
+
+Delete an unpublished draft. Published versions must be retired instead.
+
+### Parameters
+
+- `id` (`string`, required)
+- `versionId` (`string`, required)
+- `expectedRevision` (`number`, required)
+
+### Returns
+
+`DeletedObject`
+
+## listVersions
+
+`commet.plans.listVersions(params)`
+
+`GET /plans/{id}/versions` · operation `list-plan-versions`
+
+List complete publications and drafts. Existing subscribers retain their accepted version.
+
+### Parameters
+
+- `id` (`string`, required)
+
+### Returns
+
+`{ object: "list"; data: Array<PlanVersion>; hasMore: boolean; nextCursor?: string }`
+
+## createVersion
+
+`commet.plans.createVersion(params, options?)`
+
+`POST /plans/{id}/versions` · operation `create-plan-version`
+
+Copy a published version into an editable draft. Omit sourceVersionId to copy the main version. This does not change availability or any subscription.
+
+### Parameters
+
+- `id` (`string`, required)
+- `sourceVersionId` (`string`, optional)
+
+### Request options
+
+- `idempotencyKey` (`string`, optional) — Unique key used to safely retry this write for 24 hours without applying it twice.
+
+### Returns
+
+`PlanVersion`
 
 ## setVisibility
 

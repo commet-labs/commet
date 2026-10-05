@@ -1270,6 +1270,151 @@ export interface PlanRegionalPricingResult {
   livemode: boolean;
 }
 
+export interface PlanVersion {
+  id: string;
+  planId: string;
+  number: number;
+  revision: number;
+  status: "draft" | "published" | "retired";
+  publication: "main" | "test" | null;
+  isMain: boolean;
+  /** @format date-time */
+  createdAt: string;
+  publishedAt: string | null;
+  terms: {
+    isFree: boolean;
+    consumptionModel: "metered" | "credits" | "balance" | null;
+    blockOnExhaustion: boolean;
+    freeIncludedCredits: number | null;
+    freeIncludedBalance: number | null;
+    prices: Array<{
+      id?: string;
+      billingInterval:
+        | "weekly"
+        | "monthly"
+        | "quarterly"
+        | "yearly"
+        | "one_time";
+      price: number;
+      isDefault: boolean;
+      includedBalance: number | null;
+      includedCredits: number | null;
+      inheritsFromPriceId: string | null;
+      offerId: string | null;
+      countries: Array<{
+        countryCode: string;
+        price: number;
+        includedBalance: number | null;
+        autoSynced: boolean;
+      }>;
+    }>;
+    features: Array<{
+      featureId: string;
+      enabled: boolean;
+      includedAmount: number | null;
+      unlimited: boolean;
+      overageEnabled: boolean;
+      overageUnitPrice: number | null;
+      overageModel: "per_unit" | null;
+      creditsPerUnit: number | null;
+      pricingMode: "fixed" | "ai_model";
+      margin: number | null;
+      discountType: "percentage" | "amount" | null;
+      discountValue: number | null;
+      countries: Array<{
+        countryCode: string;
+        overageUnitPrice: number;
+        autoSynced: boolean;
+      }>;
+    }>;
+    countries: Array<{
+      countryCode: string;
+      currency: string;
+      exchangeRateCents: number | null;
+    }>;
+    addons: Array<{
+      id?: string;
+      featureId: string;
+      name: string;
+      consumptionModel: "boolean" | "metered" | "credits" | "balance";
+      includedUnits: number | null;
+      creditCost: number | null;
+      prices: Array<{
+        currency: string;
+        price: number;
+        overageRate: number | null;
+      }>;
+    }>;
+    creditPacks: Array<{
+      id?: string;
+      name: string;
+      credits: number;
+      prices: Array<{
+        currency: string;
+        price: number;
+      }>;
+    }>;
+  };
+  object: "plan_version";
+  livemode: boolean;
+}
+
+export interface PlanVersionAdoption {
+  id: string;
+  subscriptionId: string;
+  sourceVersionId: string;
+  targetVersionId: string;
+  timing: "now" | "next_cycle";
+  status: "requested" | "applied" | "cancelled" | "rejected";
+  reason: string | null;
+  /** @format date-time */
+  createdAt: string;
+  completedAt: string | null;
+  object: "plan_version_adoption";
+  livemode: boolean;
+}
+
+export interface PlanVersionAdoptionPreview {
+  subscriptionId: string;
+  sourceVersionId: string;
+  targetVersionId: string;
+  timing: "now" | "next_cycle";
+  eligible: boolean;
+  /** @format date-time */
+  evaluatedAt: string;
+  blockers: Array<
+    | {
+        code: "feature_limit";
+        featureCode: string;
+        featureType: "usage" | "quota" | "seats";
+        current: number;
+        limit: number;
+      }
+    | {
+        code: "addon_unavailable";
+        addonId: string;
+      }
+    | {
+        code: "allocation_exhausted";
+        balanceType: "plan_credits" | "money_balance";
+        remaining: number;
+      }
+    | {
+        code: "price_unavailable";
+        billingInterval:
+          | "weekly"
+          | "monthly"
+          | "quarterly"
+          | "yearly"
+          | "one_time"
+          | null;
+        currency: string;
+      }
+  >;
+  object: "subscription";
+  livemode: boolean;
+}
+
 export interface PortalAccess {
   portalUrl: string;
   object: "portal_session";
@@ -1775,6 +1920,15 @@ export type SubscriptionOfferApplicationPhase =
       startsAt: string | null;
       endsAt: string | null;
     };
+
+export interface SubscriptionPlanVersion {
+  subscriptionId: string;
+  id: string;
+  planId: string;
+  number: number;
+  object: "subscription";
+  livemode: boolean;
+}
 
 export interface SubscriptionResume {
   subscriptionId: string;

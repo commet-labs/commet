@@ -1,21 +1,25 @@
-# subscription_not_active
+# plan_version_conflict
 
-The subscription status does not permit the requested operation.
+The draft revision, main version, or subscription adoption state changed before the operation completed.
 
 - **Error type:** `conflict_error`
-- **`code`:** `subscription_not_active`
+- **`code`:** `plan_version_conflict`
 - **API version:** `2026-10-04`
+
+## API versions
+
+- Available since API version `2026-10-04`.
 
 
 ## What to do
 
-Read the current subscription status and use the lifecycle operation supported for that state.
+Read the current version or adoption, reconcile the intended change, and submit its current revision and main version identifier.
 
 The response `message`, `param`, and `details` fields describe the condition observed by the specific operation.
 
 ## Retry behavior
 
-Retry only after the subscription enters an eligible state.
+Do not retry with stale revision or main-version values.
 
 ## Correlate the request
 

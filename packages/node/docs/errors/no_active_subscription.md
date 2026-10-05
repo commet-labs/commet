@@ -4,7 +4,7 @@ The customer has no subscription that is active for this operation.
 
 - **Error type:** `not_found_error`
 - **`code`:** `no_active_subscription`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do

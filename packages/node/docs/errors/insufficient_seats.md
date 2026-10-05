@@ -4,7 +4,7 @@ The requested seat removal exceeds the subscription's available seat balance.
 
 - **Error type:** `billing_error`
 - **`code`:** `insufficient_seats`
-- **API version:** `2026-08-27`
+- **API version:** `2026-10-04`
 
 
 ## What to do
