@@ -1,5 +1,13 @@
 # commet
 
+## 5.2.1
+
+### Patch Changes
+
+- ba183a4: Refresh the bundled documentation from commet.co/docs, include the webhooks contract, and sync two operation descriptions with the current API contract.
+- Updated dependencies [ba183a4]
+  - @commet/node@9.5.0
+
 ## 5.2.0
 
 ### Minor Changes
