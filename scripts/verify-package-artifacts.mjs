@@ -23,7 +23,7 @@ const packageExpectations = [
       "package/docs/documentation/subscriptions/plan-grants.md",
       "package/docs/knowledge-base/how-does-billing-work.md",
       "package/docs/ai-onboarding/ai-onboarding.md",
-      "package/docs/webhooks/payment-received.md",
+      "package/docs/webhooks.openapi.json",
       "package/docs/api-reference/index.md",
       "package/docs/schemas.md",
       "package/docs/errors/index.md",
@@ -176,23 +176,21 @@ try {
       throw new Error(`Installed docs are missing ${documentationPath}`);
     }
   }
-  const installedWebhookDocumentation = readFileSync(
-    join(
-      consumerRoot,
-      "node_modules",
-      "@commet",
-      "node",
-      "docs",
-      "webhooks",
-      "payment-received.md",
+  const installedWebhooksContract = JSON.parse(
+    readFileSync(
+      join(
+        consumerRoot,
+        "node_modules",
+        "@commet",
+        "node",
+        "docs",
+        installedManifest.webhooksContract,
+      ),
+      "utf8",
     ),
-    "utf8",
   );
-  if (
-    installedWebhookDocumentation.includes("WebhookEventDoc") ||
-    !installedWebhookDocumentation.includes("```json")
-  ) {
-    throw new Error("Installed webhook documentation was not serialized");
+  if (!installedWebhooksContract.webhooks?.["payment.received"]) {
+    throw new Error("Installed webhooks contract is missing payment.received");
   }
   for (const errorReference of installedManifest.errorReferences.entries) {
     if (
