@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-09-22
 title: Refunds and Retries
 description: Understand how refunds and renewal retries affect transactions, invoices, and product access.
 ---

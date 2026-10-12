@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-08-16
 title: Payment Routing
 description: Understand how Commet chooses a provider and why existing saved methods stay on their original connection.
 ---

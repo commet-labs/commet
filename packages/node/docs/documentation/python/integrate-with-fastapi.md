@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-28
 title: Integrate with FastAPI
 description: Add billing and payments to your FastAPI application.
 ---
@@ -10,7 +9,7 @@ Install the Commet Skill so your coding agent can integrate the current SDK and 
 npx skills add commet-labs/skills --skill commet
 ```
 
-1. ## Install
+1. ### Install
    ### pip
    ```bash
    pip install commet-sdk fastapi uvicorn
@@ -24,7 +23,7 @@ npx skills add commet-labs/skills --skill commet
    poetry add commet-sdk fastapi uvicorn
    ```
 
-2. ## Configure
+2. ### Configure
    ```bash title=".env"
    COMMET_API_KEY=ck_sandbox_xxx
    ```
@@ -37,7 +36,7 @@ npx skills add commet-labs/skills --skill commet
    )
    ```
 
-3. ## Subscribe
+3. ### Subscribe
    ```python title="routes/billing.py"
    from fastapi import APIRouter, HTTPException
    from pydantic import BaseModel
@@ -66,7 +65,7 @@ npx skills add commet-labs/skills --skill commet
        return {"checkout_url": subscription.checkout_url}
    ```
 
-4. ## Check Access
+4. ### Check Access
    ```python title="routes/billing.py"
    @router.get("/subscription/{customer_id}")
    def get_subscription(customer_id: str):
@@ -82,7 +81,7 @@ npx skills add commet-labs/skills --skill commet
        return {"allowed": result.allowed}
    ```
 
-5. ## Track Usage
+5. ### Track Usage
    ```python title="routes/billing.py"
    class UsageRequest(BaseModel):
        customer_id: str
@@ -100,7 +99,7 @@ npx skills add commet-labs/skills --skill commet
    ```
    Usage is aggregated and billed at end of period.
 
-6. ## Customer Portal
+6. ### Customer Portal
    ```python title="routes/billing.py"
    from fastapi.responses import RedirectResponse
 
@@ -111,7 +110,7 @@ npx skills add commet-labs/skills --skill commet
        return RedirectResponse(result.portal_url)
    ```
 
-7. ## Webhooks
+7. ### Webhooks
    ```python title="routes/webhooks.py"
    import os
 
@@ -142,7 +141,7 @@ npx skills add commet-labs/skills --skill commet
        return Response(status_code=200)
    ```
 
-8. ## Start Server
+8. ### Start Server
    ```python title="main.py"
    from fastapi import FastAPI
    from routes.billing import router as billing_router

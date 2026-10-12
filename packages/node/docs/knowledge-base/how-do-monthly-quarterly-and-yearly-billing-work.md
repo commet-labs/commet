@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-28
 title: Billing Intervals
 description: How weekly, monthly, quarterly, and yearly billing works and when your customers get charged
 ---

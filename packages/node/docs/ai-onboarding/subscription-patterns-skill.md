@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-04-03
 title: Subscription Patterns Skill
 description: Universal subscription billing patterns for trials, proration, dunning, and more.
 ---
@@ -25,5 +24,5 @@ npx skills add commet-labs/subscription-patterns
 
 ## Learn More
 
-- [**View on GitHub**](https://github.com/commet-labs/subscription-patterns)
-- [**View on skills.sh**](https://skills.sh/commet-labs/subscription-patterns)
+- [**View on GitHub**](https://github.com/commet-labs/subscription-patterns) — See the full source code and documentation.
+- [**View on skills.sh**](https://skills.sh/commet-labs/subscription-patterns) — Installation stats and security audits.

@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-31
 title: Commet Skills
 description: Give AI agents expert-level billing knowledge with Agent Skills.
 ---
@@ -52,7 +51,7 @@ Claude Code, Cursor, Codex, Gemini CLI, GitHub Copilot, Windsurf, OpenCode, and 
 
 ## Learn More
 
-- [**commet-labs/skills on skills.sh**](https://skills.sh/commet-labs/skills)
-- [**billing-best-practices**](https://skills.sh/commet-labs/billing-best-practices)
-- [**pricing-models**](https://skills.sh/commet-labs/pricing-models)
-- [**subscription-patterns**](https://skills.sh/commet-labs/subscription-patterns)
+- [**commet-labs/skills on skills.sh**](https://skills.sh/commet-labs/skills) — All 7 skills in one package.
+- [**billing-best-practices**](https://skills.sh/commet-labs/billing-best-practices) — SaaS billing patterns and best practices.
+- [**pricing-models**](https://skills.sh/commet-labs/pricing-models) — Choose the right pricing model for your SaaS.
+- [**subscription-patterns**](https://skills.sh/commet-labs/subscription-patterns) — Subscription lifecycle, trials, proration, dunning.

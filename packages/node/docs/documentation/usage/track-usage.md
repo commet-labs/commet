@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-28
 title: Track Usage
 description: Record metered consumption with the current Commet SDKs.
 ---

@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-08-16
 title: CLI
 description: The official command-line tool for Commet. Manage billing, forward webhooks, and automate your workflow from the terminal.
 ---
@@ -383,7 +382,7 @@ commet plans add-feature \
 | `--overage-enabled <bool>` | No       | Enable overage billing                 |
 | `--overage-unit-price <n>` | No       | Overage price per unit (fixed pricing) |
 | `--pricing-mode <mode>`    | No       | `fixed` or `ai_model`                  |
-| `--margin <n>`             | No       | Margin percentage (ai\_model pricing)  |
+| `--margin <n>`             | No       | Margin percentage (ai_model pricing)   |
 | `--credits-per-unit <n>`   | No       | Credits per unit                       |
 
 **`commet plans add-price`**

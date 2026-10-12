@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-28
 title: Credit Packs
 description: Configure credit packages that customers can purchase from the Commet Customer Portal.
 ---

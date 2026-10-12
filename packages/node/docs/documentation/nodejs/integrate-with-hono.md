@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-28
 title: Integrate with Hono
 description: Add billing and payments to your Hono application.
 ---
@@ -10,7 +9,7 @@ Install the Commet Skill so your coding agent can integrate the current SDK and 
 npx skills add commet-labs/skills --skill commet
 ```
 
-1. ## Install
+1. ### Install
    ### pnpm
    ```bash
    pnpm add @commet/node hono
@@ -24,7 +23,7 @@ npx skills add commet-labs/skills --skill commet
    bun add @commet/node hono
    ```
 
-2. ## Configure
+2. ### Configure
    ```bash title=".env"
    COMMET_API_KEY=ck_sandbox_xxx
    ```
@@ -36,7 +35,7 @@ npx skills add commet-labs/skills --skill commet
    })
    ```
 
-3. ## Subscribe
+3. ### Subscribe
    ```typescript title="src/routes/billing.ts"
    import { Hono } from 'hono'
    import { commet } from '../commet'
@@ -59,7 +58,7 @@ npx skills add commet-labs/skills --skill commet
    export default billing
    ```
 
-4. ## Check Access
+4. ### Check Access
    ```typescript title="src/routes/billing.ts"
    billing.get('/subscription/:customerId', async (c) => {
      const subscription = await commet.subscriptions.getActive({ customerId: c.req.param('customerId') })
@@ -81,7 +80,7 @@ npx skills add commet-labs/skills --skill commet
    })
    ```
 
-5. ## Track Usage
+5. ### Track Usage
    ```typescript title="src/routes/billing.ts"
    billing.post('/usage', async (c) => {
      const { customerId } = await c.req.json()
@@ -97,7 +96,7 @@ npx skills add commet-labs/skills --skill commet
    ```
    Usage is aggregated and billed at end of period.
 
-6. ## Customer Portal
+6. ### Customer Portal
    ```typescript title="src/routes/billing.ts"
    billing.get('/portal', async (c) => {
      const customerId = c.get('customerId')
@@ -108,7 +107,7 @@ npx skills add commet-labs/skills --skill commet
    })
    ```
 
-7. ## Start Server
+7. ### Start Server
    ### Node.js
    ```typescript title="src/index.ts"
    import { serve } from '@hono/node-server'

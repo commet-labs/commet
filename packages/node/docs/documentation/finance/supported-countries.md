@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-08-06
 title: Supported Countries
 description: Countries where Commet supports payouts and business operations.
 ---

@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-31
 title: Introductory Offers
 description: Apply an existing Offer automatically to eligible new subscriptions.
 ---

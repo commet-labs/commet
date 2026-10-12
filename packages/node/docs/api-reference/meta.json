@@ -1,7 +1,0 @@
-{
-  "title": "API Reference",
-  "description": "Complete REST API reference for the Commet platform",
-  "icon": "Code",
-  "root": true,
-  "pages": ["..."]
-}

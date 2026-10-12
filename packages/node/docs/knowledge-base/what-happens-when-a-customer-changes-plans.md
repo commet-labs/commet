@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-28
 title: Plan Changes
 description: What happens when your customer upgrades, downgrades, or switches plans
 ---

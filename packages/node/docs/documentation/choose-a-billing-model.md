@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-09-07
 title: Quickstart
 description: Go from a Commet account to your first subscription payment in sandbox.
 ---
@@ -29,27 +28,34 @@ For this walkthrough, use a **Metered** plan with a monthly price and an include
 
 ## Your first subscription payment
 
-1. [Create a Commet account](/login) and select your **sandbox organization**. Keep every resource in this walkthrough in that organization. Complete its [payment provider setup](/docs/payment-providers) so it can accept sandbox payments.
+1. ### Create your account
+   [Create a Commet account](https://commet.co/login) and select your **sandbox organization**. Keep every resource in this walkthrough in that organization. Complete its [payment provider setup](/docs/payment-providers) so it can accept sandbox payments.
 
-2. [Create a sandbox API key](/docs/create-api-key) and store it on your server. That guide covers the dashboard, CLI, MCP, and SDK initialization.
+2. ### Create an API key
+   [Create a sandbox API key](/docs/create-api-key) and store it on your server. That guide covers the dashboard, CLI, MCP, and SDK initialization.
 
-3. In **Features**, create **API Calls** with code `api_calls` and type **Usage**. The code identifies the feature when your application records consumption. You will set its included quantity on the plan.
+3. ### Create a feature
+   In **Features**, create **API Calls** with code `api_calls` and type **Usage**. The code identifies the feature when your application records consumption. You will set its included quantity on the plan.
 
    See [Configure Features](/docs/configure-features).
 
-4. In **Plans**, create a plan named **Pro**, with code `pro`, and choose **Metered**. Add a **USD 20 monthly price**, include **1,000 API calls**, and leave overage disabled for this first example. Use a paid price without a trial so the next steps lead directly to payment.
+4. ### Create a plan
+   In **Plans**, create a plan named **Pro**, with code `pro`, and choose **Metered**. Add a **USD 20 monthly price**, include **1,000 API calls**, and leave overage disabled for this first example. Use a paid price without a trial so the next steps lead directly to payment.
 
    See [Manage Plans](/docs/create-plans).
 
-5. Create a test customer with a billing email and a stable identifier from your application, such as `demo_customer`. The customer represents the person or business you are going to bill.
+5. ### Create a customer
+   Create a test customer with a billing email and a stable identifier from your application, such as `demo_customer`. The customer represents the person or business you are going to bill.
 
    See [Manage Customers](/docs/manage-customers) for the dashboard and SDK flow.
 
-6. Connect that customer to the **Pro** plan using its monthly price. Creating the subscription for this paid plan returns a `checkoutUrl`. Open it or redirect the customer there to enter their billing details and pay.
+6. ### Create the subscription
+   Connect that customer to the **Pro** plan using its monthly price. Creating the subscription for this paid plan returns a `checkoutUrl`. Open it or redirect the customer there to enter their billing details and pay.
 
    See [Manage Subscriptions](/docs/manage-subscriptions#create) for the request in your SDK.
 
-7. Use the sandbox checkout's **Test Data** panel to fill in test payment details and complete checkout. Confirm that the invoice is paid and the subscription is active in the dashboard.
+7. ### Complete the payment
+   Use the sandbox checkout's **Test Data** panel to fill in test payment details and complete checkout. Confirm that the invoice is paid and the subscription is active in the dashboard.
 
    Your first subscription payment is complete. Commet manages subsequent renewals for the monthly plan. See [Testing](/docs/testing-sandbox) for the available test tools.
 

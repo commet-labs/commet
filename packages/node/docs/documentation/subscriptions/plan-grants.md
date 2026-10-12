@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-08-17
 title: Grant Temporary Plan Access
 description: Temporarily expand a subscription's features and limits without changing its plan, price, invoice, or billing cycle.
 ---

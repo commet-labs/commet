@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-28
 title: Integrate with Astro
 description: Add billing and payments to your Astro application.
 ---
@@ -14,7 +13,7 @@ npx skills add commet-labs/skills --skill commet
 >
 > Astro requires an SSR adapter for API routes. Set `output: 'server'` or `output: 'hybrid'` in your `astro.config.mjs`.
 
-1. ## Install
+1. ### Install
    ### pnpm
    ```bash
    pnpm add @commet/node
@@ -32,7 +31,7 @@ npx skills add commet-labs/skills --skill commet
    bun add @commet/node
    ```
 
-2. ## Configure
+2. ### Configure
    ```bash title=".env"
    COMMET_API_KEY=ck_sandbox_xxx
    ```
@@ -44,7 +43,7 @@ npx skills add commet-labs/skills --skill commet
    })
    ```
 
-3. ## Subscribe
+3. ### Subscribe
    `customers.create` is idempotent — if a customer with the same `id` already exists, it returns the existing record.
    ```typescript title="src/pages/api/billing/subscribe.ts"
    import type { APIRoute } from 'astro'
@@ -64,7 +63,7 @@ npx skills add commet-labs/skills --skill commet
    }
    ```
 
-4. ## Check Access
+4. ### Check Access
    ```typescript title="src/pages/api/billing/access/[customerId].ts"
    import type { APIRoute } from 'astro'
    import { commet } from '../../../../lib/commet'
@@ -88,7 +87,7 @@ npx skills add commet-labs/skills --skill commet
    }
    ```
 
-5. ## Track Usage
+5. ### Track Usage
    ```typescript title="src/pages/api/billing/usage.ts"
    import type { APIRoute } from 'astro'
    import { commet } from '../../../lib/commet'
@@ -107,7 +106,7 @@ npx skills add commet-labs/skills --skill commet
    ```
    Usage is aggregated and billed at end of period.
 
-6. ## Customer Portal
+6. ### Customer Portal
    ```typescript title="src/pages/api/billing/portal.ts"
    import type { APIRoute } from 'astro'
    import { commet } from '../../../lib/commet'

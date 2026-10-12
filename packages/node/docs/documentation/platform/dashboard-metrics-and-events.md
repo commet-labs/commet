@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-08-16
 title: Dashboard Metrics and Usage Events
 description: Understand MRR, revenue, churn, active subscriptions, and the usage-event explorer.
 ---

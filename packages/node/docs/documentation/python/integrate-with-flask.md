@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-28
 title: Integrate with Flask
 description: Add billing and payments to your Flask application.
 ---
@@ -10,7 +9,7 @@ Install the Commet Skill so your coding agent can integrate the current SDK and 
 npx skills add commet-labs/skills --skill commet
 ```
 
-1. ## Install
+1. ### Install
    ### pip
    ```bash
    pip install commet-sdk flask
@@ -24,7 +23,7 @@ npx skills add commet-labs/skills --skill commet
    poetry add commet-sdk flask
    ```
 
-2. ## Configure
+2. ### Configure
    ```bash title=".env"
    COMMET_API_KEY=ck_sandbox_xxx
    ```
@@ -37,7 +36,7 @@ npx skills add commet-labs/skills --skill commet
    )
    ```
 
-3. ## Subscribe
+3. ### Subscribe
    ```python title="routes/billing.py"
    from flask import Blueprint, request, jsonify, redirect
    from commet_client import commet
@@ -62,7 +61,7 @@ npx skills add commet-labs/skills --skill commet
        return jsonify({"checkout_url": subscription.checkout_url})
    ```
 
-4. ## Check Access
+4. ### Check Access
    ```python title="routes/billing.py"
    @billing.route("/subscription/<customer_id>")
    def get_subscription(customer_id):
@@ -78,7 +77,7 @@ npx skills add commet-labs/skills --skill commet
        return jsonify({"allowed": result.allowed})
    ```
 
-5. ## Track Usage
+5. ### Track Usage
    ```python title="routes/billing.py"
    @billing.route("/usage", methods=["POST"])
    def track_usage():
@@ -94,7 +93,7 @@ npx skills add commet-labs/skills --skill commet
    ```
    Usage is aggregated and billed at end of period.
 
-6. ## Customer Portal
+6. ### Customer Portal
    ```python title="routes/billing.py"
    @billing.route("/portal")
    def portal():
@@ -102,7 +101,7 @@ npx skills add commet-labs/skills --skill commet
        return redirect(result.portal_url)
    ```
 
-7. ## Webhooks
+7. ### Webhooks
    ```python title="routes/webhooks.py"
    import os
 
@@ -131,7 +130,7 @@ npx skills add commet-labs/skills --skill commet
        return "", 200
    ```
 
-8. ## Start Server
+8. ### Start Server
    ```python title="app.py"
    from flask import Flask
    from routes.billing import billing

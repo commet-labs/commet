@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-10
 title: Finance Overview
 description: How money flows through Commet — balances, payouts, and transaction history.
 ---

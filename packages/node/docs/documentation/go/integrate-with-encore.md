@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-31
 title: Integrate with Encore
 description: Add billing and payments to your Encore application.
 ---
@@ -10,14 +9,14 @@ Install the Commet Skill so your coding agent can integrate the current SDK and 
 npx skills add commet-labs/skills --skill commet
 ```
 
-1. ## Install
+1. ### Install
    ```bash
    encore app create --example=hello-world myapp
    cd myapp
    go get github.com/commet-labs/commet-go/v9
    ```
 
-2. ## Configure
+2. ### Configure
    Store secrets using Encore's secret manager instead of environment variables:
    ```bash
    encore secret set --type dev,local,pr,prod CommetAPIKey
@@ -45,7 +44,7 @@ npx skills add commet-labs/skills --skill commet
    ```
    There is no environment option on the client: sandbox vs live is decided by the organization the API key belongs to.
 
-3. ## Subscribe
+3. ### Subscribe
    ```go title="billing/billing.go"
    import "context"
 
@@ -92,7 +91,7 @@ npx skills add commet-labs/skills --skill commet
    }
    ```
 
-4. ## Check Access
+4. ### Check Access
    ```go title="billing/billing.go"
    type SubscriptionResponse struct {
    	Status string `json:"status"`
@@ -143,7 +142,7 @@ npx skills add commet-labs/skills --skill commet
    }
    ```
 
-5. ## Track Usage
+5. ### Track Usage
    ```go title="billing/billing.go"
    func float64Ptr(value float64) *float64 { return &value }
 
@@ -175,7 +174,7 @@ npx skills add commet-labs/skills --skill commet
    ```
    Usage is aggregated and billed at end of period.
 
-6. ## Webhooks
+6. ### Webhooks
    ```go title="billing/webhooks.go"
    package billing
 
@@ -216,7 +215,7 @@ npx skills add commet-labs/skills --skill commet
    }
    ```
 
-7. ## Run
+7. ### Run
    ```bash
    encore run
    ```

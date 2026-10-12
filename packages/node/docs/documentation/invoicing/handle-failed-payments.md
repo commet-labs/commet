@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-28
 title: Handle Failed Payments
 description: What happens when a customer's payment fails and how they can reactivate from the Customer Portal.
 ---
@@ -33,9 +32,15 @@ Initial checkout card declines do not emit `payment.failed`; the checkout respon
 
 Retries run on day 1, day 3, day 5, and day 7 after the original failure (4 retries). The calendar is anchored to the failure and never moves. After the last failed retry the subscription is canceled.
 
-Manual retries — from the Customer Portal or [`reactivate`](#retry-the-charge-server-to-server) — count against the same calendar: a declined manual retry consumes the next scheduled slot. Four declined retries cancel the subscription even before day 7.
+Manual retries from the Customer Portal or [`reactivate`](#retry-the-charge-server-to-server) use the default payment method and have separate daily limits. They do not consume automatic retry slots or start another charge while an automatic retry is in progress.
 
-Retries use the payment connection already associated with the subscription. Changing country routing does not move the retry to another provider, and Commet does not silently switch a saved payment method to a different account.
+### Saved payment methods
+
+Commet first tries the default saved method on the subscription's payment connection. After a confirmed decline, it tries the other available methods on that connection, newest first. OXXO is excluded from these retries. Changing country routing does not change the connection used for these retries.
+
+Trying several methods counts as one scheduled retry. Commet stops when a payment succeeds. If a result is pending or unknown, it waits for that result before trying another method.
+
+A successful charge with another method does not change the customer's default payment method.
 
 ## Dunning communications
 
@@ -217,7 +222,7 @@ Customers in `past_due` see their subscription in the [Customer Portal](/docs/cu
 - **Retry with their current card** — useful when the failure was temporary (insufficient funds that are now available, a bank hold that cleared).
 - **Update their payment method** — enter a new card through the subscription's payment provider and retry in the same step.
 
-A successful retry settles the outstanding invoice, moves the subscription back to `active`, and emits a `payment.recovered` event. A declined retry consumes the next slot on the dunning calendar. Retry attempts are rate-limited to 3 per day per customer.
+A successful retry settles the outstanding invoice, moves the subscription back to `active`, and emits a `payment.recovered` event. A declined manual retry preserves the automatic dunning calendar. Retry attempts are rate-limited to 3 per day per customer.
 
 ## Prompt payment update
 

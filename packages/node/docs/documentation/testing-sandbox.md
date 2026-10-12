@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-08-12
 title: Testing
 description: Test safely with sandbox environment
 ---

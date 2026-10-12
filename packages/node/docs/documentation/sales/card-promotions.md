@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-08-16
 title: Card Promotions
 description: Distribute a Promotional Offer to eligible card BINs and revalidate eligibility at checkout.
 ---

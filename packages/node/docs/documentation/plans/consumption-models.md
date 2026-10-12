@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-10
 title: Consumption Models
 description: Understand the three ways customers consume and pay for features in Commet plans.
 ---

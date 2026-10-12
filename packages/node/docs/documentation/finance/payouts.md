@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-08-04
 title: Request a Payout to Your Bank
 description: Withdraw your available Commet balance to your bank account — $10 minimum, no payout fee, arrives in up to 7 business days.
 ---

@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-04-03
 title: Pricing Models Skill
 description: Choose and implement the right pricing model for your SaaS with AI agents.
 ---
@@ -25,5 +24,5 @@ npx skills add commet-labs/pricing-models
 
 ## Learn More
 
-- [**View on GitHub**](https://github.com/commet-labs/pricing-models)
-- [**View on skills.sh**](https://skills.sh/commet-labs/pricing-models)
+- [**View on GitHub**](https://github.com/commet-labs/pricing-models) — See the full source code and documentation.
+- [**View on skills.sh**](https://skills.sh/commet-labs/pricing-models) — Installation stats and security audits.

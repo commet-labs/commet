@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-08-16
 title: Customer Credits
 description: Grant monetary invoice credit to a customer, inspect its remaining balance, and revoke unused credit.
 ---

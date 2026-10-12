@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-28
 title: Payment Failures
 description: What happens when your customer's payment fails
 ---

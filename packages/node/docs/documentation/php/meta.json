@@ -1,9 +1,0 @@
-{
-  "title": "PHP",
-  "description": "Integrate Commet with PHP frameworks",
-  "pages": [
-    "integrate-with-php",
-    "integrate-with-laravel",
-    "integrate-with-symfony"
-  ]
-}

@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-27
 title: Payment Orchestration
 description: Route payments across Commet and your connected PSPs using country rules, defaults, and provider-bound payment methods.
 ---

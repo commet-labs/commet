@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-28
 title: Configure Features
 description: Define capabilities and read current or prospective customer access.
 ---

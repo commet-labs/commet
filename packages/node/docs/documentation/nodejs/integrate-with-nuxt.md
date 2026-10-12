@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-28
 title: Integrate with Nuxt
 description: Add billing and payments to your Nuxt application.
 ---
@@ -10,7 +9,7 @@ Install the Commet Skill so your coding agent can integrate the current SDK and 
 npx skills add commet-labs/skills --skill commet
 ```
 
-1. ## Install
+1. ### Install
    ### pnpm
    ```bash
    pnpm add @commet/node
@@ -28,7 +27,7 @@ npx skills add commet-labs/skills --skill commet
    bun add @commet/node
    ```
 
-2. ## Configure
+2. ### Configure
    ```bash title=".env"
    COMMET_API_KEY=ck_sandbox_xxx
    ```
@@ -50,7 +49,7 @@ npx skills add commet-labs/skills --skill commet
    })
    ```
 
-3. ## Subscribe
+3. ### Subscribe
    `customers.create` is idempotent — if a customer with the same `id` already exists, it returns the existing record.
    ```typescript title="server/api/billing/subscribe.post.ts"
    export default defineEventHandler(async (event) => {
@@ -67,7 +66,7 @@ npx skills add commet-labs/skills --skill commet
    })
    ```
 
-4. ## Check Access
+4. ### Check Access
    ```typescript title="server/api/billing/access/[customerId].get.ts"
    export default defineEventHandler(async (event) => {
      const customerId = getRouterParam(event, 'customerId')!
@@ -90,7 +89,7 @@ npx skills add commet-labs/skills --skill commet
    })
    ```
 
-5. ## Track Usage
+5. ### Track Usage
    ```typescript title="server/api/billing/usage.post.ts"
    export default defineEventHandler(async (event) => {
      const { customerId } = await readBody(event)
@@ -106,7 +105,7 @@ npx skills add commet-labs/skills --skill commet
    ```
    Usage is aggregated and billed at end of period.
 
-6. ## Customer Portal
+6. ### Customer Portal
    ```typescript title="server/api/billing/portal.get.ts"
    export default defineEventHandler(async (event) => {
      const customerId = 'user_123'

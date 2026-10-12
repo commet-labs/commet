@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-28
 title: Seats
 description: How seat-based billing works for your customers
 ---

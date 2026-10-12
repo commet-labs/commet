@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-28
 title: Integrate with Python
 description: Install and configure the Commet Python SDK.
 ---
@@ -10,7 +9,7 @@ Install the Commet Skill so your coding agent can integrate the current SDK and 
 npx skills add commet-labs/skills --skill commet
 ```
 
-1. ## Install
+1. ### Install
    ### pip
    ```bash
    pip install commet-sdk
@@ -24,7 +23,7 @@ npx skills add commet-labs/skills --skill commet
    poetry add commet-sdk
    ```
 
-2. ## Configure
+2. ### Configure
    ```bash title=".env"
    COMMET_API_KEY=ck_sandbox_xxx
    ```
@@ -38,7 +37,7 @@ npx skills add commet-labs/skills --skill commet
    )
    ```
 
-3. ## Create Customer and Subscribe
+3. ### Create Customer and Subscribe
    `customers.create` is idempotent — if a customer with the same `id` already exists, it returns the existing record.
    ```python
    response = commet.customers.create(
@@ -55,7 +54,7 @@ npx skills add commet-labs/skills --skill commet
    ```
    The customer is redirected to checkout to complete payment.
 
-4. ## Check Access
+4. ### Check Access
    ```python
    sub = commet.subscriptions.get_active(customer_id="user_123")
    status = sub.status if sub else None
@@ -64,7 +63,7 @@ npx skills add commet-labs/skills --skill commet
    allowed = access.allowed
    ```
 
-5. ## Track Usage
+5. ### Track Usage
    ```python
    commet.usage.track(
        customer_id="user_123",
@@ -74,7 +73,7 @@ npx skills add commet-labs/skills --skill commet
    ```
    Usage is aggregated and billed at end of period.
 
-6. ## Multiple Operations
+6. ### Multiple Operations
    Call each resource directly with `customer_id`:
    ```python
    commet.usage.track(customer_id="user_123", feature_code="api_calls", value=1)

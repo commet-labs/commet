@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-28
 title: Seat Management
 description: Manage seat-based licenses with the Commet SDK.
 ---

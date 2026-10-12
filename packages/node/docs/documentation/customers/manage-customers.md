@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-28
 title: Manage Customers
 description: Create and manage customers using the current Commet SDKs and dashboard.
 ---
@@ -343,4 +342,4 @@ See the [Customers API reference](/docs/api-reference/customers/list-customers) 
 
 - [Customer Portal](/docs/customer-portal)
 - [Manage Subscriptions](/docs/manage-subscriptions)
-- [Offers & Pricing changelog and migration checklist](/changelog/offers-and-pricing)
+- [Offers & Pricing changelog and migration checklist](https://commet.co/changelog/offers-and-pricing)

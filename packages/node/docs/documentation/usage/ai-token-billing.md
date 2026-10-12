@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-28
 title: AI Token Billing
 description: Automatically measure and charge for AI token usage with model-aware pricing and configurable margins.
 ---

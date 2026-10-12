@@ -1,12 +1,13 @@
 ---
-lastModified: 2026-08-10
 title: Account Verification
 description: How to get verified for payouts — complete the KYC form in the Commet dashboard.
 ---
 
 Organizations using their own payment connection can start accepting payments immediately. Commet-managed payment processing remains unavailable until merchant review and identity verification are complete.
 
-> **Note: Live organizations only**
+> **Note**
+>
+> **Live organizations only**
 >
 > Payout verification is unavailable in sandbox. Switch to your live organization before submitting business, identity, document, or bank information.
 
@@ -39,7 +40,9 @@ After completing verification in the Commet dashboard, you can add destination b
 
 `POST /api/v1/payouts/verification` is deprecated and no longer accepts or processes KYC data. Authenticated requests return `410 Gone` with the `endpoint_deprecated` error code.
 
-> **Warning: Complete verification in the dashboard**
+> **Warning**
+>
+> **Complete verification in the dashboard**
 >
 > Do not send business, identity, document, or bank information to this endpoint. Use the one-time verification flow in your live organization's finance section.
 

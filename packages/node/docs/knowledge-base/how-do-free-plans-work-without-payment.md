@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-10
 title: Free Plans
 description: How free plans work for your customers
 ---

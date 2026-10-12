@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-31
 title: MCP Server
 description: Use the MCP Server to manage billing infrastructure.
 ---
@@ -45,7 +44,7 @@ To use it, you'll need to:
 
 Choose your preferred client below.
 
-### cursor
+### Cursor
 
 Open the command palette and choose "Cursor Settings" > "MCP" > "Add new global MCP server".
 
@@ -59,13 +58,13 @@ Open the command palette and choose "Cursor Settings" > "MCP" > "Add new global 
 }
 ```
 
-### claude-code
+### Claude Code
 
 ```bash
 claude mcp add --transport http commet https://commet.co/mcp/v2
 ```
 
-### claude-desktop
+### Claude Desktop
 
 Open Claude Desktop settings > "Developer" tab > "Edit Config".
 
@@ -79,7 +78,7 @@ Open Claude Desktop settings > "Developer" tab > "Edit Config".
 }
 ```
 
-### codex
+### Codex
 
 ```bash
 codex mcp add commet --url https://commet.co/mcp/v2
@@ -91,7 +90,7 @@ The command opens the browser for OAuth authentication. Once complete, verify wi
 codex mcp list
 ```
 
-### copilot
+### Copilot
 
 Add the following to your VS Code `settings.json`:
 
@@ -108,7 +107,7 @@ Add the following to your VS Code `settings.json`:
 }
 ```
 
-### gemini
+### Gemini
 
 Add the following to `~/.gemini/settings.json`:
 
@@ -122,7 +121,7 @@ Add the following to `~/.gemini/settings.json`:
 }
 ```
 
-### opencode
+### OpenCode
 
 Add the following to `opencode.json`:
 
@@ -137,7 +136,7 @@ Add the following to `opencode.json`:
 }
 ```
 
-### windsurf
+### Windsurf
 
 ```json
 {

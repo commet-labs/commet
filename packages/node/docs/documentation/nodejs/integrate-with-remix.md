@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-28
 title: Integrate with Remix
 description: Add billing and payments to your Remix application.
 ---
@@ -10,7 +9,7 @@ Install the Commet Skill so your coding agent can integrate the current SDK and 
 npx skills add commet-labs/skills --skill commet
 ```
 
-1. ## Install
+1. ### Install
    ### pnpm
    ```bash
    pnpm add @commet/node @remix-run/node
@@ -28,7 +27,7 @@ npx skills add commet-labs/skills --skill commet
    bun add @commet/node @remix-run/node
    ```
 
-2. ## Configure
+2. ### Configure
    ```bash title=".env"
    COMMET_API_KEY=ck_sandbox_xxx
    ```
@@ -41,7 +40,7 @@ npx skills add commet-labs/skills --skill commet
    })
    ```
 
-3. ## Subscribe
+3. ### Subscribe
    `customers.create` is idempotent — if a customer with the same `id` already exists, it returns the existing record.
    ```typescript title="app/routes/billing.subscribe.ts"
    import { json, redirect, type ActionFunctionArgs } from '@remix-run/node'
@@ -68,7 +67,7 @@ npx skills add commet-labs/skills --skill commet
    }
    ```
 
-4. ## Check Access
+4. ### Check Access
    ```typescript title="app/routes/billing.status.ts"
    import { json, type LoaderFunctionArgs } from '@remix-run/node'
    import { commet } from '~/lib/commet.server'
@@ -95,7 +94,7 @@ npx skills add commet-labs/skills --skill commet
    }
    ```
 
-5. ## Track Usage
+5. ### Track Usage
    ```typescript title="app/routes/billing.usage.ts"
    import { json, type ActionFunctionArgs } from '@remix-run/node'
    import { commet } from '~/lib/commet.server'
@@ -114,7 +113,7 @@ npx skills add commet-labs/skills --skill commet
    ```
    Usage is aggregated and billed at end of period.
 
-6. ## Customer Portal
+6. ### Customer Portal
    ```typescript title="app/routes/billing.portal.ts"
    import { redirect, type LoaderFunctionArgs } from '@remix-run/node'
    import { commet } from '~/lib/commet.server'

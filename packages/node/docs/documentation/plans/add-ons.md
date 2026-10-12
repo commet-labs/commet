@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-28
 title: Add-ons
 description: Offer optional features customers can activate on their subscriptions for an additional price.
 ---

@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-31
 title: Markets and Regional Pricing
 description: Combine currency pricing, reusable country Markets, and selectable price variants.
 ---

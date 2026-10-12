@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-31
 title: Offers
 description: Define reusable trials and temporary pricing terms independently from plans and distribution.
 ---

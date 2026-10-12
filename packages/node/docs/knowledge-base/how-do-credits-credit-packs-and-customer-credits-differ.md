@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-08-17
 title: Credits, Credit Packs, and Customer Credits
 description: Choose the correct credit mechanism based on what the customer receives and how it expires.
 ---

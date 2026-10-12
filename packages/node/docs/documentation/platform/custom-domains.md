@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-08-16
 title: Custom Domains
 description: Serve checkout and the Customer Portal from branded subdomains you control.
 ---

@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-08-16
 title: Organization Settings
 description: Configure the organization identity, customer emails, notification recipient, language, and environment boundaries.
 ---

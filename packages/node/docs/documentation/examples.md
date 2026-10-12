@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-08-16
 title: Examples
 description: Explore complete applications for the main Commet billing models and lifecycle patterns.
 ---
