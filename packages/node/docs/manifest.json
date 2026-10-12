@@ -8,6 +8,7 @@
   "apiReference": "api-reference/index.md",
   "schemas": "schemas.md",
   "webhooks": "webhooks.md",
+  "webhooksContract": "webhooks.openapi.json",
   "platformDocumentation": {
     "source": "commet-labs/docs",
     "index": "platform-documentation.md",

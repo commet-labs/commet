@@ -3,4 +3,4 @@
 "commet": patch
 ---
 
-Refresh the bundled documentation from commet.co/docs and sync two operation descriptions with the current API contract.
+Refresh the bundled documentation from commet.co/docs, include the webhooks contract, and sync two operation descriptions with the current API contract.
