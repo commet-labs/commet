@@ -1,5 +1,11 @@
 # @commet/node
 
+## 9.5.0
+
+### Minor Changes
+
+- ba183a4: Refresh the bundled documentation from commet.co/docs, include the webhooks contract, and sync two operation descriptions with the current API contract.
+
 ## 9.4.0
 
 ### Minor Changes
