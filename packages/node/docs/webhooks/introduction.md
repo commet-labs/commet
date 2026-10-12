@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-31
 title: Introduction
 description: Receive real-time notifications when events happen in your Commet account.
 ---

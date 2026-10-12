@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-08-16
 title: Balance and Top-Ups
 description: Configure prepaid monetary usage, adjust a subscription balance, and let customers buy more.
 ---

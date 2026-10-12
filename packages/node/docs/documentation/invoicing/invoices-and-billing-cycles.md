@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-10
 title: Invoices and Billing Cycles
 description: How Commet generates invoices, what they contain, and when customers are charged.
 ---

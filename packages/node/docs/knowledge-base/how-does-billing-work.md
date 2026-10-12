@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-08-16
 title: How Billing Works
 description: How your billing behaves based on what you and your customers do
 ---

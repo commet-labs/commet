@@ -1,9 +1,0 @@
-{
-  "title": "Subscriptions",
-  "description": "Manage subscription lifecycle, upgrades, and downgrades",
-  "pages": [
-    "manage-subscriptions",
-    "plan-grants",
-    "upgrade-and-downgrade-plans"
-  ]
-}

@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-09-07
 title: Introduction
 description: Measure consumption, manage subscriptions, and accept payments for your SaaS or AI product with Commet.
 ---
@@ -8,8 +7,8 @@ Commet is a billing and payments platform for SaaS and AI products. It connects 
 
 You define what you sell and how you price it. Commet manages the billing cycle, invoices, and payment flows. Your application reports consumption and uses Commet's access checks and events to decide what each customer can do.
 
-- [**Quickstart**](/docs/choose-a-billing-model)
-- [**Build with an agent**](/docs/mcp-server)
+- [**Quickstart**](/docs/choose-a-billing-model) — Go from creating an account to your first subscription and test payment.
+- [**Build with an agent**](/docs/mcp-server) — Connect your assistant to Commet's documentation and API through MCP.
 
 ## What can you build with Commet?
 
@@ -67,7 +66,7 @@ Using Better Auth? The [Commet plugin](/docs/better-auth) connects customer crea
 
 ### Tools for developers and agents
 
-The [CLI](/docs/cli) lets you manage Commet from your terminal and work with billing configuration as code. The [REST API reference](/docs/api-reference) documents the endpoints available to your own tools and integrations.
+The [CLI](/docs/cli) lets you manage Commet from your terminal and work with billing configuration as code. The [REST API reference](/docs/api-reference/overview) documents the endpoints available to your own tools and integrations.
 
 For an AI coding assistant, install the [Commet skill](/docs/commet-skill) for integration guidance. Connect the [MCP server](/docs/mcp-server) when the assistant also needs to read documentation and work with resources in your organization. The skill provides guidance; MCP provides access to tools.
 

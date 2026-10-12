@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-28
 title: Integrate with Bun
 description: Add billing and payments to your Bun application.
 ---
@@ -10,12 +9,12 @@ Install the Commet Skill so your coding agent can integrate the current SDK and 
 npx skills add commet-labs/skills --skill commet
 ```
 
-1. ## Install
+1. ### Install
    ```bash
    bun add @commet/node
    ```
 
-2. ## Configure
+2. ### Configure
    ```bash title=".env"
    COMMET_API_KEY=ck_sandbox_xxx
    ```
@@ -27,7 +26,7 @@ npx skills add commet-labs/skills --skill commet
    })
    ```
 
-3. ## Subscribe
+3. ### Subscribe
    ```typescript title="src/index.ts"
    import { commet } from './commet'
 
@@ -54,7 +53,7 @@ npx skills add commet-labs/skills --skill commet
    })
    ```
 
-4. ## Check Access
+4. ### Check Access
    Add these routes to the `fetch` handler.
    ```typescript title="src/index.ts"
    if (url.pathname.startsWith('/subscription/') && req.method === 'GET') {
@@ -78,7 +77,7 @@ npx skills add commet-labs/skills --skill commet
    }
    ```
 
-5. ## Track Usage
+5. ### Track Usage
    ```typescript title="src/index.ts"
    if (url.pathname === '/usage' && req.method === 'POST') {
      const { customerId } = await req.json()
@@ -94,7 +93,7 @@ npx skills add commet-labs/skills --skill commet
    ```
    Usage is aggregated and billed at end of period.
 
-6. ## Customer Portal
+6. ### Customer Portal
    ```typescript title="src/index.ts"
    if (url.pathname === '/portal' && req.method === 'GET') {
      const customerId = url.searchParams.get('customerId')!

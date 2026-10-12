@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-10
 title: Invoices
 description: What invoices your customers receive and when
 ---

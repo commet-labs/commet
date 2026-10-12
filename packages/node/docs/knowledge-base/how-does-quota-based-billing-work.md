@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-28
 title: Quota
 description: How quota-based billing works for your customers
 ---

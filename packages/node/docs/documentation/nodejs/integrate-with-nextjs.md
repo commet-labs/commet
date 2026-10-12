@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-28
 title: Integrate with Next.js
 description: Add billing and payments to your Next.js application.
 ---
@@ -10,7 +9,7 @@ Install the Commet Skill so your coding agent can integrate the current SDK and 
 npx skills add commet-labs/skills --skill commet
 ```
 
-1. ## Install
+1. ### Install
    ### pnpm
    ```bash
    pnpm add @commet/node @commet/next
@@ -28,7 +27,7 @@ npx skills add commet-labs/skills --skill commet
    bun add @commet/node @commet/next
    ```
 
-2. ## Configure
+2. ### Configure
    ```bash title=".env.local"
    COMMET_API_KEY=ck_sandbox_xxx
    ```
@@ -40,7 +39,7 @@ npx skills add commet-labs/skills --skill commet
    })
    ```
 
-3. ## Create Customer and Subscribe
+3. ### Create Customer and Subscribe
    `customers.create` is idempotent — if a customer with the same `id` already exists, it returns the existing record.
    ```typescript title="app/actions/billing.ts"
    'use server'
@@ -67,7 +66,7 @@ npx skills add commet-labs/skills --skill commet
    ```
    The customer is redirected to checkout to complete payment. When `checkoutUrl` is `null` no payment is needed and the subscription is already active.
 
-4. ## Check Access
+4. ### Check Access
    ```typescript title="app/actions/billing.ts"
    export async function getSubscription(customerId: string) {
      const subscription = await commet.subscriptions.getActive({ customerId })
@@ -83,7 +82,7 @@ npx skills add commet-labs/skills --skill commet
    }
    ```
 
-5. ## Track Usage
+5. ### Track Usage
    ```typescript title="app/actions/usage.ts"
    export async function trackApiCall(customerId: string) {
      await commet.usage.track({
@@ -95,7 +94,7 @@ npx skills add commet-labs/skills --skill commet
    ```
    Usage is aggregated and billed at end of period.
 
-6. ## Customer Portal
+6. ### Customer Portal
    ```typescript title="app/api/commet/portal/route.ts"
    import { CustomerPortal } from '@commet/next'
 

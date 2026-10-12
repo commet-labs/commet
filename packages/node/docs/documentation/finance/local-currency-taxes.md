@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-16
 title: Local Currency Taxes
 description: Banks in some countries add taxes or surcharges on top of local currency payments. What they are, where they apply, and how to handle customer questions.
 ---

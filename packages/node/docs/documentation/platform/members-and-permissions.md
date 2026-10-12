@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-08-16
 title: Members and Permissions
 description: Invite teammates and choose who can manage organization configuration.
 ---

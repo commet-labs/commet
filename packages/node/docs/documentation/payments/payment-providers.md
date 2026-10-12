@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-27
 title: Payment Providers
 description: Connect your own Stripe or dLocal account to Commet and route payments without changing your billing integration.
 ---

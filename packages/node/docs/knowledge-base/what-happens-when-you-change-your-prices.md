@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-28
 title: Pricing Changes
 description: What happens to your customers when you change your prices
 ---

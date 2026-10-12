@@ -2,6 +2,8 @@
 
 Generated from Commet API version `2026-08-27`.
 
+The complete contract, with every field description and example, is in [webhooks.openapi.json](./webhooks.openapi.json).
+
 ## subscription.created
 
 Fired when a subscription record is created with status pending_payment. The first charge has not been confirmed yet — do NOT grant access here. Wait for subscription.activated.

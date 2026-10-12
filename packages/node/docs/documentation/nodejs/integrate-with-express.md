@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-28
 title: Integrate with Express
 description: Add billing and payments to your Express application.
 ---
@@ -10,7 +9,7 @@ Install the Commet Skill so your coding agent can integrate the current SDK and 
 npx skills add commet-labs/skills --skill commet
 ```
 
-1. ## Install
+1. ### Install
    ### pnpm
    ```bash
    pnpm add @commet/node express
@@ -24,7 +23,7 @@ npx skills add commet-labs/skills --skill commet
    yarn add @commet/node express
    ```
 
-2. ## Configure
+2. ### Configure
    ```bash title=".env"
    COMMET_API_KEY=ck_sandbox_xxx
    ```
@@ -36,7 +35,7 @@ npx skills add commet-labs/skills --skill commet
    })
    ```
 
-3. ## Subscribe
+3. ### Subscribe
    ```typescript title="src/routes/billing.ts"
    import { Router } from 'express'
    import { commet } from '../commet'
@@ -59,7 +58,7 @@ npx skills add commet-labs/skills --skill commet
    export default router
    ```
 
-4. ## Check Access
+4. ### Check Access
    ```typescript title="src/routes/billing.ts"
    router.get('/subscription/:customerId', async (req, res) => {
      const subscription = await commet.subscriptions.getActive({ customerId: req.params.customerId })
@@ -81,7 +80,7 @@ npx skills add commet-labs/skills --skill commet
    })
    ```
 
-5. ## Track Usage
+5. ### Track Usage
    ```typescript title="src/routes/billing.ts"
    router.post('/usage', async (req, res) => {
      await commet.usage.track({
@@ -95,7 +94,7 @@ npx skills add commet-labs/skills --skill commet
    ```
    Usage is aggregated and billed at end of period.
 
-6. ## Customer Portal
+6. ### Customer Portal
    ```typescript title="src/routes/billing.ts"
    router.get('/portal', async (req, res) => {
      const portal = await commet.portal.getUrl({
@@ -106,7 +105,7 @@ npx skills add commet-labs/skills --skill commet
    })
    ```
 
-7. ## Start Server
+7. ### Start Server
    ```typescript title="src/index.ts"
    import express from 'express'
    import billingRoutes from './routes/billing'

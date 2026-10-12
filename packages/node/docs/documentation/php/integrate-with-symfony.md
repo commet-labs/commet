@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-28
 title: Integrate with Symfony
 description: Add billing and payments to your Symfony application.
 ---
@@ -10,12 +9,12 @@ Install the Commet Skill so your coding agent can integrate the current SDK and 
 npx skills add commet-labs/skills --skill commet
 ```
 
-1. ## Install
+1. ### Install
    ```bash
    composer require commet/commet-php
    ```
 
-2. ## Configure
+2. ### Configure
    ```bash title=".env"
    COMMET_API_KEY=ck_sandbox_xxx
    COMMET_WEBHOOK_SECRET=whsec_xxx
@@ -51,7 +50,7 @@ npx skills add commet-labs/skills --skill commet
    }
    ```
 
-3. ## Subscribe
+3. ### Subscribe
    ```php title="src/Controller/BillingController.php"
    <?php
 
@@ -91,7 +90,7 @@ npx skills add commet-labs/skills --skill commet
    }
    ```
 
-4. ## Check Access
+4. ### Check Access
    ```php title="src/Controller/BillingController.php"
    #[Route('/billing/subscription/{customerId}', methods: ['GET'])]
    public function getSubscription(string $customerId): JsonResponse
@@ -118,7 +117,7 @@ npx skills add commet-labs/skills --skill commet
    }
    ```
 
-5. ## Track Usage
+5. ### Track Usage
    ```php title="src/Controller/BillingController.php"
    #[Route('/billing/usage', methods: ['POST'])]
    public function trackUsage(Request $request): JsonResponse
@@ -136,7 +135,7 @@ npx skills add commet-labs/skills --skill commet
    ```
    Usage is aggregated and billed at end of period.
 
-6. ## Customer Portal
+6. ### Customer Portal
    ```php title="src/Controller/BillingController.php"
    use Symfony\Component\HttpFoundation\RedirectResponse;
 
@@ -149,7 +148,7 @@ npx skills add commet-labs/skills --skill commet
    }
    ```
 
-7. ## Webhooks
+7. ### Webhooks
    ```php title="src/Controller/WebhookController.php"
    <?php
 

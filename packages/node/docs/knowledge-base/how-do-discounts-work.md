@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-31
 title: Discounts
 description: How Offers, introductory placement, direct assignment, and Promo Codes work together
 ---

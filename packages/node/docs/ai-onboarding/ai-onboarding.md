@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-08-16
 title: AI Onboarding
 description: Give an AI agent the product knowledge, tools, environment, and safety boundaries it needs to implement Commet.
 ---
@@ -48,9 +47,9 @@ MCP v2 generates one `api_*` tool per current OpenAPI operation and also exposes
 Use the smallest source that answers the task:
 
 1. `node_modules/@commet/node/docs/README.md` for the API that matches the installed SDK version.
-2. [Documentation index](https://commet.co/docs/llms.txt) to discover the right curated concept or business rule.
+2. [Documentation index](/docs/llms.txt) to discover the right curated concept or business rule.
 3. Append `.md` to a page URL for focused Markdown, such as `https://commet.co/docs/how-does-billing-work.md`.
-4. [Full documentation](https://commet.co/docs/llms-full.txt) only when the task genuinely needs the complete curated corpus.
+4. [Full documentation](/docs/llms-full.txt) only when the task genuinely needs the complete curated corpus.
 5. [OpenAPI](https://commet.co/openapi.json) and generated API Reference for the exact current platform contract.
 
 Installed SDK docs are version-matched. The curated Documentation explains how dashboard and API work together. The Knowledge Base defines business rules. API Reference and Webhooks define the current generated contracts.

@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-28
 title: Accept One-Time Payments
 description: Charge customers once with the Commet payments resource — no subscription or plan required. Tax, invoice, and receipt handled automatically.
 ---

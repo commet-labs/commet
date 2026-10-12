@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-08-13
 title: Acceptable Use Policy
 description: What products and services can be sold through Commet.
 ---

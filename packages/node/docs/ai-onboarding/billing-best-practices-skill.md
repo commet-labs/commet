@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-31
 title: Billing Best Practices Skill
 description: Comprehensive guide for building production-ready billing systems with AI agents.
 ---
@@ -25,5 +24,5 @@ npx skills add commet-labs/billing-best-practices
 
 ## Learn More
 
-- [**View on GitHub**](https://github.com/commet-labs/billing-best-practices)
-- [**View on skills.sh**](https://skills.sh/commet-labs/billing-best-practices)
+- [**View on GitHub**](https://github.com/commet-labs/billing-best-practices) — See the full source code and documentation.
+- [**View on skills.sh**](https://skills.sh/commet-labs/billing-best-practices) — Installation stats and security audits.

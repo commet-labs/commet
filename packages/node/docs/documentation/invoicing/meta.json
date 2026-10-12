@@ -1,9 +1,0 @@
-{
-  "title": "Invoicing",
-  "description": "Invoice generation, billing cycles, and payment failure handling",
-  "pages": [
-    "invoices-and-billing-cycles",
-    "manage-invoices",
-    "handle-failed-payments"
-  ]
-}

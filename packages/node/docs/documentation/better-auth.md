@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-10
 title: Better Auth
 description: Better Auth Plugin for Billing and Subscriptions using Commet
 ---

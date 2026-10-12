@@ -2590,7 +2590,8 @@ export const resourceDefinitions: ResourceDef[] = [
       },
       create: {
         method: "create",
-        description: "Create a distribution code for an existing Offer.",
+        description:
+          "Create a distribution code for an existing Offer with one or more sequential discount phases and an optional leading trial.",
         hasParams: true,
         params: [
           {

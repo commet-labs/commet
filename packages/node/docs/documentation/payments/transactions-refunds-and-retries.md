@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-09-24
 title: Transactions, Refunds, and Retries
 description: Inspect provider-neutral payment attempts, refund successful charges, and retry failed renewals safely.
 ---
@@ -136,6 +135,8 @@ $refund = $commet->transactions->refund(id: 'transaction_xxx');
 The operation requests a full refund and returns its actual provider-neutral status. Do not grant the refund in your product before the result is confirmed. Handle [`payment.refunded`](/docs/webhooks/payment-refunded) idempotently for downstream access or balance changes.
 
 The subscription and its renewal schedule stay as they were, even when the payment is fully refunded. To end the subscription, [cancel it separately](/docs/manage-subscriptions).
+
+When Commet processes the payment as [Merchant of Record](/docs/merchant-of-record) and the card issuer reports it as fraudulent, Commet automatically refunds what remains of it to avoid a chargeback. The transaction appears as refunded and you receive [`payment.refunded`](/docs/webhooks/payment-refunded). The refunded amount, excluding refunded taxes, is debited from your balance, and Commet's and the processor's fees are not returned.
 
 ## Retry a failed renewal
 

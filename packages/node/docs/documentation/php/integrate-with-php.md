@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-28
 title: Integrate with PHP
 description: Install and configure the Commet PHP SDK.
 ---
@@ -10,12 +9,12 @@ Install the Commet Skill so your coding agent can integrate the current SDK and 
 npx skills add commet-labs/skills --skill commet
 ```
 
-1. ## Install
+1. ### Install
    ```bash
    composer require commet/commet-php
    ```
 
-2. ## Configure
+2. ### Configure
    ```bash title=".env"
    COMMET_API_KEY=ck_sandbox_xxx
    ```
@@ -31,7 +30,7 @@ npx skills add commet-labs/skills --skill commet
    );
    ```
 
-3. ## Create Customer and Subscribe
+3. ### Create Customer and Subscribe
    `customers->create` is idempotent — if a customer with the same `id` already exists, it returns the existing record.
    ```php
    $commet->customers->create(
@@ -48,7 +47,7 @@ npx skills add commet-labs/skills --skill commet
    ```
    The customer is redirected to checkout to complete payment.
 
-4. ## Check Access
+4. ### Check Access
    ```php
    $sub = $commet->subscriptions->getActive('user_123');
    $status = $sub?->status->value;
@@ -57,7 +56,7 @@ npx skills add commet-labs/skills --skill commet
    $allowed = $access->allowed;
    ```
 
-5. ## Track Usage
+5. ### Track Usage
    ```php
    $commet->usage->track(
        customerId: 'user_123',
@@ -67,7 +66,7 @@ npx skills add commet-labs/skills --skill commet
    ```
    Usage is aggregated and billed at end of period.
 
-6. ## Webhooks
+6. ### Webhooks
    ```php
    <?php
 

@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-08-16
 title: Manage Invoices
 description: Review invoices, create adjustments, update outstanding status, send email, and generate PDF links.
 ---

@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-03-28
 title: Plan Groups
 description: Group plans together to enable self-service upgrades and downgrades in the Commet Customer Portal.
 ---

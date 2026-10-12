@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-10
 title: Merchant of Record
 description: What a Merchant of Record is and how Commet handles taxes, compliance, refunds, and payouts on your behalf.
 ---

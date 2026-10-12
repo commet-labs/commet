@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-09-25
 title: Create an API Key
 description: Create a sandbox API key from the dashboard, CLI, or MCP, store it on your server, and rotate it safely.
 ---

@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-31
 title: Trials
 description: How free-trial Offer phases work and what customers experience
 ---

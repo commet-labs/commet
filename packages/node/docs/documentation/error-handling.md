@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-31
 title: Error Handling
 description: Handle errors with automatic retries and typed error classes
 ---
@@ -106,7 +105,7 @@ Go exposes `*commet.CommetError` and `*commet.ValidationError` as concrete types
 
 ## Error Code Reference
 
-Every current API error includes a stable `code` and a version-matched `doc_url` such as [`customer_not_found`](/docs/api-reference/2026-07-31/errors/customer_not_found.md). The URL returns a dedicated English Markdown reference with handling and retry guidance for the resolved API version.
+Every current API error includes a stable `code` and a version-matched `doc_url` such as [`customer_not_found`](/docs/api-reference/errors/customer_not_found.md). The URL returns a dedicated English Markdown reference with handling and retry guidance for the resolved API version.
 
 Keep the `x-request-id` response header when logging or reporting an error. Commet records the same identifier in Platform, allowing the request to be correlated without including credentials or customer data.
 

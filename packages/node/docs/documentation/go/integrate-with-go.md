@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-31
 title: Integrate with Go
 description: Add billing and payments to your Go application using net/http.
 ---
@@ -10,12 +9,12 @@ Install the Commet Skill so your coding agent can integrate the current SDK and 
 npx skills add commet-labs/skills --skill commet
 ```
 
-1. ## Install
+1. ### Install
    ```bash
    go get github.com/commet-labs/commet-go/v9
    ```
 
-2. ## Configure
+2. ### Configure
    ```bash title=".env"
    COMMET_API_KEY=ck_sandbox_xxx
    COMMET_WEBHOOK_SECRET=whsec_xxx
@@ -42,7 +41,7 @@ npx skills add commet-labs/skills --skill commet
    ```
    There is no environment option on the client: sandbox vs live is decided by the organization the API key belongs to.
 
-3. ## Subscribe
+3. ### Subscribe
    ```go title="billing/handlers.go"
    package billing
 
@@ -94,7 +93,7 @@ npx skills add commet-labs/skills --skill commet
    }
    ```
 
-4. ## Check Access
+4. ### Check Access
    ```go title="billing/handlers.go"
    func GetSubscription(w http.ResponseWriter, r *http.Request) {
    	customerID := r.PathValue("customerID")
@@ -133,7 +132,7 @@ npx skills add commet-labs/skills --skill commet
    }
    ```
 
-5. ## Track Usage
+5. ### Track Usage
    ```go title="billing/handlers.go"
    func float64Ptr(value float64) *float64 { return &value }
 
@@ -164,7 +163,7 @@ npx skills add commet-labs/skills --skill commet
    ```
    Usage is aggregated and billed at end of period.
 
-6. ## Customer Portal
+6. ### Customer Portal
    ```go title="billing/handlers.go"
    func Portal(w http.ResponseWriter, r *http.Request) {
    	customerID := "user_123"
@@ -180,7 +179,7 @@ npx skills add commet-labs/skills --skill commet
    }
    ```
 
-7. ## Webhooks
+7. ### Webhooks
    ```go title="billing/webhooks.go"
    package billing
 
@@ -220,7 +219,7 @@ npx skills add commet-labs/skills --skill commet
    }
    ```
 
-8. ## Start Server
+8. ### Start Server
    ```go title="main.go"
    package main
 

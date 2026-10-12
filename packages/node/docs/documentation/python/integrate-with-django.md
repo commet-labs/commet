@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-28
 title: Integrate with Django
 description: Add billing and payments to your Django application.
 ---
@@ -10,7 +9,7 @@ Install the Commet Skill so your coding agent can integrate the current SDK and 
 npx skills add commet-labs/skills --skill commet
 ```
 
-1. ## Install
+1. ### Install
    ### pip
    ```bash
    pip install commet-sdk django
@@ -24,7 +23,7 @@ npx skills add commet-labs/skills --skill commet
    poetry add commet-sdk django
    ```
 
-2. ## Configure
+2. ### Configure
    ```bash title=".env"
    COMMET_API_KEY=ck_sandbox_xxx
    ```
@@ -37,7 +36,7 @@ npx skills add commet-labs/skills --skill commet
    )
    ```
 
-3. ## Subscribe
+3. ### Subscribe
    ```python title="billing/views.py"
    import json
    from django.http import JsonResponse
@@ -62,7 +61,7 @@ npx skills add commet-labs/skills --skill commet
        return JsonResponse({"checkout_url": subscription.checkout_url})
    ```
 
-4. ## Check Access
+4. ### Check Access
    ```python title="billing/views.py"
    def get_subscription(request, customer_id):
        sub = commet.subscriptions.get_active(customer_id=customer_id)
@@ -76,7 +75,7 @@ npx skills add commet-labs/skills --skill commet
        return JsonResponse({"allowed": result.allowed})
    ```
 
-5. ## Track Usage
+5. ### Track Usage
    ```python title="billing/views.py"
    @require_POST
    def track_usage(request):
@@ -92,7 +91,7 @@ npx skills add commet-labs/skills --skill commet
    ```
    Usage is aggregated and billed at end of period.
 
-6. ## Customer Portal
+6. ### Customer Portal
    ```python title="billing/views.py"
    from django.shortcuts import redirect
 
@@ -102,7 +101,7 @@ npx skills add commet-labs/skills --skill commet
        return redirect(result.portal_url)
    ```
 
-7. ## Webhooks
+7. ### Webhooks
    ```python title="billing/views.py"
    import os
 
@@ -131,7 +130,7 @@ npx skills add commet-labs/skills --skill commet
        return JsonResponse({"ok": True})
    ```
 
-8. ## URLs
+8. ### URLs
    ```python title="billing/urls.py"
    from django.urls import path
    from . import views

@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-28
 title: Manage Plans
 description: Create and manage pricing plans in Commet that automatically generate subscriptions.
 ---

@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-28
 title: One-Time Payments
 description: Sell lifetime access or one-time purchases with a single charge and no recurring billing.
 ---

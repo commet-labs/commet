@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-09-23
 title: SDK Reference
 description: Configuration, environments, and pagination
 ---
@@ -55,7 +54,7 @@ List endpoints use cursor-based pagination.
 const page = await commet.customers.list({ limit: 25 })
 
 if (page.hasMore) {
-  const nextPage = await commet.customers.list({ 
+  const nextPage = await commet.customers.list({
     limit: 25,
     cursor: page.nextCursor,
   })

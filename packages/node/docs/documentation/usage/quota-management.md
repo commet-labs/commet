@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-28
 title: Quota Management
 description: Manage durable quota balances with the Commet SDK.
 ---

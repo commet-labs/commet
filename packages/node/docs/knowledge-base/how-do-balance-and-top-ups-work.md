@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-08-16
 title: Balance and Top-Ups
 description: Understand recurring balance, paid top-ups, administrative adjustments, and reset behavior.
 ---

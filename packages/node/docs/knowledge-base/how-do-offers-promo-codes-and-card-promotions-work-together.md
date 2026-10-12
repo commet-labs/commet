@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-08-16
 title: Offers, Promo Codes, and Card Promotions
 description: Understand where commercial terms live and how each distribution channel selects them.
 ---

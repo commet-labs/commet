@@ -66,7 +66,7 @@ List promo codes with cursor-based pagination.
 
 `POST /promo-codes` · operation `create-promo-code`
 
-Create a distribution code for an existing Offer. The referenced Offer owns the benefit and duration; the promo code owns redemption restrictions.
+Create a distribution code for an existing Offer with one or more sequential discount phases and an optional leading trial. The code owns redemption restrictions.
 
 ### Parameters
 

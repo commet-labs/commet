@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-08-17
 title: Upgrade and Downgrade Plans
 description: How customers change plans through the Customer Portal and dashboard.
 ---

@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-28
 title: Proration
 description: Exactly how mid-cycle charges are calculated when your customer upgrades
 ---

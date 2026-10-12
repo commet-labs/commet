@@ -1,5 +1,4 @@
 ---
-lastModified: 2026-07-31
 title: API Versioning
 description: How Commet versions its API and webhooks so your integration never breaks unexpectedly.
 ---
@@ -10,7 +9,7 @@ Commet uses date-based API versioning inspired by Stripe. Every breaking change 
 
 Versions use the date they were released: `YYYY-MM-DD` (e.g. `2026-05-01`).
 
-The current version is **2026-08-27**.
+The current version is `2026-08-27`.
 
 ## How versions are resolved
 
