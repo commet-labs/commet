@@ -55,6 +55,7 @@ const VALID_INTERVALS = new Set([
   "weekly",
   "monthly",
   "quarterly",
+  "semiannual",
   "yearly",
   "one_time",
 ]);
