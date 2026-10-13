@@ -1,5 +1,13 @@
 # commet
 
+## 5.2.2
+
+### Patch Changes
+
+- 02a73c1: Support the `semiannual` billing interval: plan prices, subscriptions, plan changes, promo codes, offer phase durations and `commet.config.ts` prices accept it, and the bundled documentation describes it. `PricingMarkdown` labels it `/6 mo`.
+- Updated dependencies [02a73c1]
+  - @commet/node@9.6.0
+
 ## 5.2.1
 
 ### Patch Changes
