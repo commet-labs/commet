@@ -10,7 +10,7 @@ Invoices are the financial records Commet generates automatically whenever a sub
 | Type                  | When Generated                                          | Example                                    |
 | --------------------- | ------------------------------------------------------- | ------------------------------------------ |
 | **Recurring**         | Every billing cycle                                     | $99 plan base + $12.50 overage             |
-| **Overage**           | Between cycles (quarterly/yearly only)                  | 15k extra API calls billed monthly         |
+| **Overage**           | Between cycles (quarterly, semiannual, and yearly only) | 15k extra API calls billed monthly         |
 | **Plan change**       | Customer upgrades mid-cycle                             | Starter to Pro, prorated $45               |
 | **Credit purchase**   | Customer buys a credit pack                             | 500 credits for $40                        |
 | **Balance top-up**    | Customer adds funds                                     | $50 balance top-up                         |
@@ -50,15 +50,16 @@ Each invoice is made of typed lines. The line type tells you what the charge is 
 
 ## Billing intervals
 
-| Interval      | Base Invoice              | Overage Invoice                   | Consumption Reset | Example                              |
-| ------------- | ------------------------- | --------------------------------- | ----------------- | ------------------------------------ |
-| **Weekly**    | Every 7 days              | Included in recurring invoice     | Every 7 days      | $25/week every Monday                |
-| **Monthly**   | Every month               | Included in recurring invoice     | Every month       | $99/month on the 1st                 |
-| **Quarterly** | Every 3 months            | Monthly                           | Every month       | $297 base quarterly, overage monthly |
-| **Yearly**    | Every 12 months           | Monthly                           | Every month       | $899 base yearly, overage monthly    |
-| **One-time**  | Single charge at checkout | At period end (if overage exists) | Never             | $299 lifetime, no recurring charges  |
+| Interval       | Base Invoice              | Overage Invoice                   | Consumption Reset | Example                                   |
+| -------------- | ------------------------- | --------------------------------- | ----------------- | ----------------------------------------- |
+| **Weekly**     | Every 7 days              | Included in recurring invoice     | Every 7 days      | $25/week every Monday                     |
+| **Monthly**    | Every month               | Included in recurring invoice     | Every month       | $99/month on the 1st                      |
+| **Quarterly**  | Every 3 months            | Monthly                           | Every month       | $297 base quarterly, overage monthly      |
+| **Semiannual** | Every 6 months            | Monthly                           | Every month       | $540 base every 6 months, overage monthly |
+| **Yearly**     | Every 12 months           | Monthly                           | Every month       | $899 base yearly, overage monthly         |
+| **One-time**   | Single charge at checkout | At period end (if overage exists) | Never             | $299 lifetime, no recurring charges       |
 
-For quarterly and yearly plans, overage is calculated and invoiced monthly even though the base charge is less frequent. For weekly plans, everything runs on a 7-day cycle. For one-time plans, the customer pays once at checkout and never receives a recurring invoice — only overage charges if applicable. See [One-Time Payments](/docs/one-time-payments) for details.
+For quarterly, semiannual, and yearly plans, overage is calculated and invoiced monthly even though the base charge is less frequent. For weekly plans, everything runs on a 7-day cycle. For one-time plans, the customer pays once at checkout and never receives a recurring invoice — only overage charges if applicable. See [One-Time Payments](/docs/one-time-payments) for details.
 
 ## Learn more
 

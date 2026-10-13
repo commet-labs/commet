@@ -12,7 +12,7 @@ A Balance plan includes a monetary allowance that usage draws down. The balance 
 - An administrative adjustment adds or removes balance without charging.
 - A usage event subtracts the feature's calculated monetary cost.
 
-Plan balance resets monthly for monthly, quarterly, yearly, free, and one-time plans. Weekly plans reset every seven days. **Top-ups reset with the plan balance; they do not persist like credit packs.**
+Plan balance resets monthly for monthly, quarterly, semiannual, yearly, free, and one-time plans. Weekly plans reset every seven days. **Top-ups reset with the plan balance; they do not persist like credit packs.**
 
 Use Credits instead when purchased units must remain across resets. Use Customer Credits when the goal is to reduce an invoice rather than fund product usage.
 

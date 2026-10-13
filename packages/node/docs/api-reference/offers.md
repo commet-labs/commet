@@ -30,7 +30,7 @@ Replace reusable offer terms. Existing applications keep their immutable accepte
 
 - `id` (`string`, required)
 - `name` (`string`, required)
-- `phases` (`Array<{ type: "free_trial"; durationDays: number } | { type: "percentage"; durationCycles: number | null; durationInterval?: "weekly" | "monthly" | "quarterly" | "yearly" | null; percentage: number } | { type: "amount_off"; durationCycles: number | null; durationInterval?: "weekly" | "monthly" | "quarterly" | "yearly" | null; amounts: Array<{ currency: string; amount: number }> } | { type: "fixed_price"; durationCycles: number | null; durationInterval?: "weekly" | "monthly" | "quarterly" | "yearly" | null; prices: Array<{ currency: string; amount: number }> }>`, required)
+- `phases` (`Array<{ type: "free_trial"; durationDays: number } | { type: "percentage"; durationCycles: number | null; durationInterval?: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | null; percentage: number } | { type: "amount_off"; durationCycles: number | null; durationInterval?: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | null; amounts: Array<{ currency: string; amount: number }> } | { type: "fixed_price"; durationCycles: number | null; durationInterval?: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | null; prices: Array<{ currency: string; amount: number }> }>`, required)
 - `metadata` (`Record<string, unknown>`, optional)
 - `startsAt` (`string | null`, optional)
 - `endsAt` (`string | null`, optional)
@@ -89,7 +89,7 @@ Create reusable offer terms without assigning a plan, price, eligibility rule, o
 ### Parameters
 
 - `name` (`string`, required)
-- `phases` (`Array<{ type: "free_trial"; durationDays: number } | { type: "percentage"; durationCycles: number | null; durationInterval?: "weekly" | "monthly" | "quarterly" | "yearly" | null; percentage: number } | { type: "amount_off"; durationCycles: number | null; durationInterval?: "weekly" | "monthly" | "quarterly" | "yearly" | null; amounts: Array<{ currency: string; amount: number }> } | { type: "fixed_price"; durationCycles: number | null; durationInterval?: "weekly" | "monthly" | "quarterly" | "yearly" | null; prices: Array<{ currency: string; amount: number }> }>`, required)
+- `phases` (`Array<{ type: "free_trial"; durationDays: number } | { type: "percentage"; durationCycles: number | null; durationInterval?: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | null; percentage: number } | { type: "amount_off"; durationCycles: number | null; durationInterval?: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | null; amounts: Array<{ currency: string; amount: number }> } | { type: "fixed_price"; durationCycles: number | null; durationInterval?: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | null; prices: Array<{ currency: string; amount: number }> }>`, required)
 - `metadata` (`Record<string, unknown>`, optional)
 - `startsAt` (`string | null`, optional)
 - `endsAt` (`string | null`, optional)

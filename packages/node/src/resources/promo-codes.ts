@@ -12,6 +12,7 @@ export interface UpdatePromoCodeParams {
     | "weekly"
     | "monthly"
     | "quarterly"
+    | "semiannual"
     | "yearly"
     | "one_time"
     | null;
@@ -33,6 +34,7 @@ export interface CreatePromoCodeParams {
     | "weekly"
     | "monthly"
     | "quarterly"
+    | "semiannual"
     | "yearly"
     | "one_time"
     | null;

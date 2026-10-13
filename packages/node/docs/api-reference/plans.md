@@ -189,7 +189,7 @@ Add a base price or a selectable market price variant. Variants inherit their ba
 ### Parameters
 
 - `id` (`string`, required)
-- `billingInterval` (`"weekly" | "monthly" | "quarterly" | "yearly" | "one_time"`, required)
+- `billingInterval` (`"weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | "one_time"`, required)
 - `metadata` (`Record<string, unknown>`, optional)
 - `price` (`number`, optional)
 - `trialDays` (`number`, optional)

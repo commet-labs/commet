@@ -55,7 +55,7 @@ On January 15 (15 days remaining)
 >
 > Your customer's 8 seats are now fully covered by the Business plan's 10 included seats, so they stop paying for extra seats. If they had more seats than the new plan includes, the excess would be billed for the full new period in advance.
 
-## Quarterly and Yearly Plans
+## Quarterly, Semiannual, and Yearly Plans
 
 The same calculation applies — the only difference is the cycle length.
 

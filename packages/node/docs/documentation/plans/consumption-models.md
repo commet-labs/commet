@@ -62,13 +62,13 @@ Set a margin percentage instead of a fixed price. Commet looks up the model's to
 
 ## Comparison
 
-| Aspect               | Metered                                                                                             | Credits                        | Balance                                   |
-| -------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------ | ----------------------------------------- |
-| **When exceeded**    | Overage at period end                                                                               | Blocked or buy packs           | Overage at period end                     |
-| **Reset behavior**   | Usage resets to 0 each period                                                                       | Plan credits reset each period | Balance resets to plan amount each period |
-| **Purchased extras** | N/A                                                                                                 | Credits persist forever        | Top-ups reset at period                   |
-| **Reset frequency**  | Weekly plans reset every 7 days. Monthly, quarterly, yearly, one-time, and free plans reset monthly | Same                           | Same                                      |
-| **Customer portal**  | View usage                                                                                          | Buy credit packs               | Add balance (top-up)                      |
+| Aspect               | Metered                                                                                                         | Credits                        | Balance                                   |
+| -------------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------------ | ----------------------------------------- |
+| **When exceeded**    | Overage at period end                                                                                           | Blocked or buy packs           | Overage at period end                     |
+| **Reset behavior**   | Usage resets to 0 each period                                                                                   | Plan credits reset each period | Balance resets to plan amount each period |
+| **Purchased extras** | N/A                                                                                                             | Credits persist forever        | Top-ups reset at period                   |
+| **Reset frequency**  | Weekly plans reset every 7 days. Monthly, quarterly, semiannual, yearly, one-time, and free plans reset monthly | Same                           | Same                                      |
+| **Customer portal**  | View usage                                                                                                      | Buy credit packs               | Add balance (top-up)                      |
 
 ## Overage restrictions by plan type
 

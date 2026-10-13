@@ -273,7 +273,7 @@ commet subscriptions create \
 | `--customer-id <id>`            | Yes                            | Customer ID                                                                       |
 | `--plan-code <code>`            | One of `plan-code` / `plan-id` | Plan code                                                                         |
 | `--plan-id <id>`                | One of `plan-code` / `plan-id` | Plan ID                                                                           |
-| `--billing-interval <interval>` | No                             | `weekly`, `monthly`, `quarterly`, `yearly`, `one_time`                            |
+| `--billing-interval <interval>` | No                             | `weekly`, `monthly`, `quarterly`, `semiannual`, `yearly`, `one_time`              |
 | `--price-id <id>`               | No                             | Selectable plan price. Omit it to use the interval default and its market pricing |
 | `--initial-seats <json>`        | No                             | Initial seats as JSON: `{featureCode: count}`                                     |
 | `--skip-trial <bool>`           | No                             | Skip trial period                                                                 |
@@ -404,18 +404,18 @@ commet plans add-price \
   --trial-days 14
 ```
 
-| Flag                            | Required                                  | Description                                                 |
-| ------------------------------- | ----------------------------------------- | ----------------------------------------------------------- |
-| `--plan-id <id>`                | Yes                                       | Plan ID                                                     |
-| `--billing-interval <interval>` | Yes                                       | `weekly`, `monthly`, `quarterly`, `yearly`, `one_time`      |
-| `--price <n>`                   | One of `price` / `inherits-from-price-id` | Base price in the currency's minor unit                     |
-| `--inherits-from-price-id <id>` | One of `price` / `inherits-from-price-id` | Base price inherited by a selectable variant                |
-| `--trial-days <n>`              | No                                        | Trial period in days                                        |
-| `--is-default <bool>`           | No                                        | Set as default price                                        |
-| `--included-balance <n>`        | No                                        | Included balance amount                                     |
-| `--included-credits <n>`        | No                                        | Included credits amount                                     |
-| `--market-prices <json>`        | Required for a variant                    | Market prices as `{marketGroupId, currency, price}` objects |
-| `--metadata <json>`             | No                                        | Price metadata                                              |
+| Flag                            | Required                                  | Description                                                          |
+| ------------------------------- | ----------------------------------------- | -------------------------------------------------------------------- |
+| `--plan-id <id>`                | Yes                                       | Plan ID                                                              |
+| `--billing-interval <interval>` | Yes                                       | `weekly`, `monthly`, `quarterly`, `semiannual`, `yearly`, `one_time` |
+| `--price <n>`                   | One of `price` / `inherits-from-price-id` | Base price in the currency's minor unit                              |
+| `--inherits-from-price-id <id>` | One of `price` / `inherits-from-price-id` | Base price inherited by a selectable variant                         |
+| `--trial-days <n>`              | No                                        | Trial period in days                                                 |
+| `--is-default <bool>`           | No                                        | Set as default price                                                 |
+| `--included-balance <n>`        | No                                        | Included balance amount                                              |
+| `--included-credits <n>`        | No                                        | Included credits amount                                              |
+| `--market-prices <json>`        | Required for a variant                    | Market prices as `{marketGroupId, currency, price}` objects          |
+| `--metadata <json>`             | No                                        | Price metadata                                                       |
 
 Create a selectable variant that changes only Argentina and inherits the rest of the base price:
 

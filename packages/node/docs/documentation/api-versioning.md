@@ -48,6 +48,7 @@ Non-breaking changes ship continuously and never require a version bump:
 - New event types
 - New API endpoints
 - New optional request parameters
+- New values in existing enums, such as a new billing interval. Your integration should accept values it does not recognize instead of failing
 
 ## Backward compatibility policy
 
