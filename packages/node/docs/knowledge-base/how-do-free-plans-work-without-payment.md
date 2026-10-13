@@ -7,14 +7,14 @@ A free plan has no price and no checkout. When you assign a customer to a free p
 
 ## How Free Plans Differ from Paid Plans
 
-|                | Paid plan                     | Free plan                                                  |
-| -------------- | ----------------------------- | ---------------------------------------------------------- |
-| Price          | Has a price                   | $0                                                         |
-| Billing        | Monthly, quarterly, or yearly | No charges — usage resets monthly                          |
-| How they start | Checkout + payment            | **Activated immediately**                                  |
-| Invoices       | Yes                           | Only for purchases (credits, balance, add-ons)             |
-| Overage        | Configurable per feature      | **Never allowed** — usage is blocked at the included limit |
-| Usage resets   | Every month                   | Every month                                                |
+|                | Paid plan                                 | Free plan                                                  |
+| -------------- | ----------------------------------------- | ---------------------------------------------------------- |
+| Price          | Has a price                               | $0                                                         |
+| Billing        | Monthly, quarterly, semiannual, or yearly | No charges — usage resets monthly                          |
+| How they start | Checkout + payment                        | **Activated immediately**                                  |
+| Invoices       | Yes                                       | Only for purchases (credits, balance, add-ons)             |
+| Overage        | Configurable per feature                  | **Never allowed** — usage is blocked at the included limit |
+| Usage resets   | Every month                               | Every month                                                |
 
 ## Monthly Usage Resets
 

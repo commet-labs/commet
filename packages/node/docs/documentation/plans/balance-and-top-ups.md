@@ -9,7 +9,7 @@ The Balance consumption model gives a subscription a monetary allowance. Billabl
 
 In **Plans**, choose **Balance**, set the amount included at each reset, and add billable features. Use [AI Token Billing](/docs/ai-token-billing) when model token cost and margin determine the charge.
 
-Plan balance resets monthly for monthly, quarterly, yearly, free, and one-time plans. Weekly plans reset every seven days. Purchased top-ups do not survive the next reset.
+Plan balance resets monthly for monthly, quarterly, semiannual, yearly, free, and one-time plans. Weekly plans reset every seven days. Purchased top-ups do not survive the next reset.
 
 ## Adjust balance without charging
 

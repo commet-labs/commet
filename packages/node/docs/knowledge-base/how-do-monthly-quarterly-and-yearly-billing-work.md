@@ -1,9 +1,9 @@
 ---
 title: Billing Intervals
-description: How weekly, monthly, quarterly, and yearly billing works and when your customers get charged
+description: How weekly, monthly, quarterly, semiannual, and yearly billing works and when your customers get charged
 ---
 
-Plans can be billed weekly, monthly, quarterly, or yearly. Even on quarterly and yearly plans, Commet checks for usage charges **every month**. Here's what your customers can expect.
+Plans can be billed weekly, monthly, quarterly, semiannually (every 6 months), or yearly. Even on quarterly, semiannual, and yearly plans, Commet checks for usage charges **every month**. Here's what your customers can expect.
 
 ## Weekly Plans
 
@@ -22,9 +22,9 @@ Your customer is billed every 7 days. The billing period, consumption resets, an
 
 Straightforward: your customer is billed every month for their plan base, extra usage, and extra seats.
 
-## Quarterly and Yearly Plans
+## Quarterly, Semiannual, and Yearly Plans
 
-Your customer pays the plan base every 3 or 12 months, but **usage charges can happen every month**. Here's how it works:
+Your customer pays the plan base every 3, 6, or 12 months, but **usage charges can happen every month**. Here's how it works:
 
 ### Example: Quarterly plan at $300/quarter
 
@@ -43,7 +43,7 @@ Month 3 (renewal month):
 
 > **Warning**
 >
-> Usage resets **every month**, not every quarter or year. A customer on a quarterly plan with 10,000 included API calls gets 10,000 calls each month — they don't accumulate.
+> Usage resets **every month**, not every quarter, half-year, or year. A customer on a quarterly plan with 10,000 included API calls gets 10,000 calls each month — they don't accumulate.
 
 ## What Your Customer Sees
 
@@ -56,7 +56,7 @@ Month 3 (renewal month):
 
 ## Plan Changes Mid-Cycle
 
-If your customer upgrades a quarterly or yearly plan mid-cycle, they get credit for the unused portion and start a new cycle from the change date. See [Proration](/docs/how-is-proration-calculated-when-changing-plans) for the exact calculation.
+If your customer upgrades a quarterly, semiannual, or yearly plan mid-cycle, they get credit for the unused portion and start a new cycle from the change date. See [Proration](/docs/how-is-proration-calculated-when-changing-plans) for the exact calculation.
 
 ### Example
 

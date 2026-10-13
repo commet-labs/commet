@@ -114,6 +114,7 @@ export type AddPlanPriceParams =
         | "weekly"
         | "monthly"
         | "quarterly"
+        | "semiannual"
         | "yearly"
         | "one_time";
       metadata?: Record<string, unknown>;
@@ -158,6 +159,7 @@ export type AddPlanPriceParams =
         | "weekly"
         | "monthly"
         | "quarterly"
+        | "semiannual"
         | "yearly"
         | "one_time";
       metadata?: Record<string, unknown>;

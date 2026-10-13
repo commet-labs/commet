@@ -49,7 +49,12 @@ export interface CancelSubscriptionParams {
 export interface ChangePlanParams {
   id: string;
   newPlanId?: string;
-  newBillingInterval?: "weekly" | "monthly" | "quarterly" | "yearly";
+  newBillingInterval?:
+    | "weekly"
+    | "monthly"
+    | "quarterly"
+    | "semiannual"
+    | "yearly";
   successUrl?: string;
   offerId?: string;
 }
@@ -93,7 +98,13 @@ export interface UpdatePaymentMethodParams {
 export interface PreviewChangePlanParams {
   id: string;
   planId: string;
-  billingInterval?: "weekly" | "monthly" | "quarterly" | "yearly" | "one_time";
+  billingInterval?:
+    | "weekly"
+    | "monthly"
+    | "quarterly"
+    | "semiannual"
+    | "yearly"
+    | "one_time";
   offerId?: string;
 }
 
@@ -134,6 +145,7 @@ export type CreateSubscriptionParams =
         | "weekly"
         | "monthly"
         | "quarterly"
+        | "semiannual"
         | "yearly"
         | "one_time"
         | null;
@@ -158,6 +170,7 @@ export type CreateSubscriptionParams =
         | "weekly"
         | "monthly"
         | "quarterly"
+        | "semiannual"
         | "yearly"
         | "one_time"
         | null;
@@ -182,6 +195,7 @@ export type CreateSubscriptionParams =
         | "weekly"
         | "monthly"
         | "quarterly"
+        | "semiannual"
         | "yearly"
         | "one_time"
         | null;
@@ -206,6 +220,7 @@ export type CreateSubscriptionParams =
         | "weekly"
         | "monthly"
         | "quarterly"
+        | "semiannual"
         | "yearly"
         | "one_time"
         | null;
@@ -230,6 +245,7 @@ export type CreateSubscriptionParams =
         | "weekly"
         | "monthly"
         | "quarterly"
+        | "semiannual"
         | "yearly"
         | "one_time"
         | null;
@@ -256,6 +272,7 @@ export type CreateSubscriptionParams =
         | "weekly"
         | "monthly"
         | "quarterly"
+        | "semiannual"
         | "yearly"
         | "one_time"
         | null;

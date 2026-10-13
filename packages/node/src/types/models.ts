@@ -708,7 +708,13 @@ export interface Offer {
         type: "percentage";
         durationCycles: number | null;
         /** Unit the phase duration is counted in. Only a fixed-price phase may set it, because its amount is declared rather than derived from the plan. Defaults to the plan's own billing interval. */
-        durationInterval: "weekly" | "monthly" | "quarterly" | "yearly" | null;
+        durationInterval:
+          | "weekly"
+          | "monthly"
+          | "quarterly"
+          | "semiannual"
+          | "yearly"
+          | null;
         /** Discount in basis points. 5000 means 50%. */
         percentage: number;
       }
@@ -716,7 +722,13 @@ export interface Offer {
         type: "amount_off";
         durationCycles: number | null;
         /** Unit the phase duration is counted in. Only a fixed-price phase may set it, because its amount is declared rather than derived from the plan. Defaults to the plan's own billing interval. */
-        durationInterval: "weekly" | "monthly" | "quarterly" | "yearly" | null;
+        durationInterval:
+          | "weekly"
+          | "monthly"
+          | "quarterly"
+          | "semiannual"
+          | "yearly"
+          | null;
         amounts: Array<{
           currency: string;
           /** Amount in the currency's minor unit (for example, cents for USD). */
@@ -727,7 +739,13 @@ export interface Offer {
         type: "fixed_price";
         durationCycles: number | null;
         /** Unit the phase duration is counted in. Only a fixed-price phase may set it, because its amount is declared rather than derived from the plan. Defaults to the plan's own billing interval. */
-        durationInterval: "weekly" | "monthly" | "quarterly" | "yearly" | null;
+        durationInterval:
+          | "weekly"
+          | "monthly"
+          | "quarterly"
+          | "semiannual"
+          | "yearly"
+          | null;
         prices: Array<{
           currency: string;
           /** Amount in the currency's minor unit (for example, cents for USD). */
@@ -947,6 +965,7 @@ export type PlanChange =
                 | "weekly"
                 | "monthly"
                 | "quarterly"
+                | "semiannual"
                 | "yearly"
                 | null;
               startsAt: string | null;
@@ -961,6 +980,7 @@ export type PlanChange =
                 | "weekly"
                 | "monthly"
                 | "quarterly"
+                | "semiannual"
                 | "yearly"
                 | null;
               startsAt: string | null;
@@ -975,6 +995,7 @@ export type PlanChange =
                 | "weekly"
                 | "monthly"
                 | "quarterly"
+                | "semiannual"
                 | "yearly"
                 | null;
               startsAt: string | null;
@@ -1076,6 +1097,7 @@ export type PlanChange =
                 | "weekly"
                 | "monthly"
                 | "quarterly"
+                | "semiannual"
                 | "yearly"
                 | null;
               startsAt: string | null;
@@ -1090,6 +1112,7 @@ export type PlanChange =
                 | "weekly"
                 | "monthly"
                 | "quarterly"
+                | "semiannual"
                 | "yearly"
                 | null;
               startsAt: string | null;
@@ -1104,6 +1127,7 @@ export type PlanChange =
                 | "weekly"
                 | "monthly"
                 | "quarterly"
+                | "semiannual"
                 | "yearly"
                 | null;
               startsAt: string | null;
@@ -1311,6 +1335,7 @@ export interface PreviewChange {
             | "weekly"
             | "monthly"
             | "quarterly"
+            | "semiannual"
             | "yearly"
             | null;
           startsAt: string | null;
@@ -1325,6 +1350,7 @@ export interface PreviewChange {
             | "weekly"
             | "monthly"
             | "quarterly"
+            | "semiannual"
             | "yearly"
             | null;
           startsAt: string | null;
@@ -1339,6 +1365,7 @@ export interface PreviewChange {
             | "weekly"
             | "monthly"
             | "quarterly"
+            | "semiannual"
             | "yearly"
             | null;
           startsAt: string | null;
@@ -1411,6 +1438,7 @@ export interface ReactivatedSubscription {
             | "weekly"
             | "monthly"
             | "quarterly"
+            | "semiannual"
             | "yearly"
             | null;
           startsAt: string | null;
@@ -1425,6 +1453,7 @@ export interface ReactivatedSubscription {
             | "weekly"
             | "monthly"
             | "quarterly"
+            | "semiannual"
             | "yearly"
             | null;
           startsAt: string | null;
@@ -1439,6 +1468,7 @@ export interface ReactivatedSubscription {
             | "weekly"
             | "monthly"
             | "quarterly"
+            | "semiannual"
             | "yearly"
             | null;
           startsAt: string | null;
@@ -1747,14 +1777,26 @@ export type SubscriptionOfferApplicationPhase =
   | {
       type: "free_trial";
       durationDays: number;
-      durationInterval: "weekly" | "monthly" | "quarterly" | "yearly" | null;
+      durationInterval:
+        | "weekly"
+        | "monthly"
+        | "quarterly"
+        | "semiannual"
+        | "yearly"
+        | null;
       startsAt: string | null;
       endsAt: string | null;
     }
   | {
       type: "percentage";
       durationCycles: number | null;
-      durationInterval: "weekly" | "monthly" | "quarterly" | "yearly" | null;
+      durationInterval:
+        | "weekly"
+        | "monthly"
+        | "quarterly"
+        | "semiannual"
+        | "yearly"
+        | null;
       percentage: number;
       startsAt: string | null;
       endsAt: string | null;
@@ -1762,7 +1804,13 @@ export type SubscriptionOfferApplicationPhase =
   | {
       type: "amount_off";
       durationCycles: number | null;
-      durationInterval: "weekly" | "monthly" | "quarterly" | "yearly" | null;
+      durationInterval:
+        | "weekly"
+        | "monthly"
+        | "quarterly"
+        | "semiannual"
+        | "yearly"
+        | null;
       amount: number;
       startsAt: string | null;
       endsAt: string | null;
@@ -1770,7 +1818,13 @@ export type SubscriptionOfferApplicationPhase =
   | {
       type: "fixed_price";
       durationCycles: number | null;
-      durationInterval: "weekly" | "monthly" | "quarterly" | "yearly" | null;
+      durationInterval:
+        | "weekly"
+        | "monthly"
+        | "quarterly"
+        | "semiannual"
+        | "yearly"
+        | null;
       price: number;
       startsAt: string | null;
       endsAt: string | null;

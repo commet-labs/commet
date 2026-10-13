@@ -56,6 +56,8 @@ They pay today: $99 (full month)
 | Shorter → longer interval, such as monthly → yearly | **Immediate** |
 | Longer → shorter interval, such as yearly → monthly | At renewal    |
 
+Intervals go from shortest to longest: weekly, monthly, quarterly, semiannual, yearly.
+
 Interval direction takes precedence over `sortOrder` when both the plan and interval change. A paid-to-free change is always scheduled, even if the destination plan has a higher `sortOrder`.
 
 ## Deprecating a Plan

@@ -18,6 +18,7 @@ const INTERVAL_SHORT: Record<BillingInterval, string> = {
   weekly: "/wk",
   monthly: "/mo",
   quarterly: "/qtr",
+  semiannual: "/6 mo",
   yearly: "/yr",
   one_time: "",
 };

@@ -2,6 +2,7 @@ export type BillingInterval =
   | "weekly"
   | "monthly"
   | "quarterly"
+  | "semiannual"
   | "yearly"
   | "one_time";
 

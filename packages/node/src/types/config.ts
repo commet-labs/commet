@@ -14,7 +14,13 @@ export type FeatureDef =
     };
 
 export interface PriceDef {
-  interval: "weekly" | "monthly" | "quarterly" | "yearly" | "one_time";
+  interval:
+    | "weekly"
+    | "monthly"
+    | "quarterly"
+    | "semiannual"
+    | "yearly"
+    | "one_time";
   /** Rate scale: 10000 = $1.00 */
   amount: number;
   trialDays?: number;

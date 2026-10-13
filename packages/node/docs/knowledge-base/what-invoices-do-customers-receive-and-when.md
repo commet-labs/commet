@@ -7,17 +7,17 @@ Your customers receive invoices automatically based on what happens in their sub
 
 ## Types of Invoices
 
-| Invoice           | When your customer receives it                                               |
-| ----------------- | ---------------------------------------------------------------------------- |
-| Recurring         | Every billing cycle — includes plan base, extra usage, and extra seats       |
-| Overage           | Between billing cycles (quarterly/yearly plans only) if they had extra usage |
-| Plan change       | When they upgrade or switch plans mid-cycle                                  |
-| Credit purchase   | When they buy a credit pack                                                  |
-| Balance top-up    | When they add funds to their balance                                         |
-| Add-on activation | When they activate an add-on mid-cycle (prorated)                            |
-| One-time payment  | When they pay a payment link or a standalone charge                          |
-| Reactivation      | When a canceled subscription is reactivated                                  |
-| Adjustment        | When you manually issue a correction or one-off charge                       |
+| Invoice           | When your customer receives it                                                                |
+| ----------------- | --------------------------------------------------------------------------------------------- |
+| Recurring         | Every billing cycle — includes plan base, extra usage, and extra seats                        |
+| Overage           | Between billing cycles (quarterly, semiannual, and yearly plans only) if they had extra usage |
+| Plan change       | When they upgrade or switch plans mid-cycle                                                   |
+| Credit purchase   | When they buy a credit pack                                                                   |
+| Balance top-up    | When they add funds to their balance                                                          |
+| Add-on activation | When they activate an add-on mid-cycle (prorated)                                             |
+| One-time payment  | When they pay a payment link or a standalone charge                                           |
+| Reactivation      | When a canceled subscription is reactivated                                                   |
+| Adjustment        | When you manually issue a correction or one-off charge                                        |
 
 ## Recurring
 
@@ -40,7 +40,7 @@ Monthly invoice for a customer on Plan Pro at $99/mo:
 
 ## Overage
 
-For customers on quarterly or yearly plans, if they go over their included usage **between billing cycles**, they receive a smaller invoice covering just the extra usage. No plan base or seat charges — just the overage.
+For customers on quarterly, semiannual, or yearly plans, if they go over their included usage **between billing cycles**, they receive a smaller invoice covering just the extra usage. No plan base or seat charges — just the overage.
 
 ### Example
 
@@ -95,6 +95,6 @@ Every invoice is built from these line types:
 
 ## Related
 
-- [Billing Intervals](/docs/how-do-monthly-quarterly-and-yearly-billing-work) — When quarterly and yearly customers get charged
+- [Billing Intervals](/docs/how-do-monthly-quarterly-and-yearly-billing-work) — When quarterly, semiannual, and yearly customers get charged
 - [Proration](/docs/how-is-proration-calculated-when-changing-plans) — How mid-cycle charges are calculated
 - [Plan Changes](/docs/what-happens-when-a-customer-changes-plans) — When plan change invoices are created

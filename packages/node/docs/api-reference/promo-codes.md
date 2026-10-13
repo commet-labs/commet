@@ -29,7 +29,7 @@ Update a promo code's billing interval, redemption limits, expiration, active st
 ### Parameters
 
 - `id` (`string`, required)
-- `billingInterval` (`"weekly" | "monthly" | "quarterly" | "yearly" | "one_time" | null`, optional)
+- `billingInterval` (`"weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | "one_time" | null`, optional)
 - `maxRedemptions` (`number | null`, optional)
 - `expiresAt` (`string | null`, optional)
 - `active` (`boolean`, optional)
@@ -72,7 +72,7 @@ Create a distribution code for an existing Offer with one or more sequential dis
 
 - `code` (`string`, required)
 - `offerId` (`string`, required)
-- `billingInterval` (`"weekly" | "monthly" | "quarterly" | "yearly" | "one_time" | null`, optional)
+- `billingInterval` (`"weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | "one_time" | null`, optional)
 - `maxRedemptions` (`number`, optional)
 - `expiresAt` (`string`, optional)
 - `planIds` (`Array<string>`, optional)
