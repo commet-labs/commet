@@ -1,5 +1,16 @@
 # commet
 
+## 5.3.0
+
+### Minor Changes
+
+- 530a3f5: Support paying billing periods in advance: `subscriptions.createPrepaidPeriodsCheckout`, the `prepaidPeriods` and `cancelAtPeriodEnd` parameters of `subscriptions.create`, and the `prepayment`, `prepaid_period`, `google_pay` and `smartpix` enum values. The CLI adds `subscriptions create-prepaid-periods-checkout` and the `--prepaid-periods` and `--cancel-at-period-end` flags, and the bundled documentation includes Pay in Advance.
+
+### Patch Changes
+
+- Updated dependencies [530a3f5]
+  - @commet/node@9.7.0
+
 ## 5.2.2
 
 ### Patch Changes
