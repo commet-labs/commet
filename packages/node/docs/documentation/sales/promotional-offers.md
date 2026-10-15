@@ -65,10 +65,3 @@ The same operation on a subscription with a pending payment checkout quotes or r
 Use direct `offerId` when your application decides who receives the terms. Use a Promo Code when the customer should enter a code and the campaign needs redemption restrictions.
 
 A Promo Code can distribute multiple discount phases, including `fixed_price`, and can begin with a trial when a discount follows it. A trial-only Offer remains available for direct application.
-
-## Related
-
-- [Offers](/docs/offers)
-- [Introductory Offers](/docs/introductory-offers)
-- [Promo Codes](/docs/promo-codes)
-- [Manage Subscriptions](/docs/manage-subscriptions)

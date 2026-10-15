@@ -1,6 +1,6 @@
 ---
 title: Integrate with Next.js
-description: Add billing and payments to your Next.js application.
+description: Add billing and payments to your Next.js application with the Commet SDK, using server actions and a customer portal route.
 ---
 
 Install the Commet Skill so your coding agent can integrate the current SDK and verify its work against the live API contract.
@@ -108,10 +108,3 @@ npx skills add commet-labs/skills --skill commet
    ```tsx
    <a href="/api/commet/portal">Manage Billing</a>
    ```
-
-## Related
-
-- [Subscriptions](/docs/manage-subscriptions)
-- [Track Usage](/docs/track-usage)
-- [Customer Portal](/docs/customer-portal)
-- [SDK Reference](/docs/sdk-reference)

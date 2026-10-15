@@ -68,9 +68,3 @@ They upgrade to Plan B at $600/quarter on February 15.
 → They're charged Plan B's full price minus that credit.
 → Their new cycle starts February 15, next renewal May 15.
 ```
-
-## Related
-
-- [Invoices](/docs/what-invoices-do-customers-receive-and-when) — What invoices your customers receive and when
-- [Proration](/docs/how-is-proration-calculated-when-changing-plans) — How mid-cycle charges are calculated
-- [Plan Changes](/docs/what-happens-when-a-customer-changes-plans) — Upgrades, downgrades, and switching

@@ -80,9 +80,3 @@ Downgrades take effect **at renewal**. Your customer already paid for the curren
 ## Why Free → Paid Isn't Prorated
 
 When your customer moves from a free plan to a paid plan, there's no credit to give — the free plan costs $0. They simply pay the full price of the new plan from that day.
-
-## Related
-
-- [Plan Changes](/docs/what-happens-when-a-customer-changes-plans) — When proration applies and when it doesn't
-- [Seats](/docs/how-does-seat-based-billing-work) — How seat-based billing works with upgrades
-- [Invoices](/docs/what-invoices-do-customers-receive-and-when) — What invoices your customers receive

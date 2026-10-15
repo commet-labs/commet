@@ -1,6 +1,6 @@
 ---
 title: Integrate with Python
-description: Install and configure the Commet Python SDK.
+description: Add billing and payments to your Python application with the Commet SDK, installed with pip, uv or poetry.
 ---
 
 Install the Commet Skill so your coding agent can integrate the current SDK and verify its work against the live API contract.
@@ -80,10 +80,3 @@ npx skills add commet-labs/skills --skill commet
    commet.feature_access.get(code="custom_branding", customer_id="user_123")
    commet.seats.add(customer_id="user_123", feature_code="editor", count=3)
    ```
-
-## Related
-
-- [Flask](/docs/integrate-with-flask)
-- [FastAPI](/docs/integrate-with-fastapi)
-- [Django](/docs/integrate-with-django)
-- [SDK Reference](/docs/sdk-reference)

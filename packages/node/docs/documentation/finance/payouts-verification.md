@@ -182,8 +182,3 @@ curl -X POST https://commet.co/api/v1/payouts \
   -H "Content-Type: application/json" \
   -d '{"amount": 50000, "description": "March payout"}'
 ```
-
-## Related
-
-- [Finance Overview](/docs/finance-overview) — Balances, payouts, and transaction history
-- [Merchant of Record](/docs/merchant-of-record) — How Commet handles taxes and compliance

@@ -1,6 +1,6 @@
 ---
 title: Quota Management
-description: Manage durable quota balances with the Commet SDK.
+description: Track durable quota balances such as tasks or automations with the Commet SDK, and let Commet bill the units above the included amount.
 ---
 
 Quota tracks a durable, countable balance that rises and falls as customers create and delete — tasks, WhatsApp numbers, parallel automations. Commet includes an amount with the plan and bills per-unit overage automatically.
@@ -332,9 +332,3 @@ curl "https://commet.co/api/v1/usage/quota/all?customerId=user_123" \
 ## Learn more
 
 - [How Does Quota-Based Billing Work](/docs/how-does-quota-based-billing-work)
-
-## Related
-
-- [Configure Features](/docs/configure-features) — Create quota features on your plans
-- [Manage Plans](/docs/create-plans) — Plans that include quota-based pricing
-- [Track Usage](/docs/track-usage) — Send usage events for metered features

@@ -23,7 +23,7 @@ Use this reference for the exact resources, methods, parameters, and return type
 - [Portal](./portal.md) — 1 operations
 - [Promo Codes](./promo-codes.md) — 4 operations
 - [Seats](./seats.md) — 6 operations
-- [Subscriptions](./subscriptions.md) — 22 operations
+- [Subscriptions](./subscriptions.md) — 23 operations
 - [Test Clock](./test-clock.md) — 3 operations
 - [Transactions](./transactions.md) — 4 operations
 - [Usage](./usage.md) — 3 operations

@@ -1,6 +1,6 @@
 ---
 title: Trials
-description: How free-trial Offer phases work and what customers experience
+description: "A free trial is an Offer phase: checkout saves the payment method without charging it, and the first charge waits until the trial ends."
 ---
 
 A trial is a `free_trial` phase in an Offer. It delays the first charge; the Offer's application channel determines whether Commet selects it automatically or your integration assigns it directly.
@@ -44,10 +44,3 @@ Use `customTrialDays` for terms exclusive to one subscription. Commet records th
 | Credit, balance, and add-on purchases | Available after checkout captures the payment method      |
 | Metered usage reset                   | Monthly on the billing day for trials longer than a month |
 | Included balance and credits          | Granted once when the trial starts                        |
-
-## Related
-
-- [Trial Periods](/docs/trial-periods)
-- [Offers](/docs/offers)
-- [Free Plans](/docs/how-do-free-plans-work-without-payment)
-- [Payment Failures](/docs/what-happens-when-a-payment-fails)

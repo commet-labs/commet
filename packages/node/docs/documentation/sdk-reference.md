@@ -1,6 +1,6 @@
 ---
 title: SDK Reference
-description: Configuration, environments, and pagination
+description: Configure the Commet Node.js SDK's API key, version, timeouts and retries, switch between sandbox and live, and paginate results.
 ---
 
 ## Setup

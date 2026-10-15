@@ -22,9 +22,3 @@ This order defines the upgrade path and display order in the Customer Portal.
 ## Learn more
 
 - [What Happens When a Customer Changes Plans](/docs/what-happens-when-a-customer-changes-plans)
-
-## Related
-
-- [Manage Plans](/docs/create-plans) — Create plans to add to groups
-- [Upgrade and Downgrade Plans](/docs/upgrade-and-downgrade-plans) — How plan changes work
-- [Customer Portal](/docs/customer-portal) — Where customers change plans

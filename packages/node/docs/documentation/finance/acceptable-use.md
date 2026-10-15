@@ -1,6 +1,6 @@
 ---
 title: Acceptable Use Policy
-description: What products and services can be sold through Commet.
+description: Which products can be sold through Commet-managed payments, which categories need manual review, and which cannot use them.
 ---
 
 Commet acts as Merchant of Record for transactions processed through Commet-managed payment connections. This policy defines which products we can support on that payment rail. Customer-owned payment connections remain subject to their provider's own rules and do not make a product eligible for Commet-managed processing.
@@ -137,8 +137,3 @@ Viewer ratings, mature themes, romance, adult situations, or genre labels do not
 This policy incorporates applicable payment-provider requirements, including [Stripe's prohibited and restricted businesses](https://stripe.com/legal/restricted-businesses) and [dLocal's restricted and prohibited activities](https://www.dlocal.com/legal/terms-and-conditions/). Provider approval for a restricted category must be documented in writing; an internal Commet approval cannot replace it.
 
 The lists above are representative rather than exhaustive. Commet may review, suspend, or stop processing when new evidence shows illegal, misleading, unsupported, or materially different activity.
-
-## Related
-
-- [Merchant of Record](/docs/merchant-of-record) — How Commet handles taxes and compliance as your MoR
-- [Finance Overview](/docs/finance-overview) — Balances, payouts, and transaction history

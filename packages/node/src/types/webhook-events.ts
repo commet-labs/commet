@@ -489,7 +489,9 @@ export interface PaymentReceivedData {
       | "subscription_resume"
       | "one_time_payment"
       | "overage"
-      | "adjustment";
+      | "adjustment"
+      | "addon_activation"
+      | "prepayment";
     /** The public payment link ID, independently of the reason, or null when no payment link originated the charge. */
     paymentLinkId: string | null;
     recovery:
@@ -549,7 +551,9 @@ export interface PaymentFailedData {
       | "subscription_resume"
       | "one_time_payment"
       | "overage"
-      | "adjustment";
+      | "adjustment"
+      | "addon_activation"
+      | "prepayment";
     /** The public payment link ID, independently of the reason, or null when no payment link originated the charge. */
     paymentLinkId: string | null;
     recovery:
@@ -725,7 +729,9 @@ export interface PaymentLinkCompletedData {
       | "subscription_resume"
       | "one_time_payment"
       | "overage"
-      | "adjustment";
+      | "adjustment"
+      | "addon_activation"
+      | "prepayment";
     /** The public payment link ID, independently of the reason, or null when no payment link originated the charge. */
     paymentLinkId: string | null;
     recovery:
@@ -779,7 +785,9 @@ export interface PaymentLinkFailedData {
       | "subscription_resume"
       | "one_time_payment"
       | "overage"
-      | "adjustment";
+      | "adjustment"
+      | "addon_activation"
+      | "prepayment";
     /** The public payment link ID, independently of the reason, or null when no payment link originated the charge. */
     paymentLinkId: string | null;
     recovery:

@@ -1,6 +1,6 @@
 ---
 title: Integrate with FastAPI
-description: Add billing and payments to your FastAPI application.
+description: Add billing and payments to your FastAPI application with the Commet SDK, including feature access checks and webhook verification.
 ---
 
 Install the Commet Skill so your coding agent can integrate the current SDK and verify its work against the live API contract.
@@ -154,10 +154,3 @@ npx skills add commet-labs/skills --skill commet
    ```bash
    uvicorn main:app --port 3000
    ```
-
-## Related
-
-- [Subscriptions](/docs/manage-subscriptions)
-- [Track Usage](/docs/track-usage)
-- [Customer Portal](/docs/customer-portal)
-- [SDK Reference](/docs/sdk-reference)

@@ -254,7 +254,7 @@ Revoke a pause before it becomes effective. Active pauses must be resumed instea
 
 `POST /subscriptions/{id}/payment-method/update` · operation `update-payment-method`
 
-Creates a hosted checkout session for the customer to update the subscription's default payment method.
+Creates a hosted checkout to update the payment method of an active, trialing or past_due subscription. Pending-payment subscriptions must use their payment checkout.
 
 ### Parameters
 
@@ -268,6 +268,29 @@ Creates a hosted checkout session for the customer to update the subscription's 
 ### Returns
 
 `PaymentMethodUpdateCheckout`
+
+## createPrepaidPeriodsCheckout
+
+`commet.subscriptions.createPrepaidPeriodsCheckout(params, options?)`
+
+`POST /subscriptions/{id}/prepaid-periods` · operation `create-prepaid-periods-checkout`
+
+Creates a hosted checkout to pay billing periods of a recurring subscription in advance with any payment method. On an active subscription the paid periods start after the last paid period and replace any open prepaid-periods checkout. On a pending-payment subscription the first payment covers the requested periods and replaces its pending checkout. The billing interval does not change.
+
+### Parameters
+
+- `id` (`string`, required)
+- `periods` (`number`, required) — Active subscriptions: billing periods to add after the last paid period. Pending-payment subscriptions: total billing periods the first payment covers, including the current one.
+- `offerId` (`string`, optional) — Offer applied from the first added period for its full configured duration. Active subscriptions only; assign an Offer to a pending-payment subscription with PUT /subscriptions/{id}/offer.
+- `successUrl` (`string`, optional)
+
+### Request options
+
+- `idempotencyKey` (`string`, optional) — Unique key used to safely retry this write for 24 hours without applying it twice.
+
+### Returns
+
+`PrepaidPeriodsCheckout`
 
 ## previewChange
 
@@ -440,6 +463,8 @@ Create a subscription for a customer. Commet selects the default price when pric
 - `name` (`string`, optional)
 - `startDate` (`string`, optional)
 - `successUrl` (`string`, optional)
+- `prepaidPeriods` (`number`, optional) — Billing periods of the subscription's interval paid with the first payment, including the current one. Defaults to 1. The interval does not change: each paid period renews at zero and the subscription renews normally after the last one unless `cancelAtPeriodEnd` is true.
+- `cancelAtPeriodEnd` (`boolean`, optional) — Schedules the cancellation from creation so the subscription ends after its last paid period and never renews with any payment method.
 - `offerId` (`string`, optional)
 - `promoCode` (`string`, optional)
 - `customTrialDays` (`number`, optional)

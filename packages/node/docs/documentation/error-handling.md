@@ -1,6 +1,6 @@
 ---
 title: Error Handling
-description: Handle errors with automatic retries and typed error classes
+description: Catch typed API and validation errors in each Commet SDK, configure automatic retries, and keep usage tracking from blocking requests.
 ---
 
 ## Error Classes

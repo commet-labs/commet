@@ -337,9 +337,3 @@ $customersListResult = $commet->customers->list();
 Lists return `{ object, data, hasMore, nextCursor }`. Pass `nextCursor` back as `cursor` to request the next page. Singular customer operations return the customer directly.
 
 See the [Customers API reference](/docs/api-reference/customers/list-customers) for the exact generated request and response fields.
-
-## Related
-
-- [Customer Portal](/docs/customer-portal)
-- [Manage Subscriptions](/docs/manage-subscriptions)
-- [Offers & Pricing changelog and migration checklist](https://commet.co/changelog/offers-and-pricing)

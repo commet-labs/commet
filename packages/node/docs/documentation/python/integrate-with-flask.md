@@ -1,6 +1,6 @@
 ---
 title: Integrate with Flask
-description: Add billing and payments to your Flask application.
+description: Add billing and payments to your Flask application with the Commet SDK, using a Blueprint for billing routes and webhooks.
 ---
 
 Install the Commet Skill so your coding agent can integrate the current SDK and verify its work against the live API contract.
@@ -143,10 +143,3 @@ npx skills add commet-labs/skills --skill commet
    if __name__ == "__main__":
        app.run(port=3000)
    ```
-
-## Related
-
-- [Subscriptions](/docs/manage-subscriptions)
-- [Track Usage](/docs/track-usage)
-- [Customer Portal](/docs/customer-portal)
-- [SDK Reference](/docs/sdk-reference)

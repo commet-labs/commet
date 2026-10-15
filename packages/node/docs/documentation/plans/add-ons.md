@@ -246,11 +246,3 @@ Customers can self-service add-ons from the portal:
 ## Learn more
 
 - [How Does Billing Work](/docs/how-does-billing-work)
-
-## Related
-
-- [Consumption Models](/docs/consumption-models) — Metered, Credits, and Balance explained
-- [Configure Features](/docs/configure-features) — Define features that add-ons can unlock
-- [Credit Packs](/docs/credit-packs) — Another way to extend plan capabilities
-- [Manage Subscriptions](/docs/manage-subscriptions) — Subscription lifecycle and management
-- [Customer Portal](/docs/customer-portal) — Where customers activate add-ons

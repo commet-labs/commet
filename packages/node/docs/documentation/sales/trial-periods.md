@@ -78,11 +78,3 @@ The customer provides a payment method during checkout but is not charged immedi
 4. any following Offer phase becomes active.
 
 Accepted Offer phases remain immutable, but the selected catalog price does not. If the price changes during the trial, the first paid charge uses the current value of the selected price.
-
-## Related
-
-- [Offers](/docs/offers)
-- [Introductory Offers](/docs/introductory-offers)
-- [Promotional Offers](/docs/promotional-offers)
-- [How trial periods work](/docs/how-do-trial-periods-work)
-- [Handle Failed Payments](/docs/handle-failed-payments)

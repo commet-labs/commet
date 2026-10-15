@@ -1,9 +1,16 @@
 ---
 title: One-Time Payments
-description: Sell lifetime access or one-time purchases with a single charge and no recurring billing.
+description: Sell lifetime access, or a period of access that never renews, with a single payment.
 ---
 
-A one-time payment plan charges the customer once at checkout and never bills again for the plan base. Use it for lifetime deals, one-off purchases, or any plan where recurring billing doesn't apply.
+Commet sells a one-time purchase in two ways:
+
+| Option                                                     | Use it for                                                | How                                              |
+| ---------------------------------------------------------- | --------------------------------------------------------- | ------------------------------------------------ |
+| [Lifetime access](#create-a-one-time-subscription)         | Access the customer keeps forever                         | A price with the `one_time` interval             |
+| [A period without renewal](#sell-a-period-without-renewal) | A month, a year, or several periods that end on their own | A recurring price with `cancelAtPeriodEnd: true` |
+
+A one-time price charges the customer once at checkout and never bills again for the plan base. Use it for lifetime deals or any plan where recurring billing doesn't apply.
 
 > **Note**
 >
@@ -133,9 +140,31 @@ If there's no overage or additional charges at a billing cycle, no invoice is ge
 
 In the [Customer Portal](/docs/customer-portal), one-time subscriptions display the interval as **Lifetime**. The cancel button is hidden since cancellation is not allowed. Customers can still change plans if the plan belongs to a [Plan Group](/docs/plan-groups).
 
-## Related
+## Sell a period without renewal
 
-- [Manage Plans](/docs/create-plans) — Create and configure plans
-- [Manage Subscriptions](/docs/manage-subscriptions) — Full subscription lifecycle
-- [Invoices and Billing Cycles](/docs/invoices-and-billing-cycles) — How invoicing works
-- [Consumption Models](/docs/consumption-models) — Metered, Credits, and Balance explained
+To sell a month, a year, or any period of access that ends on its own, create the subscription on a recurring price with `cancelAtPeriodEnd: true`. The customer pays once at checkout, and the subscription ends after the paid period without renewing with any payment method.
+
+```bash
+curl -X POST https://commet.co/api/v1/subscriptions \
+  -H "x-api-key: $COMMET_API_KEY" \
+  -H "commet-version: 2026-08-27" \
+  -H "Content-Type: application/json" \
+  -d '{"customerId":"user_123","planId":"pln_xxx","cancelAtPeriodEnd":true}'
+```
+
+To cover several periods in that payment, such as 6 months, add `prepaidPeriods`. [Pay in Advance](/docs/pay-in-advance) explains how each period is priced.
+
+```bash
+curl -X POST https://commet.co/api/v1/subscriptions \
+  -H "x-api-key: $COMMET_API_KEY" \
+  -H "commet-version: 2026-08-27" \
+  -H "Content-Type: application/json" \
+  -d '{"customerId":"user_123","planId":"pln_xxx","prepaidPeriods":6,"cancelAtPeriodEnd":true}'
+```
+
+- The cancellation is scheduled from creation: the response already shows `cancelAtPeriodEnd: true` and `cancellation` before the customer pays.
+- The purchase keeps ending even if the customer saves a card through a payment method update link, and the Customer Portal doesn't offer **Keep subscription** for it.
+- Free trials don't combine with it. An explicit trial (`customTrialDays`, a trial Offer, or a trial Promo Code) returns `400`, the plan's automatic introductory trial is skipped, and a trial Promo Code entered at checkout is rejected.
+- When the purchase ends, Commet emits [`subscription.canceled`](/docs/webhooks/subscription-canceled).
+
+To make it renew, [reverse the scheduled cancellation](/docs/manage-subscriptions#reverse-a-scheduled-cancellation) through the API with `POST /v1/subscriptions/{id}/uncancel`. If the customer paid with a method Commet can't charge again, such as OXXO, and has no saved card, the request returns `409 subscription_uncancel_failed`.

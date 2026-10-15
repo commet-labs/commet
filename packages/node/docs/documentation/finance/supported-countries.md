@@ -1,6 +1,6 @@
 ---
 title: Supported Countries
-description: Countries where Commet supports payouts and business operations.
+description: Commet supports businesses in 112 countries across the Americas, Europe, Asia and Pacific, and Africa, and your country sets your payout currency.
 ---
 
 Commet supports businesses in 112 countries across all major regions. Your country is set during onboarding and determines your payout currency and compliance requirements.
@@ -20,8 +20,3 @@ Armenia, Australia, Azerbaijan, Bahrain, Bangladesh, Bhutan, Brunei, Cambodia, H
 ## Africa
 
 Algeria, Angola, Benin, Botswana, Côte d’Ivoire, Egypt, Ethiopia, Gabon, Gambia, Ghana, Kenya, Mauritius, Morocco, Mozambique, Namibia, Niger, Nigeria, Rwanda, Senegal, South Africa, Tanzania, Tunisia
-
-## Related
-
-- [Finance Overview](/docs/finance-overview) — How money flows through Commet
-- [Account Verification](/docs/payouts-verification) — Get verified to withdraw money

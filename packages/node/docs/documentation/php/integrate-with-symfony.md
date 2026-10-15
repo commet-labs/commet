@@ -1,6 +1,6 @@
 ---
 title: Integrate with Symfony
-description: Add billing and payments to your Symfony application.
+description: Add billing and payments to your Symfony application with the Commet SDK, wired as a service in services.yaml.
 ---
 
 Install the Commet Skill so your coding agent can integrate the current SDK and verify its work against the live API contract.
@@ -204,10 +204,3 @@ npx skills add commet-labs/skills --skill commet
        }
    }
    ```
-
-## Related
-
-- [Subscriptions](/docs/manage-subscriptions)
-- [Track Usage](/docs/track-usage)
-- [Customer Portal](/docs/customer-portal)
-- [SDK Reference](/docs/sdk-reference)

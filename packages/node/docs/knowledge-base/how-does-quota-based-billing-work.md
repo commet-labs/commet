@@ -1,6 +1,6 @@
 ---
 title: Quota
-description: How quota-based billing works for your customers
+description: Quota plans include units of a durable resource and bill extra units at the highest balance held in the period, so deleting units never lowers the charge.
 ---
 
 Plans can include a quota of a durable resource at no extra cost — tasks, WhatsApp numbers, parallel automations. When your customer goes over the included amount, they're charged per extra unit. Unlike a usage meter that only counts up, a quota balance rises and falls as customers create and delete.
@@ -97,9 +97,3 @@ They pay today: $64.50
 > **Note**
 >
 > Your customer's 25 tasks are now covered by the Scale plan's 50 included tasks. They stop paying for extra tasks entirely.
-
-## Related
-
-- [Proration](/docs/how-is-proration-calculated-when-changing-plans) — How mid-cycle charges are calculated
-- [Pricing Changes](/docs/what-happens-when-you-change-your-prices) — How price changes apply to existing customers
-- [Billing Intervals](/docs/how-do-monthly-quarterly-and-yearly-billing-work) — When quota is charged on quarterly and yearly plans

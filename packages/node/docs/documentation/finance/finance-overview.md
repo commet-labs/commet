@@ -24,8 +24,3 @@ Once verified, request payouts of $10 or more. Money reaches your bank account i
 ## Transaction history
 
 Every payment, payout, and status change is recorded as a transaction. Use the finance dashboard to view incoming payments from subscriptions and credit purchases, outgoing payouts, and real-time status updates.
-
-## Related
-
-- [Account Verification](/docs/payouts-verification) — Get verified to withdraw money
-- [Merchant of Record](/docs/merchant-of-record) — How Commet handles taxes and compliance

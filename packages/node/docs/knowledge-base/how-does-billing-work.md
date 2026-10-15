@@ -1,6 +1,6 @@
 ---
 title: How Billing Works
-description: How your billing behaves based on what you and your customers do
+description: How the catalog, subscriptions, usage, invoices and transactions fit together, and what each change you or your customers make does to billing.
 ---
 
 Commet measures what a customer can consume and charges according to the plan they accepted. Your catalog defines the terms, the subscription stores the active relationship, usage records consumption, invoices calculate what is owed, and transactions record payment attempts.

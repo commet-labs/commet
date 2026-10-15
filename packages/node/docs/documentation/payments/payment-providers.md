@@ -50,9 +50,3 @@ Routing changes apply to new charges. A subscription with a saved payment method
 If a connection already has payment history, Commet does not hard-delete it. Keep it connected for its existing billing history and route new countries or new customers to another provider. To move an existing customer, use a new checkout or the Customer Portal to collect a payment method on the new connection; this is a new payment-method setup, not a database migration.
 
 See [Payment Orchestration](/docs/payment-orchestration) for country routing, defaults, and provider-bound payment methods.
-
-## Related
-
-- [Use Commet alongside your PSPs](/docs/merchant-of-record#use-commet-alongside-your-psps) — Understand when Commet is the MoR and when your PSP is the MoR
-- [Handle Failed Payments](/docs/handle-failed-payments) — Retries, provider errors, and recovery paths
-- [Testing in the Sandbox](/docs/testing-sandbox) — Test billing without live charges

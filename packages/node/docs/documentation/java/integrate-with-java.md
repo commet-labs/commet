@@ -1,6 +1,6 @@
 ---
 title: Integrate with Java
-description: Install and configure the Commet Java SDK.
+description: Add billing and payments to your Java application with the Commet SDK, installed with Maven or Gradle.
 ---
 
 Install the Commet Skill so your coding agent can integrate the current SDK and verify its work against the live API contract.
@@ -110,7 +110,3 @@ npx skills add commet-labs/skills --skill commet
        // handle activation
    }
    ```
-
-## Related
-
-- [SDK Reference](/docs/sdk-reference)

@@ -1,6 +1,6 @@
 ---
 title: Introductory Offers
-description: Apply an existing Offer automatically to eligible new subscriptions.
+description: Attach an existing Offer to a base plan price so Commet applies it automatically to eligible new subscriptions.
 ---
 
 An Introductory Offer is not a separate Offer type. It is an existing Offer attached to one base plan price with introductory placement.
@@ -53,11 +53,3 @@ An explicit `offerId` applies that Offer directly instead. It cannot be combined
 ## Trials and compatibility fields
 
 `trialDays`, `customTrialDays`, and `skipTrial` remain supported API shortcuts. Internally, an accepted trial is recorded as a `free_trial` phase in the Offer Application. Prefer catalog Offers when the same terms should be named, reused, inspected, or distributed consistently.
-
-## Related
-
-- [Offers](/docs/offers)
-- [Promotional Offers](/docs/promotional-offers)
-- [Promo Codes](/docs/promo-codes)
-- [Trial Periods](/docs/trial-periods)
-- [Manage Subscriptions](/docs/manage-subscriptions)

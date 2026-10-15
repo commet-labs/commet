@@ -31,9 +31,3 @@ Rates and rules change frequently and vary by bank, card type, and local regulat
 - **Refunds don't include bank taxes.** If you refund a payment, Commet returns the amount it charged. Tax perceptions are refunded (or credited) by the customer's bank or tax authority under local rules.
 
 If a customer asks about an unexpected extra charge, direct them to their card issuer — the bank can confirm which tax was applied and how to claim it back where local rules allow it.
-
-## Related
-
-- [Regional Prices](/docs/regional-prices) — Let customers pay in their own currency
-- [Merchant of Record](/docs/merchant-of-record) — How Commet handles taxes and compliance on your behalf
-- [Supported Countries](/docs/supported-countries) — Where Commet operates

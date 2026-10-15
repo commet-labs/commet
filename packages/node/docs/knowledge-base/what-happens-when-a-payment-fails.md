@@ -1,6 +1,6 @@
 ---
 title: Payment Failures
-description: What happens when your customer's payment fails
+description: Usage and seats keep working while Commet retries a failed charge on days 1, 3, 5 and 7, and the subscription is canceled if every retry fails.
 ---
 
 When a payment fails, your customer's usage and seats keep working while Commet retries the charge — but new purchases are blocked. If all retries fail, their subscription is canceled.
@@ -31,9 +31,3 @@ All retries fail
 ## First Charge After a Trial
 
 A retryable provider decline on the first paid invoice follows the same `past_due` dunning schedule. If the charge cannot start because the payment method is missing or the customer must take an action, the subscription remains `pending_payment` and checkout is used to complete payment instead of starting dunning.
-
-## Related
-
-- [Invoices](/docs/what-invoices-do-customers-receive-and-when) — What invoices your customers receive
-- [Trials](/docs/how-do-trial-periods-work) — What happens if the first charge after a trial fails
-- [Plan Changes](/docs/what-happens-when-a-customer-changes-plans) — How a canceled customer can come back

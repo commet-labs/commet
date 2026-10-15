@@ -34,9 +34,3 @@ If you need new traffic to use another provider, connect it and reassign the rel
 **Coming soon:** reuse a saved payment method across different providers.
 
 Today, a saved payment method belongs to the provider connection that collected it. Commet does not copy card credentials between Stripe, dLocal, and Commet, and a routing change cannot make the same vaulted method chargeable by another provider. Customers must complete a new setup or checkout on the new connection.
-
-## Related
-
-- [Payment Providers](/docs/payment-providers) — Connect and configure Stripe, dLocal, and Commet
-- [Use Commet alongside your PSPs](/docs/merchant-of-record#use-commet-alongside-your-psps) — Understand the MoR boundary for each rail
-- [Handle Failed Payments](/docs/handle-failed-payments) — Provider errors, retries, and self-serve recovery

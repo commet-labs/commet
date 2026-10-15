@@ -79,10 +79,3 @@ curl https://commet.co/api/v1/credit-packs \
 ```
 
 The `price` field is in **cents** (1000 = $10.00). Prices are always in USD.
-
-## Related
-
-- [Consumption Models](/docs/consumption-models) — How credits-based billing works
-- [Manage Plans](/docs/create-plans) — Create plans with consumption models
-- [Customer Portal](/docs/customer-portal) — Where customers purchase credit packs
-- [Configure Features](/docs/configure-features) — Define credit costs per feature

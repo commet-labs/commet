@@ -627,7 +627,8 @@ export interface Invoice {
       | "credit"
       | "balance_overage"
       | "addon_base"
-      | "one_time";
+      | "one_time"
+      | "prepaid_period";
     featureName: string | null;
     description: string;
     quantity: number;
@@ -778,7 +779,9 @@ export interface Payment {
       | "subscription_resume"
       | "one_time_payment"
       | "overage"
-      | "adjustment";
+      | "adjustment"
+      | "addon_activation"
+      | "prepayment";
     /** The public payment link ID, independently of the reason, or null when no payment link originated the charge. */
     paymentLinkId: string | null;
     recovery:
@@ -1297,6 +1300,12 @@ export interface PlanRegionalPricingResult {
 export interface PortalAccess {
   portalUrl: string;
   object: "portal_session";
+  livemode: boolean;
+}
+
+export interface PrepaidPeriodsCheckout {
+  checkoutUrl: string;
+  object: "checkout_session";
   livemode: boolean;
 }
 
@@ -1984,7 +1993,9 @@ export interface Transaction {
       | "subscription_resume"
       | "one_time_payment"
       | "overage"
-      | "adjustment";
+      | "adjustment"
+      | "addon_activation"
+      | "prepayment";
     /** The public payment link ID, independently of the reason, or null when no payment link originated the charge. */
     paymentLinkId: string | null;
     recovery:
@@ -2042,7 +2053,9 @@ export interface TransactionListItem {
       | "subscription_resume"
       | "one_time_payment"
       | "overage"
-      | "adjustment";
+      | "adjustment"
+      | "addon_activation"
+      | "prepayment";
     /** The public payment link ID, independently of the reason, or null when no payment link originated the charge. */
     paymentLinkId: string | null;
     recovery:

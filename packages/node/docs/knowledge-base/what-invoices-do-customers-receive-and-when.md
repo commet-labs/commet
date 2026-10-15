@@ -1,6 +1,6 @@
 ---
 title: Invoices
-description: What invoices your customers receive and when
+description: Every invoice your customers can receive, from recurring and overage invoices to plan changes, credit purchases and top-ups, and when each is issued.
 ---
 
 Your customers receive invoices automatically based on what happens in their subscription. Here's every type of invoice they might see and when it's generated.
@@ -92,9 +92,3 @@ Every invoice is built from these line types:
 - `balance_overage`: Balance spent past zero, when the plan allows it.
 - `addon_base`: Add-on charge at renewal.
 - `one_time`: Standalone one-time payment.
-
-## Related
-
-- [Billing Intervals](/docs/how-do-monthly-quarterly-and-yearly-billing-work) — When quarterly, semiannual, and yearly customers get charged
-- [Proration](/docs/how-is-proration-calculated-when-changing-plans) — How mid-cycle charges are calculated
-- [Plan Changes](/docs/what-happens-when-a-customer-changes-plans) — When plan change invoices are created

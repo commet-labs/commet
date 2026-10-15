@@ -446,7 +446,7 @@ Commet sends these headers with every webhook request:
 
 ## Retry policy
 
-If your endpoint returns a non-2xx status or times out (10 seconds), Commet retries with exponential backoff. The initial delivery counts as the first attempt, followed by up to 7 retries — 8 attempts in total over a window of roughly 8 hours:
+If your endpoint returns a non-2xx status or times out (10 seconds), Commet retries with exponential backoff capped at 1 hour. The initial delivery counts as the first attempt, followed by up to 7 retries — 8 attempts in total over a window of roughly 4 hours:
 
 | Retry     | Delay after previous attempt |
 | --------- | ---------------------------- |
@@ -455,8 +455,8 @@ If your endpoint returns a non-2xx status or times out (10 seconds), Commet retr
 | 3rd retry | 15 minutes                   |
 | 4th retry | 30 minutes                   |
 | 5th retry | 1 hour                       |
-| 6th retry | 2 hours                      |
-| 7th retry | 4 hours                      |
+| 6th retry | 1 hour                       |
+| 7th retry | 1 hour                       |
 
 After 8 failed attempts (the initial delivery plus 7 retries), the delivery is marked as failed and we email your organization's notification recipient with the endpoint URL, event type, and the last response we received (HTTP status or error code).
 

@@ -38,12 +38,15 @@ Generated from Commet API version `2026-08-27`.
 - `"one_time_payment"`
 - `"reactivation"`
 - `"resume"`
+- `"prepayment"`
 
 ### PaymentMethod
 
 - `"card"`
 - `"oxxo"`
 - `"mercado_pago"`
+- `"google_pay"`
+- `"smartpix"`
 
 ### PaymentProvider
 
@@ -375,7 +378,7 @@ Variants:
 - `planName` (`string | null`, required)
 - `poNumber` (`string | null`, required)
 - `reference` (`string | null`, required)
-- `lineItems` (`Array<{ lineType: "plan_base" | "feature_overage" | "feature_seats" | "feature_quota" | "discount" | "promo_code_discount" | "credit" | "balance_overage" | "addon_base" | "one_time"; featureName: string | null; description: string; quantity: number; unitAmount: number; amount: number; includedAmount: number | null; usedAmount: number | null; overageAmount: number | null; discountType: string | null; discountValue: number | null; discountName: string | null; chargeType: "standard" | "advance" | "true_up" }>`, required)
+- `lineItems` (`Array<{ lineType: "plan_base" | "feature_overage" | "feature_seats" | "feature_quota" | "discount" | "promo_code_discount" | "credit" | "balance_overage" | "addon_base" | "one_time" | "prepaid_period"; featureName: string | null; description: string; quantity: number; unitAmount: number; amount: number; includedAmount: number | null; usedAmount: number | null; overageAmount: number | null; discountType: string | null; discountValue: number | null; discountName: string | null; chargeType: "standard" | "advance" | "true_up" }>`, required)
 - `object` (`"invoice"`, required)
 - `livemode` (`boolean`, required)
 
@@ -437,7 +440,7 @@ Variants:
 
 ### Payment
 
-- `paymentContext` (`{ reason: "first_subscription_payment" | "trial_conversion" | "recurring_billing" | "plan_change" | "reactivation" | "subscription_resume" | "one_time_payment" | "overage" | "adjustment"; paymentLinkId: string | null; recovery: { type: "payment_recovery" } | { type: "dunning_retry"; attempt: number; maxAttempts: number } | null } | null`, required) — Charge context captured for new payments. Null for historical payments with no captured context.
+- `paymentContext` (`{ reason: "first_subscription_payment" | "trial_conversion" | "recurring_billing" | "plan_change" | "reactivation" | "subscription_resume" | "one_time_payment" | "overage" | "adjustment" | "addon_activation" | "prepayment"; paymentLinkId: string | null; recovery: { type: "payment_recovery" } | { type: "dunning_retry"; attempt: number; maxAttempts: number } | null } | null`, required) — Charge context captured for new payments. Null for historical payments with no captured context.
 - `id` (`string`, required)
 - `customerId` (`string | null`, required)
 - `kind` (`"link" | "charge"`, required)
@@ -621,6 +624,12 @@ Variants:
 
 - `portalUrl` (`string`, required)
 - `object` (`"portal_session"`, required)
+- `livemode` (`boolean`, required)
+
+### PrepaidPeriodsCheckout
+
+- `checkoutUrl` (`string`, required)
+- `object` (`"checkout_session"`, required)
 - `livemode` (`boolean`, required)
 
 ### PreviewChange
@@ -858,7 +867,7 @@ Variants:
 
 ### Transaction
 
-- `paymentContext` (`{ reason: "first_subscription_payment" | "trial_conversion" | "recurring_billing" | "plan_change" | "reactivation" | "subscription_resume" | "one_time_payment" | "overage" | "adjustment"; paymentLinkId: string | null; recovery: { type: "payment_recovery" } | { type: "dunning_retry"; attempt: number; maxAttempts: number } | null } | null`, required) — Charge context captured for new payments. Null for historical payments with no captured context.
+- `paymentContext` (`{ reason: "first_subscription_payment" | "trial_conversion" | "recurring_billing" | "plan_change" | "reactivation" | "subscription_resume" | "one_time_payment" | "overage" | "adjustment" | "addon_activation" | "prepayment"; paymentLinkId: string | null; recovery: { type: "payment_recovery" } | { type: "dunning_retry"; attempt: number; maxAttempts: number } | null } | null`, required) — Charge context captured for new payments. Null for historical payments with no captured context.
 - `id` (`string`, required)
 - `invoiceId` (`string | null`, required)
 - `grossAmount` (`number | null`, required) — Gross amount in USD cents. Null when the provider has not reported an honest USD figure; see presentmentAmount.
@@ -881,7 +890,7 @@ Variants:
 
 ### TransactionListItem
 
-- `paymentContext` (`{ reason: "first_subscription_payment" | "trial_conversion" | "recurring_billing" | "plan_change" | "reactivation" | "subscription_resume" | "one_time_payment" | "overage" | "adjustment"; paymentLinkId: string | null; recovery: { type: "payment_recovery" } | { type: "dunning_retry"; attempt: number; maxAttempts: number } | null } | null`, required) — Charge context captured for new payments. Null for historical payments with no captured context.
+- `paymentContext` (`{ reason: "first_subscription_payment" | "trial_conversion" | "recurring_billing" | "plan_change" | "reactivation" | "subscription_resume" | "one_time_payment" | "overage" | "adjustment" | "addon_activation" | "prepayment"; paymentLinkId: string | null; recovery: { type: "payment_recovery" } | { type: "dunning_retry"; attempt: number; maxAttempts: number } | null } | null`, required) — Charge context captured for new payments. Null for historical payments with no captured context.
 - `id` (`string`, required)
 - `invoiceId` (`string | null`, required)
 - `grossAmount` (`number | null`, required) — Gross amount in USD cents. Null when the provider has not reported an honest USD figure; see presentmentAmount.

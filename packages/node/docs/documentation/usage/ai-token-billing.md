@@ -285,9 +285,3 @@ Supported providers include OpenAI, Anthropic, Google, Meta, Mistral, Cohere, an
 ## AI Costs dashboard
 
 View all AI token costs in the dashboard under **AI Costs**. Each entry shows the model used, token breakdown, cost calculation, margin applied, and total charged.
-
-## Related
-
-- [Consumption Models](/docs/consumption-models) — How Balance model works
-- [Track Usage](/docs/track-usage) — Standard usage tracking
-- [Configure Features](/docs/configure-features) — Create metered features

@@ -1,6 +1,6 @@
 ---
 title: Track Usage
-description: Record metered consumption with the current Commet SDKs.
+description: Record metered usage with one feature code per event, avoid duplicates with an idempotency key, and correct period totals.
 ---
 
 Every metered feature has one code. Send that code as `featureCode`; Commet aggregates events for access, credits, balance, and billing.
@@ -273,9 +273,3 @@ $usageCheck = $commet->usage->check(
     featureCode: 'api_calls',
 );
 ```
-
-## Related
-
-- [Configure Features](/docs/configure-features)
-- [AI Token Billing](/docs/ai-token-billing)
-- [Consumption Models](/docs/consumption-models)

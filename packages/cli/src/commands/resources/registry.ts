@@ -3137,7 +3137,7 @@ export const resourceDefinitions: ResourceDef[] = [
       "update-payment-method": {
         method: "updatePaymentMethod",
         description:
-          "Creates a hosted checkout session for the customer to update the subscription's default payment method.",
+          "Creates a hosted checkout to update the payment method of an active, trialing or past_due subscription.",
         hasParams: true,
         params: [
           {
@@ -3145,6 +3145,46 @@ export const resourceDefinitions: ResourceDef[] = [
             description: "Id",
             required: true,
             sdkKey: "id",
+          },
+          {
+            flag: "--success-url <success-url>",
+            description: "Success url",
+            sdkKey: "successUrl",
+          },
+          {
+            flag: "--idempotency-key <key>",
+            description:
+              "Unique key used to safely retry this write for 24 hours without applying it twice.",
+            sdkKey: "idempotencyKey",
+            requestOption: true,
+          },
+        ],
+      },
+      "create-prepaid-periods-checkout": {
+        method: "createPrepaidPeriodsCheckout",
+        description:
+          "Creates a hosted checkout to pay billing periods of a recurring subscription in advance with any payment method.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--periods <number>",
+            description:
+              "Active subscriptions: billing periods to add after the last paid period.",
+            required: true,
+            parse: parseNumber,
+            sdkKey: "periods",
+          },
+          {
+            flag: "--offer-id <offer-id>",
+            description:
+              "Offer applied from the first added period for its full configured duration.",
+            sdkKey: "offerId",
           },
           {
             flag: "--success-url <success-url>",
@@ -3371,6 +3411,20 @@ export const resourceDefinitions: ResourceDef[] = [
             flag: "--success-url <success-url>",
             description: "Success url",
             sdkKey: "successUrl",
+          },
+          {
+            flag: "--prepaid-periods <number>",
+            description:
+              "Billing periods of the subscription's interval paid with the first payment, including the current one.",
+            parse: parseNumber,
+            sdkKey: "prepaidPeriods",
+          },
+          {
+            flag: "--cancel-at-period-end <boolean>",
+            description:
+              "Schedules the cancellation from creation so the subscription ends after its last paid period and never renews with any payment method.",
+            parse: parseBool,
+            sdkKey: "cancelAtPeriodEnd",
           },
           {
             flag: "--offer-id <offer-id>",
