@@ -1,6 +1,6 @@
 ---
 title: Seats
-description: How seat-based billing works for your customers
+description: How included and extra seats are charged, when changes to seats or seat prices take effect, and how upgrades treat seats.
 ---
 
 Plans can include a number of seats at no extra cost. When your customer uses more seats than included, they're charged per extra seat.
@@ -79,9 +79,3 @@ They pay today: $249.50
 > **Note**
 >
 > Your customer's 8 seats are now covered by the Business plan's 10 included seats. If they had 12 seats, the 2 above the included 10 would be billed for the full new period in advance: 2 × $20 = $40.
-
-## Related
-
-- [Proration](/docs/how-is-proration-calculated-when-changing-plans) — How mid-cycle charges are calculated
-- [Pricing Changes](/docs/what-happens-when-you-change-your-prices) — How price changes apply to existing customers
-- [Billing Intervals](/docs/how-do-monthly-quarterly-and-yearly-billing-work) — When seats are charged on quarterly and yearly plans

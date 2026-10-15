@@ -1,6 +1,6 @@
 ---
 title: Integrate with Express
-description: Add billing and payments to your Express application.
+description: Add billing and payments to your Express application with the Commet SDK, using a router to subscribe customers and track usage.
 ---
 
 Install the Commet Skill so your coding agent can integrate the current SDK and verify its work against the live API contract.
@@ -117,10 +117,3 @@ npx skills add commet-labs/skills --skill commet
 
    app.listen(3000)
    ```
-
-## Related
-
-- [Subscriptions](/docs/manage-subscriptions)
-- [Track Usage](/docs/track-usage)
-- [Customer Portal](/docs/customer-portal)
-- [SDK Reference](/docs/sdk-reference)

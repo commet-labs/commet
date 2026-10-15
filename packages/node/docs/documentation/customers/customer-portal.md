@@ -1,6 +1,6 @@
 ---
 title: Customer Portal
-description: Self-service portal for customers to manage their subscriptions.
+description: Self-service page where customers change plans, view usage, buy credits and see invoices, with a fresh portal URL generated on each visit.
 ---
 
 Self-service page where customers manage their subscription, view usage, change plans, and purchase credits. Automatically created with every subscription.
@@ -111,9 +111,3 @@ export const GET = CustomerPortal({
 Serve the portal from your own domain (e.g., `billing.acme.com`) instead of `commet.co`. Go to **Settings** → **Custom Domains**, add the domain, and point the DNS records shown — portal links use your domain once it verifies.
 
 Each custom domain serves one surface: **portal** or **checkout**. Checkout pages support custom domains the same way.
-
-## Related
-
-- [Manage Subscriptions](/docs/manage-subscriptions)
-- [Plan Groups](/docs/plan-groups)
-- [Credit Packs](/docs/credit-packs)

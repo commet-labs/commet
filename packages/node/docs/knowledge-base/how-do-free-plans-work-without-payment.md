@@ -1,6 +1,6 @@
 ---
 title: Free Plans
-description: How free plans work for your customers
+description: Free plans activate without checkout and reset usage every month, and usage stops at the included limit instead of charging overage.
 ---
 
 A free plan has no price and no checkout. When you assign a customer to a free plan, they're activated immediately. Their usage resets every month, just like a paid plan.
@@ -79,9 +79,3 @@ Credit from free plan: $0 (it's free)
 They pay: $99 (full month)
 Invoices, payment method, and billing info appear in their portal.
 ```
-
-## Related
-
-- [Plan Changes](/docs/what-happens-when-a-customer-changes-plans) — Upgrades, downgrades, and switching
-- [Trials](/docs/how-do-trial-periods-work) — Another way to let customers try before paying
-- [Invoices](/docs/what-invoices-do-customers-receive-and-when) — What invoices your customers receive

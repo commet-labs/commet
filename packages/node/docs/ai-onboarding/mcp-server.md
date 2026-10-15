@@ -1,6 +1,6 @@
 ---
 title: MCP Server
-description: Use the MCP Server to manage billing infrastructure.
+description: Connect Cursor, Claude Code or Claude Desktop to the Commet MCP server and manage billing with a tool for every API operation.
 ---
 
 ## What is an MCP Server?

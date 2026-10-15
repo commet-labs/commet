@@ -1,6 +1,6 @@
 ---
 title: Better Auth
-description: Better Auth Plugin for Billing and Subscriptions using Commet
+description: Use the @commet/better-auth plugin to create Commet customers on signup and manage subscriptions, usage and seats from Better Auth.
 ---
 
 [Better Auth](https://better-auth.com) is a modern authentication library for TypeScript. This plugin integrates Commet directly into your Better Auth setup.
@@ -351,10 +351,3 @@ Configure the webhook endpoint in your Commet dashboard: `/api/auth/commet/webho
      );
    }
    ```
-
-## Related
-
-- [Subscriptions](/docs/manage-subscriptions)
-- [Usage Events](/docs/track-usage)
-- [Seat Management](/docs/seat-management)
-- [Customer Portal](/docs/customer-portal)

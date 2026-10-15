@@ -20,9 +20,15 @@ export type InvoiceType =
   | "addon_activation"
   | "one_time_payment"
   | "reactivation"
-  | "resume";
+  | "resume"
+  | "prepayment";
 
-export type PaymentMethod = "card" | "oxxo" | "mercado_pago";
+export type PaymentMethod =
+  | "card"
+  | "oxxo"
+  | "mercado_pago"
+  | "google_pay"
+  | "smartpix";
 
 export type PaymentProvider = "stripe" | "commet" | "dlocal";
 

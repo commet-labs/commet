@@ -54,11 +54,3 @@ Total:      $130.00
 > **Note**
 >
 > Accepted phases are stored in an immutable Offer Application. Editing, deactivating, or archiving the catalog Offer changes future applications only.
-
-## Related
-
-- [Offers](/docs/offers)
-- [Introductory Offers](/docs/introductory-offers)
-- [Promotional Offers](/docs/promotional-offers)
-- [Promo Codes](/docs/promo-codes)
-- [Plan Changes](/docs/what-happens-when-a-customer-changes-plans)

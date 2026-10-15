@@ -316,7 +316,7 @@ Fired every time a payment settles successfully — the first payment and every 
 
 ### Data
 
-- `paymentContext` (`{ reason: "first_subscription_payment" | "trial_conversion" | "recurring_billing" | "plan_change" | "reactivation" | "subscription_resume" | "one_time_payment" | "overage" | "adjustment"; paymentLinkId: string | null; recovery: { type: "payment_recovery" } | { type: "dunning_retry"; attempt: number; maxAttempts: number } | null } | null`, required) — Charge context captured for new payments. Null for historical payments with no captured context.
+- `paymentContext` (`{ reason: "first_subscription_payment" | "trial_conversion" | "recurring_billing" | "plan_change" | "reactivation" | "subscription_resume" | "one_time_payment" | "overage" | "adjustment" | "addon_activation" | "prepayment"; paymentLinkId: string | null; recovery: { type: "payment_recovery" } | { type: "dunning_retry"; attempt: number; maxAttempts: number } | null } | null`, required) — Charge context captured for new payments. Null for historical payments with no captured context.
 - `invoiceId` (`string`, required) — The invoice ID.
 - `invoiceNumber` (`string`, required) — The human-readable invoice number.
 - `invoiceTotal` (`number`, required) — Invoice total in cents (100 = $1.00).
@@ -338,7 +338,7 @@ Fired when an invoice-linked subscription charge fails.
 
 ### Data
 
-- `paymentContext` (`{ reason: "first_subscription_payment" | "trial_conversion" | "recurring_billing" | "plan_change" | "reactivation" | "subscription_resume" | "one_time_payment" | "overage" | "adjustment"; paymentLinkId: string | null; recovery: { type: "payment_recovery" } | { type: "dunning_retry"; attempt: number; maxAttempts: number } | null } | null`, required) — Charge context captured for new payments. Null for historical payments with no captured context.
+- `paymentContext` (`{ reason: "first_subscription_payment" | "trial_conversion" | "recurring_billing" | "plan_change" | "reactivation" | "subscription_resume" | "one_time_payment" | "overage" | "adjustment" | "addon_activation" | "prepayment"; paymentLinkId: string | null; recovery: { type: "payment_recovery" } | { type: "dunning_retry"; attempt: number; maxAttempts: number } | null } | null`, required) — Charge context captured for new payments. Null for historical payments with no captured context.
 - `invoiceId` (`string`, required) — The invoice ID, if available.
 - `invoiceNumber` (`string`, required) — The human-readable invoice number, if available.
 - `customerId` (`string`, required) — The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.
@@ -448,7 +448,7 @@ Fired when a payment link is paid. The charge settled and a one-time invoice was
 
 ### Data
 
-- `paymentContext` (`{ reason: "first_subscription_payment" | "trial_conversion" | "recurring_billing" | "plan_change" | "reactivation" | "subscription_resume" | "one_time_payment" | "overage" | "adjustment"; paymentLinkId: string | null; recovery: { type: "payment_recovery" } | { type: "dunning_retry"; attempt: number; maxAttempts: number } | null } | null`, required) — Charge context captured for new payments. Null for historical payments with no captured context.
+- `paymentContext` (`{ reason: "first_subscription_payment" | "trial_conversion" | "recurring_billing" | "plan_change" | "reactivation" | "subscription_resume" | "one_time_payment" | "overage" | "adjustment" | "addon_activation" | "prepayment"; paymentLinkId: string | null; recovery: { type: "payment_recovery" } | { type: "dunning_retry"; attempt: number; maxAttempts: number } | null } | null`, required) — Charge context captured for new payments. Null for historical payments with no captured context.
 - `paymentId` (`string`, required) — The payment link ID.
 - `status` (`string`, required) — The link status. Always "succeeded" for this event.
 - `amount` (`number`, required) — The collected amount in cents (100 = $1.00).
@@ -467,7 +467,7 @@ Fired when a payment link charge attempt is declined. The link stays open and ca
 
 ### Data
 
-- `paymentContext` (`{ reason: "first_subscription_payment" | "trial_conversion" | "recurring_billing" | "plan_change" | "reactivation" | "subscription_resume" | "one_time_payment" | "overage" | "adjustment"; paymentLinkId: string | null; recovery: { type: "payment_recovery" } | { type: "dunning_retry"; attempt: number; maxAttempts: number } | null } | null`, required) — Charge context captured for new payments. Null for historical payments with no captured context.
+- `paymentContext` (`{ reason: "first_subscription_payment" | "trial_conversion" | "recurring_billing" | "plan_change" | "reactivation" | "subscription_resume" | "one_time_payment" | "overage" | "adjustment" | "addon_activation" | "prepayment"; paymentLinkId: string | null; recovery: { type: "payment_recovery" } | { type: "dunning_retry"; attempt: number; maxAttempts: number } | null } | null`, required) — Charge context captured for new payments. Null for historical payments with no captured context.
 - `paymentId` (`string`, required) — The payment link ID.
 - `status` (`string`, required) — The link status. Always "failed" for this event.
 - `amount` (`number`, required) — The amount that was attempted in cents (100 = $1.00).

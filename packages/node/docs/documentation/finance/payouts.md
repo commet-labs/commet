@@ -32,9 +32,3 @@ Navigate to **Payouts**. Add your bank accounts, then click **Withdraw funds** t
 - Only the **Available** balance can be withdrawn — Pending funds cannot.
 - Account verification is required before the first payout.
 - Money reaches your bank account in **up to 7 business days**.
-
-## Related
-
-- [Account Verification](/docs/payouts-verification) — Get verified to withdraw money
-- [Finance Overview](/docs/finance-overview) — Balances, payouts, and transaction history
-- [Merchant of Record](/docs/merchant-of-record) — How Commet handles taxes and compliance

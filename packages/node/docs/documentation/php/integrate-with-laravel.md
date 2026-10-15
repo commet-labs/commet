@@ -1,6 +1,6 @@
 ---
 title: Integrate with Laravel
-description: Add billing and payments to your Laravel application.
+description: Add billing and payments to your Laravel application with the Commet SDK, registered in a service provider.
 ---
 
 Install the Commet Skill so your coding agent can integrate the current SDK and verify its work against the live API contract.
@@ -212,10 +212,3 @@ npx skills add commet-labs/skills --skill commet
    Route::get('/billing/portal', [BillingController::class, 'portal']);
    Route::post('/webhooks/commet', [WebhookController::class, 'handle']);
    ```
-
-## Related
-
-- [Subscriptions](/docs/manage-subscriptions)
-- [Track Usage](/docs/track-usage)
-- [Customer Portal](/docs/customer-portal)
-- [SDK Reference](/docs/sdk-reference)

@@ -204,7 +204,7 @@ const recovery = await commet.subscriptions.createRecoveryLink({ id: 'sub_123' }
 
 ### Update the payment method
 
-`updatePaymentMethod` returns a hosted checkout where the customer updates the subscription's default payment method.
+`updatePaymentMethod` returns a hosted checkout where the customer updates the subscription's default payment method. It works for `active`, `trialing`, and `past_due` subscriptions.
 
 ```typescript
 const paymentMethodUpdate = await commet.subscriptions.updatePaymentMethod({
@@ -214,6 +214,8 @@ const paymentMethodUpdate = await commet.subscriptions.updatePaymentMethod({
 
 // redirect(paymentMethodUpdate.checkoutUrl)
 ```
+
+For a `pending_payment` subscription it returns `409` with `subscription_not_active`, as for any other status. After a first failed charge, the customer pays through the subscription's payment checkout instead: the `recoveryUrl` on the [`payment.failed` webhook](/docs/webhooks/payment-failed).
 
 ## Self-serve recovery
 
@@ -278,11 +280,3 @@ curl -X POST https://commet.co/api/v1/portal/request-access \
   -H "Content-Type: application/json" \
   -d '{"customerId": "user_123"}'
 ```
-
-## Related
-
-- [Invoices and Billing Cycles](/docs/invoices-and-billing-cycles) — Invoice types and charge timing
-- [Manage Subscriptions](/docs/manage-subscriptions) — Create and manage customer subscriptions
-- [Customer Portal](/docs/customer-portal) — Self-service billing portal for customers
-- [Payment Providers](/docs/payment-providers) — How Commet routes payments through Commet, Stripe, or dLocal
-- [Payment Orchestration](/docs/payment-orchestration) — Country routing, defaults, and provider-bound payment methods

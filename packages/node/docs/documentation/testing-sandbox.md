@@ -1,6 +1,6 @@
 ---
 title: Testing
-description: Test safely with sandbox environment
+description: "Test billing in an isolated sandbox: simulate renewals with the Test Clock and try test cards, failed payments and 3D Secure."
 ---
 
 Sandbox is the default environment — completely isolated from production.

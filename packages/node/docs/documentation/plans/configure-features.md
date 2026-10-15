@@ -1,6 +1,6 @@
 ---
 title: Configure Features
-description: Define capabilities and read current or prospective customer access.
+description: Choose boolean, usage, seats or quota features, read a customer's current access, and check a consumption before you track it.
 ---
 
 Features are reusable capabilities that can be attached to several plans with different limits and prices.
@@ -325,10 +325,3 @@ $usageEvent = $commet->usage->track(
 ```
 
 Use the caller-owned `eventId` for the business event when retries must deduplicate it. Request idempotency is a separate transport option that maps to `Idempotency-Key`.
-
-## Related
-
-- [Track Usage](/docs/track-usage)
-- [Consumption Models](/docs/consumption-models)
-- [Seat Management](/docs/seat-management)
-- [Quota Management](/docs/quota-management)

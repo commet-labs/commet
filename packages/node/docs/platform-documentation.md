@@ -42,6 +42,7 @@ This documentation snapshot is serialized from the source of commet.co/docs and 
 - [documentation/sales/regional-prices.md](./documentation/sales/regional-prices.md)
 - [documentation/sales/trial-periods.md](./documentation/sales/trial-periods.md)
 - [documentation/subscriptions/manage-subscriptions.md](./documentation/subscriptions/manage-subscriptions.md)
+- [documentation/subscriptions/pay-in-advance.md](./documentation/subscriptions/pay-in-advance.md)
 - [documentation/subscriptions/plan-grants.md](./documentation/subscriptions/plan-grants.md)
 - [documentation/subscriptions/upgrade-and-downgrade-plans.md](./documentation/subscriptions/upgrade-and-downgrade-plans.md)
 - [documentation/usage/track-usage.md](./documentation/usage/track-usage.md)

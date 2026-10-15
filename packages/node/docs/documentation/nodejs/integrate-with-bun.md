@@ -1,6 +1,6 @@
 ---
 title: Integrate with Bun
-description: Add billing and payments to your Bun application.
+description: Add billing and payments to your Bun application with the Commet SDK, from subscriptions and feature access to the customer portal.
 ---
 
 Install the Commet Skill so your coding agent can integrate the current SDK and verify its work against the live API contract.
@@ -103,10 +103,3 @@ npx skills add commet-labs/skills --skill commet
      return Response.redirect(portal.portalUrl)
    }
    ```
-
-## Related
-
-- [Subscriptions](/docs/manage-subscriptions)
-- [Track Usage](/docs/track-usage)
-- [Customer Portal](/docs/customer-portal)
-- [SDK Reference](/docs/sdk-reference)

@@ -115,9 +115,3 @@ curl https://commet.co/api/v1/customers/cus_xxx/plan-grants \
 ```
 
 See the [Plan Grants API reference](/docs/api-reference/customers/list-plan-grants) for exact request and response schemas.
-
-## Related
-
-- [Manage Subscriptions](/docs/manage-subscriptions)
-- [Introductory Offers](/docs/introductory-offers)
-- [Customer State Changed](/docs/webhooks/customer-state-changed)

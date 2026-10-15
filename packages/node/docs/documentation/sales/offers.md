@@ -54,11 +54,3 @@ When Commet quotes or applies an Offer, it records an immutable Offer Applicatio
 Editing, deactivating, or archiving the catalog Offer affects future applications only. Existing applications remain available for billing and audit.
 
 The v9 response is target-aware (`plan_price`, `addon`, or `credit_pack`) so new purchase surfaces do not require another breaking response change. Current public subscription, Introductory, direct, and Promo Code flows create `plan_price` applications.
-
-## Related
-
-- [Introductory Offers](/docs/introductory-offers)
-- [Promotional Offers](/docs/promotional-offers)
-- [Promo Codes](/docs/promo-codes)
-- [Trial Periods](/docs/trial-periods)
-- [Offers API reference](/docs/api-reference/offers/list-offers)

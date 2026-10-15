@@ -1,6 +1,6 @@
 ---
 title: Seat Management
-description: Manage seat-based licenses with the Commet SDK.
+description: Add, remove or set seats with the Commet SDK, with included seats billed at the start of the period and extra seats prorated.
 ---
 
 Seats are per-user licenses that let you charge based on team size. Commet tracks seat changes and bills them automatically — included seats at the start of the period, additional seats prorated.
@@ -368,9 +368,3 @@ curl "https://commet.co/api/v1/seats/balances?customerId=user_123" \
 ## Learn more
 
 - [How Does Seat-Based Billing Work](/docs/how-does-seat-based-billing-work)
-
-## Related
-
-- [Configure Features](/docs/configure-features) — Create seat features on your plans
-- [Manage Plans](/docs/create-plans) — Plans that include seat-based pricing
-- [Manage Subscriptions](/docs/manage-subscriptions) — Assign plans with initial seats

@@ -1,6 +1,6 @@
 ---
 title: Integrate with Astro
-description: Add billing and payments to your Astro application.
+description: Add billing and payments to your Astro application with the Commet SDK, using API routes to subscribe customers and track usage.
 ---
 
 Install the Commet Skill so your coding agent can integrate the current SDK and verify its work against the live API contract.
@@ -119,10 +119,3 @@ npx skills add commet-labs/skills --skill commet
      return redirect(portal.portalUrl)
    }
    ```
-
-## Related
-
-- [Subscriptions](/docs/manage-subscriptions)
-- [Track Usage](/docs/track-usage)
-- [Customer Portal](/docs/customer-portal)
-- [SDK Reference](/docs/sdk-reference)

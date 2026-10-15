@@ -12,7 +12,7 @@
   "platformDocumentation": {
     "source": "commet-labs/docs",
     "index": "platform-documentation.md",
-    "count": 95,
+    "count": 96,
     "entries": [
       "documentation/introduction.md",
       "documentation/create-api-key.md",
@@ -54,6 +54,7 @@
       "documentation/sales/regional-prices.md",
       "documentation/sales/trial-periods.md",
       "documentation/subscriptions/manage-subscriptions.md",
+      "documentation/subscriptions/pay-in-advance.md",
       "documentation/subscriptions/plan-grants.md",
       "documentation/subscriptions/upgrade-and-downgrade-plans.md",
       "documentation/usage/track-usage.md",
@@ -1351,6 +1352,12 @@
           "operationId": "update-payment-method",
           "method": "POST",
           "path": "/subscriptions/{id}/payment-method/update"
+        },
+        {
+          "name": "createPrepaidPeriodsCheckout",
+          "operationId": "create-prepaid-periods-checkout",
+          "method": "POST",
+          "path": "/subscriptions/{id}/prepaid-periods"
         },
         {
           "name": "previewChange",

@@ -83,10 +83,3 @@ See [Free Plans](/docs/how-do-free-plans-work-without-payment) and [Trials](/doc
 ## Learn more
 
 - [How Does Billing Work](/docs/how-does-billing-work)
-
-## Related
-
-- [Manage Plans](/docs/create-plans) — Create plans with consumption models
-- [Credit Packs](/docs/credit-packs) — Configure credit packages for credits-based plans
-- [Configure Features](/docs/configure-features) — Define what customers can access
-- [Customer Portal](/docs/customer-portal) — Where customers manage their consumption

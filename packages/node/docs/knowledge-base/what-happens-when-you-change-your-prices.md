@@ -1,6 +1,6 @@
 ---
 title: Pricing Changes
-description: What happens to your customers when you change your prices
+description: New customers pay new prices at once; existing customers get decreases now and increases at renewal, and base plan prices always change at renewal.
 ---
 
 When you change a price, **new customers pay the new price immediately**. For existing customers, the rule is asymmetric: **decreases apply immediately, increases apply at renewal**.
@@ -65,9 +65,3 @@ You lower it from $35/seat to $25/seat.
 
 This month → 3 × $25 = $75 — applied immediately
 ```
-
-## Related
-
-- [Plan Changes](/docs/what-happens-when-a-customer-changes-plans) — What happens when your customer upgrades or downgrades
-- [Proration](/docs/how-is-proration-calculated-when-changing-plans) — How mid-cycle charges are calculated
-- [Seats](/docs/how-does-seat-based-billing-work) — How seat-based billing works

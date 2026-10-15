@@ -1,6 +1,6 @@
 ---
 title: Integrate with PHP
-description: Install and configure the Commet PHP SDK.
+description: Add billing and payments to your PHP application with the Commet SDK, installed with Composer.
 ---
 
 Install the Commet Skill so your coding agent can integrate the current SDK and verify its work against the live API contract.
@@ -94,9 +94,3 @@ npx skills add commet-labs/skills --skill commet
 
    echo json_encode(['ok' => true]);
    ```
-
-## Related
-
-- [Laravel](/docs/integrate-with-laravel)
-- [Symfony](/docs/integrate-with-symfony)
-- [SDK Reference](/docs/sdk-reference)

@@ -65,9 +65,3 @@ For quarterly, semiannual, and yearly plans, overage is calculated and invoiced 
 
 - [What Invoices Do Customers Receive and When](/docs/what-invoices-do-customers-receive-and-when)
 - [How Do Monthly, Quarterly, and Yearly Billing Work](/docs/how-do-monthly-quarterly-and-yearly-billing-work)
-
-## Related
-
-- [Handle Failed Payments](/docs/handle-failed-payments) — Retry flow and grace periods for failed charges
-- [Consumption Models](/docs/consumption-models) — Metered, Credits, and Balance explained
-- [Finance Overview](/docs/finance-overview) — How money flows through Commet

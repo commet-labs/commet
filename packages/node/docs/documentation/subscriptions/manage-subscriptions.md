@@ -112,6 +112,8 @@ The normal path needs only `customerId` and either `planCode` or `planId`. Optio
 
 Omitting `priceId` preserves default price and Market resolution. Omitting `offerId` preserves automatic Introductory Offer selection.
 
+To charge several billing periods in the first payment, see [Pay in Advance](/docs/pay-in-advance). To sell a period that doesn't renew, see [One-Time Payments](/docs/one-time-payments#sell-a-period-without-renewal).
+
 A compatible `pending_payment` checkout may be reused. An incompatible pending selection can be replaced without duplicating a paid subscription.
 
 Omitting a `promoCode` or `offerId` that the pending checkout carries, including an Offer assigned through `PUT /subscriptions/{id}/offer`, replaces it with a new subscription and checkout without that benefit. Redirect to the returned `checkoutUrl`; the previous link stops working. To keep the Offer, send it again or assign it to the returned subscription ID.
@@ -596,12 +598,3 @@ Automatic dunning retries are anchored to the original decline on days 1, 3, 5, 
 The same `reactivate` operation charges the saved payment method, reuses the subscription record, and starts a fresh period anchored to the reactivation date. You may pass an `offerId`; accepted phases are persisted as an immutable Offer Application.
 
 The selected price is not snapshotted. Future renewals use its current catalog value. Archiving that price prevents new selection but does not break the existing subscription.
-
-## Related
-
-- [Grant Temporary Plan Access](/docs/plan-grants)
-- [Upgrade and Downgrade Plans](/docs/upgrade-and-downgrade-plans)
-- [Handle Failed Payments](/docs/handle-failed-payments)
-- [Regional and Market Pricing](/docs/regional-prices)
-- [Introductory Offers](/docs/introductory-offers)
-- [Customer Portal](/docs/customer-portal)

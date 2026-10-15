@@ -150,12 +150,3 @@ curl https://commet.co/api/v1/plans/pln_xxx \
 
 - [How Does Billing Work](/docs/how-does-billing-work)
 - [How Do Free Plans Work Without Payment](/docs/how-do-free-plans-work-without-payment)
-
-## Related
-
-- [Consumption Models](/docs/consumption-models) — Metered, Credits, and Balance explained
-- [Credit Packs](/docs/credit-packs) — Purchasable credit packages
-- [Plan Groups](/docs/plan-groups) — Enable self-service upgrades and downgrades
-- [Configure Features](/docs/configure-features) — Boolean, metered, and seat features
-- [Manage Subscriptions](/docs/manage-subscriptions) — Assign plans to customers
-- [Customer Portal](/docs/customer-portal) — Self-service billing portal

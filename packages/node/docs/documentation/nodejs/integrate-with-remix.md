@@ -1,6 +1,6 @@
 ---
 title: Integrate with Remix
-description: Add billing and payments to your Remix application.
+description: Add billing and payments to your Remix application with the Commet SDK, using actions and loaders for subscriptions and usage.
 ---
 
 Install the Commet Skill so your coding agent can integrate the current SDK and verify its work against the live API contract.
@@ -126,10 +126,3 @@ npx skills add commet-labs/skills --skill commet
      return redirect(portal.portalUrl)
    }
    ```
-
-## Related
-
-- [Subscriptions](/docs/manage-subscriptions)
-- [Track Usage](/docs/track-usage)
-- [Customer Portal](/docs/customer-portal)
-- [SDK Reference](/docs/sdk-reference)

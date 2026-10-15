@@ -38,10 +38,3 @@ See [Payment Providers](/docs/payment-providers) to connect your accounts and [P
 We believe the best companies of the future will be small teams of 5 to 30 people. Technology enables small teams to build incredible products, but monetization complexity shouldn't be a barrier.
 
 Commet exists to be the simplest, developer-preferred tool for monetization. We don't aim to solve every use case — we want to be the tool small teams choose when they want to monetize simply, globally, and without hassle.
-
-## Related
-
-- [Finance Overview](/docs/finance-overview) — Balances, payouts, and transaction history
-- [Acceptable Use Policy](/docs/acceptable-use) — What products and services can be sold through Commet
-- [Supported Countries](/docs/supported-countries) — 112 countries where Commet operates
-- [Payment Providers](/docs/payment-providers) — Connect Commet, Stripe, and dLocal payment rails

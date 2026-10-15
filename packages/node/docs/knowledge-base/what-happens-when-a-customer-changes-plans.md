@@ -103,9 +103,3 @@ You raise Plan Pro from 5,000 API calls to 10,000.
 
 All customers — new and existing — get 10,000 right away.
 ```
-
-## Related
-
-- [Proration](/docs/how-is-proration-calculated-when-changing-plans) — Exactly how mid-cycle charges are calculated
-- [Pricing Changes](/docs/what-happens-when-you-change-your-prices) — What happens when you change prices without changing plans
-- [Billing Intervals](/docs/how-do-monthly-quarterly-and-yearly-billing-work) — How quarterly and yearly billing works

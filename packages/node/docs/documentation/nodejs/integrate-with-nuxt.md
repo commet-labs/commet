@@ -1,6 +1,6 @@
 ---
 title: Integrate with Nuxt
-description: Add billing and payments to your Nuxt application.
+description: Add billing and payments to your Nuxt application with the Commet SDK, using server API routes for subscriptions and usage.
 ---
 
 Install the Commet Skill so your coding agent can integrate the current SDK and verify its work against the live API contract.
@@ -115,10 +115,3 @@ npx skills add commet-labs/skills --skill commet
      return sendRedirect(event, portal.portalUrl)
    })
    ```
-
-## Related
-
-- [Subscriptions](/docs/manage-subscriptions)
-- [Track Usage](/docs/track-usage)
-- [Customer Portal](/docs/customer-portal)
-- [SDK Reference](/docs/sdk-reference)

@@ -8,6 +8,7 @@ import type {
   DeletedSubscriptionAddon,
   PaymentMethodUpdateCheckout,
   PlanChange,
+  PrepaidPeriodsCheckout,
   PreviewChange,
   ReactivatedSubscription,
   RecoveryLink,
@@ -95,6 +96,15 @@ export interface UpdatePaymentMethodParams {
   successUrl?: string;
 }
 
+export interface CreatePrepaidPeriodsCheckoutParams {
+  id: string;
+  /** Active subscriptions: billing periods to add after the last paid period. Pending-payment subscriptions: total billing periods the first payment covers, including the current one. */
+  periods: number;
+  /** Offer applied from the first added period for its full configured duration. Active subscriptions only; assign an Offer to a pending-payment subscription with PUT /subscriptions/{id}/offer. */
+  offerId?: string;
+  successUrl?: string;
+}
+
 export interface PreviewChangePlanParams {
   id: string;
   planId: string;
@@ -158,6 +168,10 @@ export type CreateSubscriptionParams =
       /** @format date-time */
       startDate?: string;
       successUrl?: string;
+      /** Billing periods of the subscription's interval paid with the first payment, including the current one. Defaults to 1. The interval does not change: each paid period renews at zero and the subscription renews normally after the last one unless `cancelAtPeriodEnd` is true. */
+      prepaidPeriods?: number;
+      /** Schedules the cancellation from creation so the subscription ends after its last paid period and never renews with any payment method. */
+      cancelAtPeriodEnd?: boolean;
       offerId?: never;
       promoCode?: string;
       customTrialDays?: number;
@@ -183,6 +197,10 @@ export type CreateSubscriptionParams =
       /** @format date-time */
       startDate?: string;
       successUrl?: string;
+      /** Billing periods of the subscription's interval paid with the first payment, including the current one. Defaults to 1. The interval does not change: each paid period renews at zero and the subscription renews normally after the last one unless `cancelAtPeriodEnd` is true. */
+      prepaidPeriods?: number;
+      /** Schedules the cancellation from creation so the subscription ends after its last paid period and never renews with any payment method. */
+      cancelAtPeriodEnd?: boolean;
       offerId?: never;
       promoCode?: string;
       customTrialDays?: number;
@@ -208,6 +226,10 @@ export type CreateSubscriptionParams =
       /** @format date-time */
       startDate?: string;
       successUrl?: string;
+      /** Billing periods of the subscription's interval paid with the first payment, including the current one. Defaults to 1. The interval does not change: each paid period renews at zero and the subscription renews normally after the last one unless `cancelAtPeriodEnd` is true. */
+      prepaidPeriods?: number;
+      /** Schedules the cancellation from creation so the subscription ends after its last paid period and never renews with any payment method. */
+      cancelAtPeriodEnd?: boolean;
       offerId: string;
       promoCode?: never;
       customTrialDays?: never;
@@ -233,6 +255,10 @@ export type CreateSubscriptionParams =
       /** @format date-time */
       startDate?: string;
       successUrl?: string;
+      /** Billing periods of the subscription's interval paid with the first payment, including the current one. Defaults to 1. The interval does not change: each paid period renews at zero and the subscription renews normally after the last one unless `cancelAtPeriodEnd` is true. */
+      prepaidPeriods?: number;
+      /** Schedules the cancellation from creation so the subscription ends after its last paid period and never renews with any payment method. */
+      cancelAtPeriodEnd?: boolean;
       offerId: string;
       promoCode?: never;
       customTrialDays?: never;
@@ -258,6 +284,10 @@ export type CreateSubscriptionParams =
       /** @format date-time */
       startDate?: string;
       successUrl?: string;
+      /** Billing periods of the subscription's interval paid with the first payment, including the current one. Defaults to 1. The interval does not change: each paid period renews at zero and the subscription renews normally after the last one unless `cancelAtPeriodEnd` is true. */
+      prepaidPeriods?: number;
+      /** Schedules the cancellation from creation so the subscription ends after its last paid period and never renews with any payment method. */
+      cancelAtPeriodEnd?: boolean;
       offerId?: never;
       /** Public card promotion ID. The offer is shown immediately and remains conditional on card eligibility until checkout confirmation. */
       cardPromotionId: string;
@@ -285,6 +315,10 @@ export type CreateSubscriptionParams =
       /** @format date-time */
       startDate?: string;
       successUrl?: string;
+      /** Billing periods of the subscription's interval paid with the first payment, including the current one. Defaults to 1. The interval does not change: each paid period renews at zero and the subscription renews normally after the last one unless `cancelAtPeriodEnd` is true. */
+      prepaidPeriods?: number;
+      /** Schedules the cancellation from creation so the subscription ends after its last paid period and never renews with any payment method. */
+      cancelAtPeriodEnd?: boolean;
       offerId?: never;
       /** Public card promotion ID. The offer is shown immediately and remains conditional on card eligibility until checkout confirmation. */
       cardPromotionId: string;
@@ -429,7 +463,7 @@ export class SubscriptionsResource {
     );
   }
 
-  /** Creates a hosted checkout session for the customer to update the subscription's default payment method. */
+  /** Creates a hosted checkout to update the payment method of an active, trialing or past_due subscription. Pending-payment subscriptions must use their payment checkout. */
   async updatePaymentMethod(
     params: UpdatePaymentMethodParams,
     options?: RequestOptions,
@@ -437,6 +471,19 @@ export class SubscriptionsResource {
     const { id, ...rest } = params;
     return this.httpClient.post(
       `/subscriptions/${id}/payment-method/update`,
+      rest,
+      options,
+    );
+  }
+
+  /** Creates a hosted checkout to pay billing periods of a recurring subscription in advance with any payment method. On an active subscription the paid periods start after the last paid period and replace any open prepaid-periods checkout. On a pending-payment subscription the first payment covers the requested periods and replaces its pending checkout. The billing interval does not change. */
+  async createPrepaidPeriodsCheckout(
+    params: CreatePrepaidPeriodsCheckoutParams,
+    options?: RequestOptions,
+  ): Promise<PrepaidPeriodsCheckout> {
+    const { id, ...rest } = params;
+    return this.httpClient.post(
+      `/subscriptions/${id}/prepaid-periods`,
       rest,
       options,
     );

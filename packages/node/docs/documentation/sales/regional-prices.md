@@ -90,10 +90,3 @@ Accepted Offer phases are a separate immutable snapshot; the selected catalog pr
 ## v8 compatibility
 
 API `2026-07-24` and SDK v8 keep `/pricing/market-groups` and `commet.pricing.*`. API `2026-07-31` and SDK v9 use the top-level Market surface.
-
-## Related
-
-- [Offers](/docs/offers)
-- [Create Plans](/docs/create-plans)
-- [Manage Subscriptions](/docs/manage-subscriptions)
-- [Markets API reference](/docs/api-reference/markets/list-markets)

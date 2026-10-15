@@ -1,6 +1,6 @@
 ---
 title: Commet Skills
-description: Give AI agents expert-level billing knowledge with Agent Skills.
+description: Install Commet Agent Skills with one command so coding agents such as Claude Code and Cursor know the SDK, pricing models and billing patterns.
 ---
 
 Agent Skills give AI agents modular billing capabilities — SDK integration, pricing models, subscription patterns, and billing best practices. Install all skills with a single command.

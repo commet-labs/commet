@@ -70,10 +70,3 @@ await commet.subscriptions.create({
   promoCode: 'LAUNCH50',
 })
 ```
-
-## Related
-
-- [Offers](/docs/offers)
-- [Promotional Offers](/docs/promotional-offers)
-- [Introductory Offers](/docs/introductory-offers)
-- [Manage Subscriptions](/docs/manage-subscriptions)

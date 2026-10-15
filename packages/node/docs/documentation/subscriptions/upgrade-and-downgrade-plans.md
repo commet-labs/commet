@@ -1,6 +1,6 @@
 ---
 title: Upgrade and Downgrade Plans
-description: How customers change plans through the Customer Portal and dashboard.
+description: Upgrades apply immediately with proration and downgrades wait for renewal, whether customers change plans in the portal or you do it in the dashboard.
 ---
 
 Customers change plans through the [Customer Portal](/docs/customer-portal) or from the dashboard. Commet handles proration, feature transitions, and billing adjustments automatically.
@@ -28,9 +28,3 @@ From a customer's subscription detail page, click **Change Plan** and select the
 
 - [What Happens When a Customer Changes Plans](/docs/what-happens-when-a-customer-changes-plans)
 - [How Is Proration Calculated](/docs/how-is-proration-calculated-when-changing-plans)
-
-## Related
-
-- [Manage Subscriptions](/docs/manage-subscriptions) — Create, get, and cancel subscriptions
-- [Plan Groups](/docs/plan-groups) — Group plans together for self-service upgrades
-- [Customer Portal](/docs/customer-portal) — Self-service billing portal for customers
