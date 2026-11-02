@@ -58,3 +58,22 @@ describe("Customers — id (external_id) on the wire", () => {
     expect(customers[1]).not.toHaveProperty("id");
   });
 });
+
+describe("Customers — starting plan group on the wire", () => {
+  beforeEach(() => {
+    vi.stubGlobal("fetch", vi.fn());
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("create sends the plan group whose starting plan the customer starts on", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(jsonResponse({ id: "cus_x" }));
+    const client = new Commet({ apiKey: "ck_test_123" });
+
+    await client.customers.create({ email: "a@b.com", planGroupId: "pg_1" });
+
+    expect(lastBody().planGroupId).toBe("pg_1");
+  });
+});

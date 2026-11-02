@@ -529,7 +529,7 @@ describe("Offers — contract-generated CRUD", () => {
     await client().offers.update({
       id: "offer_1",
       name: "Launch",
-      phases: [{ type: "free_trial", durationDays: 14 }],
+      phases: [{ type: "percentage", durationCycles: 3, percentage: 2000 }],
       active: false,
     });
 

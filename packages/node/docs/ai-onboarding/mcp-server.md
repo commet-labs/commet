@@ -199,7 +199,7 @@ The following Commet-specific tools remain available:
 | `get_current_organization` | Get the organization used by API tools                 |
 | `search_docs`              | Search the live Commet documentation by semantic query |
 
-The previous MCP endpoint remains available at `https://commet.co/mcp` with its original tools and behavior. New connections should use v2.
+The previous endpoint, `https://commet.co/mcp`, is retired. It no longer exposes tools: it tells the connected agent to reconnect at `https://commet.co/mcp/v2`. Replace the URL in your client configuration and sign in again.
 
 > **Warning**
 >

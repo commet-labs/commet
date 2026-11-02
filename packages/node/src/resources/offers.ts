@@ -11,10 +11,6 @@ export interface UpdateOfferParams {
   name: string;
   phases: Array<
     | {
-        type: "free_trial";
-        durationDays: number;
-      }
-    | {
         type: "percentage";
         durationCycles: number | null;
         /** Unit the phase duration is counted in. Only a fixed-price phase may set it, because its amount is declared rather than derived from the plan. Defaults to the plan's own billing interval. */
@@ -82,10 +78,6 @@ export interface ListOffersParams {
 export interface CreateOfferParams {
   name: string;
   phases: Array<
-    | {
-        type: "free_trial";
-        durationDays: number;
-      }
     | {
         type: "percentage";
         durationCycles: number | null;

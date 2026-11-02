@@ -138,6 +138,8 @@ export interface CreatedSubscription {
   billingDayOfMonth: number | null;
   nextBillingDate: string | null;
   checkoutUrl: string | null;
+  /** Whether Commet can charge this subscription on its own at its next charge (the trial end or the renewal). A trial that started without a payment method reports false until the customer adds one for this subscription; a payment method saved for another subscription does not count. A subscription on a free plan reports false. */
+  hasPaymentMethod: boolean;
   /** @format date-time */
   createdAt: string;
   /** @format date-time */
@@ -684,6 +686,8 @@ export interface InvoiceListItem {
   livemode: boolean;
 }
 
+export type ManagedBy = "dub" | null;
+
 export interface Market {
   id: string;
   name: string;
@@ -701,10 +705,6 @@ export interface Offer {
   id: string;
   name: string;
   phases: Array<
-    | {
-        type: "free_trial";
-        durationDays: number;
-      }
     | {
         type: "percentage";
         durationCycles: number | null;
@@ -758,6 +758,8 @@ export interface Offer {
   startsAt: string | null;
   endsAt: string | null;
   active: boolean;
+  /** Integration that manages this record, or null when the merchant does. While an integration manages it, its terms change only in that integration and edits answer 409 managed_by_integration. */
+  managedBy: ManagedBy;
   /** @format date-time */
   createdAt: string;
   /** @format date-time */
@@ -872,6 +874,24 @@ export interface Plan {
   isDefault: boolean;
   isFree: boolean;
   blockOnExhaustion: boolean | null;
+  /** Credits plans only; null for other consumption models. What happens to unused plan credits at each reset. Purchased credits never expire and never count toward maxPlanCredits. */
+  unusedPlanCredits:
+    | {
+        type: "expire";
+      }
+    | {
+        type: "roll_over";
+        /** The most plan credits a subscription holds after a reset, including the credits that reset grants; credits above it expire. At least the included credits of every price. null means no limit other than the largest storable balance, 2,147,483,647 plan credits. */
+        maxPlanCredits: number | null;
+      }
+    | null;
+  /** Credits plans only. The most plan credits a subscription spends per day or per week; null means no limit. */
+  planCreditLimit: {
+    /** The most plan credits a subscription spends in one window. */
+    credits: number;
+    /** The window length: `day` is 24 hours and `week` is 7 days, starting at the time of day of the subscription's billing anchor. */
+    interval: "day" | "week";
+  } | null;
   sortOrder: number;
   planGroupId: string | null;
   metadata: Record<string, unknown> | null;
@@ -906,6 +926,8 @@ export interface Plan {
     price: number;
     isDefault: boolean;
     trialDays: number;
+    /** Whether the price's free trial needs a payment method to start. When false, a new subscription starts trialing right away without checkout; without a payment method added by the trial end, the customer moves to the plan group's default plan, or the subscription is canceled when there is none. Null when the price has no trial. */
+    trialRequiresPaymentMethod: boolean | null;
     includedBalance: number | null;
     includedCredits: number | null;
     /** Automatic introductory offer for this price. Pass a Promotional Offer ID when creating a subscription to override it. */
@@ -1251,6 +1273,8 @@ export interface PlanPrice {
   price: number;
   isDefault: boolean;
   trialDays: number;
+  /** Whether the price's free trial needs a payment method to start. When false, a new subscription starts trialing right away without checkout; without a payment method added by the trial end, the customer moves to the plan group's default plan, or the subscription is canceled when there is none. Null when the price has no trial. */
+  trialRequiresPaymentMethod: boolean | null;
   includedBalance: number | null;
   includedCredits: number | null;
   /** Automatic introductory offer for this price. */
@@ -1410,6 +1434,10 @@ export interface PromoCode {
   expiresAt: string | null;
   isActive: boolean;
   redemptionCount: number;
+  /** Whether the code only applies to a customer's first purchase: one with no paid invoice above zero and no paid subscription. */
+  firstPurchaseOnly: boolean;
+  /** Integration that manages this record, or null when the merchant does. While an integration manages it, its terms change only in that integration and edits answer 409 managed_by_integration. */
+  managedBy: ManagedBy;
   /** @format date-time */
   createdAt: string;
   /** @format date-time */
@@ -1628,6 +1656,8 @@ export interface Subscription {
   billingDayOfMonth: number | null;
   nextBillingDate: string | null;
   checkoutUrl: string | null;
+  /** Whether Commet can charge this subscription on its own at its next charge (the trial end or the renewal). A trial that started without a payment method reports false until the customer adds one for this subscription; a payment method saved for another subscription does not count. A subscription on a free plan reports false. */
+  hasPaymentMethod: boolean;
   /** @format date-time */
   createdAt: string;
   /** @format date-time */
@@ -1744,6 +1774,35 @@ export interface SubscriptionAddon {
   status: "active";
   proratedCharge: number;
   object: "subscription_addon";
+  livemode: boolean;
+}
+
+export interface SubscriptionAutoTopUp {
+  /** Whether credits are bought automatically. Always false when the plan does not sell credits. */
+  enabled: boolean;
+  /** Credits at or below which a top-up is bought, or null when never configured. */
+  threshold: number | null;
+  /** Credits each top-up buys, or null when never configured. */
+  quantity: number | null;
+  /** Maximum top-ups per credit renewal period, or null when never configured. */
+  maxPerPeriod: number | null;
+  /** active buys when credits reach the threshold; paused stops after three consecutive failed top-ups, or after one whose charge could not be refunded, until the payment method changes, a credit purchase succeeds or it is saved enabled again; off buys nothing. */
+  status: "active" | "paused" | "off";
+  /** Top-ups bought in the current credit renewal period. */
+  topUpsThisPeriod: number;
+  /** When the top-up count of the period resets, or null before the subscription starts its first period. */
+  periodResetsAt: string | null;
+  /** The last top-up that failed, or null when none has failed. */
+  lastFailure: {
+    reason:
+      | "payment_declined"
+      | "no_payment_method"
+      | "quantity_below_minimum"
+      | "purchase_failed";
+    /** @format date-time */
+    at: string;
+  } | null;
+  object: "subscription_auto_top_up";
   livemode: boolean;
 }
 
@@ -1888,6 +1947,8 @@ export interface SubscriptionSummary {
   billingDayOfMonth: number | null;
   nextBillingDate: string | null;
   checkoutUrl: string | null;
+  /** Whether Commet can charge this subscription on its own at its next charge (the trial end or the renewal). A trial that started without a payment method reports false until the customer adds one for this subscription; a payment method saved for another subscription does not count. A subscription on a free plan reports false. */
+  hasPaymentMethod: boolean;
   /** @format date-time */
   createdAt: string;
   /** @format date-time */
@@ -2154,6 +2215,21 @@ export type UsageCheck =
       planCredits: number;
       purchasedCredits: number;
       totalCredits: number;
+      planCreditLimit: {
+        /** The most plan credits the subscription spends per window. */
+        credits: number;
+        /** The window length: 24 hours for `day`, 7 days for `week`. */
+        interval: "day" | "week";
+        /** Plan credits spent in the current window. */
+        spent: number;
+        /** Plan credits the subscription can still spend in the current window. Purchased credits are not limited. */
+        remaining: number;
+        /**
+         * When the next window starts and spending resets.
+         * @format date-time
+         */
+        resetsAt: string;
+      } | null;
       object: "usage_check";
       livemode: boolean;
     }
@@ -2193,6 +2269,22 @@ export interface UsageEvent {
     deducted: number;
     remaining: number;
     blocked: boolean;
+    /** Credits consumption only, omitted for balance. The plan credit limit after this event; null when the plan has no limit. */
+    planCreditLimit?: {
+      /** The most plan credits the subscription spends per window. */
+      credits: number;
+      /** The window length: 24 hours for `day`, 7 days for `week`. */
+      interval: "day" | "week";
+      /** Plan credits spent in the current window. */
+      spent: number;
+      /** Plan credits the subscription can still spend in the current window. Purchased credits are not limited. */
+      remaining: number;
+      /**
+       * When the next window starts and spending resets.
+       * @format date-time
+       */
+      resetsAt: string;
+    } | null;
   };
   object: "usage_event";
   livemode: boolean;

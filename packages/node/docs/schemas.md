@@ -205,6 +205,7 @@ Generated from Commet API version `2026-08-27`.
 - `billingDayOfMonth` (`number | null`, required)
 - `nextBillingDate` (`string | null`, required)
 - `checkoutUrl` (`string | null`, required)
+- `hasPaymentMethod` (`boolean`, required) — Whether Commet can charge this subscription on its own at its next charge (the trial end or the renewal). A trial that started without a payment method reports false until the customer adds one for this subscription; a payment method saved for another subscription does not count. A subscription on a free plan reports false.
 - `createdAt` (`string`, required)
 - `updatedAt` (`string`, required)
 - `offerApplications` (`Array<SubscriptionOfferApplication>`, required)
@@ -413,6 +414,13 @@ Variants:
 - `object` (`"invoice"`, required)
 - `livemode` (`boolean`, required)
 
+### ManagedBy
+
+Variants:
+
+- `"dub"`
+- `null`
+
 ### Market
 
 - `id` (`string`, required)
@@ -428,11 +436,12 @@ Variants:
 
 - `id` (`string`, required)
 - `name` (`string`, required)
-- `phases` (`Array<{ type: "free_trial"; durationDays: number } | { type: "percentage"; durationCycles: number | null; durationInterval: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | null; percentage: number } | { type: "amount_off"; durationCycles: number | null; durationInterval: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | null; amounts: Array<{ currency: string; amount: number }> } | { type: "fixed_price"; durationCycles: number | null; durationInterval: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | null; prices: Array<{ currency: string; amount: number }> }>`, required)
+- `phases` (`Array<{ type: "percentage"; durationCycles: number | null; durationInterval: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | null; percentage: number } | { type: "amount_off"; durationCycles: number | null; durationInterval: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | null; amounts: Array<{ currency: string; amount: number }> } | { type: "fixed_price"; durationCycles: number | null; durationInterval: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | null; prices: Array<{ currency: string; amount: number }> }>`, required)
 - `metadata` (`Record<string, unknown>`, required)
 - `startsAt` (`string | null`, required)
 - `endsAt` (`string | null`, required)
 - `active` (`boolean`, required)
+- `managedBy` (`ManagedBy`, required) — Integration that manages this record, or null when the merchant does. While an integration manages it, its terms change only in that integration and edits answer 409 managed_by_integration.
 - `createdAt` (`string`, required)
 - `updatedAt` (`string`, required)
 - `object` (`"offer"`, required)
@@ -506,13 +515,15 @@ Variants:
 - `isDefault` (`boolean`, required)
 - `isFree` (`boolean`, required)
 - `blockOnExhaustion` (`boolean | null`, required)
+- `unusedPlanCredits` (`{ type: "expire" } | { type: "roll_over"; maxPlanCredits: number | null } | null`, required) — Credits plans only; null for other consumption models. What happens to unused plan credits at each reset. Purchased credits never expire and never count toward maxPlanCredits.
+- `planCreditLimit` (`{ credits: number; interval: "day" | "week" } | null`, required) — Credits plans only. The most plan credits a subscription spends per day or per week; null means no limit.
 - `sortOrder` (`number`, required)
 - `planGroupId` (`string | null`, required)
 - `metadata` (`Record<string, unknown> | null`, required)
 - `createdAt` (`string`, required)
 - `updatedAt` (`string`, required)
 - `features` (`Array<{ code: string; name: string; type: FeatureType; unitName: string | null; enabled: boolean; includedAmount: number | null; unlimited: boolean; overage: { enabled: boolean; model: "per_unit" | null; unitPrice: number | null } | null; regionalPrices: Array<{ currency: string; overageUnitPrice: number | null; autoSynced: boolean }> }>`, required)
-- `prices` (`Array<{ id: string; billingInterval: BillingInterval; price: number; isDefault: boolean; trialDays: number; includedBalance: number | null; includedCredits: number | null; offerId: string | null; inheritsFromPriceId: string | null; metadata: Record<string, unknown>; marketPrices: Array<{ marketGroupId: string; currency: string; price: number }>; regionalPrices: Array<{ currency: string; price: number; includedBalance: number | null; autoSynced: boolean }> }>`, required)
+- `prices` (`Array<{ id: string; billingInterval: BillingInterval; price: number; isDefault: boolean; trialDays: number; trialRequiresPaymentMethod: boolean | null; includedBalance: number | null; includedCredits: number | null; offerId: string | null; inheritsFromPriceId: string | null; metadata: Record<string, unknown>; marketPrices: Array<{ marketGroupId: string; currency: string; price: number }>; regionalPrices: Array<{ currency: string; price: number; includedBalance: number | null; autoSynced: boolean }> }>`, required)
 - `exchangeRates` (`Array<{ currency: string; exchangeRate: number }>`, required)
 - `object` (`"plan"`, required)
 - `livemode` (`boolean`, required)
@@ -592,6 +603,7 @@ Variants:
 - `price` (`number`, required) — Price in the currency's minor unit (for example, cents for USD).
 - `isDefault` (`boolean`, required)
 - `trialDays` (`number`, required)
+- `trialRequiresPaymentMethod` (`boolean | null`, required) — Whether the price's free trial needs a payment method to start. When false, a new subscription starts trialing right away without checkout; without a payment method added by the trial end, the customer moves to the plan group's default plan, or the subscription is canceled when there is none. Null when the price has no trial.
 - `includedBalance` (`number | null`, required)
 - `includedCredits` (`number | null`, required)
 - `offerId` (`string | null`, required) — Automatic introductory offer for this price.
@@ -656,6 +668,8 @@ Variants:
 - `expiresAt` (`string | null`, required)
 - `isActive` (`boolean`, required)
 - `redemptionCount` (`number`, required)
+- `firstPurchaseOnly` (`boolean`, required) — Whether the code only applies to a customer's first purchase: one with no paid invoice above zero and no paid subscription.
+- `managedBy` (`ManagedBy`, required) — Integration that manages this record, or null when the merchant does. While an integration manages it, its terms change only in that integration and edits answer 409 managed_by_integration.
 - `createdAt` (`string`, required)
 - `updatedAt` (`string`, required)
 - `object` (`"promo_code"`, required)
@@ -760,6 +774,7 @@ Variants:
 - `billingDayOfMonth` (`number | null`, required)
 - `nextBillingDate` (`string | null`, required)
 - `checkoutUrl` (`string | null`, required)
+- `hasPaymentMethod` (`boolean`, required) — Whether Commet can charge this subscription on its own at its next charge (the trial end or the renewal). A trial that started without a payment method reports false until the customer adds one for this subscription; a payment method saved for another subscription does not count. A subscription on a free plan reports false.
 - `createdAt` (`string`, required)
 - `updatedAt` (`string`, required)
 - `offerApplications` (`Array<SubscriptionOfferApplication>`, required)
@@ -779,6 +794,19 @@ Variants:
 - `status` (`"active"`, required)
 - `proratedCharge` (`number`, required)
 - `object` (`"subscription_addon"`, required)
+- `livemode` (`boolean`, required)
+
+### SubscriptionAutoTopUp
+
+- `enabled` (`boolean`, required) — Whether credits are bought automatically. Always false when the plan does not sell credits.
+- `threshold` (`number | null`, required) — Credits at or below which a top-up is bought, or null when never configured.
+- `quantity` (`number | null`, required) — Credits each top-up buys, or null when never configured.
+- `maxPerPeriod` (`number | null`, required) — Maximum top-ups per credit renewal period, or null when never configured.
+- `status` (`"active" | "paused" | "off"`, required) — active buys when credits reach the threshold; paused stops after three consecutive failed top-ups, or after one whose charge could not be refunded, until the payment method changes, a credit purchase succeeds or it is saved enabled again; off buys nothing.
+- `topUpsThisPeriod` (`number`, required) — Top-ups bought in the current credit renewal period.
+- `periodResetsAt` (`string | null`, required) — When the top-up count of the period resets, or null before the subscription starts its first period.
+- `lastFailure` (`{ reason: "payment_declined" | "no_payment_method" | "quantity_below_minimum" | "purchase_failed"; at: string } | null`, required) — The last top-up that failed, or null when none has failed.
+- `object` (`"subscription_auto_top_up"`, required)
 - `livemode` (`boolean`, required)
 
 ### SubscriptionOfferApplication
@@ -834,6 +862,7 @@ Variants:
 - `billingDayOfMonth` (`number | null`, required)
 - `nextBillingDate` (`string | null`, required)
 - `checkoutUrl` (`string | null`, required)
+- `hasPaymentMethod` (`boolean`, required) — Whether Commet can charge this subscription on its own at its next charge (the trial end or the renewal). A trial that started without a payment method reports false until the customer adds one for this subscription; a payment method saved for another subscription does not count. A subscription on a free plan reports false.
 - `createdAt` (`string`, required)
 - `updatedAt` (`string`, required)
 - `offerApplications` (`Array<SubscriptionOfferApplication>`, required)
@@ -937,7 +966,7 @@ Variants:
 Variants:
 
 - `{ allowed: boolean; subscriptionStatus: string; featureCode: string; quantity: number; reason?: string; message?: string; consumptionModel: "metered"; current: number; remaining: number; unlimited: boolean; included: number; overageEnabled: boolean; overageUnitPrice: number | null; object: "usage_check"; livemode: boolean }`
-- `{ allowed: boolean; subscriptionStatus: string; featureCode: string; quantity: number; reason?: string; message?: string; consumptionModel: "credits"; creditsPerUnit: number; estimatedCredits: number; planCredits: number; purchasedCredits: number; totalCredits: number; object: "usage_check"; livemode: boolean }`
+- `{ allowed: boolean; subscriptionStatus: string; featureCode: string; quantity: number; reason?: string; message?: string; consumptionModel: "credits"; creditsPerUnit: number; estimatedCredits: number; planCredits: number; purchasedCredits: number; totalCredits: number; planCreditLimit: { credits: number; interval: "day" | "week"; spent: number; remaining: number; resetsAt: string } | null; object: "usage_check"; livemode: boolean }`
 - `{ allowed: boolean; subscriptionStatus: string; featureCode: string; quantity: number; reason?: string; message?: string; consumptionModel: "balance"; unitPrice: number; estimatedAmount: number; currentBalance: number; blockOnExhaustion: boolean; currency: string; object: "usage_check"; livemode: boolean }`
 
 ### UsageEvent
@@ -950,7 +979,7 @@ Variants:
 - `ts` (`string`, required)
 - `createdAt` (`string`, required)
 - `properties` (`Array<{ property: string; value: string }>`, required)
-- `consumption` (`{ model: "credits" | "balance"; deducted: number; remaining: number; blocked: boolean }`, optional)
+- `consumption` (`{ model: "credits" | "balance"; deducted: number; remaining: number; blocked: boolean; planCreditLimit?: { credits: number; interval: "day" | "week"; spent: number; remaining: number; resetsAt: string } | null }`, optional)
 - `object` (`"usage_event"`, required)
 - `livemode` (`boolean`, required)
 

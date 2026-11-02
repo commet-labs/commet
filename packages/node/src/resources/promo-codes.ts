@@ -20,6 +20,8 @@ export interface UpdatePromoCodeParams {
   expiresAt?: string | null;
   active?: boolean;
   planIds?: Array<string>;
+  /** Whether the code only applies to a customer's first purchase: one with no paid invoice above zero and no paid subscription. */
+  firstPurchaseOnly?: boolean;
 }
 
 export interface ListPromoCodesParams {
@@ -42,6 +44,8 @@ export interface CreatePromoCodeParams {
   /** @format date-time */
   expiresAt?: string;
   planIds?: Array<string>;
+  /** Whether the code only applies to a customer's first purchase: one with no paid invoice above zero and no paid subscription. Defaults to false. */
+  firstPurchaseOnly?: boolean;
 }
 
 export class PromoCodesResource {
@@ -78,7 +82,7 @@ export class PromoCodesResource {
     return this.httpClient.get("/promo-codes", params, options);
   }
 
-  /** Create a distribution code for an existing Offer with one or more sequential discount phases and an optional leading trial. The code owns redemption restrictions. */
+  /** Create a distribution code for an existing Offer with one or more sequential discount phases. The code owns redemption restrictions. */
   async create(
     params: CreatePromoCodeParams,
     options?: RequestOptions,

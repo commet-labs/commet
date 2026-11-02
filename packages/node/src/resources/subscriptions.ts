@@ -14,6 +14,7 @@ import type {
   RecoveryLink,
   Subscription,
   SubscriptionAddon,
+  SubscriptionAutoTopUp,
   SubscriptionResume,
   SubscriptionSummary,
 } from "../types/models";
@@ -27,6 +28,18 @@ export interface DeactivateAddonParams {
 export interface ActivateAddonParams {
   id: string;
   addonId: string;
+}
+
+export interface GetSubscriptionAutoTopUpParams {
+  id: string;
+}
+
+export interface UpdateSubscriptionAutoTopUpParams {
+  id: string;
+  enabled?: boolean;
+  threshold?: number;
+  quantity?: number;
+  maxPerPeriod?: number;
 }
 
 export interface AdjustBalanceParams {
@@ -47,23 +60,45 @@ export interface CancelSubscriptionParams {
   immediate?: boolean;
 }
 
-export interface ChangePlanParams {
-  id: string;
-  newPlanId?: string;
-  newBillingInterval?:
-    | "weekly"
-    | "monthly"
-    | "quarterly"
-    | "semiannual"
-    | "yearly";
-  successUrl?: string;
-  offerId?: string;
-}
+export type ChangePlanParams =
+  | {
+      id: string;
+      newPlanId?: string;
+      newBillingInterval?:
+        | "weekly"
+        | "monthly"
+        | "quarterly"
+        | "semiannual"
+        | "yearly";
+      successUrl?: string;
+      offerId?: string;
+      promoCode?: never;
+    }
+  | {
+      id: string;
+      newPlanId?: string;
+      newBillingInterval?:
+        | "weekly"
+        | "monthly"
+        | "quarterly"
+        | "semiannual"
+        | "yearly";
+      successUrl?: string;
+      offerId?: never;
+      /** Promo code whose Offer prices the change, validated with the checkout's rules: a code the checkout would refuse returns 400 validation_error with the checkout's reason in details.reason. Cannot be combined with offerId. */
+      promoCode: string;
+    };
 
-export interface PurchaseCreditsParams {
-  id: string;
-  creditPackId: string;
-}
+export type PurchaseCreditsParams =
+  | {
+      id: string;
+      creditPackId: string;
+      quantity?: never;
+    }
+  | {
+      id: string;
+      quantity: number;
+    };
 
 export interface ApplySubscriptionOfferParams {
   id: string;
@@ -105,18 +140,34 @@ export interface CreatePrepaidPeriodsCheckoutParams {
   successUrl?: string;
 }
 
-export interface PreviewChangePlanParams {
-  id: string;
-  planId: string;
-  billingInterval?:
-    | "weekly"
-    | "monthly"
-    | "quarterly"
-    | "semiannual"
-    | "yearly"
-    | "one_time";
-  offerId?: string;
-}
+export type PreviewChangePlanParams =
+  | {
+      id: string;
+      planId: string;
+      billingInterval?:
+        | "weekly"
+        | "monthly"
+        | "quarterly"
+        | "semiannual"
+        | "yearly"
+        | "one_time";
+      offerId?: string;
+      promoCode?: never;
+    }
+  | {
+      id: string;
+      planId: string;
+      billingInterval?:
+        | "weekly"
+        | "monthly"
+        | "quarterly"
+        | "semiannual"
+        | "yearly"
+        | "one_time";
+      offerId?: never;
+      /** Promo code whose Offer prices the change, validated with the checkout's rules: a code the checkout would refuse returns 400 validation_error with the checkout's reason in details.reason. Cannot be combined with offerId. */
+      promoCode: string;
+    };
 
 export interface ReactivateSubscriptionParams {
   id: string;
@@ -132,6 +183,10 @@ export interface ResumeSubscriptionParams {
 }
 
 export interface GetSubscriptionParams {
+  id: string;
+}
+
+export interface RevokeScheduledPlanChangeParams {
   id: string;
 }
 
@@ -174,6 +229,7 @@ export type CreateSubscriptionParams =
       cancelAtPeriodEnd?: boolean;
       offerId?: never;
       promoCode?: string;
+      /** Trial length in days, replacing the price's trial. A customer who already had this plan, in a trial or paying, gets no trial and goes through the regular checkout. */
       customTrialDays?: number;
       skipTrial?: boolean;
       planId: string;
@@ -203,6 +259,7 @@ export type CreateSubscriptionParams =
       cancelAtPeriodEnd?: boolean;
       offerId?: never;
       promoCode?: string;
+      /** Trial length in days, replacing the price's trial. A customer who already had this plan, in a trial or paying, gets no trial and goes through the regular checkout. */
       customTrialDays?: number;
       skipTrial?: boolean;
       planCode: string;
@@ -232,8 +289,9 @@ export type CreateSubscriptionParams =
       cancelAtPeriodEnd?: boolean;
       offerId: string;
       promoCode?: never;
-      customTrialDays?: never;
-      skipTrial?: false;
+      /** Trial length in days, replacing the price's trial. A customer who already had this plan, in a trial or paying, gets no trial and goes through the regular checkout. */
+      customTrialDays?: number;
+      skipTrial?: boolean;
       planId: string;
     }
   | {
@@ -261,8 +319,9 @@ export type CreateSubscriptionParams =
       cancelAtPeriodEnd?: boolean;
       offerId: string;
       promoCode?: never;
-      customTrialDays?: never;
-      skipTrial?: false;
+      /** Trial length in days, replacing the price's trial. A customer who already had this plan, in a trial or paying, gets no trial and goes through the regular checkout. */
+      customTrialDays?: number;
+      skipTrial?: boolean;
       planCode: string;
     }
   | {
@@ -353,6 +412,32 @@ export class SubscriptionsResource {
     return this.httpClient.post(`/subscriptions/${id}/addons`, rest, options);
   }
 
+  /** Read whether the subscription buys credits automatically with its saved payment method when credits reach a threshold, with the top-ups used this period and the last failure. */
+  async getAutoTopUp(
+    params: GetSubscriptionAutoTopUpParams,
+    options?: RequestOptions,
+  ): Promise<SubscriptionAutoTopUp> {
+    const { id } = params;
+    return this.httpClient.get(
+      `/subscriptions/${id}/auto-top-up`,
+      undefined,
+      options,
+    );
+  }
+
+  /** Turn automatic credit purchases on or off and set the threshold, the credits each top-up buys and the maximum top-ups per period. Send only the fields that change. Enabling requires a plan that sells credits. The quantity must be at least the plan's purchase minimum when auto top-up is enabled or when the quantity changes, so turning it off keeps working after the minimum rises. Saving it enabled resumes a paused auto top-up. */
+  async updateAutoTopUp(
+    params: UpdateSubscriptionAutoTopUpParams,
+    options?: RequestOptions,
+  ): Promise<SubscriptionAutoTopUp> {
+    const { id, ...rest } = params;
+    return this.httpClient.patch(
+      `/subscriptions/${id}/auto-top-up`,
+      rest,
+      options,
+    );
+  }
+
   /** Adjust a subscription's balance or credits by a signed amount. Positive adds, negative subtracts. */
   async adjustBalance(
     params: AdjustBalanceParams,
@@ -388,7 +473,7 @@ export class SubscriptionsResource {
     return this.httpClient.post(`/subscriptions/${id}/cancel`, rest, options);
   }
 
-  /** Upgrade or change billing interval immediately, optionally applying an Offer. Scheduled changes do not accept offers. */
+  /** Upgrade or change billing interval immediately, optionally applying an Offer by offerId or the Offer of a promoCode. Scheduled changes accept neither offerId nor promoCode. From a free plan, a promoCode opens the checkout with the code applied and counts its use when the checkout is paid; without offerId or promoCode, a destination price whose free trial requires no payment method starts that trial right away without checkout. During a trial without a payment method, an immediate change returns 409 no_payment_method; scheduled changes still apply. */
   async changePlan(
     params: ChangePlanParams,
     options?: RequestOptions,
@@ -401,7 +486,7 @@ export class SubscriptionsResource {
     );
   }
 
-  /** Purchase a credit pack for a subscription. Charges the customer and adds credits to their balance. */
+  /** Purchase a fixed credit pack or choose a whole credit quantity at the subscription plan price and minimum. Charges the saved payment method and adds purchased credits. */
   async purchaseCredits(
     params: PurchaseCreditsParams,
     options?: RequestOptions,
@@ -410,7 +495,7 @@ export class SubscriptionsResource {
     return this.httpClient.post(`/subscriptions/${id}/credits`, rest, options);
   }
 
-  /** Apply a direct Offer to a subscription. On a pending payment checkout it quotes or replaces the checkout discount and the existing checkout URL remains unchanged. On an active subscription it applies the Offer immediately with its discount phases starting at the next billing cycle; the call is rejected while another applied Offer still has active or upcoming discount phases. Offers with a free trial phase cannot be applied after checkout creation. */
+  /** Apply a direct Offer to a subscription. On a pending checkout it quotes or replaces the checkout discount, which starts after the plan price trial when there is one, and the existing checkout URL remains unchanged. On an active subscription it applies the Offer immediately with its discount phases starting at the next billing cycle; the call is rejected while another applied Offer still has active or upcoming discount phases. */
   async applyOffer(
     params: ApplySubscriptionOfferParams,
     options?: RequestOptions,
@@ -489,7 +574,7 @@ export class SubscriptionsResource {
     );
   }
 
-  /** Preview proration details for an immediate plan change without applying it. Free-to-paid changes are never scheduled and the change-plan endpoint always returns hosted checkout for them. For paid plans, interval direction takes precedence: a longer interval is immediate and a shorter interval is scheduled. When the interval is unchanged, a higher-sort-order plan is immediate and a lower-sort-order plan is scheduled. A paid-to-free change is always scheduled. Returns credit, charge, and net amount. The target plan must belong to the same plan group as the current plan, otherwise a 400 with code `plans_not_in_same_group` is returned. A change between two free plans has nothing to prorate and returns a zero-amount estimate. Scheduled changes return a 400 with code `plan_change_scheduled`; apply those via the change-plan endpoint. Pass offerId to quote the destination plan with an Offer. */
+  /** Preview proration details for an immediate plan change without applying it. Free-to-paid changes are never scheduled and the change-plan endpoint returns hosted checkout for them, except a change without offerId or promoCode to a price whose free trial needs no payment method, for a customer who never had that plan: it starts the trial at once, so the preview reports nothing due today. For paid plans, interval direction takes precedence: a longer interval is immediate and a shorter interval is scheduled. When the interval is unchanged, a higher-sort-order plan is immediate and a lower-sort-order plan is scheduled. A paid-to-free change is always scheduled. Returns credit, charge, and net amount. The target plan must belong to the same plan group as the current plan, otherwise a 400 with code `plans_not_in_same_group` is returned. A change between two free plans has nothing to prorate and returns a zero-amount estimate. Scheduled changes return a 400 with code `plan_change_scheduled`; apply those via the change-plan endpoint. Pass offerId to quote the destination plan with an Offer, or promoCode to quote it with the Offer of a promo code validated with the checkout's rules. */
   async previewChange(
     params: PreviewChangePlanParams,
     options?: RequestOptions,
@@ -546,6 +631,19 @@ export class SubscriptionsResource {
     return this.httpClient.get(`/subscriptions/${id}`, undefined, options);
   }
 
+  /** Revoke the plan or interval change scheduled for the end of the period, so the subscription stays on its current plan. Returns the updated subscription. */
+  async revokeScheduledPlanChange(
+    params: RevokeScheduledPlanChangeParams,
+    options?: RequestOptions,
+  ): Promise<Subscription> {
+    const { id } = params;
+    return this.httpClient.delete(
+      `/subscriptions/${id}/scheduled-plan-change`,
+      undefined,
+      options,
+    );
+  }
+
   /** Revert a scheduled cancellation and return the updated subscription. Only works before cancellation takes effect. */
   async uncancel(
     params: UncancelSubscriptionParams,
@@ -576,7 +674,7 @@ export class SubscriptionsResource {
     return this.httpClient.get("/subscriptions", params, options);
   }
 
-  /** Create a subscription for a customer. Commet selects the default price when priceId is omitted. The subscription starts at the base USD price; market and currency are resolved from the buyer's request country when the checkout opens. Without an offer override, Commet applies the price's automatic introductory Offer. Pass offerId to apply an active compatible Offer directly, or cardPromotionId to preselect a card-eligible Promotional Offer for the initial checkout when card promotions are enabled for the organization. For the initial checkout, provider accepts either a processor name or an exact payment connection ID. */
+  /** Create a subscription for a customer. Commet selects the default price when priceId is omitted. The subscription starts at the base USD price; market and currency are resolved from the buyer's request country when the checkout opens. Without an offer override, Commet applies the price's automatic introductory Offer. Pass offerId to apply an active compatible Offer directly, or cardPromotionId to preselect a card-eligible Promotional Offer for the initial checkout when card promotions are enabled for the organization. For the initial checkout, provider accepts either a processor name or an exact payment connection ID. When the price's free trial requires no payment method, the subscription starts trialing right away with no checkout (checkoutUrl null, hasPaymentMethod false); it cannot be combined with offerId, promoCode, cardPromotionId or provider, and an organization that cannot charge yet receives 403. */
   async create(
     params: CreateSubscriptionParams,
     options?: RequestOptions,

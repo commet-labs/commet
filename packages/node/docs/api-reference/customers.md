@@ -213,11 +213,12 @@ Update a customer's name, external ID, or metadata.
 
 `POST /customers/batch` · operation `batch-create-customers`
 
-Create up to 100 customers in a single request.
+Create up to 100 customers in a single request. With planGroupId, each customer without an open subscription starts on that group's starting plan (see planGroupId), and the entry of a deleted customer fails with customer_deleted.
 
 ### Parameters
 
 - `customers` (`Array<{ email: string; id?: string; externalId?: string; fullName?: string; taxDocument?: string; timezone?: Timezone; metadata?: Record<string, unknown>; address?: { line1: string; line2?: string; city: string; state?: string; postalCode: string; country: string; region?: string } }>`, required)
+- `planGroupId` (`string`, optional) — Plan group whose starting plan the customer starts on when it has no open subscription: its signup trial, a trial without a payment method, when the group has one and the customer never had that plan, otherwise its default plan. A customer who already had the signup trial plan in a group without a default plan starts on none. Without it, no plan is assigned.
 
 ### Request options
 
@@ -251,7 +252,7 @@ List customers with cursor-based pagination.
 
 `POST /customers` · operation `create-customer`
 
-Create a new customer. Idempotent when customerId is provided.
+Create a new customer. Idempotent when customerId is provided. With planGroupId, a customer without an open subscription starts on that group's starting plan (see planGroupId), and the externalId of a deleted customer is rejected.
 
 ### Parameters
 
@@ -264,6 +265,7 @@ Create a new customer. Idempotent when customerId is provided.
 - `email` (`string`, required)
 - `timezone` (`Timezone`, optional)
 - `metadata` (`Record<string, unknown>`, optional)
+- `planGroupId` (`string`, optional) — Plan group whose starting plan the customer starts on when it has no open subscription: its signup trial, a trial without a payment method, when the group has one and the customer never had that plan, otherwise its default plan. A customer who already had the signup trial plan in a group without a default plan starts on none. Without it, no plan is assigned.
 
 ### Request options
 
