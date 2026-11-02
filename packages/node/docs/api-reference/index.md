@@ -5,7 +5,7 @@ Generated from Commet API version `2026-08-27`.
 Use this reference for the exact resources, methods, parameters, and return types available in the installed SDK.
 
 - [Schemas](../schemas.md) — generated models and enums
-- [API errors](../errors/index.md) — 83 version-matched error references
+- [API errors](../errors/index.md) — 87 version-matched error references
 - [Addons](./addons.md) — 6 operations
 - [Api Keys](./api-keys.md) — 3 operations
 - [Provisioning](./provisioning.md) — 1 operations
@@ -23,7 +23,7 @@ Use this reference for the exact resources, methods, parameters, and return type
 - [Portal](./portal.md) — 1 operations
 - [Promo Codes](./promo-codes.md) — 4 operations
 - [Seats](./seats.md) — 6 operations
-- [Subscriptions](./subscriptions.md) — 23 operations
+- [Subscriptions](./subscriptions.md) — 26 operations
 - [Test Clock](./test-clock.md) — 3 operations
 - [Transactions](./transactions.md) — 4 operations
 - [Usage](./usage.md) — 3 operations

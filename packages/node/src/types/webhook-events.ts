@@ -78,7 +78,7 @@ export type WebhookEvent =
   | "payout.paid"
   | "payout.failed";
 
-/** Fired when a subscription record is created with status pending_payment. The first charge has not been confirmed yet — do NOT grant access here. Wait for subscription.activated. */
+/** Fired when a subscription record is created, usually with status pending_payment: the first charge has not been confirmed yet — do NOT grant access here; wait for subscription.activated. A trial whose price requires no payment method is created already trialing, together with trial.started. */
 export interface SubscriptionCreatedData {
   /** The subscription ID. */
   subscriptionId: string;
@@ -259,7 +259,7 @@ export interface SubscriptionCanceledData {
   status: string;
   /** ISO 8601 datetime when the cancellation was requested or triggered. */
   canceledAt?: string;
-  /** The reason for cancellation, if provided. Set to "dunning_exhausted" when all payment retries fail. Historical refund-triggered cancellations may have "refund". */
+  /** The reason for cancellation, if provided. Set to "dunning_exhausted" when all payment retries fail, and to "trial_ended_without_payment_method" when a trial without a payment method ends with no card and no default plan. Historical refund-triggered cancellations may have "refund". */
   cancelReason: string | null;
   /** ISO 8601 datetime when the subscription ended. Matches the billing period end for scheduled cancellations; for immediate terminations it is the moment of termination. */
   endDate?: string;
@@ -349,7 +349,7 @@ export interface SubscriptionPlanChangeScheduledData {
   effectiveAt: string;
 }
 
-/** Fired when a scheduled plan change is replaced by a different one before it executes. The replacement also fires subscription.plan_change_scheduled with the new target plan. */
+/** Fired when a scheduled plan change will no longer take effect: it was revoked through the API, the dashboard or the customer portal, an immediate plan change or an immediate cancellation voided it, or a different change replaced it. A replacement also fires subscription.plan_change_scheduled with the new target plan. */
 export interface SubscriptionPlanChangeRevokedData {
   /** The subscription ID. */
   subscriptionId: string;
@@ -381,7 +381,7 @@ export interface SubscriptionPastDueData {
   invoiceNumber: string;
 }
 
-/** Fired when a subscription enters its trial period after checkout. Grant access here — trialing subscriptions have full access until trialEndsAt. */
+/** Fired when a subscription enters its trial period: after checkout, or right away when the price's trial requires no payment method. Grant access here — trialing subscriptions have full access until trialEndsAt. */
 export interface TrialStartedData {
   /** The subscription ID. */
   subscriptionId: string;
@@ -411,7 +411,7 @@ export interface TrialConvertedData {
   planName: string;
 }
 
-/** Fired when a trial period runs out and the billing cycle activates the subscription. The first regular invoice is generated right after — this is the natural trial-to-paid transition. */
+/** Fired when a trial period runs out. With a payment method the billing cycle activates the subscription and generates the first regular invoice right after — the natural trial-to-paid transition. A trial without a payment method instead moves to the plan group's default plan (subscription.plan_changed) or is canceled with cancelReason trial_ended_without_payment_method (subscription.canceled), without an invoice. */
 export interface TrialExpiredData {
   /** The subscription ID. */
   subscriptionId: string;
@@ -443,7 +443,7 @@ export interface TrialWillEndData {
   trialEndsAt: string;
 }
 
-/** Fired when a trial checkout link is ready to share with the customer. Completing this checkout saves a payment method and starts the trial (trial.started) — the customer is not charged until the trial ends. */
+/** Fired when a trial checkout link is ready to share with the customer. Completing this checkout saves a payment method and starts the trial (trial.started) — the customer is not charged until the trial ends. Not fired for a trial whose price requires no payment method, which starts without checkout. */
 export interface TrialCheckoutReadyData {
   /** The subscription ID. */
   subscriptionId: string;
@@ -1455,7 +1455,7 @@ export interface PlanGrantRevokedData {
   events: Array<WebhookPlanGrantTimelineEvent>;
 }
 
-/** Fired when non-purchase credits are granted to a subscription: plan-included credits at the start of each billing period, or a manual adjustment from the dashboard. Credit pack purchases fire credits.purchased instead. */
+/** Fired when non-purchase credits are granted to a subscription: plan-included credits at the start of each billing period, or a manual adjustment from the dashboard. Credit purchases through the API, automatic top-ups, or the customer portal fire credits.purchased instead. */
 export interface CreditsGrantedData {
   /** The subscription ID. */
   subscriptionId: string;
@@ -1467,7 +1467,7 @@ export interface CreditsGrantedData {
   reason: string;
 }
 
-/** Fired when a customer buys a credit pack through the customer portal and the payment succeeds. Purchased credits never expire — unlike plan credits, they survive period resets. Plan-included credit grants fire credits.granted instead. */
+/** Fired when a customer buys a credit pack or a chosen quantity of credits through the API, an automatic top-up, or the customer portal and the payment succeeds. Purchased credits never expire — unlike plan credits, they survive period resets. Plan-included credit grants fire credits.granted instead. */
 export interface CreditsPurchasedData {
   /** The subscription ID. */
   subscriptionId: string;
@@ -1477,7 +1477,7 @@ export interface CreditsPurchasedData {
   invoiceId: string;
   /** The human-readable invoice number. */
   invoiceNumber: string;
-  /** The purchased credit pack's name. */
+  /** The purchased credit pack's name, or Credit purchase for a chosen quantity of credits. */
   creditPackName: string;
   /** The number of credits purchased. */
   credits: number;
@@ -1507,13 +1507,13 @@ export interface CreditsDepletedData {
   remainingCredits: number;
 }
 
-/** Fired at the period reset when unused plan credits from the previous period are discarded. Plan credits expire at period end; purchased credits never expire and are not affected. */
+/** Fired at a reset when unused plan credits are discarded. On a plan whose unused plan credits expire, every unused plan credit expires at each reset. On a plan that rolls them over, a reset keeps them, up to the plan's maxPlanCredits when it has one, and only the excess expires. A change to another credits plan applies the new plan's terms the same way. Purchased credits never expire and are not affected. */
 export interface CreditsExpiredData {
   /** The subscription ID. */
   subscriptionId: string;
   /** The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId. */
   customerId: string;
-  /** The unused plan credits that were discarded. */
+  /** The plan credits that were discarded. */
   expiredCredits: number;
 }
 

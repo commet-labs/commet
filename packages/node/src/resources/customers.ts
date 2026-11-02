@@ -149,6 +149,8 @@ export interface BatchCreateCustomersParams {
       region?: string;
     };
   }>;
+  /** Plan group whose starting plan the customer starts on when it has no open subscription: its signup trial, a trial without a payment method, when the group has one and the customer never had that plan, otherwise its default plan. A customer who already had the signup trial plan in a group without a default plan starts on none. Without it, no plan is assigned. */
+  planGroupId?: string;
 }
 
 export interface ListCustomersParams {
@@ -175,6 +177,8 @@ export interface CreateCustomerParams {
   email: string;
   timezone?: Timezone;
   metadata?: Record<string, unknown>;
+  /** Plan group whose starting plan the customer starts on when it has no open subscription: its signup trial, a trial without a payment method, when the group has one and the customer never had that plan, otherwise its default plan. A customer who already had the signup trial plan in a group without a default plan starts on none. Without it, no plan is assigned. */
+  planGroupId?: string;
 }
 
 export class CustomersResource {
@@ -287,7 +291,7 @@ export class CustomersResource {
     return this.httpClient.patch(`/customers/${id}`, rest, options);
   }
 
-  /** Create up to 100 customers in a single request. */
+  /** Create up to 100 customers in a single request. With planGroupId, each customer without an open subscription starts on that group's starting plan (see planGroupId), and the entry of a deleted customer fails with customer_deleted. */
   async createBatch(
     params: BatchCreateCustomersParams,
     options?: RequestOptions,
@@ -308,7 +312,7 @@ export class CustomersResource {
     return this.httpClient.get("/customers", params, options);
   }
 
-  /** Create a new customer. Idempotent when customerId is provided. */
+  /** Create a new customer. Idempotent when customerId is provided. With planGroupId, a customer without an open subscription starts on that group's starting plan (see planGroupId), and the externalId of a deleted customer is rejected. */
   async create(
     params: CreateCustomerParams,
     options?: RequestOptions,

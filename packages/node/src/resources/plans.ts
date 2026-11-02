@@ -70,6 +70,8 @@ export interface UpdatePlanPriceParams {
   price?: number;
   isDefault?: boolean;
   trialDays?: number;
+  /** Set to false so the price's free trial starts without a payment method. Requires trialDays on the price. */
+  trialRequiresPaymentMethod?: boolean;
   includedBalance?: number | null;
   includedCredits?: number | null;
   /** Metadata keys to merge into the existing price metadata. */
@@ -120,6 +122,8 @@ export type AddPlanPriceParams =
       metadata?: Record<string, unknown>;
       price: number;
       trialDays?: number;
+      /** Set to false so the price's free trial starts without a payment method. Requires trialDays on the price. */
+      trialRequiresPaymentMethod?: boolean;
       isDefault?: boolean;
       includedBalance?: number | null;
       includedCredits?: number | null;
@@ -241,6 +245,25 @@ export interface UpdatePlanParams {
   description?: string | null;
   metadata?: Record<string, unknown>;
   isPublic?: boolean;
+  /** Credits plans only. What happens to unused plan credits at each reset. Existing subscriptions apply it from their next reset. */
+  unusedPlanCredits?:
+    | {
+        type: "expire";
+      }
+    | {
+        type: "roll_over";
+        /** The most plan credits a subscription holds after a reset, including the credits that reset grants; credits above it expire. At least the included credits of every price. null means no limit other than the largest storable balance, 2,147,483,647 plan credits. */
+        maxPlanCredits: number | null;
+      };
+  /** Credits plans only. The most plan credits a subscription spends per day or per week; null removes the limit. Raising or removing it applies to existing subscriptions at once; lowering it, adding it or changing its interval applies from their next period. */
+  planCreditLimit?: {
+    /** The most plan credits a subscription spends in one window. */
+    credits: number;
+    /** The window length: `day` is 24 hours and `week` is 7 days, starting at the time of day of the subscription's billing anchor. */
+    interval: "day" | "week";
+  } | null;
+  /** Make this plan the default plan of its plan group: customers created with that planGroupId start on it, and a paid plan of the group that ends from the customer portal, a revoked payment authorization or exhausted dunning moves to it instead of canceling. Requires a free plan in a plan group; replaces the group's previous default plan. false unmarks it. */
+  isDefault?: boolean;
 }
 
 export interface DeletePlanParams {
@@ -264,7 +287,26 @@ export interface CreatePlanParams {
   isPublic?: boolean;
   isFree?: boolean;
   blockOnExhaustion?: boolean;
+  /** Credits plans only. What happens to unused plan credits at each reset; omitted means they expire. */
+  unusedPlanCredits?:
+    | {
+        type: "expire";
+      }
+    | {
+        type: "roll_over";
+        /** The most plan credits a subscription holds after a reset, including the credits that reset grants; credits above it expire. At least the included credits of every price. null means no limit other than the largest storable balance, 2,147,483,647 plan credits. */
+        maxPlanCredits: number | null;
+      };
+  /** Credits plans only. The most plan credits a subscription spends per day or per week; omitted or null means no limit. */
+  planCreditLimit?: {
+    /** The most plan credits a subscription spends in one window. */
+    credits: number;
+    /** The window length: `day` is 24 hours and `week` is 7 days, starting at the time of day of the subscription's billing anchor. */
+    interval: "day" | "week";
+  } | null;
   planGroupId?: string;
+  /** Make this plan the default plan of its plan group: customers created with that planGroupId start on it, and a paid plan of the group that ends from the customer portal, a revoked payment authorization or exhausted dunning moves to it instead of canceling. Requires a free plan with a planGroupId; replaces the group's previous default plan. */
+  isDefault?: boolean;
   metadata?: Record<string, unknown>;
 }
 
@@ -395,7 +437,7 @@ export class PlansResource {
     return this.httpClient.get(`/plans/${id}`, undefined, options);
   }
 
-  /** Update a plan's name, description, visibility, or metadata. */
+  /** Update a plan's name, description, visibility, default status, metadata, what happens to its unused plan credits, or its plan credit limit. */
   async update(
     params: UpdatePlanParams,
     options?: RequestOptions,

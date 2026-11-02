@@ -731,6 +731,12 @@ export const resourceDefinitions: ResourceDef[] = [
             sdkKey: "customers",
           },
           {
+            flag: "--plan-group-id <plan-group-id>",
+            description:
+              "Plan group whose starting plan the customer starts on when it has no open subscription: its signup trial, a trial without a payment method, when the group has one and the customer never had that plan, otherwise its default plan.",
+            sdkKey: "planGroupId",
+          },
+          {
             flag: "--idempotency-key <key>",
             description:
               "Unique key used to safely retry this write for 24 hours without applying it twice.",
@@ -810,6 +816,12 @@ export const resourceDefinitions: ResourceDef[] = [
             description: "Metadata",
             parse: parseJson,
             sdkKey: "metadata",
+          },
+          {
+            flag: "--plan-group-id <plan-group-id>",
+            description:
+              "Plan group whose starting plan the customer starts on when it has no open subscription: its signup trial, a trial without a payment method, when the group has one and the customer never had that plan, otherwise its default plan.",
+            sdkKey: "planGroupId",
           },
           {
             flag: "--idempotency-key <key>",
@@ -2119,6 +2131,13 @@ export const resourceDefinitions: ResourceDef[] = [
             sdkKey: "trialDays",
           },
           {
+            flag: "--trial-requires-payment-method <boolean>",
+            description:
+              "Set to false so the price's free trial starts without a payment method.",
+            parse: parseBool,
+            sdkKey: "trialRequiresPaymentMethod",
+          },
+          {
             flag: "--included-balance <number|null>",
             description: "Included balance",
             parse: parseNullableNumber,
@@ -2205,6 +2224,13 @@ export const resourceDefinitions: ResourceDef[] = [
             description: "Trial days",
             parse: parseNumber,
             sdkKey: "trialDays",
+          },
+          {
+            flag: "--trial-requires-payment-method <boolean>",
+            description:
+              "Set to false so the price's free trial starts without a payment method.",
+            parse: parseBool,
+            sdkKey: "trialRequiresPaymentMethod",
           },
           {
             flag: "--is-default <boolean>",
@@ -2311,7 +2337,7 @@ export const resourceDefinitions: ResourceDef[] = [
       update: {
         method: "update",
         description:
-          "Update a plan's name, description, visibility, or metadata.",
+          "Update a plan's name, description, visibility, default status, metadata, what happens to its unused plan credits, or its plan credit limit.",
         hasParams: true,
         params: [
           {
@@ -2337,6 +2363,25 @@ export const resourceDefinitions: ResourceDef[] = [
             description: "Is public",
             parse: parseBool,
             sdkKey: "isPublic",
+          },
+          {
+            flag: "--unused-plan-credits <json>",
+            description: "Credits plans only.",
+            parse: parseJson,
+            sdkKey: "unusedPlanCredits",
+          },
+          {
+            flag: "--plan-credit-limit <json>",
+            description: "Credits plans only.",
+            parse: parseJson,
+            sdkKey: "planCreditLimit",
+          },
+          {
+            flag: "--is-default <boolean>",
+            description:
+              "Make this plan the default plan of its plan group: customers created with that planGroupId start on it, and a paid plan of the group that ends from the customer portal, a revoked payment authorization or exhausted dunning moves to it instead of canceling.",
+            parse: parseBool,
+            sdkKey: "isDefault",
           },
           {
             flag: "--idempotency-key <key>",
@@ -2449,9 +2494,28 @@ export const resourceDefinitions: ResourceDef[] = [
             sdkKey: "blockOnExhaustion",
           },
           {
+            flag: "--unused-plan-credits <json>",
+            description: "Credits plans only.",
+            parse: parseJson,
+            sdkKey: "unusedPlanCredits",
+          },
+          {
+            flag: "--plan-credit-limit <json>",
+            description: "Credits plans only.",
+            parse: parseJson,
+            sdkKey: "planCreditLimit",
+          },
+          {
             flag: "--plan-group-id <plan-group-id>",
             description: "Plan group id",
             sdkKey: "planGroupId",
+          },
+          {
+            flag: "--is-default <boolean>",
+            description:
+              "Make this plan the default plan of its plan group: customers created with that planGroupId start on it, and a paid plan of the group that ends from the customer portal, a revoked payment authorization or exhausted dunning moves to it instead of canceling.",
+            parse: parseBool,
+            sdkKey: "isDefault",
           },
           {
             flag: "--metadata <json>",
@@ -2562,6 +2626,13 @@ export const resourceDefinitions: ResourceDef[] = [
             sdkKey: "planIds",
           },
           {
+            flag: "--first-purchase-only <boolean>",
+            description:
+              "Whether the code only applies to a customer's first purchase: one with no paid invoice above zero and no paid subscription.",
+            parse: parseBool,
+            sdkKey: "firstPurchaseOnly",
+          },
+          {
             flag: "--idempotency-key <key>",
             description:
               "Unique key used to safely retry this write for 24 hours without applying it twice.",
@@ -2591,7 +2662,7 @@ export const resourceDefinitions: ResourceDef[] = [
       create: {
         method: "create",
         description:
-          "Create a distribution code for an existing Offer with one or more sequential discount phases and an optional leading trial.",
+          "Create a distribution code for an existing Offer with one or more sequential discount phases.",
         hasParams: true,
         params: [
           {
@@ -2627,6 +2698,13 @@ export const resourceDefinitions: ResourceDef[] = [
             description: "Plan ids",
             parse: parseJson,
             sdkKey: "planIds",
+          },
+          {
+            flag: "--first-purchase-only <boolean>",
+            description:
+              "Whether the code only applies to a customer's first purchase: one with no paid invoice above zero and no paid subscription.",
+            parse: parseBool,
+            sdkKey: "firstPurchaseOnly",
           },
           {
             flag: "--idempotency-key <key>",
@@ -2855,6 +2933,65 @@ export const resourceDefinitions: ResourceDef[] = [
           },
         ],
       },
+      "get-auto-top-up": {
+        method: "getAutoTopUp",
+        description:
+          "Read whether the subscription buys credits automatically with its saved payment method when credits reach a threshold, with the top-ups used this period and the last failure.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+        ],
+      },
+      "update-auto-top-up": {
+        method: "updateAutoTopUp",
+        description:
+          "Turn automatic credit purchases on or off and set the threshold, the credits each top-up buys and the maximum top-ups per period.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--enabled <boolean>",
+            description: "Enabled",
+            parse: parseBool,
+            sdkKey: "enabled",
+          },
+          {
+            flag: "--threshold <number>",
+            description: "Threshold",
+            parse: parseNumber,
+            sdkKey: "threshold",
+          },
+          {
+            flag: "--quantity <number>",
+            description: "Quantity",
+            parse: parseNumber,
+            sdkKey: "quantity",
+          },
+          {
+            flag: "--max-per-period <number>",
+            description: "Max per period",
+            parse: parseNumber,
+            sdkKey: "maxPerPeriod",
+          },
+          {
+            flag: "--idempotency-key <key>",
+            description:
+              "Unique key used to safely retry this write for 24 hours without applying it twice.",
+            sdkKey: "idempotencyKey",
+            requestOption: true,
+          },
+        ],
+      },
       "adjust-balance": {
         method: "adjustBalance",
         description:
@@ -2951,7 +3088,7 @@ export const resourceDefinitions: ResourceDef[] = [
       "change-plan": {
         method: "changePlan",
         description:
-          "Upgrade or change billing interval immediately, optionally applying an Offer.",
+          "Upgrade or change billing interval immediately, optionally applying an Offer by offerId or the Offer of a promoCode.",
         hasParams: true,
         params: [
           {
@@ -2981,6 +3118,11 @@ export const resourceDefinitions: ResourceDef[] = [
             sdkKey: "offerId",
           },
           {
+            flag: "--promo-code <promo-code>",
+            description: "Promo code",
+            sdkKey: "promoCode",
+          },
+          {
             flag: "--idempotency-key <key>",
             description:
               "Unique key used to safely retry this write for 24 hours without applying it twice.",
@@ -2988,10 +3130,12 @@ export const resourceDefinitions: ResourceDef[] = [
             requestOption: true,
           },
         ],
+        requiredAlternatives: [["promoCode"]],
       },
       "purchase-credits": {
         method: "purchaseCredits",
-        description: "Purchase a credit pack for a subscription.",
+        description:
+          "Purchase a fixed credit pack or choose a whole credit quantity at the subscription plan price and minimum.",
         hasParams: true,
         params: [
           {
@@ -3003,8 +3147,13 @@ export const resourceDefinitions: ResourceDef[] = [
           {
             flag: "--credit-pack-id <credit-pack-id>",
             description: "Credit pack id",
-            required: true,
             sdkKey: "creditPackId",
+          },
+          {
+            flag: "--quantity <number>",
+            description: "Quantity",
+            parse: parseNumber,
+            sdkKey: "quantity",
           },
           {
             flag: "--idempotency-key <key>",
@@ -3014,6 +3163,7 @@ export const resourceDefinitions: ResourceDef[] = [
             requestOption: true,
           },
         ],
+        requiredAlternatives: [["creditPackId"], ["quantity"]],
       },
       "apply-offer": {
         method: "applyOffer",
@@ -3229,6 +3379,11 @@ export const resourceDefinitions: ResourceDef[] = [
             sdkKey: "offerId",
           },
           {
+            flag: "--promo-code <promo-code>",
+            description: "Promo code",
+            sdkKey: "promoCode",
+          },
+          {
             flag: "--idempotency-key <key>",
             description:
               "Unique key used to safely retry this write for 24 hours without applying it twice.",
@@ -3236,6 +3391,7 @@ export const resourceDefinitions: ResourceDef[] = [
             requestOption: true,
           },
         ],
+        requiredAlternatives: [["planId"], ["planId", "promoCode"]],
       },
       reactivate: {
         method: "reactivate",
@@ -3307,6 +3463,20 @@ export const resourceDefinitions: ResourceDef[] = [
         method: "get",
         description:
           "Get a subscription by its public ID, regardless of status (including pending_payment and past_due).",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+        ],
+      },
+      "revoke-scheduled-plan-change": {
+        method: "revokeScheduledPlanChange",
+        description:
+          "Revoke the plan or interval change scheduled for the end of the period, so the subscription stays on its current plan.",
         hasParams: true,
         params: [
           {
@@ -3438,7 +3608,7 @@ export const resourceDefinitions: ResourceDef[] = [
           },
           {
             flag: "--custom-trial-days <number>",
-            description: "Custom trial days",
+            description: "Trial length in days, replacing the price's trial.",
             parse: parseNumber,
             sdkKey: "customTrialDays",
           },
@@ -3656,13 +3826,6 @@ export const resourceDefinitions: ResourceDef[] = [
             description: "Quantity",
             parse: parseNumber,
             sdkKey: "quantity",
-          },
-          {
-            flag: "--idempotency-key <key>",
-            description:
-              "Unique key used to safely retry this write for 24 hours without applying it twice.",
-            sdkKey: "idempotencyKey",
-            requestOption: true,
           },
         ],
       },

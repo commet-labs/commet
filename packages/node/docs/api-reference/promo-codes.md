@@ -34,6 +34,7 @@ Update a promo code's billing interval, redemption limits, expiration, active st
 - `expiresAt` (`string | null`, optional)
 - `active` (`boolean`, optional)
 - `planIds` (`Array<string>`, optional)
+- `firstPurchaseOnly` (`boolean`, optional) — Whether the code only applies to a customer's first purchase: one with no paid invoice above zero and no paid subscription.
 
 ### Request options
 
@@ -66,7 +67,7 @@ List promo codes with cursor-based pagination.
 
 `POST /promo-codes` · operation `create-promo-code`
 
-Create a distribution code for an existing Offer with one or more sequential discount phases and an optional leading trial. The code owns redemption restrictions.
+Create a distribution code for an existing Offer with one or more sequential discount phases. The code owns redemption restrictions.
 
 ### Parameters
 
@@ -76,6 +77,7 @@ Create a distribution code for an existing Offer with one or more sequential dis
 - `maxRedemptions` (`number`, optional)
 - `expiresAt` (`string`, optional)
 - `planIds` (`Array<string>`, optional)
+- `firstPurchaseOnly` (`boolean`, optional) — Whether the code only applies to a customer's first purchase: one with no paid invoice above zero and no paid subscription. Defaults to false.
 
 ### Request options
 

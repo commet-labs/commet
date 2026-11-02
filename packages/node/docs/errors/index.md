@@ -12,6 +12,7 @@ Use the response `code` to open the matching local reference. Preserve `x-reques
 - [`payouts_not_available_in_sandbox`](./payouts_not_available_in_sandbox.md) — Payout operations are not available in sandbox mode.
 - [`not_found`](./not_found.md) — The requested endpoint or resource could not be found in the current organization, mode, or API version.
 - [`customer_not_found`](./customer_not_found.md) — The requested customer does not exist in this organization.
+- [`customer_deleted`](./customer_deleted.md) — The externalId belongs to a deleted customer, so the plan group's default plan cannot start for it.
 - [`feature_not_found`](./feature_not_found.md) — The requested feature, seat feature, or quota feature does not exist in this organization.
 - [`plan_not_found`](./plan_not_found.md) — The requested plan does not exist or is not available in this organization.
 - [`subscription_not_found`](./subscription_not_found.md) — The requested subscription does not exist in this organization.
@@ -31,6 +32,7 @@ Use the response `code` to open the matching local reference. Preserve `x-reques
 - [`insufficient_credits`](./insufficient_credits.md) — The subscription does not have enough credits for the usage event.
 - [`insufficient_seats`](./insufficient_seats.md) — The requested seat removal exceeds the subscription's available seat balance.
 - [`included_limit_reached`](./included_limit_reached.md) — The requested usage exceeds the plan's included usage limit.
+- [`plan_credit_limit_reached`](./plan_credit_limit_reached.md) — The usage event would spend more plan credits than the plan's credit limit allows in the current day or week, and purchased credits do not cover the rest.
 - [`missing_regional_price`](./missing_regional_price.md) — The plan has no price for the subscription's currency or resolved market.
 - [`payment_failed`](./payment_failed.md) — The operation could not complete its payment or required tax calculation.
 - [`payment_not_found`](./payment_not_found.md) — The requested payment does not exist in this organization.
@@ -56,6 +58,7 @@ Use the response `code` to open the matching local reference. Preserve `x-reques
 - [`plans_not_in_same_group`](./plans_not_in_same_group.md) — The current and target plans do not belong to the same plan group.
 - [`free_plan_change_not_supported`](./free_plan_change_not_supported.md) — This plan-change operation does not support the selected free plan.
 - [`plan_change_scheduled`](./plan_change_scheduled.md) — The requested plan change takes effect at the end of the current billing period instead of being prorated immediately.
+- [`no_scheduled_plan_change`](./no_scheduled_plan_change.md) — The subscription has no scheduled plan change to revoke.
 - [`addon_not_found`](./addon_not_found.md) — The requested add-on does not exist in this organization.
 - [`addon_already_active`](./addon_already_active.md) — The add-on is already active on this subscription.
 - [`addon_not_active`](./addon_not_active.md) — The add-on is not active on this subscription.
@@ -77,6 +80,7 @@ Use the response `code` to open the matching local reference. Preserve `x-reques
 - [`transaction_not_found`](./transaction_not_found.md) — The requested transaction does not exist in this organization.
 - [`price_not_found`](./price_not_found.md) — The requested price does not exist on the selected plan or no price matches the operation.
 - [`price_in_use`](./price_in_use.md) — The price cannot be removed or changed while it is in use.
+- [`managed_by_integration`](./managed_by_integration.md) — The record is managed by an integration (its managedBy field), so its terms change only in that integration.
 - [`market_not_found`](./market_not_found.md) — The requested market does not exist in this organization.
 - [`market_in_use`](./market_in_use.md) — The market cannot be deleted while a price or subscription uses it.
 - [`market_group_not_found`](./market_group_not_found.md) — The requested market group does not exist in this organization.
