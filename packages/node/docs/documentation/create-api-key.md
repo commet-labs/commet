@@ -16,7 +16,7 @@ Choose the path that fits where you are working. You only need one to get starte
 1. Select your **sandbox organization** in the dashboard.
 2. Go to **Settings → API Keys** and click **Create API Key**.
 3. Choose **Full Access** for a backend or **AI Agents** to select resource permissions.
-4. Enter a descriptive name, such as `Local development`, and choose **Expires In (Days)**. The dashboard accepts **1–365 days** and defaults to **365**.
+4. Enter a descriptive name of up to 32 characters, such as `Local development`, and choose **Expires In (Days)**. The dashboard accepts **1–365 days** and defaults to **365**.
 5. Create the key and copy it before closing the dialog. The full secret is shown only once.
 
 ### CLI
@@ -116,6 +116,8 @@ Use a separate key for each application or deployment that needs independent rot
 2. Update the secret in every process using the old key and deploy or restart those processes.
 3. Verify a successful read with the replacement and confirm the application is using it.
 4. Delete the old key from **Settings → API Keys** or through [Delete API key](/docs/api-reference/api-keys/delete-api-key).
+
+A deleted key stops authenticating within about 5 seconds. A key's last use, **Last used** in the dashboard and `lastUsedAt` in [List API keys](/docs/api-reference/api-keys/list-api-keys), can lag up to 5 minutes.
 
 For production, create a key in your **live organization** and store it separately from sandbox credentials. Do not copy sandbox customer, plan, or subscription IDs into live configuration. Before switching, verify checkout, webhooks, and a renewal in sandbox with the [Test Clock](/docs/testing-sandbox).
 

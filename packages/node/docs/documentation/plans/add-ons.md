@@ -45,7 +45,7 @@ Add-ons can be activated on any subscription with a payment method:
 | Status        | Can activate add-ons                              |
 | ------------- | ------------------------------------------------- |
 | **Active**    | Yes                                               |
-| **Trialing**  | Yes — card was captured during trial checkout     |
+| **Trialing**  | Yes — with a saved payment method                 |
 | **Free plan** | Yes — first purchase prompts for a payment method |
 
 ## Manage add-ons

@@ -223,6 +223,7 @@ export type {
   ApiKey,
   BalanceAdjustment,
   BalanceTopup,
+  BusinessTaxId,
   ClaimLink,
   CreatedApiKey,
   CreatedSubscription,

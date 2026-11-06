@@ -9,7 +9,7 @@ Commet calculates tax, generates an invoice, and sends a receipt on every paymen
 
 > **Note**
 >
-> For lifetime deals and one-off purchases billed as a **plan** (trials, intro offers, add-ons, consumption models), use [One-Time Plans](/docs/one-time-payments) instead.
+> For lifetime deals and one-off purchases billed as a **plan** (add-ons, consumption models), use [One-Time Plans](/docs/one-time-payments) instead.
 
 ## Link vs. charge
 

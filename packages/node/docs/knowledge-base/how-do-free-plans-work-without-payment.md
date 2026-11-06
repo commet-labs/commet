@@ -7,14 +7,14 @@ A free plan has no price and no checkout. When you assign a customer to a free p
 
 ## How Free Plans Differ from Paid Plans
 
-|                | Paid plan                                 | Free plan                                                  |
-| -------------- | ----------------------------------------- | ---------------------------------------------------------- |
-| Price          | Has a price                               | $0                                                         |
-| Billing        | Monthly, quarterly, semiannual, or yearly | No charges — usage resets monthly                          |
-| How they start | Checkout + payment                        | **Activated immediately**                                  |
-| Invoices       | Yes                                       | Only for purchases (credits, balance, add-ons)             |
-| Overage        | Configurable per feature                  | **Never allowed** — usage is blocked at the included limit |
-| Usage resets   | Every month                               | Every month                                                |
+|                | Paid plan                                                                                                             | Free plan                                                  |
+| -------------- | --------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| Price          | Has a price                                                                                                           | $0                                                         |
+| Billing        | Monthly, quarterly, semiannual, or yearly                                                                             | No charges — usage resets monthly                          |
+| How they start | Checkout + payment, or a [trial without a payment method](/docs/trial-periods#start-a-trial-without-a-payment-method) | **Activated immediately**                                  |
+| Invoices       | Yes                                                                                                                   | Only for purchases (credits, balance, add-ons)             |
+| Overage        | Configurable per feature                                                                                              | **Never allowed** — usage is blocked at the included limit |
+| Usage resets   | Every month                                                                                                           | Every month                                                |
 
 ## Monthly Usage Resets
 
@@ -79,3 +79,9 @@ Credit from free plan: $0 (it's free)
 They pay: $99 (full month)
 Invoices, payment method, and billing info appear in their portal.
 ```
+
+When the Pro price has a trial without a payment method and the customer never had Pro, the trial starts at once with no checkout and no charge. Without a card at the end of the trial, the subscription moves to the plan group's default plan, or is canceled when the group has none.
+
+## Use a Free Plan as the Default Plan
+
+Mark a free plan as its [plan group's default plan](/docs/plan-groups#default-plan-and-signup-trial) to keep customers on it instead of canceling. A paid plan of the group that ends from the Customer Portal, a revoked payment authorization, exhausted payment retries, or a trial without a card moves to it.

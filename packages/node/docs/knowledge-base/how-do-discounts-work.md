@@ -17,13 +17,13 @@ A direct Offer does not need a prior association with the selected plan or price
 
 ## Eligibility and exclusivity
 
-Automatic introductory selection currently excludes customers with an `active` or `past_due` subscription in the organization. Other historical statuses do not create a lifetime ban.
+Automatic introductory selection excludes customers with an `active`, `past_due`, or `paused` subscription in the organization. Other historical statuses do not create a lifetime ban.
 
-An explicit `offerId` overrides automatic introductory selection. A Promo Code is rejected with `intro_offer_active` while an eligible introductory placement applies. `offerId`, `promoCode`, `customTrialDays`, and `skipTrial: true` are mutually exclusive selection controls.
+An explicit `offerId` overrides automatic introductory selection. A Promo Code is rejected with `intro_offer_active` while an eligible introductory placement applies. `offerId`, `promoCode`, and `cardPromotionId` are mutually exclusive. `customTrialDays` and `skipTrial` combine with `offerId` and `promoCode`, not with `cardPromotionId`. A trial without a payment method starts with none of the three.
 
 ## Duration and phases
 
-An Offer may combine a free trial with ordered discount or fixed-price phases. A finite `durationCycles` counts billing periods, not calendar months. A yearly Offer phase with `durationCycles: 2` lasts two yearly billing cycles.
+An Offer combines ordered discount or fixed-price phases. A finite `durationCycles` counts billing periods, not calendar months. A yearly Offer phase with `durationCycles: 2` lasts two yearly billing cycles.
 
 ```
 Pro costs $99/month with 50% off for 3 cycles:
@@ -34,11 +34,13 @@ Cycle 3: $49.50
 Cycle 4: $99.00
 ```
 
-The final discount phase may use `durationCycles: null` to remain active until the accepted application ends. Promo Codes are intentionally narrower: they can reference only one `percentage` or `amount_off` phase.
+The final discount phase may use `durationCycles: null` to remain active until the accepted application ends. Promo Codes can reference the same Offers. Introductory placement is narrower: exactly one finite `percentage` or `amount_off` phase.
+
+Trials are not Offer phases. When the price has a [trial](/docs/trial-periods), the discount starts with the first invoice after it.
 
 ## Plan changes
 
-The Offer Application belongs to the price target accepted by the subscription. An immediate plan change ends that application. The change may pass a new `offerId`; otherwise the new plan begins at its normal price. Scheduled plan changes do not accept an Offer.
+The Offer Application belongs to the price target accepted by the subscription. An immediate plan change ends that application. The change may pass a new `offerId` or a `promoCode`; otherwise the new plan begins at its normal price. Scheduled plan changes accept neither.
 
 ## What gets discounted
 

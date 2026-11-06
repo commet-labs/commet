@@ -39,6 +39,7 @@ This documentation snapshot is serialized from the source of commet.co/docs and 
 - [documentation/sales/promotional-offers.md](./documentation/sales/promotional-offers.md)
 - [documentation/sales/introductory-offers.md](./documentation/sales/introductory-offers.md)
 - [documentation/sales/promo-codes.md](./documentation/sales/promo-codes.md)
+- [documentation/sales/connect-dub-affiliates.md](./documentation/sales/connect-dub-affiliates.md)
 - [documentation/sales/regional-prices.md](./documentation/sales/regional-prices.md)
 - [documentation/sales/trial-periods.md](./documentation/sales/trial-periods.md)
 - [documentation/subscriptions/manage-subscriptions.md](./documentation/subscriptions/manage-subscriptions.md)

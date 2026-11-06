@@ -462,9 +462,11 @@ After 8 failed attempts (the initial delivery plus 7 retries), the delivery is m
 
 ## Auto-disable for broken endpoints
 
-If three events in a row fail to deliver, Commet automatically disables the endpoint so it stops consuming retries. You'll get a second email confirming the endpoint was turned off.
+Commet disables an endpoint when its three most recent deliveries with a final outcome all failed after their 8 attempts, even if newer deliveries are still retrying. A successful delivery among those three, including a test event, keeps the endpoint active. You get one email when the endpoint is disabled, with a link to it.
 
-Once you've fixed the issue on your receiver, re-enable the endpoint from the Commet dashboard under **Settings → Webhooks → Endpoints**. Events that arrived while the endpoint was disabled are not replayed automatically — contact support if you need to backfill any missed events.
+Deliveries still retrying when the endpoint is disabled are stopped: Commet doesn't call your receiver again for them or send their failure emails.
+
+Once you've fixed the issue on your receiver, re-enable the endpoint in **Settings → Webhooks**: choose **Re-enable** in the endpoint's menu, or **Re-enable endpoint** in its detail. The next delivery that fails all its attempts disables it again unless a success lands first. Events that arrived while the endpoint was disabled are not replayed automatically — contact support if you need to backfill any missed events.
 
 You can monitor delivery status, inspect payloads, and retry individual deliveries from the dashboard at any time.
 
@@ -472,14 +474,14 @@ You can monitor delivery status, inspect payloads, and retry individual deliveri
 
 Every `subscription.*` webhook includes a `status` field. These are the valid values and which ones grant access to your product:
 
-| Status            | Grants access?     | Meaning                                                                                                        |
-| ----------------- | ------------------ | -------------------------------------------------------------------------------------------------------------- |
-| `draft`           | No                 | Internal setup state before any event is fired                                                                 |
-| `pending_payment` | **No**             | Subscription created, waiting for the first charge to confirm                                                  |
-| `trialing`        | **Yes**            | Trial active; card captured, no charge yet                                                                     |
-| `active`          | **Yes**            | Paid and current                                                                                               |
-| `past_due`        | Yes (grace period) | A renewal charge failed; dunning retries in progress — usage and seats keep working, new purchases are blocked |
-| `canceled`        | No                 | Terminal — the cancellation executed at period end, or dunning exhausted its retries                           |
+| Status            | Grants access?     | Meaning                                                                                                                                     |
+| ----------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `draft`           | No                 | Internal setup state before any event is fired                                                                                              |
+| `pending_payment` | **No**             | Subscription created, waiting for the first charge to confirm                                                                               |
+| `trialing`        | **Yes**            | Trial active, with or without a payment method; no charge yet                                                                               |
+| `active`          | **Yes**            | Paid and current                                                                                                                            |
+| `past_due`        | Yes (grace period) | A renewal charge failed; dunning retries in progress — usage and seats keep working, new purchases are blocked                              |
+| `canceled`        | No                 | Terminal — the cancellation executed at period end, dunning exhausted its retries, or a trial without a payment method ended without a card |
 
 Typical flow:
 
@@ -490,8 +492,8 @@ draft → pending_payment → trialing → active ⇄ past_due
                                          canceled
 ```
 
-- Without a trial, `pending_payment` goes straight to `active` when the first charge confirms; with one, it goes to `trialing`.
-- `trialing → active` happens when the trial converts — and also when it expires: trial expiry activates the subscription and regular billing begins.
+- Without a trial, `pending_payment` goes straight to `active` when the first charge confirms; with one, it goes to `trialing`. A [trial without a payment method](/docs/trial-periods#start-a-trial-without-a-payment-method) starts in `trialing` with no checkout.
+- `trialing → active` happens when the trial converts — and also when it expires: trial expiry activates the subscription and regular billing begins. A trial without a payment method that ends without a card moves to the plan group's default plan (`subscription.plan_changed`) or is canceled.
 - `active ⇄ past_due`: a failed renewal starts dunning; a recovered payment returns the subscription to `active`.
 - `canceled` is terminal, reached when a scheduled cancellation executes at period end or when dunning exhausts its retries.
 

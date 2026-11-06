@@ -97,7 +97,7 @@ $createdSubscription = $commet->subscriptions->create(
 );
 ```
 
-For a paid plan, redirect the customer to `checkoutUrl`. Free plans can activate without checkout and return `checkoutUrl: null`.
+For a paid plan, redirect the customer to `checkoutUrl`. Free plans and [trials without a payment method](/docs/trial-periods#start-a-trial-without-a-payment-method) start without checkout and return `checkoutUrl: null`; `hasPaymentMethod` tells whether Commet can charge the subscription on its own.
 
 The normal path needs only `customerId` and either `planCode` or `planId`. Optional selection fields are:
 
@@ -108,7 +108,7 @@ The normal path needs only `customerId` and either `planCode` or `planId`. Optio
 | `offerId`                        | Your application selected an Offer directly; it overrides automatic introductory selection |
 | `promoCode`                      | The customer entered a Promo Code                                                          |
 | `initialSeats`                   | You know the initial seat quantities at creation                                           |
-| `skipTrial` or `customTrialDays` | You intentionally override the configured trial                                            |
+| `skipTrial` or `customTrialDays` | You intentionally override the price's [trial](/docs/trial-periods)                        |
 
 Omitting `priceId` preserves default price and Market resolution. Omitting `offerId` preserves automatic Introductory Offer selection.
 
@@ -402,6 +402,8 @@ $subscription = $commet->subscriptions->cancel(id: 'sub_xxx');
 
 A normal paid active subscription schedules cancellation at period end unless `immediate: true` is sent. Free, pending-payment, and past-due relationships cancel immediately. Cancellation does not erase the stored subscription balance.
 
+The API cancels even when the plan group has a [default plan](/docs/plan-groups#default-plan-and-signup-trial). A paid plan canceled from the Customer Portal moves to that default plan at period end instead.
+
 Canceling a paused subscription is immediate and discards its preserved time. Pending usage, overage, or seat adjustments may still produce a final invoice. To cancel while a future pause is scheduled, revoke that pause first.
 
 ## Reverse a scheduled cancellation
@@ -466,6 +468,67 @@ $subscription = $commet->subscriptions->uncancel(id: 'sub_xxx');
 ```
 
 `uncancel` works only before an end-of-period cancellation takes effect. It keeps the same subscription and current period.
+
+## Revoke a scheduled plan change
+
+Keep the current plan when a downgrade or interval change is scheduled for the end of the period:
+
+**TypeScript**
+
+```typescript
+import { Commet } from "@commet/node";
+
+const commet = new Commet({ apiKey: "ck_xxx" });
+
+const subscription = await commet.subscriptions.revokeScheduledPlanChange({ id: "sub_xxx" });
+```
+
+**Python**
+
+```python
+from commet import Commet
+
+commet = Commet("ck_xxx")
+
+subscription = commet.subscriptions.revoke_scheduled_plan_change("sub_xxx")
+```
+
+**Go**
+
+```go
+client, err := commet.New("ck_xxx")
+if err != nil {
+	log.Fatal(err)
+}
+ctx := context.Background()
+
+subscription, err := client.Subscriptions.RevokeScheduledPlanChange(ctx, "sub_xxx")
+if err != nil {
+	log.Fatal(err)
+}
+```
+
+**Java**
+
+```java
+import co.commet.Commet;
+
+var commet = Commet.builder().apiKey("ck_xxx").build();
+
+var subscription = commet.subscriptions().revokeScheduledPlanChange("sub_xxx");
+```
+
+**PHP**
+
+```php
+use Commet\Commet;
+
+$commet = new Commet('ck_xxx');
+
+$subscription = $commet->subscriptions->revokeScheduledPlanChange(id: 'sub_xxx');
+```
+
+This also revokes a scheduled move to the plan group's default plan. A subscription with nothing scheduled returns `409 no_scheduled_plan_change`.
 
 ## Recover a past-due subscription
 

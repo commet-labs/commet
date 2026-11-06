@@ -9,13 +9,21 @@ Self-service page where customers manage their subscription, view usage, change 
 
 - View current subscription and billing cycle
 - See usage across all features
-- Upgrade or downgrade plans (requires a [Plan Group](/docs/plan-groups))
-- Purchase [Credit Packs](/docs/credit-packs), balance top-ups, and [Add-ons](/docs/add-ons)
+- Upgrade or downgrade plans (requires a [Plan Group](/docs/plan-groups)), and keep the current plan when a change is scheduled (**Keep current plan**)
+- Purchase [Credit Packs](/docs/credit-packs), a chosen quantity of credits, balance top-ups, and [Add-ons](/docs/add-ons)
+- Turn on and edit [auto top-up](/docs/credit-packs#top-up-credits-automatically) for credits
+- Add a card during a [trial without a payment method](/docs/trial-periods#start-a-trial-without-a-payment-method) (**Add card**)
 - Manage saved payment methods and billing details
 - View invoice history
 - Cancel subscription
 
 Purchases are available on active, trialing, and free plan subscriptions. Free plan customers are prompted to add a payment method on their first purchase.
+
+When the plan group has a [default plan](/docs/plan-groups#default-plan-and-signup-trial), canceling a paid plan from the portal moves the customer to that default plan at period end instead of canceling.
+
+## Languages
+
+The portal and checkout open in English, Spanish, or Portuguese, following the customer's browser language, and in English otherwise. Customer emails are sent in English or Spanish.
 
 ## Saved payment methods
 

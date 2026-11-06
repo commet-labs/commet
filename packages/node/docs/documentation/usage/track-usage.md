@@ -273,3 +273,26 @@ $usageCheck = $commet->usage->check(
     featureCode: 'api_calls',
 );
 ```
+
+## Limit plan credit spending
+
+When a credits plan has a [plan credit limit](/docs/consumption-models#limit-plan-credit-spending), an event that would spend more plan credits than the current day or week allows, and that purchased credits can't cover, is rejected with `402 plan_credit_limit_reached`. Nothing is deducted.
+
+Usage Check reports the same case before you consume:
+
+```json
+{
+  "allowed": false,
+  "reason": "plan_credit_limit_reached",
+  "consumptionModel": "credits",
+  "planCreditLimit": {
+    "credits": 100,
+    "interval": "day",
+    "spent": 100,
+    "remaining": 0,
+    "resetsAt": "2026-11-03T14:00:00.000Z"
+  }
+}
+```
+
+Only plan credits count toward the limit. Accepted events return the updated limit in `consumption.planCreditLimit`. Show `remaining` and `resetsAt` to the customer, or let them [buy credits](/docs/credit-packs#buy-a-chosen-quantity-of-credits), which the limit never caps.

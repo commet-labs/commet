@@ -25,7 +25,7 @@ Customers pay a base price and get included usage. Overage beyond the included a
 
 ## Credits
 
-Customers receive credits with their subscription. Feature usage consumes credits. When credits run out, customers can purchase [Credit Packs](/docs/credit-packs) or wait for the next billing cycle.
+Customers receive credits with their subscription. Feature usage consumes credits. When credits run out, customers can buy [Credit Packs or a chosen quantity](/docs/credit-packs), turn on [auto top-up](/docs/credit-packs#top-up-credits-automatically), or wait for the next billing cycle.
 
 | Feature             | Credits per Use |
 | ------------------- | --------------- |
@@ -35,7 +35,42 @@ Customers receive credits with their subscription. Feature usage consumes credit
 
 > **Note**
 >
-> Plan credits reset each billing period. Credits purchased via Credit Packs **never expire**.
+> Plan credits expire at each reset unless the plan rolls them over. Purchased credits **never expire**.
+
+### Roll over unused plan credits
+
+```typescript
+await commet.plans.update({
+  id: 'pln_xxx',
+  unusedPlanCredits: { type: 'roll_over', maxPlanCredits: 2500 },
+})
+```
+
+At each reset, the new allocation is added to the unused plan credits instead of replacing them. `maxPlanCredits` caps the total after the reset, including the new allocation; credits above it expire. It must be at least the included credits of every price. `null` means no cap other than 2,147,483,647 credits.
+
+```
+Plan grants 1,000 credits per month. maxPlanCredits: 2,500.
+
+Month 1: 800 unused → 800 + 1,000 = 1,800
+Month 2: 1,800 unused → 2,800, capped at 2,500. 300 expire.
+```
+
+`{ type: 'expire' }` restores the default. Existing subscriptions apply a change from their next reset. A plan change applies the new plan's setting.
+
+### Limit plan credit spending
+
+```typescript
+await commet.plans.update({
+  id: 'pln_xxx',
+  planCreditLimit: { credits: 100, interval: 'day' },
+})
+```
+
+`planCreditLimit` caps the plan credits a subscription spends per window: `day` is 24 hours and `week` is 7 days, starting at the time of day of the subscription's billing anchor. Purchased credits are never limited.
+
+An event past the limit uses purchased credits. Without enough, [Track Usage](/docs/track-usage#limit-plan-credit-spending) rejects it with `402 plan_credit_limit_reached`. Raising or removing the limit applies at once; lowering it, adding it, or changing its interval applies from the next period.
+
+In the dashboard, open **Plans**, select a credits plan, and edit **Credit rollover**, **Credit limit**, or **Credit purchases**.
 
 ## Balance
 
@@ -62,13 +97,13 @@ Set a margin percentage instead of a fixed price. Commet looks up the model's to
 
 ## Comparison
 
-| Aspect               | Metered                                                                                                         | Credits                        | Balance                                   |
-| -------------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------------ | ----------------------------------------- |
-| **When exceeded**    | Overage at period end                                                                                           | Blocked or buy packs           | Overage at period end                     |
-| **Reset behavior**   | Usage resets to 0 each period                                                                                   | Plan credits reset each period | Balance resets to plan amount each period |
-| **Purchased extras** | N/A                                                                                                             | Credits persist forever        | Top-ups reset at period                   |
-| **Reset frequency**  | Weekly plans reset every 7 days. Monthly, quarterly, semiannual, yearly, one-time, and free plans reset monthly | Same                           | Same                                      |
-| **Customer portal**  | View usage                                                                                                      | Buy credit packs               | Add balance (top-up)                      |
+| Aspect               | Metered                                                                                                         | Credits                                     | Balance                                   |
+| -------------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------- | ----------------------------------------- |
+| **When exceeded**    | Overage at period end                                                                                           | Blocked or buy credits                      | Overage at period end                     |
+| **Reset behavior**   | Usage resets to 0 each period                                                                                   | Plan credits reset or roll over each period | Balance resets to plan amount each period |
+| **Purchased extras** | N/A                                                                                                             | Credits persist forever                     | Top-ups reset at period                   |
+| **Reset frequency**  | Weekly plans reset every 7 days. Monthly, quarterly, semiannual, yearly, one-time, and free plans reset monthly | Same                                        | Same                                      |
+| **Customer portal**  | View usage                                                                                                      | Buy credits, set auto top-up                | Add balance (top-up)                      |
 
 ## Overage restrictions by plan type
 

@@ -688,6 +688,12 @@ export const resourceDefinitions: ResourceDef[] = [
             sdkKey: "taxDocument",
           },
           {
+            flag: "--business-tax-id <business-tax-id>",
+            description:
+              "Business tax ID, such as an EU VAT number or a Peruvian RUC, for the country of the customer's address.",
+            sdkKey: "businessTaxId",
+          },
+          {
             flag: "--external-id <external-id>",
             description: "External id",
             sdkKey: "externalId",
@@ -788,6 +794,12 @@ export const resourceDefinitions: ResourceDef[] = [
             flag: "--tax-document <tax-document>",
             description: "Tax document",
             sdkKey: "taxDocument",
+          },
+          {
+            flag: "--business-tax-id <business-tax-id>",
+            description:
+              "Business tax ID, such as an EU VAT number or a Peruvian RUC, for the country of the customer's address.",
+            sdkKey: "businessTaxId",
           },
           {
             flag: "--address <json>",
@@ -2337,7 +2349,7 @@ export const resourceDefinitions: ResourceDef[] = [
       update: {
         method: "update",
         description:
-          "Update a plan's name, description, visibility, default status, metadata, what happens to its unused plan credits, or its plan credit limit.",
+          "Update a plan's name, description, visibility, default status, metadata, overage behavior, what happens to its unused plan credits or plan balance, or its plan credit or plan balance limit.",
         hasParams: true,
         params: [
           {
@@ -2375,6 +2387,24 @@ export const resourceDefinitions: ResourceDef[] = [
             description: "Credits plans only.",
             parse: parseJson,
             sdkKey: "planCreditLimit",
+          },
+          {
+            flag: "--unused-plan-balance <json>",
+            description: "Balance plans only.",
+            parse: parseJson,
+            sdkKey: "unusedPlanBalance",
+          },
+          {
+            flag: "--plan-balance-limit <json>",
+            description: "Balance plans only.",
+            parse: parseJson,
+            sdkKey: "planBalanceLimit",
+          },
+          {
+            flag: "--block-on-exhaustion <boolean>",
+            description: "Credits and balance plans only.",
+            parse: parseBool,
+            sdkKey: "blockOnExhaustion",
           },
           {
             flag: "--is-default <boolean>",
@@ -2450,7 +2480,7 @@ export const resourceDefinitions: ResourceDef[] = [
       create: {
         method: "create",
         description:
-          "Create a new plan with optional consumption model, visibility, and plan group assignment.",
+          "Create a new plan with optional consumption model, visibility, plan group assignment, overage behavior, and the rollover and spend limit of its plan credits or plan balance.",
         hasParams: true,
         params: [
           {
@@ -2489,7 +2519,7 @@ export const resourceDefinitions: ResourceDef[] = [
           },
           {
             flag: "--block-on-exhaustion <boolean>",
-            description: "Block on exhaustion",
+            description: "Credits and balance plans.",
             parse: parseBool,
             sdkKey: "blockOnExhaustion",
           },
@@ -2504,6 +2534,18 @@ export const resourceDefinitions: ResourceDef[] = [
             description: "Credits plans only.",
             parse: parseJson,
             sdkKey: "planCreditLimit",
+          },
+          {
+            flag: "--unused-plan-balance <json>",
+            description: "Balance plans only.",
+            parse: parseJson,
+            sdkKey: "unusedPlanBalance",
+          },
+          {
+            flag: "--plan-balance-limit <json>",
+            description: "Balance plans only.",
+            parse: parseJson,
+            sdkKey: "planBalanceLimit",
           },
           {
             flag: "--plan-group-id <plan-group-id>",
@@ -2936,7 +2978,7 @@ export const resourceDefinitions: ResourceDef[] = [
       "get-auto-top-up": {
         method: "getAutoTopUp",
         description:
-          "Read whether the subscription buys credits automatically with its saved payment method when credits reach a threshold, with the top-ups used this period and the last failure.",
+          "Read whether the subscription tops up automatically with its saved payment method when its available credits or balance reach a threshold, with the top-ups used this period and the last failure.",
         hasParams: true,
         params: [
           {
@@ -2950,7 +2992,7 @@ export const resourceDefinitions: ResourceDef[] = [
       "update-auto-top-up": {
         method: "updateAutoTopUp",
         description:
-          "Turn automatic credit purchases on or off and set the threshold, the credits each top-up buys and the maximum top-ups per period.",
+          "Turn automatic top-ups on or off and set the threshold, the size of each top-up and the maximum top-ups per period.",
         hasParams: true,
         params: [
           {
@@ -2973,9 +3015,16 @@ export const resourceDefinitions: ResourceDef[] = [
           },
           {
             flag: "--quantity <number>",
-            description: "Quantity",
+            description: "Credits each top-up buys.",
             parse: parseNumber,
             sdkKey: "quantity",
+          },
+          {
+            flag: "--amount <number>",
+            description:
+              "Minor units of the subscription currency each top-up adds.",
+            parse: parseNumber,
+            sdkKey: "amount",
           },
           {
             flag: "--max-per-period <number>",
@@ -3028,7 +3077,7 @@ export const resourceDefinitions: ResourceDef[] = [
       },
       "topup-balance": {
         method: "topupBalance",
-        description: "Top up a subscription's balance.",
+        description: "Top up a balance subscription.",
         hasParams: true,
         params: [
           {
@@ -3039,7 +3088,8 @@ export const resourceDefinitions: ResourceDef[] = [
           },
           {
             flag: "--amount <number>",
-            description: "Amount",
+            description:
+              "The amount to add, in minor units of the subscription currency (cents; whole units for zero-decimal currencies).",
             required: true,
             parse: parseNumber,
             sdkKey: "amount",
@@ -3570,6 +3620,12 @@ export const resourceDefinitions: ResourceDef[] = [
             description:
               "Payment provider name or exact public payment connection ID for the initial checkout.",
             sdkKey: "provider",
+          },
+          {
+            flag: "--payment-method-types <json>",
+            description: "Payment methods the initial checkout may offer.",
+            parse: parseJson,
+            sdkKey: "paymentMethodTypes",
           },
           { flag: "--name <name>", description: "Name", sdkKey: "name" },
           {

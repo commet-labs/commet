@@ -67,7 +67,7 @@ $transactionsListResult = $commet->transactions->list();
 
 One invoice can have multiple transactions when a renewal is retried. The original failed transaction remains immutable; a retry creates a new attempt.
 
-`provider` names the processor. `paymentMethod` names the method used for that attempt (`card`, `mercado_pago`, or `oxxo`), or is `null` when unknown. It stays tied to the transaction if the customer changes their saved method later.
+`provider` names the processor. `paymentMethod` names the method used for that attempt (`card`, `google_pay`, `mercado_pago`, `oxxo`, or `smartpix`), or is `null` when unknown. It stays tied to the transaction if the customer changes their saved method later.
 
 `subPaymentMethod` describes how a Mercado Pago charge was funded when dLocal reports it: `credit_card`, `debit_card`, `prepaid_card`, `bank_transfer`, or `account_money`. It is `null` when unavailable or unknown. The dashboard also shows the card brand and last four digits when dLocal provides them for that charge.
 

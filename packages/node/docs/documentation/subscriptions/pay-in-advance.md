@@ -13,7 +13,7 @@ Paying in advance doesn't decide whether the subscription renews afterward. To s
 
 > **Warning**
 >
-> **Free trials don't combine with paying in advance.** With `prepaidPeriods` above `1` or `cancelAtPeriodEnd: true`, an explicit trial (`customTrialDays`, a trial Offer, or a trial Promo Code) returns `400`, and the plan's automatic introductory trial is skipped.
+> **Free trials don't combine with paying in advance.** With `prepaidPeriods` above `1` or `cancelAtPeriodEnd: true`, `customTrialDays` above `0` returns `400` and the price's trial is skipped.
 
 ```bash
 curl -X POST https://commet.co/api/v1/subscriptions \
@@ -66,10 +66,10 @@ Commet voids an unpaid link and emits [`invoice.voided`](/docs/webhooks/invoice-
 | Response                          | Cause                                                                                                                                                                 |
 | --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `400 validation_error`            | The price is one-time or the plan is free                                                                                                                             |
-| `400 validation_error`            | `offerId` has a free trial or was sent for a `pending_payment` subscription. `param` is `offerId`                                                                     |
+| `400 validation_error`            | `offerId` is unavailable or was sent for a `pending_payment` subscription. `param` is `offerId`                                                                       |
 | `400 validation_error`            | An Offer bills on another interval. See [Offers billed on another interval](#offers-billed-on-another-interval)                                                       |
 | `400 validation_error`            | The total is below the minimum charge, such as with a 100% Offer. `param` is `offerId` when you sent one, `periods` otherwise. The previous unpaid link stays payable |
-| `409 invalid_subscription_status` | The subscription isn't `active` or awaiting its first payment, it has a free trial, or a pause is scheduled                                                           |
+| `409 invalid_subscription_status` | The subscription isn't `active` or awaiting its first payment, it starts with a free trial, or a pause is scheduled                                                   |
 | `409 charge_in_progress`          | A payment for the link being replaced couldn't be canceled, such as a generated OXXO voucher                                                                          |
 
 ## How each period is priced
@@ -89,10 +89,7 @@ Payment → $20
 
 For the first payment, the currency and country price are resolved at checkout, as for any subscription. Offers run for their full configured duration starting at the first paid period. An Offer assigned with `PUT /v1/subscriptions/{id}/offer` to a subscription with paid periods left starts at the first renewal that charges, after the last paid period.
 
-[Card Promotions](/docs/card-promotions) behave as on any subscription. [Promo Codes](/docs/promo-codes) do too, with two exceptions:
-
-- A link that adds periods to an active subscription keeps the price it was created with, so a Promo Code entered there is rejected with "Promo codes can't be used on a link that adds billing periods".
-- A trial Promo Code entered on a checkout that pays several periods or on a one-time purchase is rejected with "Trial codes can't be used when paying in advance".
+[Card Promotions](/docs/card-promotions) behave as on any subscription. [Promo Codes](/docs/promo-codes) do too, with one exception: a link that adds periods to an active subscription keeps the price it was created with, so a Promo Code entered there is rejected with "Promo codes can't be used on a link that adds billing periods".
 
 ### Offers billed on another interval
 

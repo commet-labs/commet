@@ -116,6 +116,8 @@ export interface UpdateCustomerParams {
   email?: string;
   fullName?: string;
   taxDocument?: string;
+  /** Business tax ID, such as an EU VAT number or a Peruvian RUC, for the country of the customer's address. Accepted only where Commet collects tax; a valid ID replaces consumer tax with the business treatment. Send null to remove it. */
+  businessTaxId?: string | null;
   externalId?: string;
   timezone?: Timezone;
   metadata?: Record<string, unknown>;
@@ -164,6 +166,8 @@ export interface CreateCustomerParams {
   externalId?: string;
   fullName?: string;
   taxDocument?: string;
+  /** Business tax ID, such as an EU VAT number or a Peruvian RUC, for the country of the customer's address. Accepted only where Commet collects tax; a valid ID replaces consumer tax with the business treatment. */
+  businessTaxId?: string;
   address?: {
     line1: string;
     line2?: string;

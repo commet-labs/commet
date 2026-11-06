@@ -9,7 +9,7 @@
     "subscription.created": {
       "post": {
         "summary": "subscription.created",
-        "description": "Fired when a subscription record is created with status pending_payment. The first charge has not been confirmed yet — do NOT grant access here. Wait for subscription.activated.",
+        "description": "Fired when a subscription record is created, usually with status pending_payment: the first charge has not been confirmed yet — do NOT grant access here; wait for subscription.activated. A trial whose price requires no payment method is created already trialing, together with trial.started.",
         "tags": [
           "Webhooks"
         ],
@@ -71,15 +71,11 @@
                         "description": "ISO 8601 datetime when the subscription starts."
                       },
                       "name": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "Optional custom name for the subscription."
+                        "description": "Optional custom name for the subscription.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       }
                     },
                     "required": [
@@ -201,15 +197,11 @@
                         "type": "string"
                       },
                       "name": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "Optional custom name for the subscription."
+                        "description": "Optional custom name for the subscription.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "invoiceId": {
                         "type": "string",
@@ -370,15 +362,11 @@
                         "type": "string"
                       },
                       "name": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "Optional custom name for the subscription."
+                        "description": "Optional custom name for the subscription.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "invoiceId": {
                         "type": "string",
@@ -1046,15 +1034,11 @@
                         "description": "When access was restored."
                       },
                       "invoiceId": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The resume invoice ID, or null when no charge was required."
+                        "description": "The resume invoice ID, or null when no charge was required.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       }
                     },
                     "required": [
@@ -1287,15 +1271,11 @@
                         "type": "string"
                       },
                       "cancelReason": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The reason for cancellation, if provided. Set to \"dunning_exhausted\" when all payment retries fail. Historical refund-triggered cancellations may have \"refund\"."
+                        "description": "The reason for cancellation, if provided. Set to \"dunning_exhausted\" when all payment retries fail, and to \"trial_ended_without_payment_method\" when a trial without a payment method ends with no card and no default plan. Historical refund-triggered cancellations may have \"refund\".",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "endDate": {
                         "description": "ISO 8601 datetime when the subscription ended. Matches the billing period end for scheduled cancellations; for immediate terminations it is the moment of termination.",
@@ -1352,7 +1332,7 @@
             "description": "Fired when a subscription is terminated, at period end or immediately. Revoke access here.",
             "playground": "none"
           },
-          "content": "## Cancellation lifecycle\n\nA regular cancellation is scheduled for the end of the current billing period. Two events fire at different moments:\n\n| Moment | Event | status | What to do |\n| --- | --- | --- | --- |\n| Customer requests cancellation | `subscription.updated` | `active` | Show \"ending on \\{endDate\\}\" in your UI. Do NOT revoke access. |\n| Billing period ends | `subscription.canceled` | `canceled` | Revoke access. |\n\n```\nPOST /subscriptions/{id}/cancel\n  └→ subscription.updated  (status: \"active\", canceledAt: set, endDate: set)\n       ... time passes until billing period ends ...\n  └→ subscription.canceled (status: \"canceled\")\n```\n\n## Immediate terminations\n\nSome terminations skip the schedule: `subscription.canceled` arrives right away, with no prior `subscription.updated`, and `endDate` is the moment of termination — not a billing period boundary.\n\n- `POST /subscriptions/{id}/cancel` with `immediate: true`. Cancellations of free plans and of subscriptions in `pending_payment` or `past_due` also settle immediately — canceling inside the dunning grace window voids the unpaid renewal.\n- Exhausted dunning retries: fires with `cancelReason: \"dunning_exhausted\"`, alongside `payment.retry_failed`.\n\nRefunding a payment does not cancel its subscription. If you want both outcomes, request a [cancellation](/manage-subscriptions) separately. Older cancellation events triggered by refunds may have `cancelReason: \"refund\"`."
+          "content": "## Cancellation lifecycle\n\nA regular cancellation is scheduled for the end of the current billing period. Two events fire at different moments:\n\n| Moment | Event | status | What to do |\n| --- | --- | --- | --- |\n| Customer requests cancellation | `subscription.updated` | `active` | Show \"ending on \\{endDate\\}\" in your UI. Do NOT revoke access. |\n| Billing period ends | `subscription.canceled` | `canceled` | Revoke access. |\n\n```\nPOST /subscriptions/{id}/cancel\n  └→ subscription.updated  (status: \"active\", canceledAt: set, endDate: set)\n       ... time passes until billing period ends ...\n  └→ subscription.canceled (status: \"canceled\")\n```\n\n## Immediate terminations\n\nSome terminations skip the schedule: `subscription.canceled` arrives right away, with no prior `subscription.updated`, and `endDate` is the moment of termination — not a billing period boundary.\n\n- `POST /subscriptions/{id}/cancel` with `immediate: true`. Cancellations of free plans and of subscriptions in `pending_payment` or `past_due` also settle immediately — canceling inside the dunning grace window voids the unpaid renewal.\n- Exhausted dunning retries: fires with `cancelReason: \"dunning_exhausted\"`, alongside `payment.retry_failed`.\n- A trial without a payment method that ends without a card: fires with `cancelReason: \"trial_ended_without_payment_method\"`.\n\nWhen the plan group has a default plan, exhausted dunning retries and a trial that ends without a card move the subscription to that plan instead, and `subscription.plan_changed` fires.\n\nRefunding a payment does not cancel its subscription. If you want both outcomes, request a [cancellation](/manage-subscriptions) separately. Older cancellation events triggered by refunds may have `cancelReason: \"refund\"`."
         }
       }
     },
@@ -1413,15 +1393,11 @@
                         "type": "string"
                       },
                       "cancelReason": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The reason for cancellation, if provided."
+                        "description": "The reason for cancellation, if provided.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "endDate": {
                         "description": "ISO 8601 datetime when the subscription will end. Present when cancellation is scheduled — this is the date access should be revoked (via subscription.canceled).",
@@ -1539,15 +1515,11 @@
                         "$ref": "#/components/schemas/WebhookPlanRef"
                       },
                       "billingInterval": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The billing interval (monthly, yearly)."
+                        "description": "The billing interval (monthly, yearly).",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "credit": {
                         "type": "number",
@@ -1685,15 +1657,11 @@
                         "type": "string"
                       },
                       "cancelReason": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The reason for cancellation, if provided."
+                        "description": "The reason for cancellation, if provided.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "effectiveAt": {
                         "type": "string",
@@ -1924,26 +1892,18 @@
                         "$ref": "#/components/schemas/WebhookPlanRef"
                       },
                       "billingInterval": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The current billing interval."
+                        "description": "The current billing interval.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "scheduledBillingInterval": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The new billing interval, if the change includes one. Null when only the plan changes."
+                        "description": "The new billing interval, if the change includes one. Null when only the plan changes.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "effectiveAt": {
                         "type": "string",
@@ -2019,7 +1979,7 @@
     "subscription.plan_change_revoked": {
       "post": {
         "summary": "subscription.plan_change_revoked",
-        "description": "Fired when a scheduled plan change is replaced by a different one before it executes. The replacement also fires subscription.plan_change_scheduled with the new target plan.",
+        "description": "Fired when a scheduled plan change will no longer take effect: it was revoked through the API, the dashboard or the customer portal, an immediate plan change or an immediate cancellation voided it, or a different change replaced it. A replacement also fires subscription.plan_change_scheduled with the new target plan.",
         "tags": [
           "Webhooks"
         ],
@@ -2077,26 +2037,18 @@
                         "$ref": "#/components/schemas/WebhookPlanRef"
                       },
                       "billingInterval": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The current billing interval."
+                        "description": "The current billing interval.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "revokedBillingInterval": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The previously scheduled billing interval, if the revoked change included one."
+                        "description": "The previously scheduled billing interval, if the revoked change included one.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       }
                     },
                     "required": [
@@ -2281,7 +2233,7 @@
     "trial.started": {
       "post": {
         "summary": "trial.started",
-        "description": "Fired when a subscription enters its trial period after checkout. Grant access here — trialing subscriptions have full access until trialEndsAt.",
+        "description": "Fired when a subscription enters its trial period: after checkout, or right away when the price's trial requires no payment method. Grant access here — trialing subscriptions have full access until trialEndsAt.",
         "tags": [
           "Webhooks"
         ],
@@ -2392,10 +2344,10 @@
           "href": "/webhooks/trial-started",
           "metadata": {
             "title": "trial.started",
-            "description": "Fired when a subscription enters its trial period. Grant access here.",
+            "description": "Fired when a subscription enters its trial period, after checkout or at once when the price's trial requires no payment method. Grant access here.",
             "playground": "none"
           },
-          "content": "## Trial lifecycle\n\nTrials in Commet collect a payment method at checkout, so every trial has a clear path to revenue:\n\n| Moment | Event | What to do |\n| --- | --- | --- |\n| Checkout completes with trial days | `trial.started` | Grant full access. |\n| 3 days before the trial ends | `trial.will_end` | Remind the customer billing starts soon. |\n| Customer upgrades during the trial | `trial.converted` | Trial ends early, paid plan starts now. |\n| Trial runs out | `trial.expired` | Regular billing begins automatically. |\n\nSubscriptions with `status: \"trialing\"` have full access — treat them like `active` in your entitlement checks."
+          "content": "## Trial lifecycle\n\nA trial either saves a payment method at checkout or, when the price's trial requires none, starts at once without checkout:\n\n| Moment | Event | What to do |\n| --- | --- | --- |\n| The trial checkout completes, or a trial without a payment method starts | `trial.started` | Grant full access. |\n| 3 days before the trial ends | `trial.will_end` | Remind the customer billing starts soon. |\n| Customer upgrades during the trial | `trial.converted` | Trial ends early, paid plan starts now. |\n| Trial runs out | `trial.expired` | With a payment method, regular billing begins. Without one, the subscription moves to the plan group's default plan or is canceled. |\n\nSubscriptions with `status: \"trialing\"` have full access — treat them like `active` in your entitlement checks. While a trial without a payment method has no card, the subscription's `hasPaymentMethod` is `false`."
         }
       }
     },
@@ -2517,7 +2469,7 @@
     "trial.expired": {
       "post": {
         "summary": "trial.expired",
-        "description": "Fired when a trial period runs out and the billing cycle activates the subscription. The first regular invoice is generated right after — this is the natural trial-to-paid transition.",
+        "description": "Fired when a trial period runs out. With a payment method the billing cycle activates the subscription and generates the first regular invoice right after — the natural trial-to-paid transition. A trial without a payment method instead moves to the plan group's default plan (subscription.plan_changed) or is canceled with cancelReason trial_ended_without_payment_method (subscription.canceled), without an invoice.",
         "tags": [
           "Webhooks"
         ],
@@ -2628,10 +2580,10 @@
           "href": "/webhooks/trial-expired",
           "metadata": {
             "title": "trial.expired",
-            "description": "Fired when a trial period runs out and regular billing begins.",
+            "description": "Fired when a trial period runs out: regular billing begins, or a trial without a card moves to the default plan or is canceled.",
             "playground": "none"
           },
-          "content": "## When this fires\n\nThe trial reached `trialEndsAt`. The billing cycle activates the subscription (`status: \"active\"`), starts the first regular billing period, and generates the first invoice — `invoice.created` and payment events follow as the charge is processed.\n\nAccess does not change at this moment: the customer already had full access while trialing. A retryable first-charge failure moves the subscription to `past_due` recovery; a missing payment method or a customer-action-required outcome leaves it in `pending_payment` until checkout is completed."
+          "content": "## When this fires\n\nThe trial reached `trialEndsAt`. With a payment method, the billing cycle activates the subscription (`status: \"active\"`), starts the first regular billing period, and generates the first invoice — `invoice.created` and payment events follow as the charge is processed.\n\nAccess does not change at this moment: the customer already had full access while trialing. A retryable first-charge failure moves the subscription to `past_due` recovery; a missing payment method or a customer-action-required outcome leaves it in `pending_payment` until checkout is completed.\n\nA trial without a payment method that ends without a card creates no invoice. The subscription moves to the plan group's default plan (`subscription.plan_changed`) or, without one, is canceled with `cancelReason: \"trial_ended_without_payment_method\"` (`subscription.canceled`)."
         }
       }
     },
@@ -2759,7 +2711,7 @@
     "trial.checkout_ready": {
       "post": {
         "summary": "trial.checkout_ready",
-        "description": "Fired when a trial checkout link is ready to share with the customer. Completing this checkout saves a payment method and starts the trial (trial.started) — the customer is not charged until the trial ends.",
+        "description": "Fired when a trial checkout link is ready to share with the customer. Completing this checkout saves a payment method and starts the trial (trial.started) — the customer is not charged until the trial ends. Not fired for a trial whose price requires no payment method, which starts without checkout.",
         "tags": [
           "Webhooks"
         ],
@@ -3061,15 +3013,11 @@
                                 "description": "The original reason for the charge. Recovery never replaces this reason."
                               },
                               "paymentLinkId": {
-                                "anyOf": [
-                                  {
-                                    "type": "string"
-                                  },
-                                  {
-                                    "type": "null"
-                                  }
-                                ],
-                                "description": "The public payment link ID, independently of the reason, or null when no payment link originated the charge."
+                                "description": "The public payment link ID, independently of the reason, or null when no payment link originated the charge.",
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
                               },
                               "recovery": {
                                 "anyOf": [
@@ -3153,26 +3101,18 @@
                         "description": "The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId."
                       },
                       "subscriptionId": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The subscription ID."
+                        "description": "The subscription ID.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "paymentTransactionId": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The payment transaction ID."
+                        "description": "The payment transaction ID.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "provider": {
                         "anyOf": [
@@ -3214,48 +3154,32 @@
                         "description": "The source of funds for this charge, when reported by the provider. Null when unavailable or unknown."
                       },
                       "grossAmount": {
-                        "anyOf": [
-                          {
-                            "type": "number"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "Gross amount in cents before fees."
+                        "description": "Gross amount in cents before fees.",
+                        "type": [
+                          "number",
+                          "null"
+                        ]
                       },
                       "currency": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The payment currency code."
+                        "description": "The payment currency code.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "orgNetAmount": {
-                        "anyOf": [
-                          {
-                            "type": "number"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "Net amount after fees in cents."
+                        "description": "Net amount after fees in cents.",
+                        "type": [
+                          "number",
+                          "null"
+                        ]
                       },
                       "customerEmail": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The customer email used for this payment."
+                        "description": "The customer email used for this payment.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "paidAt": {
                         "description": "ISO 8601 datetime when the payment was received.",
@@ -3402,15 +3326,11 @@
                                 "description": "The original reason for the charge. Recovery never replaces this reason."
                               },
                               "paymentLinkId": {
-                                "anyOf": [
-                                  {
-                                    "type": "string"
-                                  },
-                                  {
-                                    "type": "null"
-                                  }
-                                ],
-                                "description": "The public payment link ID, independently of the reason, or null when no payment link originated the charge."
+                                "description": "The public payment link ID, independently of the reason, or null when no payment link originated the charge.",
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
                               },
                               "recovery": {
                                 "anyOf": [
@@ -3490,15 +3410,11 @@
                         "description": "The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId."
                       },
                       "subscriptionId": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The subscription ID, if the invoice is linked to a subscription."
+                        "description": "The subscription ID, if the invoice is linked to a subscription.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "provider": {
                         "type": "string",
@@ -3540,15 +3456,11 @@
                         "description": "A human-readable failure message."
                       },
                       "recoveryUrl": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "A ready-to-use link the customer can follow to retry this payment, or null when no recovery path applies. For a first failed charge (pending_payment) it is the checkout URL; for a failed renewal (past_due) it is a signed recovery link — no separate createRecoveryLink call needed."
+                        "description": "A ready-to-use link the customer can follow to retry this payment, or null when no recovery path applies. For a first failed charge (pending_payment) it is the checkout URL; for a failed renewal (past_due) it is a signed recovery link — no separate createRecoveryLink call needed.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       }
                     },
                     "required": [
@@ -3678,15 +3590,11 @@
                         "description": "The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId."
                       },
                       "subscriptionId": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The subscription ID, if the invoice is linked to a subscription."
+                        "description": "The subscription ID, if the invoice is linked to a subscription.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "provider": {
                         "anyOf": [
@@ -3968,59 +3876,39 @@
                         "description": "The payment provider the charge was routed to: stripe, commet, or dlocal."
                       },
                       "paymentLinkId": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The payment link the payment originated from, or null when the payment did not come from a payment link."
+                        "description": "The payment link the payment originated from, or null when the payment did not come from a payment link.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "invoiceId": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The invoice the payment collected, or null for payments without an invoice."
+                        "description": "The invoice the payment collected, or null for payments without an invoice.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "invoiceNumber": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The human-readable invoice number, if available."
+                        "description": "The human-readable invoice number, if available.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "customerId": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The customer ID, when the payment is linked to an invoice. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId."
+                        "description": "The customer ID, when the payment is linked to an invoice. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "subscriptionId": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The subscription ID, if the invoice is linked to a subscription."
+                        "description": "The subscription ID, if the invoice is linked to a subscription.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "refundAmount": {
                         "type": "number",
@@ -4147,59 +4035,39 @@
                         "description": "The payment provider the charge was routed to: stripe, commet, or dlocal."
                       },
                       "paymentLinkId": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The payment link the payment originated from, or null when the payment did not come from a payment link."
+                        "description": "The payment link the payment originated from, or null when the payment did not come from a payment link.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "invoiceId": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The invoice the payment collected, or null for payments without an invoice."
+                        "description": "The invoice the payment collected, or null for payments without an invoice.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "invoiceNumber": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The human-readable invoice number, if available."
+                        "description": "The human-readable invoice number, if available.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "customerId": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The customer ID, when the payment is linked to an invoice. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId."
+                        "description": "The customer ID, when the payment is linked to an invoice. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "subscriptionId": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The subscription ID, if the invoice is linked to a subscription."
+                        "description": "The subscription ID, if the invoice is linked to a subscription.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "disputeAmount": {
                         "type": "number",
@@ -4210,15 +4078,11 @@
                         "description": "The dispute currency code."
                       },
                       "disputeReason": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The provider's reason code (e.g. fraudulent, product_not_received), or null when none is given."
+                        "description": "The provider's reason code (e.g. fraudulent, product_not_received), or null when none is given.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       }
                     },
                     "required": [
@@ -4339,59 +4203,39 @@
                         "description": "The payment provider the charge was routed to: stripe, commet, or dlocal."
                       },
                       "paymentLinkId": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The payment link the payment originated from, or null when the payment did not come from a payment link."
+                        "description": "The payment link the payment originated from, or null when the payment did not come from a payment link.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "invoiceId": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The invoice the payment collected, or null for payments without an invoice."
+                        "description": "The invoice the payment collected, or null for payments without an invoice.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "invoiceNumber": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The human-readable invoice number, if available."
+                        "description": "The human-readable invoice number, if available.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "customerId": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The customer ID, when the payment is linked to an invoice. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId."
+                        "description": "The customer ID, when the payment is linked to an invoice. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "subscriptionId": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The subscription ID, if the invoice is linked to a subscription."
+                        "description": "The subscription ID, if the invoice is linked to a subscription.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "disputeAmount": {
                         "type": "number",
@@ -4402,15 +4246,11 @@
                         "description": "The dispute currency code."
                       },
                       "disputeReason": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The provider's reason code, or null when none is given."
+                        "description": "The provider's reason code, or null when none is given.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "outcome": {
                         "type": "string",
@@ -4544,15 +4384,11 @@
                         "description": "The payment description shown to the customer."
                       },
                       "customerId": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The customer ID, or null when the link is not tied to a customer. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId."
+                        "description": "The customer ID, or null when the link is not tied to a customer. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       }
                     },
                     "required": [
@@ -4674,15 +4510,11 @@
                                 "description": "The original reason for the charge. Recovery never replaces this reason."
                               },
                               "paymentLinkId": {
-                                "anyOf": [
-                                  {
-                                    "type": "string"
-                                  },
-                                  {
-                                    "type": "null"
-                                  }
-                                ],
-                                "description": "The public payment link ID, independently of the reason, or null when no payment link originated the charge."
+                                "description": "The public payment link ID, independently of the reason, or null when no payment link originated the charge.",
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
                               },
                               "recovery": {
                                 "anyOf": [
@@ -4770,15 +4602,11 @@
                         "description": "The payment description shown to the customer."
                       },
                       "customerId": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The customer ID, or null when the link is not tied to a customer. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId."
+                        "description": "The customer ID, or null when the link is not tied to a customer. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "invoiceId": {
                         "type": "string",
@@ -4789,15 +4617,11 @@
                         "description": "The human-readable invoice number."
                       },
                       "paymentTransactionId": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The payment transaction ID for the settled charge."
+                        "description": "The payment transaction ID for the settled charge.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "paymentMethod": {
                         "anyOf": [
@@ -4957,15 +4781,11 @@
                                 "description": "The original reason for the charge. Recovery never replaces this reason."
                               },
                               "paymentLinkId": {
-                                "anyOf": [
-                                  {
-                                    "type": "string"
-                                  },
-                                  {
-                                    "type": "null"
-                                  }
-                                ],
-                                "description": "The public payment link ID, independently of the reason, or null when no payment link originated the charge."
+                                "description": "The public payment link ID, independently of the reason, or null when no payment link originated the charge.",
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
                               },
                               "recovery": {
                                 "anyOf": [
@@ -5053,15 +4873,11 @@
                         "description": "The payment description shown to the customer."
                       },
                       "customerId": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The customer ID, or null when the link is not tied to a customer. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId."
+                        "description": "The customer ID, or null when the link is not tied to a customer. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "failureCode": {
                         "type": "string",
@@ -5225,15 +5041,11 @@
                         "description": "The payment description shown to the customer."
                       },
                       "customerId": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The customer ID, or null when the link is not tied to a customer. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId."
+                        "description": "The customer ID, or null when the link is not tied to a customer. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       }
                     },
                     "required": [
@@ -5377,15 +5189,11 @@
                         "description": "The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId."
                       },
                       "subscriptionId": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The subscription ID, if the invoice is linked to a subscription."
+                        "description": "The subscription ID, if the invoice is linked to a subscription.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       }
                     },
                     "required": [
@@ -5541,15 +5349,11 @@
                         "description": "The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId."
                       },
                       "subscriptionId": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The subscription ID, if the invoice is linked to a subscription."
+                        "description": "The subscription ID, if the invoice is linked to a subscription.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       }
                     },
                     "required": [
@@ -5705,15 +5509,11 @@
                         "description": "The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId."
                       },
                       "subscriptionId": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The subscription ID, if the invoice is linked to a subscription."
+                        "description": "The subscription ID, if the invoice is linked to a subscription.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       }
                     },
                     "required": [
@@ -5845,15 +5645,11 @@
                         "description": "The plan name."
                       },
                       "billingInterval": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The billing interval (monthly, yearly)."
+                        "description": "The billing interval (monthly, yearly).",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "currentPeriodEnd": {
                         "type": "string",
@@ -6163,6 +5959,130 @@
         }
       }
     },
+    "payment_method.detached": {
+      "post": {
+        "summary": "payment_method.detached",
+        "description": "Fired when a saved payment method is removed from a customer: the customer unlinked it at the payment provider (for example, revoking a Mercado Pago authorization), or removed it through the customer portal. Removing a method never changes the customer's subscriptions; a renewal that finds no usable method follows the usual failed-payment recovery.",
+        "tags": [
+          "Webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "event": {
+                    "type": "string",
+                    "const": "payment_method.detached"
+                  },
+                  "timestamp": {
+                    "type": "string"
+                  },
+                  "organizationId": {
+                    "type": "string"
+                  },
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "live",
+                      "sandbox"
+                    ]
+                  },
+                  "apiVersion": {
+                    "type": "string"
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "customerId": {
+                        "type": "string",
+                        "description": "The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId."
+                      },
+                      "paymentMethod": {
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/PaymentMethod"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ],
+                        "description": "The payment method: card, oxxo, or mercado_pago. Null when unknown."
+                      },
+                      "card": {
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/WebhookCardInfo"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ],
+                        "description": "Card display metadata of the removed method: brand, last4, expMonth, expYear. Null when the method is not a card or its details cannot be retrieved."
+                      },
+                      "reason": {
+                        "type": "string",
+                        "enum": [
+                          "unlinked_at_provider",
+                          "removed_by_customer"
+                        ],
+                        "description": "Why the method was removed: `unlinked_at_provider` when the customer revoked it at the payment provider, `removed_by_customer` when the customer removed it through the customer portal."
+                      }
+                    },
+                    "required": [
+                      "customerId",
+                      "paymentMethod",
+                      "card",
+                      "reason"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "id",
+                  "event",
+                  "timestamp",
+                  "organizationId",
+                  "mode",
+                  "apiVersion",
+                  "data"
+                ],
+                "additionalProperties": false
+              },
+              "example": {
+                "event": "payment_method.detached",
+                "timestamp": "2026-06-23T14:30:00.000Z",
+                "organizationId": "8f14e45f-ceea-4e7a-9c3d-1c2b3a4d5e6f",
+                "mode": "live",
+                "apiVersion": "2026-08-27",
+                "data": {
+                  "customerId": "user_123",
+                  "paymentMethod": "mercado_pago",
+                  "card": null,
+                  "reason": "unlinked_at_provider"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Return any 2xx status code to acknowledge receipt of the event."
+          }
+        },
+        "x-mint": {
+          "href": "/webhooks/payment-method-detached",
+          "metadata": {
+            "playground": "none"
+          }
+        }
+      }
+    },
     "customer.created": {
       "post": {
         "summary": "customer.created",
@@ -6208,63 +6128,74 @@
                         "description": "The Commet customer ID (cus_...)."
                       },
                       "externalId": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "Your own identifier for this customer, if you provided one."
+                        "description": "Your own identifier for this customer, if you provided one.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "fullName": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The customer's full name."
+                        "description": "The customer's full name.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "email": {
                         "type": "string",
                         "description": "The customer's email."
                       },
                       "taxDocument": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The customer's tax identification number, if provided."
+                        "description": "The customer's tax identification number, if provided.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "documentType": {
+                        "description": "The local tax document type label inferred from the customer's country (e.g. CUIT, RFC, RUT), or null when no tax document was provided.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "businessTaxId": {
                         "anyOf": [
                           {
-                            "type": "string"
+                            "type": "object",
+                            "properties": {
+                              "country": {
+                                "type": "string",
+                                "description": "ISO-2 country the tax ID belongs to."
+                              },
+                              "type": {
+                                "type": "string",
+                                "description": "Tax ID type (e.g. eu_vat, pe_ruc)."
+                              },
+                              "value": {
+                                "type": "string",
+                                "description": "The normalized tax ID."
+                              }
+                            },
+                            "required": [
+                              "country",
+                              "type",
+                              "value"
+                            ],
+                            "additionalProperties": false
                           },
                           {
                             "type": "null"
                           }
                         ],
-                        "description": "The local tax document type label inferred from the customer's country (e.g. CUIT, RFC, RUT), or null when no tax document was provided."
+                        "description": "The business tax ID saved for the customer (EU VAT number, Peruvian RUC), or null when the customer has none."
                       },
                       "timezone": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The customer's timezone."
+                        "description": "The customer's timezone.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "metadata": {
                         "anyOf": [
@@ -6297,6 +6228,7 @@
                       "email",
                       "taxDocument",
                       "documentType",
+                      "businessTaxId",
                       "timezone",
                       "metadata",
                       "createdAt",
@@ -6329,6 +6261,7 @@
                   "email": "ada@acme.com",
                   "taxDocument": "20-12345678-9",
                   "documentType": "CUIT",
+                  "businessTaxId": null,
                   "timezone": "UTC",
                   "metadata": {
                     "plan_intent": "pro"
@@ -6401,63 +6334,74 @@
                         "description": "The Commet customer ID (cus_...)."
                       },
                       "externalId": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "Your own identifier for this customer, if you provided one."
+                        "description": "Your own identifier for this customer, if you provided one.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "fullName": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The customer's full name."
+                        "description": "The customer's full name.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "email": {
                         "type": "string",
                         "description": "The customer's email."
                       },
                       "taxDocument": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The customer's tax identification number, if provided."
+                        "description": "The customer's tax identification number, if provided.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "documentType": {
+                        "description": "The local tax document type label inferred from the customer's country (e.g. CUIT, RFC, RUT), or null when no tax document was provided.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "businessTaxId": {
                         "anyOf": [
                           {
-                            "type": "string"
+                            "type": "object",
+                            "properties": {
+                              "country": {
+                                "type": "string",
+                                "description": "ISO-2 country the tax ID belongs to."
+                              },
+                              "type": {
+                                "type": "string",
+                                "description": "Tax ID type (e.g. eu_vat, pe_ruc)."
+                              },
+                              "value": {
+                                "type": "string",
+                                "description": "The normalized tax ID."
+                              }
+                            },
+                            "required": [
+                              "country",
+                              "type",
+                              "value"
+                            ],
+                            "additionalProperties": false
                           },
                           {
                             "type": "null"
                           }
                         ],
-                        "description": "The local tax document type label inferred from the customer's country (e.g. CUIT, RFC, RUT), or null when no tax document was provided."
+                        "description": "The business tax ID saved for the customer (EU VAT number, Peruvian RUC), or null when the customer has none."
                       },
                       "timezone": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The customer's timezone."
+                        "description": "The customer's timezone.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "metadata": {
                         "anyOf": [
@@ -6490,6 +6434,7 @@
                       "email",
                       "taxDocument",
                       "documentType",
+                      "businessTaxId",
                       "timezone",
                       "metadata",
                       "createdAt",
@@ -6522,6 +6467,7 @@
                   "email": "ada.lovelace@acme.com",
                   "taxDocument": "20-12345678-9",
                   "documentType": "CUIT",
+                  "businessTaxId": null,
                   "timezone": "Europe/London",
                   "metadata": {
                     "plan_intent": "pro"
@@ -6602,15 +6548,11 @@
                         "description": "The customer's current subscription status, or \"none\" when no live subscription exists. Access is granted while trialing, active, or past_due — past_due is a permissive grace window during dunning."
                       },
                       "subscriptionId": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The live subscription ID, or null when status is none."
+                        "description": "The live subscription ID, or null when status is none.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "plan": {
                         "anyOf": [
@@ -6624,26 +6566,18 @@
                         "description": "The current plan (id and name), or null when status is none."
                       },
                       "billingInterval": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The current billing interval."
+                        "description": "The current billing interval.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "consumptionModel": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The plan's consumption model: metered, credits, or balance."
+                        "description": "The plan's consumption model: metered, credits, or balance.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "features": {
                         "type": "array",
@@ -6661,15 +6595,11 @@
                                   "description": "Display name of the feature."
                                 },
                                 "unitName": {
-                                  "anyOf": [
-                                    {
-                                      "type": "string"
-                                    },
-                                    {
-                                      "type": "null"
-                                    }
-                                  ],
-                                  "description": "Display name for one product unit, or null when not applicable."
+                                  "description": "Display name for one product unit, or null when not applicable.",
+                                  "type": [
+                                    "string",
+                                    "null"
+                                  ]
                                 },
                                 "allowed": {
                                   "type": "boolean",
@@ -6706,15 +6636,11 @@
                                   "description": "Display name of the feature."
                                 },
                                 "unitName": {
-                                  "anyOf": [
-                                    {
-                                      "type": "string"
-                                    },
-                                    {
-                                      "type": "null"
-                                    }
-                                  ],
-                                  "description": "Display name for one product unit, or null when not applicable."
+                                  "description": "Display name for one product unit, or null when not applicable.",
+                                  "type": [
+                                    "string",
+                                    "null"
+                                  ]
                                 },
                                 "allowed": {
                                   "type": "boolean",
@@ -7009,15 +6935,11 @@
                                   "description": "Display name of the feature."
                                 },
                                 "unitName": {
-                                  "anyOf": [
-                                    {
-                                      "type": "string"
-                                    },
-                                    {
-                                      "type": "null"
-                                    }
-                                  ],
-                                  "description": "Display name for one product unit, or null when not applicable."
+                                  "description": "Display name for one product unit, or null when not applicable.",
+                                  "type": [
+                                    "string",
+                                    "null"
+                                  ]
                                 },
                                 "allowed": {
                                   "type": "boolean",
@@ -7145,15 +7067,11 @@
                                   "description": "Display name of the feature."
                                 },
                                 "unitName": {
-                                  "anyOf": [
-                                    {
-                                      "type": "string"
-                                    },
-                                    {
-                                      "type": "null"
-                                    }
-                                  ],
-                                  "description": "Display name for one product unit, or null when not applicable."
+                                  "description": "Display name for one product unit, or null when not applicable.",
+                                  "type": [
+                                    "string",
+                                    "null"
+                                  ]
                                 },
                                 "allowed": {
                                   "type": "boolean",
@@ -7305,7 +7223,7 @@
                             "type": "null"
                           }
                         ],
-                        "description": "For balance plans: currentBalance in rate scale (10000 = $1.00). Null otherwise."
+                        "description": "For balance plans, in rate scale (10000 = 1.00 of the subscription currency): currentBalance (the available total), planBalance, purchasedBalance and totalBalance. Null otherwise."
                       }
                     },
                     "required": [
@@ -8457,7 +8375,7 @@
     "credits.granted": {
       "post": {
         "summary": "credits.granted",
-        "description": "Fired when non-purchase credits are granted to a subscription: plan-included credits at the start of each billing period, or a manual adjustment from the dashboard. Credit pack purchases fire credits.purchased instead.",
+        "description": "Fired when non-purchase credits are granted to a subscription: plan-included credits at the start of each billing period, or a manual adjustment from the dashboard. Credit purchases through the API, automatic top-ups, or the customer portal fire credits.purchased instead.",
         "tags": [
           "Webhooks"
         ],
@@ -8559,14 +8477,14 @@
             "description": "Non-purchase credits were granted to a subscription.",
             "playground": "none"
           },
-          "content": "## When this fires\n\nPlan-included credits are granted at the start of every billing period (`reason: \"period_reset\"`), and manual adjustments from the dashboard grant purchased credits (`reason: \"manual_adjustment\"`). Credit pack purchases are a separate flow and fire `credits.purchased` instead.\n\nThe idempotency key is derived from the billing operation that granted the credits, so engine retries never send a duplicate.\n\nUse it to reset in-app usage meters at the start of a period or to confirm a support-driven credit grant reached the customer."
+          "content": "## When this fires\n\nPlan-included credits are granted at the start of every billing period (`reason: \"period_reset\"`), and manual adjustments from the dashboard grant purchased credits (`reason: \"manual_adjustment\"`). Purchases through the API, automatic top-ups, or the customer portal fire `credits.purchased` instead.\n\nThe idempotency key is derived from the billing operation that granted the credits, so engine retries never send a duplicate.\n\nUse it to reset in-app usage meters at the start of a period or to confirm a support-driven credit grant reached the customer."
         }
       }
     },
     "credits.purchased": {
       "post": {
         "summary": "credits.purchased",
-        "description": "Fired when a customer buys a credit pack through the customer portal and the payment succeeds. Purchased credits never expire — unlike plan credits, they survive period resets. Plan-included credit grants fire credits.granted instead.",
+        "description": "Fired when a customer buys a credit pack or a chosen quantity of credits through the API, an automatic top-up, or the customer portal and the payment succeeds. Purchased credits never expire — unlike plan credits, they survive period resets. Plan-included credit grants fire credits.granted instead.",
         "tags": [
           "Webhooks"
         ],
@@ -8621,7 +8539,7 @@
                       },
                       "creditPackName": {
                         "type": "string",
-                        "description": "The purchased credit pack's name."
+                        "description": "The purchased credit pack's name, or Credit purchase for a chosen quantity of credits."
                       },
                       "credits": {
                         "type": "number",
@@ -8677,17 +8595,17 @@
           "href": "/webhooks/credits-purchased",
           "metadata": {
             "title": "credits.purchased",
-            "description": "A credit pack purchase was completed.",
+            "description": "A credit pack or a chosen quantity of credits was purchased.",
             "playground": "none"
           },
-          "content": "## When this fires\n\nWhen a customer buys a credit pack through the customer portal and the payment succeeds. Purchased credits never expire — unlike plan credits, they survive period resets.\n\nPlan-included credits granted at each period reset fire `credits.granted` instead.\n\nUse it to confirm top-up purchases in your own UI or analytics."
+          "content": "## When this fires\n\nWhen a customer buys a credit pack or a chosen quantity of credits through the API, an automatic top-up, or the customer portal, and the payment succeeds. Purchased credits never expire — unlike plan credits, they survive period resets.\n\nPlan-included credits granted at each period reset fire `credits.granted` instead.\n\nUse it to confirm top-up purchases in your own UI or analytics."
         }
       }
     },
     "credits.low": {
       "post": {
         "summary": "credits.low",
-        "description": "Fired when a subscription's remaining credits cross below 10% of the credits granted for the current period. Emitted once per billing period, when the crossing happens.",
+        "description": "Fired when a subscription's available credits (plan plus purchased) cross below 10% of their last refill: a period reset, a purchase or a manual adjustment. Emitted once per crossing, the same rule as balance.low.",
         "tags": [
           "Webhooks"
         ],
@@ -8738,11 +8656,11 @@
                       },
                       "thresholdCredits": {
                         "type": "number",
-                        "description": "The low-credit threshold that was crossed: 10% of the period's granted plan credits."
+                        "description": "The low-credit threshold that was crossed: 10% of the last refill."
                       },
                       "periodCredits": {
                         "type": "number",
-                        "description": "The plan credits granted at the last period reset."
+                        "description": "The credits added by the last refill: a period reset, a purchase or a manual adjustment."
                       }
                     },
                     "required": [
@@ -8802,7 +8720,7 @@
     "credits.depleted": {
       "post": {
         "summary": "credits.depleted",
-        "description": "Fired when a subscription's credits hit zero. Usage requests that need more credits than remain are rejected from this point. Also fires customer.state_changed with trigger credits_depleted.",
+        "description": "Fired each time a subscription's available credits cross to zero or below. Usage that needs more credits than remain is rejected from this point, unless the plan allows overage, which is billed at its price per credit at the next renewal. Also fires customer.state_changed with trigger credits_depleted.",
         "tags": [
           "Webhooks"
         ],
@@ -8905,7 +8823,7 @@
     "credits.expired": {
       "post": {
         "summary": "credits.expired",
-        "description": "Fired at the period reset when unused plan credits from the previous period are discarded. Plan credits expire at period end; purchased credits never expire and are not affected.",
+        "description": "Fired at a reset when unused plan credits are discarded. On a plan whose unused plan credits expire, every unused plan credit expires at each reset. On a plan that rolls them over, a reset keeps them, up to the plan's maxPlanCredits when it has one, and only the excess expires. A change to another credits plan applies the new plan's terms the same way. Purchased credits never expire and are not affected.",
         "tags": [
           "Webhooks"
         ],
@@ -8952,7 +8870,7 @@
                       },
                       "expiredCredits": {
                         "type": "number",
-                        "description": "The unused plan credits that were discarded."
+                        "description": "The plan credits that were discarded."
                       }
                     },
                     "required": [
@@ -9005,10 +8923,122 @@
         }
       }
     },
+    "balance.granted": {
+      "post": {
+        "summary": "balance.granted",
+        "description": "Fired when non-purchase balance is granted to a subscription: the plan balance at the start of each billing period, or a manual adjustment from the dashboard or the API, which goes to the purchased balance. Balance top-ups fire balance.topped_up instead.",
+        "tags": [
+          "Webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "event": {
+                    "type": "string",
+                    "const": "balance.granted"
+                  },
+                  "timestamp": {
+                    "type": "string"
+                  },
+                  "organizationId": {
+                    "type": "string"
+                  },
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "live",
+                      "sandbox"
+                    ]
+                  },
+                  "apiVersion": {
+                    "type": "string"
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "subscriptionId": {
+                        "type": "string",
+                        "description": "The subscription ID."
+                      },
+                      "customerId": {
+                        "type": "string",
+                        "description": "The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId."
+                      },
+                      "amount": {
+                        "type": "number",
+                        "description": "The balance granted in rate scale (10000 = 1.00 of the subscription currency)."
+                      },
+                      "currency": {
+                        "type": "string",
+                        "description": "The subscription currency."
+                      },
+                      "reason": {
+                        "type": "string",
+                        "description": "Why the balance was granted: period_reset or manual_adjustment."
+                      }
+                    },
+                    "required": [
+                      "subscriptionId",
+                      "customerId",
+                      "amount",
+                      "currency",
+                      "reason"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "id",
+                  "event",
+                  "timestamp",
+                  "organizationId",
+                  "mode",
+                  "apiVersion",
+                  "data"
+                ],
+                "additionalProperties": false
+              },
+              "example": {
+                "event": "balance.granted",
+                "timestamp": "2026-06-23T14:30:00.000Z",
+                "organizationId": "8f14e45f-ceea-4e7a-9c3d-1c2b3a4d5e6f",
+                "mode": "live",
+                "apiVersion": "2026-08-27",
+                "data": {
+                  "subscriptionId": "sub_1a2b3c4d",
+                  "customerId": "user_123",
+                  "amount": 100000,
+                  "currency": "usd",
+                  "reason": "period_reset"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Return any 2xx status code to acknowledge receipt of the event."
+          }
+        },
+        "x-mint": {
+          "href": "/webhooks/balance-granted",
+          "metadata": {
+            "playground": "none"
+          }
+        }
+      }
+    },
     "balance.topped_up": {
       "post": {
         "summary": "balance.topped_up",
-        "description": "Fired when a customer on a balance plan tops up their prepaid balance through the customer portal and the payment succeeds.",
+        "description": "Fired when a balance top-up succeeds: through the API, an automatic top-up or the customer portal. The amount goes to the purchased balance, which is spent after the plan balance and kept until the subscription ends.",
         "tags": [
           "Webhooks"
         ],
@@ -9350,6 +9380,112 @@
         }
       }
     },
+    "balance.expired": {
+      "post": {
+        "summary": "balance.expired",
+        "description": "Fired at a reset when unused plan balance is discarded. On a plan whose unused plan balance expires, all of it expires at each reset. On a plan that rolls it over, a reset keeps it, up to the plan's maxPlanBalance when it has one, and only the excess expires. An overage debt invoiced at the renewal counts as nothing left over. Purchased balance never expires and is not affected.",
+        "tags": [
+          "Webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "event": {
+                    "type": "string",
+                    "const": "balance.expired"
+                  },
+                  "timestamp": {
+                    "type": "string"
+                  },
+                  "organizationId": {
+                    "type": "string"
+                  },
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "live",
+                      "sandbox"
+                    ]
+                  },
+                  "apiVersion": {
+                    "type": "string"
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "subscriptionId": {
+                        "type": "string",
+                        "description": "The subscription ID."
+                      },
+                      "customerId": {
+                        "type": "string",
+                        "description": "The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId."
+                      },
+                      "expiredAmount": {
+                        "type": "number",
+                        "description": "The plan balance that was discarded, in rate scale (10000 = 1.00 of the subscription currency)."
+                      },
+                      "currency": {
+                        "type": "string",
+                        "description": "The subscription currency."
+                      }
+                    },
+                    "required": [
+                      "subscriptionId",
+                      "customerId",
+                      "expiredAmount",
+                      "currency"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "id",
+                  "event",
+                  "timestamp",
+                  "organizationId",
+                  "mode",
+                  "apiVersion",
+                  "data"
+                ],
+                "additionalProperties": false
+              },
+              "example": {
+                "event": "balance.expired",
+                "timestamp": "2026-06-23T14:30:00.000Z",
+                "organizationId": "8f14e45f-ceea-4e7a-9c3d-1c2b3a4d5e6f",
+                "mode": "live",
+                "apiVersion": "2026-08-27",
+                "data": {
+                  "subscriptionId": "sub_1a2b3c4d",
+                  "customerId": "user_123",
+                  "expiredAmount": 40000,
+                  "currency": "usd"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Return any 2xx status code to acknowledge receipt of the event."
+          }
+        },
+        "x-mint": {
+          "href": "/webhooks/balance-expired",
+          "metadata": {
+            "playground": "none"
+          }
+        }
+      }
+    },
     "quota.threshold_reached": {
       "post": {
         "summary": "quota.threshold_reached",
@@ -9643,15 +9779,11 @@
                         "description": "The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId."
                       },
                       "subscriptionId": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The live subscription ID, or null when the customer has no live subscription."
+                        "description": "The live subscription ID, or null when the customer has no live subscription.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "featureCode": {
                         "type": "string",
@@ -10508,15 +10640,11 @@
                         "description": "Destination bank display metadata: bankName and last4."
                       },
                       "paidAt": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "ISO 8601 datetime when the provider confirmed the deposit arrived."
+                        "description": "ISO 8601 datetime when the provider confirmed the deposit arrived.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       }
                     },
                     "required": [
@@ -10658,37 +10786,25 @@
                         "description": "Destination bank display metadata: bankName and last4."
                       },
                       "failedAt": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "ISO 8601 datetime when the failure was recorded."
+                        "description": "ISO 8601 datetime when the failure was recorded.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "failureCode": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "The provider's failure code, when available."
+                        "description": "The provider's failure code, when available.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "failureMessage": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ],
-                        "description": "A human-readable failure message, when available."
+                        "description": "A human-readable failure message, when available.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       }
                     },
                     "required": [
@@ -10828,43 +10944,27 @@
             "type": "string"
           },
           "current": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "number",
+              "null"
             ]
           },
           "included": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "number",
+              "null"
             ]
           },
           "remaining": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "number",
+              "null"
             ]
           },
           "unlimited": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "boolean",
+              "null"
             ]
           }
         },
@@ -10901,11 +11001,27 @@
         "type": "object",
         "properties": {
           "currentBalance": {
-            "type": "number"
+            "type": "number",
+            "description": "The available balance, plan plus purchased, in rate scale. Equal to totalBalance."
+          },
+          "planBalance": {
+            "type": "number",
+            "description": "The plan part in rate scale: spent first, replaced or rolled over at each reset, negative while overage is owed."
+          },
+          "purchasedBalance": {
+            "type": "number",
+            "description": "The purchased part in rate scale: top-ups and manual adjustments, spent after the plan part and kept until the subscription ends."
+          },
+          "totalBalance": {
+            "type": "number",
+            "description": "planBalance plus purchasedBalance, in rate scale."
           }
         },
         "required": [
-          "currentBalance"
+          "currentBalance",
+          "planBalance",
+          "purchasedBalance",
+          "totalBalance"
         ],
         "additionalProperties": false
       },
@@ -11044,13 +11160,9 @@
         "type": "object",
         "properties": {
           "bankName": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "string",
+              "null"
             ]
           },
           "last4": {

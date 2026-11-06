@@ -584,6 +584,17 @@ Fired when a customer replaces their default payment method through the customer
 - `paymentMethod` (`PaymentMethod | null`, required) — The payment method: card, oxxo, or mercado_pago. Null when unknown.
 - `card` (`WebhookCardInfo | null`, required) — Card display metadata for the new method: brand, last4, expMonth, expYear. Null when the method is not a card or its details cannot be retrieved.
 
+## payment_method.detached
+
+Fired when a saved payment method is removed from a customer: the customer unlinked it at the payment provider (for example, revoking a Mercado Pago authorization), or removed it through the customer portal. Removing a method never changes the customer's subscriptions; a renewal that finds no usable method follows the usual failed-payment recovery.
+
+### Data
+
+- `customerId` (`string`, required) — The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.
+- `paymentMethod` (`PaymentMethod | null`, required) — The payment method: card, oxxo, or mercado_pago. Null when unknown.
+- `card` (`WebhookCardInfo | null`, required) — Card display metadata of the removed method: brand, last4, expMonth, expYear. Null when the method is not a card or its details cannot be retrieved.
+- `reason` (`"unlinked_at_provider" | "removed_by_customer"`, required) — Why the method was removed: `unlinked_at_provider` when the customer revoked it at the payment provider, `removed_by_customer` when the customer removed it through the customer portal.
+
 ## customer.created
 
 Fired when a customer is created, via the API (including batch create), SDK, or dashboard. The payload is the customer resource exactly as GET /customers returns it.
@@ -596,6 +607,7 @@ Fired when a customer is created, via the API (including batch create), SDK, or 
 - `email` (`string`, required) — The customer's email.
 - `taxDocument` (`string | null`, required) — The customer's tax identification number, if provided.
 - `documentType` (`string | null`, required) — The local tax document type label inferred from the customer's country (e.g. CUIT, RFC, RUT), or null when no tax document was provided.
+- `businessTaxId` (`{ country: string; type: string; value: string } | null`, required) — The business tax ID saved for the customer (EU VAT number, Peruvian RUC), or null when the customer has none.
 - `timezone` (`string | null`, required) — The customer's timezone.
 - `metadata` (`Record<string, unknown> | null`, required) — Custom key-value metadata you attached to the customer.
 - `createdAt` (`string`, required) — ISO 8601 datetime when the customer was created.
@@ -613,6 +625,7 @@ Fired when a customer's details change (email, name, timezone, externalId, or me
 - `email` (`string`, required) — The customer's email.
 - `taxDocument` (`string | null`, required) — The customer's tax identification number, if provided.
 - `documentType` (`string | null`, required) — The local tax document type label inferred from the customer's country (e.g. CUIT, RFC, RUT), or null when no tax document was provided.
+- `businessTaxId` (`{ country: string; type: string; value: string } | null`, required) — The business tax ID saved for the customer (EU VAT number, Peruvian RUC), or null when the customer has none.
 - `timezone` (`string | null`, required) — The customer's timezone.
 - `metadata` (`Record<string, unknown> | null`, required) — Custom key-value metadata you attached to the customer.
 - `createdAt` (`string`, required) — ISO 8601 datetime when the customer was created.
@@ -634,7 +647,7 @@ Aggregate entitlement event answering one question: what can this customer acces
 - `features` (`Array<{ code: string; name: string; unitName: string | null; allowed: boolean; type: "boolean"; enabled: boolean } | { code: string; name: string; unitName: string | null; allowed: boolean; type: "usage"; consumption: { model: "metered"; period: { start: string; end: string }; unitsUsed: number; includedUnits: number; remainingUnits?: number; unlimited: boolean; overage: { enabled: boolean; units: number; unitPrice?: { amount: number; currency: string; scale: 10000 } } } | { model: "credits"; period: { start: string; end: string }; unitsUsed: number; creditsPerUnit: number; creditsConsumed: number; availableUnits: number } | { model: "balance"; period: { start: string; end: string }; unitsUsed: number; spent: { amount: number; currency: string }; availableUnits?: number; unitPrice?: { amount: number; currency: string; scale: 10000 } } } | { code: string; name: string; unitName: string | null; allowed: boolean; type: "seats"; usage: { period: { start: string; end: string }; unitsUsed: number; includedUnits: number; remainingUnits?: number; unlimited: boolean; overage: { enabled: boolean; units: number; unitPrice?: { amount: number; currency: string; scale: 10000 } } } } | { code: string; name: string; unitName: string | null; allowed: boolean; type: "quota"; usage: { period: { start: string; end: string }; unitsUsed: number; includedUnits: number; remainingUnits?: number; unlimited: boolean; overage: { enabled: boolean; units: number; unitPrice?: { amount: number; currency: string; scale: 10000 } }; billedUnits: number } }>`, required) — Current feature access, discriminated by type. Boolean features expose enabled; usage features expose model-specific consumption; seats and quota expose usage allowances.
 - `seats` (`Array<WebhookSeatSummary>`, required) — Summary of seats-type features: code, current, included, remaining, unlimited.
 - `credits` (`WebhookCreditsBalance | null`, required) — For credits plans: planCredits, purchasedCredits, totalCredits. Null otherwise.
-- `balance` (`WebhookBalance | null`, required) — For balance plans: currentBalance in rate scale (10000 = $1.00). Null otherwise.
+- `balance` (`WebhookBalance | null`, required) — For balance plans, in rate scale (10000 = 1.00 of the subscription currency): currentBalance (the available total), planBalance, purchasedBalance and totalBalance. Null otherwise.
 
 ## plan_grant.created
 
@@ -758,19 +771,19 @@ Fired when a customer buys a credit pack or a chosen quantity of credits through
 
 ## credits.low
 
-Fired when a subscription's remaining credits cross below 10% of the credits granted for the current period. Emitted once per billing period, when the crossing happens.
+Fired when a subscription's available credits (plan plus purchased) cross below 10% of their last refill: a period reset, a purchase or a manual adjustment. Emitted once per crossing, the same rule as balance.low.
 
 ### Data
 
 - `subscriptionId` (`string`, required) — The subscription ID.
 - `customerId` (`string`, required) — The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.
 - `remainingCredits` (`number`, required) — Total credits remaining (plan plus purchased).
-- `thresholdCredits` (`number`, required) — The low-credit threshold that was crossed: 10% of the period's granted plan credits.
-- `periodCredits` (`number`, required) — The plan credits granted at the last period reset.
+- `thresholdCredits` (`number`, required) — The low-credit threshold that was crossed: 10% of the last refill.
+- `periodCredits` (`number`, required) — The credits added by the last refill: a period reset, a purchase or a manual adjustment.
 
 ## credits.depleted
 
-Fired when a subscription's credits hit zero. Usage requests that need more credits than remain are rejected from this point. Also fires customer.state_changed with trigger credits_depleted.
+Fired each time a subscription's available credits cross to zero or below. Usage that needs more credits than remain is rejected from this point, unless the plan allows overage, which is billed at its price per credit at the next renewal. Also fires customer.state_changed with trigger credits_depleted.
 
 ### Data
 
@@ -788,9 +801,21 @@ Fired at a reset when unused plan credits are discarded. On a plan whose unused 
 - `customerId` (`string`, required) — The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.
 - `expiredCredits` (`number`, required) — The plan credits that were discarded.
 
+## balance.granted
+
+Fired when non-purchase balance is granted to a subscription: the plan balance at the start of each billing period, or a manual adjustment from the dashboard or the API, which goes to the purchased balance. Balance top-ups fire balance.topped_up instead.
+
+### Data
+
+- `subscriptionId` (`string`, required) — The subscription ID.
+- `customerId` (`string`, required) — The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.
+- `amount` (`number`, required) — The balance granted in rate scale (10000 = 1.00 of the subscription currency).
+- `currency` (`string`, required) — The subscription currency.
+- `reason` (`string`, required) — Why the balance was granted: period_reset or manual_adjustment.
+
 ## balance.topped_up
 
-Fired when a customer on a balance plan tops up their prepaid balance through the customer portal and the payment succeeds.
+Fired when a balance top-up succeeds: through the API, an automatic top-up or the customer portal. The amount goes to the purchased balance, which is spent after the plan balance and kept until the subscription ends.
 
 ### Data
 
@@ -822,6 +847,17 @@ Fired when a subscription's prepaid balance crosses to zero or below. With block
 - `subscriptionId` (`string`, required) — The subscription ID.
 - `customerId` (`string`, required) — The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.
 - `currentBalance` (`number`, required) — The balance after depletion in rate scale. Zero, or negative when overage is allowed.
+- `currency` (`string`, required) — The subscription currency.
+
+## balance.expired
+
+Fired at a reset when unused plan balance is discarded. On a plan whose unused plan balance expires, all of it expires at each reset. On a plan that rolls it over, a reset keeps it, up to the plan's maxPlanBalance when it has one, and only the excess expires. An overage debt invoiced at the renewal counts as nothing left over. Purchased balance never expires and is not affected.
+
+### Data
+
+- `subscriptionId` (`string`, required) — The subscription ID.
+- `customerId` (`string`, required) — The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.
+- `expiredAmount` (`number`, required) — The plan balance that was discarded, in rate scale (10000 = 1.00 of the subscription currency).
 - `currency` (`string`, required) — The subscription currency.
 
 ## quota.threshold_reached

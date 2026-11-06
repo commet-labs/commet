@@ -168,6 +168,12 @@ Generated from Commet API version `2026-08-27`.
 - `object` (`"balance_topup"`, required)
 - `livemode` (`boolean`, required)
 
+### BusinessTaxId
+
+- `country` (`string`, required)
+- `type` (`string`, required)
+- `value` (`string`, required)
+
 ### ClaimLink
 
 - `url` (`string`, required)
@@ -266,6 +272,7 @@ Generated from Commet API version `2026-08-27`.
 - `email` (`string`, required)
 - `taxDocument` (`string | null`, required)
 - `documentType` (`string | null`, required)
+- `businessTaxId` (`BusinessTaxId | null`, required)
 - `timezone` (`string | null`, required)
 - `metadata` (`Record<string, unknown> | null`, required)
 - `createdAt` (`string`, required)
@@ -514,9 +521,11 @@ Variants:
 - `isPublic` (`boolean`, required)
 - `isDefault` (`boolean`, required)
 - `isFree` (`boolean`, required)
-- `blockOnExhaustion` (`boolean | null`, required)
+- `blockOnExhaustion` (`boolean | null`, required) — Credits and balance plans: true stops usage when the plan and purchased amounts run out; false lets usage continue and bills the missing amount as overage at the next renewal (credits at the price per credit). Trials and free plans always stop.
 - `unusedPlanCredits` (`{ type: "expire" } | { type: "roll_over"; maxPlanCredits: number | null } | null`, required) — Credits plans only; null for other consumption models. What happens to unused plan credits at each reset. Purchased credits never expire and never count toward maxPlanCredits.
 - `planCreditLimit` (`{ credits: number; interval: "day" | "week" } | null`, required) — Credits plans only. The most plan credits a subscription spends per day or per week; null means no limit.
+- `unusedPlanBalance` (`{ type: "expire" } | { type: "roll_over"; maxPlanBalance: number | null } | null`, required) — Balance plans only; null for other consumption models. What happens to unused plan balance at each reset. Purchased balance never expires and never counts toward maxPlanBalance.
+- `planBalanceLimit` (`{ amount: number; interval: "day" | "week" } | null`, required) — Balance plans only. The most plan balance a subscription spends per day or per week, in USD cents; null means no limit.
 - `sortOrder` (`number`, required)
 - `planGroupId` (`string | null`, required)
 - `metadata` (`Record<string, unknown> | null`, required)
@@ -782,8 +791,8 @@ Variants:
 - `planGrant` (`{ id: string; plan: { id: string; name: string }; expiresAt: string | null }`, optional)
 - `consumptionModel` (`ConsumptionModel | null`, required)
 - `features` (`Array<{ code: string; name: string; type: "boolean"; enabled: boolean; baseAccess?: { enabled: boolean } | null } | { code: string; name: string; type: "usage"; usage?: { current: number; included: number; overageQuantity: number; overageUnitPrice?: number; unlimited?: boolean }; baseAccess?: { included: number; unlimited: boolean } | null } | { code: string; name: string; type: "seats"; usage: { current: number; included: number; overageQuantity: number; overageUnitPrice?: number; unlimited?: boolean }; baseAccess?: { included: number; unlimited: boolean } | null } | { code: string; name: string; type: "quota"; usage?: { current: number; included: number; overageQuantity: number; overageUnitPrice?: number; unlimited?: boolean }; baseAccess?: { included: number; unlimited: boolean } | null }>`, required)
-- `credits` (`{ remaining: number; included: number; purchased: number } | null`, required)
-- `balance` (`{ remaining: number; included: number; currency: string } | null`, required)
+- `credits` (`{ remaining: number; included: number; purchased: number; plan: number; total: number } | null`, required)
+- `balance` (`{ remaining: number; included: number; currency: string; plan: number; purchased: number; total: number } | null`, required)
 - `priceId` (`string | null`, required)
 - `object` (`"subscription"`, required)
 - `livemode` (`boolean`, required)
@@ -798,14 +807,15 @@ Variants:
 
 ### SubscriptionAutoTopUp
 
-- `enabled` (`boolean`, required) — Whether credits are bought automatically. Always false when the plan does not sell credits.
-- `threshold` (`number | null`, required) — Credits at or below which a top-up is bought, or null when never configured.
-- `quantity` (`number | null`, required) — Credits each top-up buys, or null when never configured.
-- `maxPerPeriod` (`number | null`, required) — Maximum top-ups per credit renewal period, or null when never configured.
-- `status` (`"active" | "paused" | "off"`, required) — active buys when credits reach the threshold; paused stops after three consecutive failed top-ups, or after one whose charge could not be refunded, until the payment method changes, a credit purchase succeeds or it is saved enabled again; off buys nothing.
-- `topUpsThisPeriod` (`number`, required) — Top-ups bought in the current credit renewal period.
+- `enabled` (`boolean`, required) — Whether top-ups run automatically: credits bought on a credits plan, balance added on a balance plan. Always false when the plan does not sell credits or has balance top-ups turned off.
+- `threshold` (`number | null`, required) — The available amount at or below which a top-up runs, or null when never configured: credits (plan plus purchased) on a credits plan, minor units of the subscription currency (plan plus purchased balance) on a balance plan.
+- `quantity` (`number | null`, required) — Credits each top-up buys on a credits plan, or null when never configured or on a balance plan.
+- `amount` (`number | null`, required) — Minor units of the subscription currency each top-up adds on a balance plan, charged plus tax, or null when never configured or on a credits plan.
+- `maxPerPeriod` (`number | null`, required) — Maximum top-ups per renewal period, or null when never configured.
+- `status` (`"active" | "paused" | "off"`, required) — active tops up when the available amount reaches the threshold; paused stops after three consecutive failed top-ups, or after one whose charge could not be refunded, until the payment method changes, a credit purchase or balance top-up succeeds or it is saved enabled again; off tops up nothing.
+- `topUpsThisPeriod` (`number`, required) — Top-ups made in the current renewal period.
 - `periodResetsAt` (`string | null`, required) — When the top-up count of the period resets, or null before the subscription starts its first period.
-- `lastFailure` (`{ reason: "payment_declined" | "no_payment_method" | "quantity_below_minimum" | "purchase_failed"; at: string } | null`, required) — The last top-up that failed, or null when none has failed.
+- `lastFailure` (`{ reason: "payment_declined" | "no_payment_method" | "quantity_below_minimum" | "amount_below_minimum" | "purchase_failed"; at: string } | null`, required) — The last top-up that failed, or null when none has failed.
 - `object` (`"subscription_auto_top_up"`, required)
 - `livemode` (`boolean`, required)
 
@@ -966,8 +976,8 @@ Variants:
 Variants:
 
 - `{ allowed: boolean; subscriptionStatus: string; featureCode: string; quantity: number; reason?: string; message?: string; consumptionModel: "metered"; current: number; remaining: number; unlimited: boolean; included: number; overageEnabled: boolean; overageUnitPrice: number | null; object: "usage_check"; livemode: boolean }`
-- `{ allowed: boolean; subscriptionStatus: string; featureCode: string; quantity: number; reason?: string; message?: string; consumptionModel: "credits"; creditsPerUnit: number; estimatedCredits: number; planCredits: number; purchasedCredits: number; totalCredits: number; planCreditLimit: { credits: number; interval: "day" | "week"; spent: number; remaining: number; resetsAt: string } | null; object: "usage_check"; livemode: boolean }`
-- `{ allowed: boolean; subscriptionStatus: string; featureCode: string; quantity: number; reason?: string; message?: string; consumptionModel: "balance"; unitPrice: number; estimatedAmount: number; currentBalance: number; blockOnExhaustion: boolean; currency: string; object: "usage_check"; livemode: boolean }`
+- `{ allowed: boolean; subscriptionStatus: string; featureCode: string; quantity: number; reason?: string; message?: string; consumptionModel: "credits"; creditsPerUnit: number; estimatedCredits: number; planCredits: number; purchasedCredits: number; totalCredits: number; planCreditLimit: { credits: number; interval: "day" | "week"; spent: number; remaining: number; resetsAt: string } | null; blockOnExhaustion: boolean; object: "usage_check"; livemode: boolean }`
+- `{ allowed: boolean; subscriptionStatus: string; featureCode: string; quantity: number; reason?: string; message?: string; consumptionModel: "balance"; unitPrice: number; estimatedAmount: number; currentBalance: number; planBalance: number; purchasedBalance: number; totalBalance: number; planBalanceLimit: { amount: number; interval: "day" | "week"; spent: number; remaining: number; resetsAt: string } | null; blockOnExhaustion: boolean; currency: string; object: "usage_check"; livemode: boolean }`
 
 ### UsageEvent
 
@@ -979,7 +989,7 @@ Variants:
 - `ts` (`string`, required)
 - `createdAt` (`string`, required)
 - `properties` (`Array<{ property: string; value: string }>`, required)
-- `consumption` (`{ model: "credits" | "balance"; deducted: number; remaining: number; blocked: boolean; planCreditLimit?: { credits: number; interval: "day" | "week"; spent: number; remaining: number; resetsAt: string } | null }`, optional)
+- `consumption` (`{ model: "credits" | "balance"; deducted: number; remaining: number; blocked: boolean; planCreditLimit?: { credits: number; interval: "day" | "week"; spent: number; remaining: number; resetsAt: string } | null; planBalanceLimit?: { amount: number; interval: "day" | "week"; spent: number; remaining: number; resetsAt: string } | null }`, optional)
 - `object` (`"usage_event"`, required)
 - `livemode` (`boolean`, required)
 
@@ -1027,7 +1037,10 @@ Variants:
 
 ### WebhookBalance
 
-- `currentBalance` (`number`, required)
+- `currentBalance` (`number`, required) — The available balance, plan plus purchased, in rate scale. Equal to totalBalance.
+- `planBalance` (`number`, required) — The plan part in rate scale: spent first, replaced or rolled over at each reset, negative while overage is owed.
+- `purchasedBalance` (`number`, required) — The purchased part in rate scale: top-ups and manual adjustments, spent after the plan part and kept until the subscription ends.
+- `totalBalance` (`number`, required) — planBalance plus purchasedBalance, in rate scale.
 
 ### WebhookBankRef
 

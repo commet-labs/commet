@@ -9,13 +9,12 @@ The Offer stays independent from plans and prices until your integration selects
 
 ## Create the terms
 
-Direct Offers may combine a free trial with ordered discount or fixed-price phases:
+Direct Offers may combine ordered discount and fixed-price phases:
 
 ```typescript
 const retentionOffer = await commet.offers.create({
   name: 'Return to Pro',
   phases: [
-    { type: 'free_trial', durationDays: 7 },
     { type: 'fixed_price', durationCycles: 2, prices: [
       { currency: 'usd', amount: 2900 },
       { currency: 'ars', amount: 3990000 },
@@ -39,9 +38,9 @@ await commet.subscriptions.create({
 
 The Offer must be active, inside its availability window, and resolvable in the selected currency. It does not need a prior association with the plan or price.
 
-An explicit `offerId` overrides automatic introductory selection. It cannot be combined with `promoCode`, `customTrialDays`, or `skipTrial: true`.
+An explicit `offerId` overrides automatic introductory selection. It cannot be combined with `promoCode`. It combines with `customTrialDays` and `skipTrial`; when the price has a trial, the discount starts after it.
 
-Immediate plan changes, plan-change previews, and supported reactivation flows also accept `offerId`. Scheduled plan changes do not accept an Offer.
+Immediate plan changes, plan-change previews, and supported reactivation flows also accept `offerId`. Scheduled plan changes do not accept an Offer or a promo code.
 
 ## Apply it to an active subscription
 
@@ -54,14 +53,14 @@ await commet.subscriptions.applyOffer({
 })
 ```
 
-Only one Offer applies at a time: while an accepted Offer still has active or upcoming discount phases, a new application is rejected. Once its phases are exhausted, the subscription accepts a new Offer. Offers with a free trial phase cannot be applied to an active subscription, and the discount applies to the plan base price only.
+Only one Offer applies at a time: while an accepted Offer still has active or upcoming discount phases, a new application is rejected. Once its phases are exhausted, the subscription accepts a new Offer. The discount applies to the plan base price only.
 
 The applied Offer belongs to that subscription and plan: it ends with a cancellation and a plan change removes it.
 
-The same operation on a subscription with a pending payment checkout quotes or replaces the checkout discount instead; there it accepts an optional `expiresAt` for the quote.
+The same operation on a subscription with a pending checkout quotes or replaces the checkout discount instead; there it accepts an optional `expiresAt` for the quote. When the price has a trial, the discount starts after it.
 
 ## Direct application or Promo Code?
 
 Use direct `offerId` when your application decides who receives the terms. Use a Promo Code when the customer should enter a code and the campaign needs redemption restrictions.
 
-A Promo Code can distribute multiple discount phases, including `fixed_price`, and can begin with a trial when a discount follows it. A trial-only Offer remains available for direct application.
+A Promo Code can distribute the same Offers, including multiple phases and `fixed_price`.

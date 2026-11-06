@@ -12,6 +12,22 @@ Commet has two complementary pricing layers:
 
 Currency Pricing remains the fallback. Add Markets when country segmentation or selectable variants require it.
 
+## Set currency pricing
+
+```typescript
+await commet.plans.setRegionalPricing({
+  id: 'pln_pro',
+  currency: 'gbp',
+  exchangeRate: 0.79,
+})
+```
+
+With only `currency` and `exchangeRate`, Commet derives every price, included balance, and overage from the USD values. Send `prices` or `features` to set exact amounts instead.
+
+Supported currencies: USD, ARS, BOB, BRL, CAD, CLP, CNY, COP, EUR, GBP, HKD, INR, JPY, KRW, MXN, PEN, PYG, SGD, THB, TWD, and UYU.
+
+A currency applies to the countries that use it. Buyers in the United Kingdom pay in GBP, and EUR covers the euro countries. Buyers in a country without a configured currency pay the USD base price.
+
 ## Create a Market
 
 A Market is a top-level Sales resource. It does not require a plan or price.

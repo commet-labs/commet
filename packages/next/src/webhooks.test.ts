@@ -167,6 +167,10 @@ const webhookHandlerCases = [
     handlerName: "onPaymentMethodUpdated",
   },
   {
+    event: "payment_method.detached",
+    handlerName: "onPaymentMethodDetached",
+  },
+  {
     event: "customer.created",
     handlerName: "onCustomerCreated",
   },
@@ -225,6 +229,14 @@ const webhookHandlerCases = [
   {
     event: "balance.depleted",
     handlerName: "onBalanceDepleted",
+  },
+  {
+    event: "balance.granted",
+    handlerName: "onBalanceGranted",
+  },
+  {
+    event: "balance.expired",
+    handlerName: "onBalanceExpired",
   },
   {
     event: "quota.threshold_reached",
@@ -401,9 +413,9 @@ describe("Webhooks", () => {
 
   describe("event routing", () => {
     it("should cover every typed webhook event and named handler", () => {
-      expect(webhookHandlerCases).toHaveLength(66);
+      expect(webhookHandlerCases).toHaveLength(69);
       expect(new Set(webhookHandlerCases.map(({ event }) => event)).size).toBe(
-        66,
+        69,
       );
       expect(webhookEventCoverage).toBe(true);
       expect(webhookHandlerCoverage).toBe(true);

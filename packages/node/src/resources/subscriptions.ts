@@ -38,7 +38,10 @@ export interface UpdateSubscriptionAutoTopUpParams {
   id: string;
   enabled?: boolean;
   threshold?: number;
+  /** Credits each top-up buys. Credits plans only. */
   quantity?: number;
+  /** Minor units of the subscription currency each top-up adds. Balance plans only. */
+  amount?: number;
   maxPerPeriod?: number;
 }
 
@@ -51,6 +54,7 @@ export interface AdjustBalanceParams {
 
 export interface TopupBalanceParams {
   id: string;
+  /** The amount to add, in minor units of the subscription currency (cents; whole units for zero-decimal currencies). */
   amount: number;
 }
 
@@ -219,6 +223,10 @@ export type CreateSubscriptionParams =
       initialSeats?: Record<string, number>;
       /** Payment provider name or exact public payment connection ID for the initial checkout. Overrides country routing when present. */
       provider?: "stripe" | "commet" | "dlocal" | string;
+      /** Payment methods the initial checkout may offer. Restricts what the checkout already offers for the buyer's country, currency and payment connection; it never enables a method the connection does not have and never changes routing. When none of them is available to the buyer, the checkout shows that it cannot accept payments. */
+      paymentMethodTypes?: Array<
+        "card" | "oxxo" | "mercado_pago" | "google_pay" | "smartpix"
+      >;
       name?: string;
       /** @format date-time */
       startDate?: string;
@@ -249,6 +257,10 @@ export type CreateSubscriptionParams =
       initialSeats?: Record<string, number>;
       /** Payment provider name or exact public payment connection ID for the initial checkout. Overrides country routing when present. */
       provider?: "stripe" | "commet" | "dlocal" | string;
+      /** Payment methods the initial checkout may offer. Restricts what the checkout already offers for the buyer's country, currency and payment connection; it never enables a method the connection does not have and never changes routing. When none of them is available to the buyer, the checkout shows that it cannot accept payments. */
+      paymentMethodTypes?: Array<
+        "card" | "oxxo" | "mercado_pago" | "google_pay" | "smartpix"
+      >;
       name?: string;
       /** @format date-time */
       startDate?: string;
@@ -279,6 +291,10 @@ export type CreateSubscriptionParams =
       initialSeats?: Record<string, number>;
       /** Payment provider name or exact public payment connection ID for the initial checkout. Overrides country routing when present. */
       provider?: "stripe" | "commet" | "dlocal" | string;
+      /** Payment methods the initial checkout may offer. Restricts what the checkout already offers for the buyer's country, currency and payment connection; it never enables a method the connection does not have and never changes routing. When none of them is available to the buyer, the checkout shows that it cannot accept payments. */
+      paymentMethodTypes?: Array<
+        "card" | "oxxo" | "mercado_pago" | "google_pay" | "smartpix"
+      >;
       name?: string;
       /** @format date-time */
       startDate?: string;
@@ -309,6 +325,10 @@ export type CreateSubscriptionParams =
       initialSeats?: Record<string, number>;
       /** Payment provider name or exact public payment connection ID for the initial checkout. Overrides country routing when present. */
       provider?: "stripe" | "commet" | "dlocal" | string;
+      /** Payment methods the initial checkout may offer. Restricts what the checkout already offers for the buyer's country, currency and payment connection; it never enables a method the connection does not have and never changes routing. When none of them is available to the buyer, the checkout shows that it cannot accept payments. */
+      paymentMethodTypes?: Array<
+        "card" | "oxxo" | "mercado_pago" | "google_pay" | "smartpix"
+      >;
       name?: string;
       /** @format date-time */
       startDate?: string;
@@ -339,6 +359,10 @@ export type CreateSubscriptionParams =
       initialSeats?: Record<string, number>;
       /** Payment provider name or exact public payment connection ID for the initial checkout. Overrides country routing when present. */
       provider?: "stripe" | "commet" | "dlocal" | string;
+      /** Payment methods the initial checkout may offer. Restricts what the checkout already offers for the buyer's country, currency and payment connection; it never enables a method the connection does not have and never changes routing. When none of them is available to the buyer, the checkout shows that it cannot accept payments. */
+      paymentMethodTypes?: Array<
+        "card" | "oxxo" | "mercado_pago" | "google_pay" | "smartpix"
+      >;
       name?: string;
       /** @format date-time */
       startDate?: string;
@@ -370,6 +394,10 @@ export type CreateSubscriptionParams =
       initialSeats?: Record<string, number>;
       /** Payment provider name or exact public payment connection ID for the initial checkout. Overrides country routing when present. */
       provider?: "stripe" | "commet" | "dlocal" | string;
+      /** Payment methods the initial checkout may offer. Restricts what the checkout already offers for the buyer's country, currency and payment connection; it never enables a method the connection does not have and never changes routing. When none of them is available to the buyer, the checkout shows that it cannot accept payments. */
+      paymentMethodTypes?: Array<
+        "card" | "oxxo" | "mercado_pago" | "google_pay" | "smartpix"
+      >;
       name?: string;
       /** @format date-time */
       startDate?: string;
@@ -412,7 +440,7 @@ export class SubscriptionsResource {
     return this.httpClient.post(`/subscriptions/${id}/addons`, rest, options);
   }
 
-  /** Read whether the subscription buys credits automatically with its saved payment method when credits reach a threshold, with the top-ups used this period and the last failure. */
+  /** Read whether the subscription tops up automatically with its saved payment method when its available credits or balance reach a threshold, with the top-ups used this period and the last failure. */
   async getAutoTopUp(
     params: GetSubscriptionAutoTopUpParams,
     options?: RequestOptions,
@@ -425,7 +453,7 @@ export class SubscriptionsResource {
     );
   }
 
-  /** Turn automatic credit purchases on or off and set the threshold, the credits each top-up buys and the maximum top-ups per period. Send only the fields that change. Enabling requires a plan that sells credits. The quantity must be at least the plan's purchase minimum when auto top-up is enabled or when the quantity changes, so turning it off keeps working after the minimum rises. Saving it enabled resumes a paused auto top-up. */
+  /** Turn automatic top-ups on or off and set the threshold, the size of each top-up and the maximum top-ups per period. Send only the fields that change. On a credits plan each top-up buys `quantity` credits; on a balance plan it adds `amount` in minor units of the subscription currency, plus tax, and `threshold` is in the same minor units. Enabling requires a plan that sells credits or has balance top-ups on. The size must be at least the plan's minimum when auto top-up is enabled or when the size changes, so turning it off keeps working after the minimum rises. Saving it enabled resumes a paused auto top-up. */
   async updateAutoTopUp(
     params: UpdateSubscriptionAutoTopUpParams,
     options?: RequestOptions,
@@ -451,7 +479,7 @@ export class SubscriptionsResource {
     );
   }
 
-  /** Top up a subscription's balance. Charges the customer's payment method for the specified amount. */
+  /** Top up a balance subscription. Charges the customer's payment method for the amount plus tax, adds it to the subscription's purchased balance (after paying back any overage owed on the plan balance), creates its invoice and emits `balance.topped_up`. Purchased balance is spent after the plan balance and is kept until the subscription ends. Rejected with 400 when the subscription is not on a balance plan, its plan has top-ups turned off, or the amount is below the effective minimum: the plan's minimum top-up in the subscription currency, raised to the currency's minimum charge. */
   async topupBalance(
     params: TopupBalanceParams,
     options?: RequestOptions,
