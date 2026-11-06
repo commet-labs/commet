@@ -55,7 +55,7 @@ Month 1: 800 unused → 800 + 1,000 = 1,800
 Month 2: 1,800 unused → 2,800, capped at 2,500. 300 expire.
 ```
 
-`{ type: 'expire' }` restores the default. Existing subscriptions apply a change from their next reset. A plan change applies the new plan's setting.
+`{ type: 'expire' }` restores the default. Changing it publishes a new [plan version](/docs/plan-versions); each subscription keeps its version's setting until you move it. A plan change applies the new plan's setting.
 
 ### Limit plan credit spending
 
@@ -68,9 +68,9 @@ await commet.plans.update({
 
 `planCreditLimit` caps the plan credits a subscription spends per window: `day` is 24 hours and `week` is 7 days, starting at the time of day of the subscription's billing anchor. Purchased credits are never limited.
 
-An event past the limit uses purchased credits. Without enough, [Track Usage](/docs/track-usage#limit-plan-credit-spending) rejects it with `402 plan_credit_limit_reached`. Raising or removing the limit applies at once; lowering it, adding it, or changing its interval applies from the next period.
+An event past the limit uses purchased credits. Without enough, [Track Usage](/docs/track-usage#limit-plan-credit-spending) rejects it with `402 plan_credit_limit_reached`. Changing the limit publishes a new plan version; each subscription keeps its version's limit until you move it.
 
-In the dashboard, open **Plans**, select a credits plan, and edit **Credit rollover**, **Credit limit**, or **Credit purchases**.
+In the dashboard, open **Plans**, select a credits plan, and edit **Carry-over**, **Credit limit**, or **Buying credits** under **Credit rules**. The changes go into a draft until you publish it.
 
 ## Balance
 

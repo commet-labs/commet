@@ -9,8 +9,8 @@ Self-service page where customers manage their subscription, view usage, change 
 
 - View current subscription and billing cycle
 - See usage across all features
-- Upgrade or downgrade plans (requires a [Plan Group](/docs/plan-groups)), and keep the current plan when a change is scheduled (**Keep current plan**)
-- Purchase [Credit Packs](/docs/credit-packs), a chosen quantity of credits, balance top-ups, and [Add-ons](/docs/add-ons)
+- Upgrade or downgrade to group plans that sell their currency (requires a [Plan Group](/docs/plan-groups)), and keep the current plan when a change is scheduled (**Keep current plan**)
+- Purchase the [Credit Packs](/docs/credit-packs) and [Add-ons](/docs/add-ons) their [plan version](/docs/plan-versions) sells, a chosen quantity of credits, and balance top-ups
 - Turn on and edit [auto top-up](/docs/credit-packs#top-up-credits-automatically) for credits
 - Add a card during a [trial without a payment method](/docs/trial-periods#start-a-trial-without-a-payment-method) (**Add card**)
 - Manage saved payment methods and billing details

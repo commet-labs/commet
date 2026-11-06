@@ -140,6 +140,7 @@ Generated from Commet API version `2026-08-27`.
 - `includedUnits` (`number | null`, required)
 - `overageRate` (`number | null`, required)
 - `creditCost` (`number | null`, required)
+- `planIds` (`Array<string>`, required) — Plans that sell the add-on.
 - `object` (`"addon"`, required)
 - `livemode` (`boolean`, required)
 
@@ -214,6 +215,7 @@ Generated from Commet API version `2026-08-27`.
 - `hasPaymentMethod` (`boolean`, required) — Whether Commet can charge this subscription on its own at its next charge (the trial end or the renewal). A trial that started without a payment method reports false until the customer adds one for this subscription; a payment method saved for another subscription does not count. A subscription on a free plan reports false.
 - `createdAt` (`string`, required)
 - `updatedAt` (`string`, required)
+- `planVersion` (`{ id: string; label: string } | null`, required) — The plan version whose terms the subscription has now. It keeps paying and receiving everything from this version until it is moved.
 - `offerApplications` (`Array<SubscriptionOfferApplication>`, required)
 - `pause` (`{ status: "scheduled"; mode: "period_end"; requestedAt: string; effectiveAt: string; resumeAt: string | null } | { status: "active"; mode: "immediate" | "period_end"; requestedAt: string; effectiveAt: string; resumeAt: string | null } | null`, required)
 - `checkoutProvider` (`PaymentProvider | null`, required) — Payment provider resolved for this checkout when the subscription response was created. This is an informational snapshot and may differ when the checkout is loaded if its country or the organization's routing changes.
@@ -247,6 +249,7 @@ Generated from Commet API version `2026-08-27`.
 - `description` (`string | null`, required)
 - `credits` (`number`, required)
 - `price` (`number`, required)
+- `planIds` (`Array<string>`, required) — Plans that sell the credit pack.
 - `isActive` (`boolean`, required)
 - `createdAt` (`string`, required)
 - `updatedAt` (`string`, required)
@@ -260,6 +263,7 @@ Generated from Commet API version `2026-08-27`.
 - `description` (`string | null`, required)
 - `credits` (`number`, required)
 - `price` (`number`, required)
+- `planIds` (`Array<string>`, required) — Plans that sell the credit pack.
 - `currency` (`string`, required)
 - `object` (`"credit_pack"`, required)
 - `livemode` (`boolean`, required)
@@ -421,6 +425,13 @@ Variants:
 - `object` (`"invoice"`, required)
 - `livemode` (`boolean`, required)
 
+### KeptOnVersion
+
+- `subscriptionId` (`string`, required)
+- `keptOnVersion` (`true`, required)
+- `object` (`"kept_on_version"`, required)
+- `livemode` (`boolean`, required)
+
 ### ManagedBy
 
 Variants:
@@ -534,6 +545,7 @@ Variants:
 - `features` (`Array<{ code: string; name: string; type: FeatureType; unitName: string | null; enabled: boolean; includedAmount: number | null; unlimited: boolean; overage: { enabled: boolean; model: "per_unit" | null; unitPrice: number | null } | null; regionalPrices: Array<{ currency: string; overageUnitPrice: number | null; autoSynced: boolean }> }>`, required)
 - `prices` (`Array<{ id: string; billingInterval: BillingInterval; price: number; isDefault: boolean; trialDays: number; trialRequiresPaymentMethod: boolean | null; includedBalance: number | null; includedCredits: number | null; offerId: string | null; inheritsFromPriceId: string | null; metadata: Record<string, unknown>; marketPrices: Array<{ marketGroupId: string; currency: string; price: number }>; regionalPrices: Array<{ currency: string; price: number; includedBalance: number | null; autoSynced: boolean }> }>`, required)
 - `exchangeRates` (`Array<{ currency: string; exchangeRate: number }>`, required)
+- `countries` (`Array<{ country: string; currency: string; prices: Array<{ billingInterval: BillingInterval; price: number; manual: boolean }>; addons: Array<{ addonId: string; price: number; manual: boolean }>; creditPacks: Array<{ creditPackId: string; price: number; manual: boolean }> }>`, required) — Countries with their own currency or prices in the current version. Buyers from any other country pay the USD prices.
 - `object` (`"plan"`, required)
 - `livemode` (`boolean`, required)
 
@@ -544,6 +556,46 @@ Variants:
 - `{ outcome: "requires_checkout"; requiresCheckout: true; checkoutUrl: string; offerApplication?: { id: string; offerId: string; name: string; currency: string; subtotal: number; discountAmount: number; total: number; phases: Array<{ type: "free_trial"; durationDays: number; startsAt: string | null; endsAt: string | null } | { type: "percentage"; durationCycles: number | null; durationInterval: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | null; startsAt: string | null; endsAt: string | null; percentage: number } | { type: "amount_off"; durationCycles: number | null; durationInterval: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | null; startsAt: string | null; endsAt: string | null; amount: number } | { type: "fixed_price"; durationCycles: number | null; durationInterval: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | null; startsAt: string | null; endsAt: string | null; price: number }>; appliesTo: { type: "plan_price"; id: string } | { type: "addon"; id: string } | { type: "credit_pack"; id: string } }; object: "plan_change"; livemode: boolean }`
 - `{ outcome: "scheduled"; id: string; scheduled: true; scheduledFor: string; changeType: "subscription.plan_downgrade" | "subscription.interval_change" | "subscription.cancel"; customerId: string; newPlanId?: string; newPlanName?: string; newBillingInterval?: string; seatLimitWarning?: { featureCode: string; featureName: string; currentSeats: number; included: number; newPlanName: string; effectiveDate: string }; object: "plan_change"; livemode: boolean }`
 - `{ outcome: "completed"; id: string; scheduled: false; customerId: string; previousPlan: { id: string; name: string }; currentPlan: { id: string; name: string; price: number }; billingInterval: string; billing: { credit: number; creditsApplied: number; charge: number; taxAmount: number; netAmount: number; totalCharged: number; remainingCreditBalance: number }; invoiceId?: string; offerApplication?: { id: string; offerId: string; name: string; currency: string; subtotal: number; discountAmount: number; total: number; phases: Array<{ type: "free_trial"; durationDays: number; startsAt: string | null; endsAt: string | null } | { type: "percentage"; durationCycles: number | null; durationInterval: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | null; startsAt: string | null; endsAt: string | null; percentage: number } | { type: "amount_off"; durationCycles: number | null; durationInterval: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | null; startsAt: string | null; endsAt: string | null; amount: number } | { type: "fixed_price"; durationCycles: number | null; durationInterval: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | null; startsAt: string | null; endsAt: string | null; price: number }>; appliesTo: { type: "plan_price"; id: string } | { type: "addon"; id: string } | { type: "credit_pack"; id: string } }; object: "plan_change"; livemode: boolean }`
+
+### PlanDraft
+
+- `id` (`string`, required) — Public plan draft ID.
+- `fromVersionId` (`string`, required) — The version the draft started from.
+- `changes` (`Array<{ key: string; section: string; country: string | null; label: string; before: string | null; after: string | null }>`, required) — What the draft changes against the version it started from.
+- `createdAt` (`string`, required)
+- `updatedAt` (`string`, required)
+- `object` (`"plan_draft"`, required)
+- `livemode` (`boolean`, required)
+
+### PlanDraftPublication
+
+- `preview` (`boolean`, required)
+- `version` (`{ id: string; label: string; number: number | null; experiment: { code: string; version: number } | null; isCurrent: boolean; parentVersionId: string | null; subscriptionCount: number; maxPlanCredits: number | null; maxPlanBalance: number | null; prices: Array<{ id: string; billingInterval: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | "one_time"; price: number; includedCredits: number | null; includedBalance: number | null; regionalPrices: Array<{ currency: string; price: number; includedBalance: number | null }> }>; createdAt: string } | null`, required) — The published version. Null for a preview.
+- `moveId` (`string | null`, required) — The move of subscribers, if any.
+- `subscribers` (`{ moving: number; keptOnVersion: number; needsAChange: number; leftOut: Array<{ subscriptionId: string; code: string; message: string }> } | null`, required)
+- `object` (`"plan_draft_publication"`, required)
+- `livemode` (`boolean`, required)
+
+### PlanExperiment
+
+- `id` (`string`, required) — Public plan experiment ID.
+- `code` (`string`, required) — The code to sell it with as planCode, such as pro:price-test. It always sells the experiment's latest version while running, and the plan's current version once closed.
+- `status` (`"running" | "won" | "archived"`, required) — running sells its latest version; won became the plan's current version; archived stopped selling.
+- `startedFromVersionId` (`string`, required) — The plan's version that was current when it started.
+- `latestVersionId` (`string`, required) — Its latest version.
+- `sellsVersionId` (`string`, required) — The version its code sells to new buyers today.
+- `subscriptionCount` (`number`, required) — Active, trialing, past due and paused subscriptions on its versions.
+- `createdAt` (`string`, required)
+- `closedAt` (`string | null`, required)
+- `object` (`"plan_experiment"`, required)
+- `livemode` (`boolean`, required)
+
+### PlanExperimentArchive
+
+- `experiment` (`{ id: string; code: string; status: "running" | "won" | "archived"; startedFromVersionId: string; latestVersionId: string; sellsVersionId: string; subscriptionCount: number; createdAt: string; closedAt: string | null }`, required)
+- `moveId` (`string | null`, required) — The move of its subscribers, or null when they stay.
+- `object` (`"plan_experiment_archive"`, required)
+- `livemode` (`boolean`, required)
 
 ### PlanFeature
 
@@ -604,6 +656,22 @@ Variants:
 - `object` (`"plan_group"`, required)
 - `livemode` (`boolean`, required)
 
+### PlanMove
+
+- `id` (`string | null`, required) — Public move ID. Null for a preview, which records nothing.
+- `toVersionId` (`string`, required)
+- `fromVersionIds` (`Array<string>`, required) — The versions its subscribers are moving from.
+- `effective` (`"now" | "period_end"`, required)
+- `preview` (`boolean`, required)
+- `status` (`"checking" | "blocked" | "checked" | "moving" | "completed" | "canceled"`, required) — checked is a preview where everyone fits; moving while subscribers wait for their move; completed once every move ran; canceled after it was canceled.
+- `counts` (`{ moving: number; moved: number; needsAChange: number; leftOut: number; canceled: number; keptOnVersion: number }`, required)
+- `subscriptions` (`Array<{ subscriptionId: string; status: "moving" | "moved" | "needs_a_change" | "left_out" | "canceled" | "kept_on_version"; code: string | null; message: string | null }>`, required)
+- `createdAt` (`string | null`, required)
+- `completedAt` (`string | null`, required)
+- `canceledAt` (`string | null`, required)
+- `object` (`"plan_move"`, required)
+- `livemode` (`boolean`, required)
+
 ### PlanPrice
 
 - `id` (`string`, required) — Public plan price ID.
@@ -641,6 +709,30 @@ Variants:
 - `object` (`"plan_regional_pricing"`, required)
 - `livemode` (`boolean`, required)
 
+### PlanVersion
+
+- `id` (`string`, required) — Public plan version ID.
+- `label` (`string`, required) — The plan's versions are numbered 1, 2, 3; an experiment's own versions read with its code, such as price-test 2.
+- `number` (`number | null`, required) — The plan's version number. Null for a version that only belongs to an experiment; an experiment version made current takes the next number.
+- `experiment` (`{ code: string; version: number } | null`, required) — The experiment this version belongs to, if any.
+- `isCurrent` (`boolean`, required) — Whether new buyers get this version.
+- `parentVersionId` (`string | null`, required) — The version this one was created from.
+- `subscriptionCount` (`number`, required) — Active, trialing, past due and paused subscriptions on it.
+- `maxPlanCredits` (`number | null`, required)
+- `maxPlanBalance` (`number | null`, required)
+- `prices` (`Array<{ id: string; billingInterval: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | "one_time"; price: number; includedCredits: number | null; includedBalance: number | null; regionalPrices: Array<{ currency: string; price: number; includedBalance: number | null }> }>`, required)
+- `createdAt` (`string`, required)
+- `object` (`"plan_version"`, required)
+- `livemode` (`boolean`, required)
+
+### PlanVersionComparison
+
+- `versionId` (`string`, required) — The version the changes start from.
+- `againstVersionId` (`string`, required) — The version they end at.
+- `changes` (`Array<{ key: string; section: string; country: string | null; label: string; before: string | null; after: string | null }>`, required) — Every term that differs, the plan's first and then each country.
+- `object` (`"plan_version_comparison"`, required)
+- `livemode` (`boolean`, required)
+
 ### PortalAccess
 
 - `portalUrl` (`string`, required)
@@ -663,6 +755,7 @@ Variants:
 - `daysRemaining` (`number`, required)
 - `totalDays` (`number`, required)
 - `isUpgrade` (`boolean`, required)
+- `deactivatedAddons` (`Array<{ addonId: string; name: string }>`, required) — Active add-ons that the version the change moves the subscription to does not sell. The change deactivates them when it applies.
 - `offerApplication` (`{ id: string; offerId: string; name: string; currency: string; subtotal: number; discountAmount: number; total: number; phases: Array<{ type: "free_trial"; durationDays: number; startsAt: string | null; endsAt: string | null } | { type: "percentage"; durationCycles: number | null; durationInterval: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | null; startsAt: string | null; endsAt: string | null; percentage: number } | { type: "amount_off"; durationCycles: number | null; durationInterval: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | null; startsAt: string | null; endsAt: string | null; amount: number } | { type: "fixed_price"; durationCycles: number | null; durationInterval: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | null; startsAt: string | null; endsAt: string | null; price: number }>; appliesTo: { type: "plan_price"; id: string } | { type: "addon"; id: string } | { type: "credit_pack"; id: string } }`, optional)
 - `object` (`"plan_change_preview"`, required)
 - `livemode` (`boolean`, required)
@@ -764,6 +857,17 @@ Variants:
 - `object` (`"invoice_delivery"`, required)
 - `livemode` (`boolean`, required)
 
+### SubscriberNeedingAChange
+
+- `subscriptionId` (`string`, required)
+- `moveId` (`string | null`, required) — The move it could not complete, or null for a single change.
+- `fromVersionId` (`string`, required) — The version it stays on.
+- `toVersionId` (`string`, required) — The version it could not move to.
+- `code` (`string`, required) — Why it could not move.
+- `message` (`string`, required)
+- `object` (`"subscriber_needing_a_change"`, required)
+- `livemode` (`boolean`, required)
+
 ### Subscription
 
 - `id` (`string`, required)
@@ -786,8 +890,10 @@ Variants:
 - `hasPaymentMethod` (`boolean`, required) — Whether Commet can charge this subscription on its own at its next charge (the trial end or the renewal). A trial that started without a payment method reports false until the customer adds one for this subscription; a payment method saved for another subscription does not count. A subscription on a free plan reports false.
 - `createdAt` (`string`, required)
 - `updatedAt` (`string`, required)
+- `planVersion` (`{ id: string; label: string } | null`, required) — The plan version whose terms the subscription has now. It keeps paying and receiving everything from this version until it is moved.
 - `offerApplications` (`Array<SubscriptionOfferApplication>`, required)
 - `pause` (`{ status: "scheduled"; mode: "period_end"; requestedAt: string; effectiveAt: string; resumeAt: string | null } | { status: "active"; mode: "immediate" | "period_end"; requestedAt: string; effectiveAt: string; resumeAt: string | null } | null`, required)
+- `scheduledVersionChange` (`{ planVersionId: string; label: string; effectiveAt: string } | null`, required) — A move to another version of the plan pending for the next renewal.
 - `planGrant` (`{ id: string; plan: { id: string; name: string }; expiresAt: string | null }`, optional)
 - `consumptionModel` (`ConsumptionModel | null`, required)
 - `features` (`Array<{ code: string; name: string; type: "boolean"; enabled: boolean; baseAccess?: { enabled: boolean } | null } | { code: string; name: string; type: "usage"; usage?: { current: number; included: number; overageQuantity: number; overageUnitPrice?: number; unlimited?: boolean }; baseAccess?: { included: number; unlimited: boolean } | null } | { code: string; name: string; type: "seats"; usage: { current: number; included: number; overageQuantity: number; overageUnitPrice?: number; unlimited?: boolean }; baseAccess?: { included: number; unlimited: boolean } | null } | { code: string; name: string; type: "quota"; usage?: { current: number; included: number; overageQuantity: number; overageUnitPrice?: number; unlimited?: boolean }; baseAccess?: { included: number; unlimited: boolean } | null }>`, required)
@@ -875,6 +981,7 @@ Variants:
 - `hasPaymentMethod` (`boolean`, required) — Whether Commet can charge this subscription on its own at its next charge (the trial end or the renewal). A trial that started without a payment method reports false until the customer adds one for this subscription; a payment method saved for another subscription does not count. A subscription on a free plan reports false.
 - `createdAt` (`string`, required)
 - `updatedAt` (`string`, required)
+- `planVersion` (`{ id: string; label: string } | null`, required) — The plan version whose terms the subscription has now. It keeps paying and receiving everything from this version until it is moved.
 - `offerApplications` (`Array<SubscriptionOfferApplication>`, required)
 - `pause` (`{ status: "scheduled"; mode: "period_end"; requestedAt: string; effectiveAt: string; resumeAt: string | null } | { status: "active"; mode: "immediate" | "period_end"; requestedAt: string; effectiveAt: string; resumeAt: string | null } | null`, required)
 - `priceId` (`string | null`, required)

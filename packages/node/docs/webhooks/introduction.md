@@ -11,6 +11,8 @@ Webhooks let your application receive real-time HTTP notifications when events h
 2. You select which events you want to receive
 3. When an event occurs, Commet sends a `POST` request to your URL with the event data
 
+An endpoint receives only the events it lists. New event types are not added to existing endpoints: when Commet adds one, such as `subscription.version_changed`, edit the endpoint to receive it.
+
 ## Local development
 
 Use the Commet CLI to forward webhook events to your local server in real time — no tunneling tools needed:
@@ -472,7 +474,7 @@ You can monitor delivery status, inspect payloads, and retry individual deliveri
 
 ## Subscription status lifecycle
 
-Every `subscription.*` webhook includes a `status` field. These are the valid values and which ones grant access to your product:
+Most `subscription.*` webhooks include a `status` field. These are the valid values and which ones grant access to your product:
 
 | Status            | Grants access?     | Meaning                                                                                                                                     |
 | ----------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |

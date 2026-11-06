@@ -40,7 +40,7 @@ Retrieve an add-on by its public ID or slug.
 
 `PATCH /addons/{id}` · operation `update-addon`
 
-Update an add-on's name, description, or pricing.
+Update an add-on's name, description, pricing, or the plans that sell it.
 
 ### Parameters
 
@@ -50,6 +50,7 @@ Update an add-on's name, description, or pricing.
 - `basePrice` (`number`, optional)
 - `includedUnits` (`number`, optional)
 - `overageRate` (`number`, optional)
+- `planIds` (`Array<string>`, optional) — Plans that sell the add-on, replacing the current ones. Empty means every plan; omitted keeps them. Removing a plan is rejected with addon_has_activations while a subscription of that plan has the add-on active.
 
 ### Request options
 
@@ -106,6 +107,7 @@ Create a new add-on linked to a feature. Each feature can only be assigned to on
 - `description` (`string`, optional)
 - `basePrice` (`number`, required)
 - `featureId` (`string`, required)
+- `planIds` (`Array<string>`, optional) — Plans that sell the add-on. Omitted or empty, every plan sells it. Plans created later sell it too.
 - `consumptionModel` (`"boolean" | "metered" | "credits" | "balance"`, required)
 - `includedUnits` (`number`, optional)
 - `overageRate` (`number`, optional)

@@ -17,7 +17,7 @@ A plan group is the [upgrade and downgrade path](/docs/what-happens-when-a-custo
 
 ## Create a plan group in the dashboard
 
-Go to **Plans** → **Groups** and click **Create Group**. Name the group, add your plans, then drag and drop to arrange them from lowest to highest tier. Each plan can only belong to one group. Plans with [Regional Prices](/docs/regional-prices) can be added, but all plans in a group must support the same set of currencies so any subscriber can move between them.
+Go to **Plans** → **Groups** and click **Create Group**. Name the group, add your plans, then drag and drop to arrange them from lowest to highest tier. Each plan can only belong to one group. Plans in a group can sell different currencies and countries with [Regional Prices](/docs/regional-prices). A subscriber can switch only to group plans that sell its currency in its country: the Customer Portal shows only those, and the API rejects the others with `422 missing_regional_price`.
 
 This order defines the upgrade path and display order in the Customer Portal.
 

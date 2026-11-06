@@ -142,3 +142,63 @@ describe("Subscriptions — credit quantity, auto top-up and promo codes", () =>
     });
   });
 });
+
+describe("Subscriptions — plan versions", () => {
+  beforeEach(() => {
+    vi.stubGlobal("fetch", vi.fn());
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("create sells a chosen plan version", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(jsonResponse({ id: "sub_1" }));
+    const client = new Commet({ apiKey: "ck_test_123" });
+
+    await client.subscriptions.create({
+      customerId: "cus_1",
+      planCode: "pro",
+      planVersionId: "plnrel_v3",
+    });
+
+    expect(lastRequest().body).toEqual({
+      customerId: "cus_1",
+      planCode: "pro",
+      planVersionId: "plnrel_v3",
+    });
+  });
+
+  it("list filters by plan version", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(jsonResponse({ data: [] }));
+    const client = new Commet({ apiKey: "ck_test_123" });
+
+    await client.subscriptions.list({ planVersionId: "plnrel_v3" });
+
+    const searchParams = new URL(lastCall().url).searchParams;
+    expect(searchParams.get("planVersionId")).toBe("plnrel_v3");
+  });
+
+  it("changeVersion and revokeScheduledVersionChange move a subscription between versions", async () => {
+    vi.mocked(fetch)
+      .mockResolvedValueOnce(jsonResponse({ id: "sub_1" }))
+      .mockResolvedValueOnce(jsonResponse({ id: "sub_1" }));
+    const client = new Commet({ apiKey: "ck_test_123" });
+
+    await client.subscriptions.changeVersion({
+      id: "sub_1",
+      planVersionId: "plnrel_v4",
+      effective: "period_end",
+    });
+    expect(lastRequest().url).toContain("/subscriptions/sub_1/change-version");
+    expect(lastRequest().body).toEqual({
+      planVersionId: "plnrel_v4",
+      effective: "period_end",
+    });
+
+    await client.subscriptions.revokeScheduledVersionChange({ id: "sub_1" });
+    const { url, init } = lastCall();
+    expect(url).toContain("/subscriptions/sub_1/scheduled-version-change");
+    expect(init.method).toBe("DELETE");
+  });
+});

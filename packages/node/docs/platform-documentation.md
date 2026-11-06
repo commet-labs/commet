@@ -27,6 +27,7 @@ This documentation snapshot is serialized from the source of commet.co/docs and 
 - [documentation/customers/customer-credits.md](./documentation/customers/customer-credits.md)
 - [documentation/customers/customer-portal.md](./documentation/customers/customer-portal.md)
 - [documentation/plans/create-plans.md](./documentation/plans/create-plans.md)
+- [documentation/plans/plan-versions.md](./documentation/plans/plan-versions.md)
 - [documentation/plans/add-ons.md](./documentation/plans/add-ons.md)
 - [documentation/plans/configure-features.md](./documentation/plans/configure-features.md)
 - [documentation/plans/consumption-models.md](./documentation/plans/consumption-models.md)

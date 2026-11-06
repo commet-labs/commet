@@ -221,6 +221,30 @@ Fired when a scheduled plan change will no longer take effect: it was revoked th
 - `billingInterval` (`string | null`, required) — The current billing interval.
 - `revokedBillingInterval` (`string | null`, required) — The previously scheduled billing interval, if the revoked change included one.
 
+## subscription.version_changed
+
+Fired when a subscription moves to another version of its plan: a move applied now or a scheduled move that took effect at renewal. Making an experiment current moves nobody, so it sends none. The plan stays the same; the version's prices and features apply from now on.
+
+### Data
+
+- `subscriptionId` (`string`, required) — The subscription ID.
+- `customerId` (`string`, required) — The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.
+- `fromVersionId` (`string`, required) — The version the subscription left.
+- `toVersionId` (`string`, required) — The version the subscription is on now.
+- `currency` (`string`, required) — The currency the subscription pays in.
+- `billingInterval` (`string`, required) — The billing interval the subscription pays.
+
+## subscription.version_change_canceled
+
+Fired when a scheduled move to another plan version will no longer take effect because the subscription no longer fit the version at its renewal, or because the merchant revoked the scheduled version change or canceled the plan move. A new move that replaces it, a move made now, a plan change or an immediate cancellation sends none. The subscription stays on its version; reason says why.
+
+### Data
+
+- `subscriptionId` (`string`, required) — The subscription ID.
+- `customerId` (`string`, required) — The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.
+- `toVersionId` (`string`, required) — The version the subscription was going to move to.
+- `reason` (`string`, required) — Why the move was canceled: canceled_by_merchant, version_change_failed when the move could not be applied at renewal, or the code of what the subscription no longer fits (addon_unavailable, seat_limit_exceeded, price_not_found, missing_regional_price).
+
 ## subscription.past_due
 
 Fired when a recurring payment fails on a previously paid subscription and its status becomes past_due. past_due is a grace window, not a cutoff: usage and seats keep working while new purchases are blocked, and dunning retries the charge — use this to notify the customer and recover the payment.

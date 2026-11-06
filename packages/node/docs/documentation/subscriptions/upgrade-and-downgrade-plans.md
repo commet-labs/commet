@@ -16,6 +16,8 @@ Customers change plans through the [Customer Portal](/docs/customer-portal) or f
 
 Both plans must be in the same [Plan Group](/docs/plan-groups) for customers to change plans themselves through the portal. Free-to-paid changes open a checkout for the customer to pay. When the new price has a [trial without a payment method](/docs/trial-periods#start-a-trial-without-a-payment-method) and the customer never had that plan, the trial starts at once instead.
 
+A change to another plan lands on that plan's current [version](/docs/plan-versions). The destination must sell the customer's currency in their country: otherwise the change and its preview return `422 missing_regional_price`, and the portal doesn't offer that plan. To move a customer to a newer version of the same plan, [change its version](/docs/manage-subscriptions#change-the-plan-version) instead.
+
 Immediate changes accept an `offerId` or a [`promoCode`](/docs/promo-codes#apply-a-code-on-a-plan-change). Scheduled changes accept neither.
 
 An immediate upgrade is rejected with a seat-limit error when the customer's current seats exceed the target plan's included seats for a seat feature that is not unlimited and has overage disabled. Reduce seats first, or pick a plan with enough included seats. Interval-only changes and scheduled downgrades are not affected.

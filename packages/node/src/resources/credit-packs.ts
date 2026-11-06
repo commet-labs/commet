@@ -13,6 +13,8 @@ export interface UpdateCreditPackParams {
   credits?: number;
   price?: number;
   isActive?: boolean;
+  /** Plans that sell the credit pack, replacing the current ones. Empty means every plan; omitted keeps them. */
+  planIds?: Array<string>;
 }
 
 export interface DeleteCreditPackParams {
@@ -25,12 +27,14 @@ export interface CreateCreditPackParams {
   credits: number;
   price: number;
   isActive?: boolean;
+  /** Plans that sell the credit pack. Omitted or empty, every plan sells it. Plans created later sell it too. */
+  planIds?: Array<string>;
 }
 
 export class CreditPacksResource {
   constructor(private httpClient: CommetHTTPClient) {}
 
-  /** Update a credit pack's name, description, credits, price, or active status. */
+  /** Update a credit pack's name, description, credits, price, active status, or the plans that sell it. */
   async update(
     params: UpdateCreditPackParams,
     options?: RequestOptions,
