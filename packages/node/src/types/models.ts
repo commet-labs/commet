@@ -76,6 +76,12 @@ export interface BalanceTopup {
   livemode: boolean;
 }
 
+export interface BusinessTaxId {
+  country: string;
+  type: string;
+  value: string;
+}
+
 export interface ClaimLink {
   url: string;
   /** @format date-time */
@@ -225,6 +231,7 @@ export interface Customer {
   email: string;
   taxDocument: string | null;
   documentType: string | null;
+  businessTaxId: BusinessTaxId | null;
   timezone: string | null;
   metadata: Record<string, unknown> | null;
   /** @format date-time */
@@ -873,6 +880,7 @@ export interface Plan {
   isPublic: boolean;
   isDefault: boolean;
   isFree: boolean;
+  /** Credits and balance plans: true stops usage when the plan and purchased amounts run out; false lets usage continue and bills the missing amount as overage at the next renewal (credits at the price per credit). Trials and free plans always stop. */
   blockOnExhaustion: boolean | null;
   /** Credits plans only; null for other consumption models. What happens to unused plan credits at each reset. Purchased credits never expire and never count toward maxPlanCredits. */
   unusedPlanCredits:
@@ -889,6 +897,24 @@ export interface Plan {
   planCreditLimit: {
     /** The most plan credits a subscription spends in one window. */
     credits: number;
+    /** The window length: `day` is 24 hours and `week` is 7 days, starting at the time of day of the subscription's billing anchor. */
+    interval: "day" | "week";
+  } | null;
+  /** Balance plans only; null for other consumption models. What happens to unused plan balance at each reset. Purchased balance never expires and never counts toward maxPlanBalance. */
+  unusedPlanBalance:
+    | {
+        type: "expire";
+      }
+    | {
+        type: "roll_over";
+        /** The most plan balance a subscription holds after a reset, in USD cents, including the balance that reset grants; balance above it expires. At least the included balance of every price. Other currencies convert it with the plan's exchange rate unless the dashboard sets a custom amount for that currency. null means no limit other than the largest storable amount, 2,147,483,647 cents. */
+        maxPlanBalance: number | null;
+      }
+    | null;
+  /** Balance plans only. The most plan balance a subscription spends per day or per week, in USD cents; null means no limit. */
+  planBalanceLimit: {
+    /** The most plan balance a subscription spends in one window, in USD cents. Other currencies convert it with the plan's exchange rate unless the dashboard sets a custom amount for that currency. */
+    amount: number;
     /** The window length: `day` is 24 hours and `week` is 7 days, starting at the time of day of the subscription's billing anchor. */
     interval: "day" | "week";
   } | null;
@@ -1755,14 +1781,27 @@ export interface Subscription {
       }
   >;
   credits: {
+    /** Plan credits left. Kept for compatibility; equal to `plan`. */
     remaining: number;
     included: number;
+    /** Purchased credits: purchases and manual adjustments. Spent after plan credits and kept until the subscription ends. */
     purchased: number;
+    /** Plan credits left this period. Spent first and replaced or rolled over at each reset; negative while overage is owed. */
+    plan: number;
+    /** Credits available: `plan` plus `purchased`. */
+    total: number;
   } | null;
   balance: {
+    /** Balance available in minor units of the subscription currency. Kept for compatibility; equal to `total`. */
     remaining: number;
     included: number;
     currency: string;
+    /** Plan balance left this period, in minor units. Spent first and replaced or rolled over at each reset; negative while overage is owed. */
+    plan: number;
+    /** Purchased balance in minor units: top-ups and manual adjustments. Spent after the plan balance and kept until the subscription ends. */
+    purchased: number;
+    /** Balance available in minor units: `plan` plus `purchased`. */
+    total: number;
   } | null;
   priceId: string | null;
   object: "subscription";
@@ -1778,17 +1817,19 @@ export interface SubscriptionAddon {
 }
 
 export interface SubscriptionAutoTopUp {
-  /** Whether credits are bought automatically. Always false when the plan does not sell credits. */
+  /** Whether top-ups run automatically: credits bought on a credits plan, balance added on a balance plan. Always false when the plan does not sell credits or has balance top-ups turned off. */
   enabled: boolean;
-  /** Credits at or below which a top-up is bought, or null when never configured. */
+  /** The available amount at or below which a top-up runs, or null when never configured: credits (plan plus purchased) on a credits plan, minor units of the subscription currency (plan plus purchased balance) on a balance plan. */
   threshold: number | null;
-  /** Credits each top-up buys, or null when never configured. */
+  /** Credits each top-up buys on a credits plan, or null when never configured or on a balance plan. */
   quantity: number | null;
-  /** Maximum top-ups per credit renewal period, or null when never configured. */
+  /** Minor units of the subscription currency each top-up adds on a balance plan, charged plus tax, or null when never configured or on a credits plan. */
+  amount: number | null;
+  /** Maximum top-ups per renewal period, or null when never configured. */
   maxPerPeriod: number | null;
-  /** active buys when credits reach the threshold; paused stops after three consecutive failed top-ups, or after one whose charge could not be refunded, until the payment method changes, a credit purchase succeeds or it is saved enabled again; off buys nothing. */
+  /** active tops up when the available amount reaches the threshold; paused stops after three consecutive failed top-ups, or after one whose charge could not be refunded, until the payment method changes, a credit purchase or balance top-up succeeds or it is saved enabled again; off tops up nothing. */
   status: "active" | "paused" | "off";
-  /** Top-ups bought in the current credit renewal period. */
+  /** Top-ups made in the current renewal period. */
   topUpsThisPeriod: number;
   /** When the top-up count of the period resets, or null before the subscription starts its first period. */
   periodResetsAt: string | null;
@@ -1798,6 +1839,7 @@ export interface SubscriptionAutoTopUp {
       | "payment_declined"
       | "no_payment_method"
       | "quantity_below_minimum"
+      | "amount_below_minimum"
       | "purchase_failed";
     /** @format date-time */
     at: string;
@@ -2230,6 +2272,8 @@ export type UsageCheck =
          */
         resetsAt: string;
       } | null;
+      /** Whether usage stops when plan and purchased credits run out. False only when the plan allows overage, which is billed at its price per credit; trials and free plans always stop. */
+      blockOnExhaustion: boolean;
       object: "usage_check";
       livemode: boolean;
     }
@@ -2243,7 +2287,29 @@ export type UsageCheck =
       consumptionModel: "balance";
       unitPrice: number;
       estimatedAmount: number;
+      /** The available balance, plan plus purchased, in rate scale (10000 = 1.00 of the subscription currency). Equal to totalBalance. */
       currentBalance: number;
+      /** The plan part of the balance in rate scale. Consumed first, replaced or rolled over at each reset, and negative while overage is owed. */
+      planBalance: number;
+      /** The purchased part of the balance in rate scale: top-ups and adjustments. Consumed after the plan part and kept until the subscription ends. */
+      purchasedBalance: number;
+      /** planBalance plus purchasedBalance, in rate scale. */
+      totalBalance: number;
+      planBalanceLimit: {
+        /** The most plan balance the subscription spends per window, in rate scale (10000 = 1.00 of the subscription currency). */
+        amount: number;
+        /** The window length: 24 hours for `day`, 7 days for `week`. */
+        interval: "day" | "week";
+        /** Plan balance spent in the current window, in rate scale. */
+        spent: number;
+        /** Plan balance the subscription can still spend in the current window, in rate scale. Purchased balance is not limited. */
+        remaining: number;
+        /**
+         * When the next window starts and spending resets.
+         * @format date-time
+         */
+        resetsAt: string;
+      } | null;
       blockOnExhaustion: boolean;
       currency: string;
       object: "usage_check";
@@ -2278,6 +2344,22 @@ export interface UsageEvent {
       /** Plan credits spent in the current window. */
       spent: number;
       /** Plan credits the subscription can still spend in the current window. Purchased credits are not limited. */
+      remaining: number;
+      /**
+       * When the next window starts and spending resets.
+       * @format date-time
+       */
+      resetsAt: string;
+    } | null;
+    /** Balance consumption on a plan with a plan balance limit: the limit after this event. Omitted for credits and for plans without a limit. */
+    planBalanceLimit?: {
+      /** The most plan balance the subscription spends per window, in rate scale (10000 = 1.00 of the subscription currency). */
+      amount: number;
+      /** The window length: 24 hours for `day`, 7 days for `week`. */
+      interval: "day" | "week";
+      /** Plan balance spent in the current window, in rate scale. */
+      spent: number;
+      /** Plan balance the subscription can still spend in the current window, in rate scale. Purchased balance is not limited. */
       remaining: number;
       /**
        * When the next window starts and spending resets.
@@ -2336,7 +2418,14 @@ export interface WebhookAddonRef {
 }
 
 export interface WebhookBalance {
+  /** The available balance, plan plus purchased, in rate scale. Equal to totalBalance. */
   currentBalance: number;
+  /** The plan part in rate scale: spent first, replaced or rolled over at each reset, negative while overage is owed. */
+  planBalance: number;
+  /** The purchased part in rate scale: top-ups and manual adjustments, spent after the plan part and kept until the subscription ends. */
+  purchasedBalance: number;
+  /** planBalance plus purchasedBalance, in rate scale. */
+  totalBalance: number;
 }
 
 export interface WebhookBankRef {

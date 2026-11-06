@@ -13,24 +13,24 @@ When a renewal payment fails, the subscription moves to `past_due` and enters du
 4. The customer receives an email notification
 5. Commet retries the charge on a fixed schedule (dunning)
 
-If a retry succeeds, the subscription returns to `active`. If all retries fail, the subscription is canceled and the invoice is marked as `uncollectible`.
+If a retry succeeds, the subscription returns to `active`. If all retries fail, the invoice is marked as `uncollectible` and the subscription is canceled. When the plan's group has a [default plan](/docs/plan-groups#default-plan-and-signup-trial), the subscription moves to it instead and `subscription.plan_changed` fires.
 
 ## Provider error mapping
 
 Commet translates provider responses into a common payment outcome and keeps the provider detail alongside it. For recurring failures, the [`payment.failed`](/docs/webhooks/payment-failed) webhook exposes `failureCode`, `failureMessage`, and a `recoveryUrl` when a recovery path is available. The exact `failureCode` depends on the provider, so use the normalized outcome and the recovery URL for customer handling instead of matching only one provider's raw codes.
 
-| Payment outcome                      | What it means                                                     | What to do                                                                                                         |
-| ------------------------------------ | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `requires_action`                    | The provider needs an additional customer step, such as 3D Secure | Keep the customer in checkout and complete the authentication flow                                                 |
-| `PAYMENT_FAILED` with a decline code | The provider rejected the charge                                  | Show a retry or alternate payment method and record the provider code for support                                  |
-| `payment.failed`                     | A recurring charge failed and the invoice entered dunning         | Keep service during the grace window, communicate the recovery path, and wait for a retry or recovery              |
-| `payment.retry_failed`               | All scheduled dunning retries were exhausted                      | Revoke access according to your product policy and ask the customer to start a new subscription or contact support |
+| Payment outcome                      | What it means                                                     | What to do                                                                                                              |
+| ------------------------------------ | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `requires_action`                    | The provider needs an additional customer step, such as 3D Secure | Keep the customer in checkout and complete the authentication flow                                                      |
+| `PAYMENT_FAILED` with a decline code | The provider rejected the charge                                  | Show a retry or alternate payment method and record the provider code for support                                       |
+| `payment.failed`                     | A recurring charge failed and the invoice entered dunning         | Keep service during the grace window, communicate the recovery path, and wait for a retry or recovery                   |
+| `payment.retry_failed`               | All scheduled dunning retries were exhausted                      | Revoke paid access according to your product policy and ask the customer to start a new subscription or contact support |
 
 Initial checkout card declines do not emit `payment.failed`; the checkout response carries the failure state directly. Recurring failures use the dunning flow below.
 
 ## Automatic retries
 
-Retries run on day 1, day 3, day 5, and day 7 after the original failure (4 retries). The calendar is anchored to the failure and never moves. After the last failed retry the subscription is canceled.
+Retries run on day 1, day 3, day 5, and day 7 after the original failure (4 retries). The calendar is anchored to the failure and never moves. After the last failed retry the subscription is canceled, or moves to the plan group's default plan.
 
 Manual retries from the Customer Portal or [`reactivate`](#retry-the-charge-server-to-server) use the default payment method and have separate daily limits. They do not consume automatic retry slots or start another charge while an automatic retry is in progress.
 
@@ -48,7 +48,7 @@ Commet sends a payment-failure notification when a recurring charge enters dunni
 
 - [`payment.failed`](/docs/webhooks/payment-failed) — a recurring charge failed; use `failureCode`, `failureMessage`, and `recoveryUrl` to explain the next step.
 - [`payment.recovered`](/docs/webhooks/payment-recovered) — the outstanding invoice was paid and the subscription returned to `active`.
-- [`payment.retry_failed`](/docs/webhooks/payment-retry-failed) — all retries were exhausted and the subscription was canceled.
+- [`payment.retry_failed`](/docs/webhooks/payment-retry-failed) — all retries were exhausted and the subscription was canceled or moved to the default plan.
 
 Send your own email, SMS, or in-app message when you need product-specific copy. Do not create a second retry schedule in your app; use Commet's events to close the communication loop.
 

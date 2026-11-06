@@ -3,7 +3,7 @@ title: Offers, Promo Codes, and Card Promotions
 description: Understand where commercial terms live and how each distribution channel selects them.
 ---
 
-An Offer owns the economic terms: trial, percentage discount, amount off, or temporary fixed price. Introductory Offers, direct Promotional Offers, Promo Codes, and Card Promotions decide how those terms reach a customer.
+An Offer owns the economic terms: percentage discount, amount off, or temporary fixed price. Trials belong to the plan price. Introductory Offers, direct Promotional Offers, Promo Codes, and Card Promotions decide how those terms reach a customer.
 
 | Channel                | Who selects it                                                                                                         | Additional rule                                   |
 | ---------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |

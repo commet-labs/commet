@@ -19,6 +19,14 @@ To connect your own account:
 
 Commet registers and consumes the provider webhooks required to keep payment, refund, dispute, and setup events synchronized. You do not need to create a second billing integration for the connected account.
 
+### Connect several accounts of the same provider
+
+An organization can connect more than one Stripe or dLocal account, for example one dLocal account for Argentina and another for Brazil and Mexico. Each additional account starts with no countries and is not the default.
+
+Give each account a label with **Edit alias** in its menu, then assign its countries in **Payment routing**. When you have several accounts of the same provider, Payment routing shows each connection ID (`pcon_...`) to copy.
+
+To pin a subscription's first checkout to one account, pass its connection ID as `provider` when [creating the subscription](/docs/manage-subscriptions#create). `provider: "stripe"` or `"dlocal"` uses the oldest connected account of that provider.
+
 ### Stripe credentials
 
 Provide the Stripe **secret key** and **publishable key** for the account you own. In sandbox mode, use `sk_test_...` and `pk_test_...` keys. In live mode, use `sk_live_...` and `pk_live_...` keys. Commet rejects keys from the wrong mode.
@@ -26,6 +34,44 @@ Provide the Stripe **secret key** and **publishable key** for the account you ow
 ### dLocal credentials
 
 Provide the credentials issued for the matching dLocal environment: **X-Login**, **X-Trans-Key**, **Secret Key**, and the **API key (dlocal.js)**. Commet validates the account before saving the connection.
+
+## Choose payment methods per connection
+
+Stripe and Commet connections accept cards. A dLocal connection can also offer local methods; each one applies only to that connection.
+
+Open **Settings → Payments**, open the connection menu, and choose **Payment methods**. Enable a method in your dLocal account before turning it on in Commet.
+
+| Method       | Where it's offered        |
+| ------------ | ------------------------- |
+| Card         | All countries             |
+| Google Pay   | All countries             |
+| Mercado Pago | Argentina, in ARS         |
+| OXXO         | Mexico, as a cash voucher |
+| SmartPix     | Brazil, in BRL            |
+
+A country method appears under **Not available for this connection** until its country is assigned to the connection. Google Pay asks for the **dLocal gateway merchant ID**, the **Google merchant ID** (optional in sandbox), and the **Business name** buyers see.
+
+The `paymentMethod` of each [transaction](/docs/transactions-refunds-and-retries) names the method used: `card`, `google_pay`, `mercado_pago`, `oxxo`, or `smartpix`.
+
+### Limit the methods of one checkout
+
+To offer only some methods in a subscription's first checkout, pass `paymentMethodTypes` when [creating the subscription](/docs/manage-subscriptions#create), for example `["oxxo"]`. The list only narrows what the checkout already offers for the buyer's country and connection: it never turns on a method or changes which connection the checkout uses. With `["card", "oxxo"]`, a buyer in Mexico sees card and OXXO, and a buyer in Argentina sees only card. Pass `provider` as well to choose the connection.
+
+Every method in the list must be turned on in the `provider` connection, or in one of your connections when you don't pass `provider`. Otherwise the request fails with `validation_error` naming that method. A plan that starts with a card trial also rejects methods that can't be saved for renewals, such as OXXO.
+
+When no method in the list is available to the buyer, the checkout shows that it can't accept payments and charges nothing. A new checkout for the same invoice, for example after an OXXO voucher expires, keeps the list.
+
+### Mercado Pago
+
+The customer authorizes Mercado Pago once in checkout. Commet charges the first payment after the authorization is active, and charges renewals to it automatically.
+
+If the customer revokes the authorization in Mercado Pago, Commet removes the saved method and sends the `payment_method.detached` webhook; the subscription does not change. If no other usable method is saved when the next renewal is due, the payment fails and the subscription follows [failed-payment recovery](/docs/what-happens-when-a-payment-fails). The customer can authorize Mercado Pago again from the [Customer Portal](/docs/customer-portal).
+
+### OXXO
+
+OXXO is a cash voucher. Checkout shows it inline with the amount, the expiration date, the barcode, and the reference, which the customer can copy or save. The subscription activates when dLocal confirms the payment.
+
+Cash can't renew. A subscription paid with OXXO and no other saved payment method [ends after its paid periods](/docs/pay-in-advance#end-oxxo-subscriptions-after-their-paid-periods) unless the customer adds a card. Combine OXXO with [Pay in Advance](/docs/pay-in-advance) to sell several periods with one voucher.
 
 ## Sandbox and live credentials
 

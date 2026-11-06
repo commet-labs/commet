@@ -14,15 +14,33 @@ Customers change plans through the [Customer Portal](/docs/customer-portal) or f
 | **Interval change (up)**   | Applied immediately                       | Monthly → Yearly          |
 | **Interval change (down)** | Takes effect at next renewal              | Yearly → Monthly          |
 
-Both plans must be in the same [Plan Group](/docs/plan-groups) for customers to change plans themselves through the portal. Free-to-paid changes require a new checkout — the customer is redirected to complete payment.
+Both plans must be in the same [Plan Group](/docs/plan-groups) for customers to change plans themselves through the portal. Free-to-paid changes open a checkout for the customer to pay. When the new price has a [trial without a payment method](/docs/trial-periods#start-a-trial-without-a-payment-method) and the customer never had that plan, the trial starts at once instead.
+
+Immediate changes accept an `offerId` or a [`promoCode`](/docs/promo-codes#apply-a-code-on-a-plan-change). Scheduled changes accept neither.
 
 An immediate upgrade is rejected with a seat-limit error when the customer's current seats exceed the target plan's included seats for a seat feature that is not unlimited and has overage disabled. Reduce seats first, or pick a plan with enough included seats. Interval-only changes and scheduled downgrades are not affected.
 
+During a trial without a payment method, an immediate change returns `409 no_payment_method`. Scheduled changes still apply.
+
 If you need to expand features or limits temporarily without changing the subscription's plan, price, or billing cycle, use a [Plan Grant](/docs/plan-grants) instead.
+
+## Revoke a scheduled plan change
+
+A scheduled downgrade or interval change can be revoked before it takes effect, so the subscription stays on its current plan:
+
+- Customers choose **Keep current plan** in the portal.
+- In the dashboard, open the subscription and choose **Revert plan change**.
+- Through the API, call `DELETE /subscriptions/{id}/scheduled-plan-change`.
+
+```typescript
+await commet.subscriptions.revokeScheduledPlanChange({ id: 'sub_xxx' })
+```
+
+A subscription with nothing scheduled returns `409 no_scheduled_plan_change`. One whose payment authorization must be renewed first returns `409 no_payment_method`.
 
 ## Dashboard
 
-From a customer's subscription detail page, click **Change Plan** and select the new plan. The same upgrade/downgrade rules apply.
+From a customer's subscription detail page, click **Change plan** and select the new plan. The same upgrade/downgrade rules apply.
 
 ## Learn more
 

@@ -5,7 +5,7 @@ Generated from Commet API version `2026-08-27`.
 Use this reference for the exact resources, methods, parameters, and return types available in the installed SDK.
 
 - [Schemas](../schemas.md) — generated models and enums
-- [API errors](../errors/index.md) — 87 version-matched error references
+- [API errors](../errors/index.md) — 88 version-matched error references
 - [Addons](./addons.md) — 6 operations
 - [Api Keys](./api-keys.md) — 3 operations
 - [Provisioning](./provisioning.md) — 1 operations

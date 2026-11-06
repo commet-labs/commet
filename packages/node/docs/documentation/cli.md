@@ -222,17 +222,18 @@ commet customers create \
   --metadata '{"plan":"enterprise"}'
 ```
 
-| Flag                     | Required | Description                                           |
-| ------------------------ | -------- | ----------------------------------------------------- |
-| `--email <email>`        | Yes      | Billing email                                         |
-| `--id <id>`              | No       | Custom customer ID                                    |
-| `--external-id <id>`     | No       | ID from your system                                   |
-| `--full-name <name>`     | No       | Full name                                             |
-| `--tax-document <value>` | No       | Tax document                                          |
-| `--timezone <tz>`        | No       | Timezone                                              |
-| `--metadata <json>`      | No       | Metadata as JSON object                               |
-| `--address <json>`       | No       | Address as JSON: `{line1, city, postalCode, country}` |
-| `--address-id <id>`      | No       | Existing customer address ID                          |
+| Flag                     | Required | Description                                                    |
+| ------------------------ | -------- | -------------------------------------------------------------- |
+| `--email <email>`        | Yes      | Billing email                                                  |
+| `--id <id>`              | No       | Custom customer ID                                             |
+| `--external-id <id>`     | No       | ID from your system                                            |
+| `--full-name <name>`     | No       | Full name                                                      |
+| `--tax-document <value>` | No       | Tax document                                                   |
+| `--timezone <tz>`        | No       | Timezone                                                       |
+| `--metadata <json>`      | No       | Metadata as JSON object                                        |
+| `--address <json>`       | No       | Address as JSON: `{line1, city, postalCode, country}`          |
+| `--address-id <id>`      | No       | Existing customer address ID                                   |
+| `--plan-group-id <id>`   | No       | Start the customer on the group's signup trial or default plan |
 
 ```bash
 commet customers get --id cus_xxx                   # Get a customer by ID
@@ -276,9 +277,9 @@ commet subscriptions create \
 | `--billing-interval <interval>` | No                             | `weekly`, `monthly`, `quarterly`, `semiannual`, `yearly`, `one_time`              |
 | `--price-id <id>`               | No                             | Selectable plan price. Omit it to use the interval default and its market pricing |
 | `--initial-seats <json>`        | No                             | Initial seats as JSON: `{featureCode: count}`                                     |
-| `--skip-trial <bool>`           | No                             | Skip trial period                                                                 |
-| `--custom-trial-days <n>`       | No                             | Override the catalog trial duration                                               |
-| `--offer-id <id>`               | No                             | Apply an Offer directly. Cannot be combined with `promo-code` or a custom trial   |
+| `--skip-trial <bool>`           | No                             | Start without the price's trial                                                   |
+| `--custom-trial-days <n>`       | No                             | Trial days replacing the price's trial                                            |
+| `--offer-id <id>`               | No                             | Apply an Offer directly. Cannot be combined with `promo-code`                     |
 | `--promo-code <code>`           | No                             | Apply the Offer referenced by a customer-entered code                             |
 | `--provider <provider>`         | No                             | Initial checkout provider override: `stripe`, `commet`, or `dlocal`               |
 | `--name <name>`                 | No                             | Subscription name                                                                 |
@@ -308,6 +309,8 @@ commet subscriptions get-active --customer-id user_123           # Get active su
 commet subscriptions uncancel --id sub_xxx                       # Revert pending cancellation
 commet subscriptions reactivate --id sub_xxx --offer-id ofr_xxx  # Reactivate a canceled subscription with a direct Offer
 commet subscriptions change-plan --id sub_xxx --new-plan-id pln_xxx --new-billing-interval yearly  # Change plan
+commet subscriptions change-plan --id sub_xxx --new-plan-id pln_xxx --promo-code LAUNCH50       # Change plan with a promo code
+commet subscriptions revoke-scheduled-plan-change --id sub_xxx      # Keep the current plan
 commet subscriptions list                                            # List all subscriptions
 commet subscriptions list --customer-id user_123 --status active     # Filter by customer/status
 commet subscriptions preview-change --id sub_xxx --plan-id pln_xxx --billing-interval yearly  # Preview proration
@@ -316,6 +319,9 @@ commet subscriptions deactivate-addon --id sub_xxx --addon-id adn_xxx
 commet subscriptions adjust-balance --id sub_xxx --amount 1000 --type balance --reason "Courtesy credit"
 commet subscriptions topup-balance --id sub_xxx --amount 5000
 commet subscriptions purchase-credits --id sub_xxx --credit-pack-id cpk_xxx
+commet subscriptions purchase-credits --id sub_xxx --quantity 500
+commet subscriptions get-auto-top-up --id sub_xxx
+commet subscriptions update-auto-top-up --id sub_xxx --enabled true --threshold 100 --quantity 500 --max-per-period 3
 ```
 
 ## Plans
@@ -339,17 +345,20 @@ commet plans create \
   --block-on-exhaustion true
 ```
 
-| Flag                           | Required | Description                                |
-| ------------------------------ | -------- | ------------------------------------------ |
-| `--name <name>`                | Yes      | Plan name                                  |
-| `--code <code>`                | Yes      | Plan code                                  |
-| `--description <desc>`         | No       | Plan description                           |
-| `--consumption-model <model>`  | No       | `metered`, `credits`, or `balance`         |
-| `--is-public <bool>`           | No       | Whether plan is publicly visible           |
-| `--is-free <bool>`             | No       | Whether plan is free                       |
-| `--block-on-exhaustion <bool>` | No       | Block usage when balance/credits exhausted |
-| `--plan-group-id <id>`         | No       | Plan group ID                              |
-| `--metadata <json>`            | No       | Metadata as JSON object                    |
+| Flag                           | Required | Description                                                                        |
+| ------------------------------ | -------- | ---------------------------------------------------------------------------------- |
+| `--name <name>`                | Yes      | Plan name                                                                          |
+| `--code <code>`                | Yes      | Plan code                                                                          |
+| `--description <desc>`         | No       | Plan description                                                                   |
+| `--consumption-model <model>`  | No       | `metered`, `credits`, or `balance`                                                 |
+| `--is-public <bool>`           | No       | Whether plan is publicly visible                                                   |
+| `--is-free <bool>`             | No       | Whether plan is free                                                               |
+| `--block-on-exhaustion <bool>` | No       | Block usage when balance/credits exhausted                                         |
+| `--plan-group-id <id>`         | No       | Plan group ID                                                                      |
+| `--is-default <bool>`          | No       | Make this free plan the default plan of its group                                  |
+| `--unused-plan-credits <json>` | No       | Credits plans: `{"type":"expire"}` or `{"type":"roll_over","maxPlanCredits":5000}` |
+| `--plan-credit-limit <json>`   | No       | Credits plans: `{"credits":100,"interval":"day"}`                                  |
+| `--metadata <json>`            | No       | Metadata as JSON object                                                            |
 
 **`commet plans add-feature`**
 
@@ -404,18 +413,19 @@ commet plans add-price \
   --trial-days 14
 ```
 
-| Flag                            | Required                                  | Description                                                          |
-| ------------------------------- | ----------------------------------------- | -------------------------------------------------------------------- |
-| `--plan-id <id>`                | Yes                                       | Plan ID                                                              |
-| `--billing-interval <interval>` | Yes                                       | `weekly`, `monthly`, `quarterly`, `semiannual`, `yearly`, `one_time` |
-| `--price <n>`                   | One of `price` / `inherits-from-price-id` | Base price in the currency's minor unit                              |
-| `--inherits-from-price-id <id>` | One of `price` / `inherits-from-price-id` | Base price inherited by a selectable variant                         |
-| `--trial-days <n>`              | No                                        | Trial period in days                                                 |
-| `--is-default <bool>`           | No                                        | Set as default price                                                 |
-| `--included-balance <n>`        | No                                        | Included balance amount                                              |
-| `--included-credits <n>`        | No                                        | Included credits amount                                              |
-| `--market-prices <json>`        | Required for a variant                    | Market prices as `{marketGroupId, currency, price}` objects          |
-| `--metadata <json>`             | No                                        | Price metadata                                                       |
+| Flag                                     | Required                                  | Description                                                          |
+| ---------------------------------------- | ----------------------------------------- | -------------------------------------------------------------------- |
+| `--plan-id <id>`                         | Yes                                       | Plan ID                                                              |
+| `--billing-interval <interval>`          | Yes                                       | `weekly`, `monthly`, `quarterly`, `semiannual`, `yearly`, `one_time` |
+| `--price <n>`                            | One of `price` / `inherits-from-price-id` | Base price in the currency's minor unit                              |
+| `--inherits-from-price-id <id>`          | One of `price` / `inherits-from-price-id` | Base price inherited by a selectable variant                         |
+| `--trial-days <n>`                       | No                                        | Free trial days, `0` to `730`                                        |
+| `--trial-requires-payment-method <bool>` | No                                        | `false` starts the trial without checkout                            |
+| `--is-default <bool>`                    | No                                        | Set as default price                                                 |
+| `--included-balance <n>`                 | No                                        | Included balance amount                                              |
+| `--included-credits <n>`                 | No                                        | Included credits amount                                              |
+| `--market-prices <json>`                 | Required for a variant                    | Market prices as `{marketGroupId, currency, price}` objects          |
+| `--metadata <json>`                      | No                                        | Price metadata                                                       |
 
 Create a selectable variant that changes only Argentina and inherits the rest of the base price:
 
@@ -736,11 +746,11 @@ Create reusable Offers independently from plans and distribution channels.
 
 ```bash
 commet offers create \
-  --name "14 days free, then 25% off" \
-  --phases '[{"type":"free_trial","durationDays":14},{"type":"percentage","percentage":2500,"durationCycles":3}]'
+  --name "25% off for 3 cycles" \
+  --phases '[{"type":"percentage","percentage":2500,"durationCycles":3}]'
 ```
 
-`percentage` uses basis points, so `2500` means 25%. Other phase types are `free_trial`, `amount_off`, and `fixed_price`.
+`percentage` uses basis points, so `2500` means 25%. Other phase types are `amount_off` and `fixed_price`. Set trials on the plan price with `--trial-days`.
 
 ```bash
 commet offers list --active true
@@ -749,7 +759,7 @@ commet offers update --id ofr_xxx --name "Launch offer" --phases '[{"type":"fixe
 commet offers delete --id ofr_xxx
 ```
 
-An Offer does not contain `purpose` or plan-price associations. Attach a compatible Offer to a base price in the Dashboard for automatic introductory selection, pass its ID directly as `offerId`, or reference a single-discount Offer from a Promo Code.
+An Offer does not contain `purpose` or plan-price associations. Attach a compatible Offer to a base price in the Dashboard for automatic introductory selection, pass its ID directly as `offerId`, or reference it from a Promo Code.
 
 ## Promo Codes
 
@@ -775,14 +785,15 @@ commet promo-codes create \
   --expires-at 2026-12-31
 ```
 
-| Flag                            | Required | Description                                                  |
-| ------------------------------- | -------- | ------------------------------------------------------------ |
-| `--code <code>`                 | Yes      | Promo code string                                            |
-| `--offer-id <id>`               | Yes      | Offer ID with exactly one `percentage` or `amount_off` phase |
-| `--billing-interval <interval>` | No       | Restrict redemption to one billing interval                  |
-| `--max-redemptions <n>`         | No       | Maximum number of redemptions                                |
-| `--expires-at <date>`           | No       | Expiration date (ISO 8601)                                   |
-| `--plan-ids <json>`             | No       | Restrict to specific plan IDs (JSON array)                   |
+| Flag                            | Required | Description                                           |
+| ------------------------------- | -------- | ----------------------------------------------------- |
+| `--code <code>`                 | Yes      | Promo code string                                     |
+| `--offer-id <id>`               | Yes      | Offer ID                                              |
+| `--billing-interval <interval>` | No       | Restrict redemption to one billing interval           |
+| `--max-redemptions <n>`         | No       | Maximum number of redemptions                         |
+| `--expires-at <date>`           | No       | Expiration date (ISO 8601)                            |
+| `--plan-ids <json>`             | No       | Restrict to specific plan IDs (JSON array)            |
+| `--first-purchase-only <bool>`  | No       | Only for a customer's first purchase. Default `false` |
 
 ```bash
 commet promo-codes list                              # List all promo codes

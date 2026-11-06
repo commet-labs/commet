@@ -16,7 +16,7 @@ A one-time price charges the customer once at checkout and never bills again for
 >
 > This page covers one-time charges billed as a **plan**. To charge a customer once with **no subscription or plan** — a standalone invoice with tax and receipt — use [Accept One-Time Payments](/docs/accept-one-time-payments) instead.
 
-One-time plans behave like any other plan — they support [trials](/docs/trial-periods), [intro offers](/docs/introductory-offers), [add-ons](/docs/add-ons), and all [consumption models](/docs/consumption-models). The only differences are:
+One-time plans behave like any other plan — they support [add-ons](/docs/add-ons) and all [consumption models](/docs/consumption-models). One-time prices can't have a [trial](/docs/trial-periods) or an [intro offer](/docs/introductory-offers). The other differences are:
 
 | Aspect               | Behavior                                                                  |
 | -------------------- | ------------------------------------------------------------------------- |
@@ -131,7 +131,7 @@ The initial invoice includes the plan base price as a one-time charge. After tha
 
 | Invoice               | What's included                                                          |
 | --------------------- | ------------------------------------------------------------------------ |
-| **Initial**           | `plan_base` (once) + any applicable intro offer discount                 |
+| **Initial**           | `plan_base` (once)                                                       |
 | **Subsequent cycles** | `feature_overage`, `feature_seats`, `addon_base` — only if charges exist |
 
 If there's no overage or additional charges at a billing cycle, no invoice is generated.
@@ -164,7 +164,7 @@ curl -X POST https://commet.co/api/v1/subscriptions \
 
 - The cancellation is scheduled from creation: the response already shows `cancelAtPeriodEnd: true` and `cancellation` before the customer pays.
 - The purchase keeps ending even if the customer saves a card through a payment method update link, and the Customer Portal doesn't offer **Keep subscription** for it.
-- Free trials don't combine with it. An explicit trial (`customTrialDays`, a trial Offer, or a trial Promo Code) returns `400`, the plan's automatic introductory trial is skipped, and a trial Promo Code entered at checkout is rejected.
+- Free trials don't combine with it: `customTrialDays` above `0` returns `400` and the price's trial is skipped.
 - When the purchase ends, Commet emits [`subscription.canceled`](/docs/webhooks/subscription-canceled).
 
 To make it renew, [reverse the scheduled cancellation](/docs/manage-subscriptions#reverse-a-scheduled-cancellation) through the API with `POST /v1/subscriptions/{id}/uncancel`. If the customer paid with a method Commet can't charge again, such as OXXO, and has no saved card, the request returns `409 subscription_uncancel_failed`.

@@ -30,6 +30,8 @@ await commet.usage.track({
 })
 ```
 
+Commet doesn't send emails whose recipients are all on reserved domains: `example.com`, `example.net`, `example.org` and their subdomains, and the `.example`, `.test`, `.invalid`, and `.localhost` domains. They still show as sent. Use a real inbox to check customer emails.
+
 ## Dev Tools Panel
 
 A floating widget that appears on all sandbox pages. The [**Test Clock**](#test-clock) tab is available everywhere. The [**Test Data**](#test-data) tab (address and card presets) only appears on checkout pages.

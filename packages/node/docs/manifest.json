@@ -12,7 +12,7 @@
   "platformDocumentation": {
     "source": "commet-labs/docs",
     "index": "platform-documentation.md",
-    "count": 96,
+    "count": 97,
     "entries": [
       "documentation/introduction.md",
       "documentation/create-api-key.md",
@@ -51,6 +51,7 @@
       "documentation/sales/promotional-offers.md",
       "documentation/sales/introductory-offers.md",
       "documentation/sales/promo-codes.md",
+      "documentation/sales/connect-dub-affiliates.md",
       "documentation/sales/regional-prices.md",
       "documentation/sales/trial-periods.md",
       "documentation/subscriptions/manage-subscriptions.md",
@@ -114,7 +115,7 @@
   },
   "errorReferences": {
     "index": "errors/index.md",
-    "count": 87,
+    "count": 88,
     "entries": [
       {
         "code": "validation_error",
@@ -289,6 +290,12 @@
         "type": "billing_error",
         "documentation": "errors/plan_credit_limit_reached.md",
         "canonicalUrl": "/docs/api-reference/2026-08-27/errors/plan_credit_limit_reached.md"
+      },
+      {
+        "code": "plan_balance_limit_reached",
+        "type": "billing_error",
+        "documentation": "errors/plan_balance_limit_reached.md",
+        "canonicalUrl": "/docs/api-reference/2026-08-27/errors/plan_balance_limit_reached.md"
       },
       {
         "code": "missing_regional_price",
@@ -1655,6 +1662,7 @@
     "invoice.upcoming",
     "payment_method.attached",
     "payment_method.updated",
+    "payment_method.detached",
     "customer.created",
     "customer.updated",
     "customer.state_changed",
@@ -1667,9 +1675,11 @@
     "credits.low",
     "credits.depleted",
     "credits.expired",
+    "balance.granted",
     "balance.topped_up",
     "balance.low",
     "balance.depleted",
+    "balance.expired",
     "quota.threshold_reached",
     "quota.exceeded",
     "seats.updated",

@@ -47,6 +47,7 @@ Those layers change at different times. Commet separates catalog changes, subscr
 | ------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
 | Trial starts                                                 | They use the product, no charge. **Overage is blocked** — usage stops at included limits     |
 | Trial ends                                                   | They're charged the current price, overage activates normally                                |
+| Trial without a payment method ends without a card           | No charge; the subscription moves to the plan group's default plan or is canceled            |
 | Renewal or retryable first-trial charge fails                | Subscription becomes `past_due`; usage continues while retries run and purchases are blocked |
 | First-trial charge needs a payment method or customer action | Subscription remains `pending_payment` so checkout can complete                              |
 | Canceled subscription                                        | Can be reactivated — fresh invoice at the current price, new billing period starts that day  |

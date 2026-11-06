@@ -260,7 +260,7 @@ Get a plan with public price IDs and their automatic introductory offer IDs.
 
 `PATCH /plans/{id}` · operation `update-plan`
 
-Update a plan's name, description, visibility, default status, metadata, what happens to its unused plan credits, or its plan credit limit.
+Update a plan's name, description, visibility, default status, metadata, overage behavior, what happens to its unused plan credits or plan balance, or its plan credit or plan balance limit.
 
 ### Parameters
 
@@ -271,6 +271,9 @@ Update a plan's name, description, visibility, default status, metadata, what ha
 - `isPublic` (`boolean`, optional)
 - `unusedPlanCredits` (`{ type: "expire" } | { type: "roll_over"; maxPlanCredits: number | null }`, optional) — Credits plans only. What happens to unused plan credits at each reset. Existing subscriptions apply it from their next reset.
 - `planCreditLimit` (`{ credits: number; interval: "day" | "week" } | null`, optional) — Credits plans only. The most plan credits a subscription spends per day or per week; null removes the limit. Raising or removing it applies to existing subscriptions at once; lowering it, adding it or changing its interval applies from their next period.
+- `unusedPlanBalance` (`{ type: "expire" } | { type: "roll_over"; maxPlanBalance: number | null }`, optional) — Balance plans only. What happens to unused plan balance at each reset. Existing subscriptions apply it from their next reset.
+- `planBalanceLimit` (`{ amount: number; interval: "day" | "week" } | null`, optional) — Balance plans only. The most plan balance a subscription spends per day or per week, in USD cents; null removes the limit. Raising or removing it applies to existing subscriptions at once; lowering it, adding it or changing its interval applies from their next period.
+- `blockOnExhaustion` (`boolean`, optional) — Credits and balance plans only. false lets usage continue past the plan and purchased amounts and bills the missing amount as overage at the next renewal; a credits plan bills it at the price per credit and needs one. Trials and free plans always stop, so free plans accept only true. Existing subscriptions apply it from their next reset.
 - `isDefault` (`boolean`, optional) — Make this plan the default plan of its plan group: customers created with that planGroupId start on it, and a paid plan of the group that ends from the customer portal, a revoked payment authorization or exhausted dunning moves to it instead of canceling. Requires a free plan in a plan group; replaces the group's previous default plan. false unmarks it.
 
 ### Request options
@@ -340,7 +343,7 @@ List plans with public price IDs and their automatic introductory offer IDs.
 
 `POST /plans` · operation `create-plan`
 
-Create a new plan with optional consumption model, visibility, and plan group assignment.
+Create a new plan with optional consumption model, visibility, plan group assignment, overage behavior, and the rollover and spend limit of its plan credits or plan balance.
 
 ### Parameters
 
@@ -350,9 +353,11 @@ Create a new plan with optional consumption model, visibility, and plan group as
 - `consumptionModel` (`"metered" | "credits" | "balance"`, optional)
 - `isPublic` (`boolean`, optional)
 - `isFree` (`boolean`, optional)
-- `blockOnExhaustion` (`boolean`, optional)
+- `blockOnExhaustion` (`boolean`, optional) — Credits and balance plans. Omitted, credits plans and free plans stop usage when the plan and purchased amounts run out, and paid balance plans bill the missing balance as overage. A new credits plan always stops usage: it allows overage only with a price per credit, which is set after creation, and then `PATCH /v1/plans/{id}` turns overage on.
 - `unusedPlanCredits` (`{ type: "expire" } | { type: "roll_over"; maxPlanCredits: number | null }`, optional) — Credits plans only. What happens to unused plan credits at each reset; omitted means they expire.
 - `planCreditLimit` (`{ credits: number; interval: "day" | "week" } | null`, optional) — Credits plans only. The most plan credits a subscription spends per day or per week; omitted or null means no limit.
+- `unusedPlanBalance` (`{ type: "expire" } | { type: "roll_over"; maxPlanBalance: number | null }`, optional) — Balance plans only. What happens to unused plan balance at each reset; omitted means it expires.
+- `planBalanceLimit` (`{ amount: number; interval: "day" | "week" } | null`, optional) — Balance plans only. The most plan balance a subscription spends per day or per week, in USD cents; omitted or null means no limit.
 - `planGroupId` (`string`, optional)
 - `isDefault` (`boolean`, optional) — Make this plan the default plan of its plan group: customers created with that planGroupId start on it, and a paid plan of the group that ends from the customer portal, a revoked payment authorization or exhausted dunning moves to it instead of canceling. Requires a free plan with a planGroupId; replaces the group's previous default plan.
 - `metadata` (`Record<string, unknown>`, optional)

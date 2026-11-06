@@ -1,6 +1,6 @@
 ---
 title: Introductory Offers
-description: Attach an existing Offer to a base plan price so Commet applies it automatically to eligible new subscriptions.
+description: Attach an existing Offer to a base plan price so Commet applies its discount automatically to eligible new subscriptions.
 ---
 
 An Introductory Offer is not a separate Offer type. It is an existing Offer attached to one base plan price with introductory placement.
@@ -10,22 +10,16 @@ That placement adds two behaviors:
 - Commet selects the Offer automatically when no explicit override is supplied.
 - Commet checks introductory eligibility before applying it.
 
-Selectable price variants inherit the introductory placement from their base price.
+Selectable price variants inherit the introductory placement from their base price. One-time prices can't have an Introductory Offer.
 
 ## Compatible phases
 
-An Offer used as introductory may contain:
-
-1. One optional `free_trial` phase at the beginning.
-2. At most one finite `percentage` or `amount_off` phase.
-
-It cannot use `fixed_price`, multiple discount phases, or an open-ended discount.
+An Offer used as introductory contains exactly one finite `percentage` or `amount_off` phase. It cannot use `fixed_price` or an open-ended discount.
 
 ```typescript
 const onboarding = await commet.offers.create({
   name: 'Starter onboarding',
   phases: [
-    { type: 'free_trial', durationDays: 14 },
     { type: 'percentage', durationCycles: 3, percentage: 3000 },
   ],
 })
@@ -35,7 +29,7 @@ In the Dashboard, open the plan price and choose **Add intro offer** to attach t
 
 ## Eligibility
 
-Current automatic eligibility excludes a customer who already has an `active` or `past_due` subscription in the organization. Other historical statuses do not create a lifetime ban.
+Automatic eligibility excludes a customer who already has an `active`, `past_due`, or `paused` subscription in the organization. Other historical statuses do not create a lifetime ban.
 
 ## Selection at subscription creation
 
@@ -48,8 +42,8 @@ await commet.subscriptions.create({
 
 When `offerId` is omitted, Commet resolves the selected price and applies its introductory Offer if the customer is eligible.
 
-An explicit `offerId` applies that Offer directly instead. It cannot be combined with `promoCode`, `customTrialDays`, or `skipTrial: true`.
+An explicit `offerId` applies that Offer directly instead. It cannot be combined with `promoCode` or `cardPromotionId`.
 
-## Trials and compatibility fields
+## Trials
 
-`trialDays`, `customTrialDays`, and `skipTrial` remain supported API shortcuts. Internally, an accepted trial is recorded as a `free_trial` phase in the Offer Application. Prefer catalog Offers when the same terms should be named, reused, inspected, or distributed consistently.
+Trial days belong to the plan price, not to the Offer. When the price has a trial, the introductory discount starts with the first invoice after it. See [Trial Periods](/docs/trial-periods).

@@ -51,6 +51,7 @@ export type WebhookEvent =
   | "invoice.upcoming"
   | "payment_method.attached"
   | "payment_method.updated"
+  | "payment_method.detached"
   | "customer.created"
   | "customer.updated"
   | "customer.state_changed"
@@ -63,9 +64,11 @@ export type WebhookEvent =
   | "credits.low"
   | "credits.depleted"
   | "credits.expired"
+  | "balance.granted"
   | "balance.topped_up"
   | "balance.low"
   | "balance.depleted"
+  | "balance.expired"
   | "quota.threshold_reached"
   | "quota.exceeded"
   | "seats.updated"
@@ -965,6 +968,18 @@ export interface PaymentMethodUpdatedData {
   card: WebhookCardInfo | null;
 }
 
+/** Fired when a saved payment method is removed from a customer: the customer unlinked it at the payment provider (for example, revoking a Mercado Pago authorization), or removed it through the customer portal. Removing a method never changes the customer's subscriptions; a renewal that finds no usable method follows the usual failed-payment recovery. */
+export interface PaymentMethodDetachedData {
+  /** The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId. */
+  customerId: string;
+  /** The payment method: card, oxxo, or mercado_pago. Null when unknown. */
+  paymentMethod: PaymentMethod | null;
+  /** Card display metadata of the removed method: brand, last4, expMonth, expYear. Null when the method is not a card or its details cannot be retrieved. */
+  card: WebhookCardInfo | null;
+  /** Why the method was removed: `unlinked_at_provider` when the customer revoked it at the payment provider, `removed_by_customer` when the customer removed it through the customer portal. */
+  reason: "unlinked_at_provider" | "removed_by_customer";
+}
+
 /** Fired when a customer is created, via the API (including batch create), SDK, or dashboard. The payload is the customer resource exactly as GET /customers returns it. */
 export interface CustomerCreatedData {
   /** The Commet customer ID (cus_...). */
@@ -979,6 +994,15 @@ export interface CustomerCreatedData {
   taxDocument: string | null;
   /** The local tax document type label inferred from the customer's country (e.g. CUIT, RFC, RUT), or null when no tax document was provided. */
   documentType: string | null;
+  /** The business tax ID saved for the customer (EU VAT number, Peruvian RUC), or null when the customer has none. */
+  businessTaxId: {
+    /** ISO-2 country the tax ID belongs to. */
+    country: string;
+    /** Tax ID type (e.g. eu_vat, pe_ruc). */
+    type: string;
+    /** The normalized tax ID. */
+    value: string;
+  } | null;
   /** The customer's timezone. */
   timezone: string | null;
   /** Custom key-value metadata you attached to the customer. */
@@ -1003,6 +1027,15 @@ export interface CustomerUpdatedData {
   taxDocument: string | null;
   /** The local tax document type label inferred from the customer's country (e.g. CUIT, RFC, RUT), or null when no tax document was provided. */
   documentType: string | null;
+  /** The business tax ID saved for the customer (EU VAT number, Peruvian RUC), or null when the customer has none. */
+  businessTaxId: {
+    /** ISO-2 country the tax ID belongs to. */
+    country: string;
+    /** Tax ID type (e.g. eu_vat, pe_ruc). */
+    type: string;
+    /** The normalized tax ID. */
+    value: string;
+  } | null;
   /** The customer's timezone. */
   timezone: string | null;
   /** Custom key-value metadata you attached to the customer. */
@@ -1263,7 +1296,7 @@ export interface CustomerStateChangedData {
   seats: Array<WebhookSeatSummary>;
   /** For credits plans: planCredits, purchasedCredits, totalCredits. Null otherwise. */
   credits: WebhookCreditsBalance | null;
-  /** For balance plans: currentBalance in rate scale (10000 = $1.00). Null otherwise. */
+  /** For balance plans, in rate scale (10000 = 1.00 of the subscription currency): currentBalance (the available total), planBalance, purchasedBalance and totalBalance. Null otherwise. */
   balance: WebhookBalance | null;
 }
 
@@ -1483,7 +1516,7 @@ export interface CreditsPurchasedData {
   credits: number;
 }
 
-/** Fired when a subscription's remaining credits cross below 10% of the credits granted for the current period. Emitted once per billing period, when the crossing happens. */
+/** Fired when a subscription's available credits (plan plus purchased) cross below 10% of their last refill: a period reset, a purchase or a manual adjustment. Emitted once per crossing, the same rule as balance.low. */
 export interface CreditsLowData {
   /** The subscription ID. */
   subscriptionId: string;
@@ -1491,13 +1524,13 @@ export interface CreditsLowData {
   customerId: string;
   /** Total credits remaining (plan plus purchased). */
   remainingCredits: number;
-  /** The low-credit threshold that was crossed: 10% of the period's granted plan credits. */
+  /** The low-credit threshold that was crossed: 10% of the last refill. */
   thresholdCredits: number;
-  /** The plan credits granted at the last period reset. */
+  /** The credits added by the last refill: a period reset, a purchase or a manual adjustment. */
   periodCredits: number;
 }
 
-/** Fired when a subscription's credits hit zero. Usage requests that need more credits than remain are rejected from this point. Also fires customer.state_changed with trigger credits_depleted. */
+/** Fired each time a subscription's available credits cross to zero or below. Usage that needs more credits than remain is rejected from this point, unless the plan allows overage, which is billed at its price per credit at the next renewal. Also fires customer.state_changed with trigger credits_depleted. */
 export interface CreditsDepletedData {
   /** The subscription ID. */
   subscriptionId: string;
@@ -1517,7 +1550,21 @@ export interface CreditsExpiredData {
   expiredCredits: number;
 }
 
-/** Fired when a customer on a balance plan tops up their prepaid balance through the customer portal and the payment succeeds. */
+/** Fired when non-purchase balance is granted to a subscription: the plan balance at the start of each billing period, or a manual adjustment from the dashboard or the API, which goes to the purchased balance. Balance top-ups fire balance.topped_up instead. */
+export interface BalanceGrantedData {
+  /** The subscription ID. */
+  subscriptionId: string;
+  /** The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId. */
+  customerId: string;
+  /** The balance granted in rate scale (10000 = 1.00 of the subscription currency). */
+  amount: number;
+  /** The subscription currency. */
+  currency: string;
+  /** Why the balance was granted: period_reset or manual_adjustment. */
+  reason: string;
+}
+
+/** Fired when a balance top-up succeeds: through the API, an automatic top-up or the customer portal. The amount goes to the purchased balance, which is spent after the plan balance and kept until the subscription ends. */
 export interface BalanceToppedUpData {
   /** The subscription ID. */
   subscriptionId: string;
@@ -1555,6 +1602,18 @@ export interface BalanceDepletedData {
   customerId: string;
   /** The balance after depletion in rate scale. Zero, or negative when overage is allowed. */
   currentBalance: number;
+  /** The subscription currency. */
+  currency: string;
+}
+
+/** Fired at a reset when unused plan balance is discarded. On a plan whose unused plan balance expires, all of it expires at each reset. On a plan that rolls it over, a reset keeps it, up to the plan's maxPlanBalance when it has one, and only the excess expires. An overage debt invoiced at the renewal counts as nothing left over. Purchased balance never expires and is not affected. */
+export interface BalanceExpiredData {
+  /** The subscription ID. */
+  subscriptionId: string;
+  /** The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId. */
+  customerId: string;
+  /** The plan balance that was discarded, in rate scale (10000 = 1.00 of the subscription currency). */
+  expiredAmount: number;
   /** The subscription currency. */
   currency: string;
 }
@@ -1818,6 +1877,7 @@ export type WebhookEventPayload =
   | WebhookEventEnvelope<"invoice.upcoming", InvoiceUpcomingData>
   | WebhookEventEnvelope<"payment_method.attached", PaymentMethodAttachedData>
   | WebhookEventEnvelope<"payment_method.updated", PaymentMethodUpdatedData>
+  | WebhookEventEnvelope<"payment_method.detached", PaymentMethodDetachedData>
   | WebhookEventEnvelope<"customer.created", CustomerCreatedData>
   | WebhookEventEnvelope<"customer.updated", CustomerUpdatedData>
   | WebhookEventEnvelope<"customer.state_changed", CustomerStateChangedData>
@@ -1830,9 +1890,11 @@ export type WebhookEventPayload =
   | WebhookEventEnvelope<"credits.low", CreditsLowData>
   | WebhookEventEnvelope<"credits.depleted", CreditsDepletedData>
   | WebhookEventEnvelope<"credits.expired", CreditsExpiredData>
+  | WebhookEventEnvelope<"balance.granted", BalanceGrantedData>
   | WebhookEventEnvelope<"balance.topped_up", BalanceToppedUpData>
   | WebhookEventEnvelope<"balance.low", BalanceLowData>
   | WebhookEventEnvelope<"balance.depleted", BalanceDepletedData>
+  | WebhookEventEnvelope<"balance.expired", BalanceExpiredData>
   | WebhookEventEnvelope<"quota.threshold_reached", QuotaThresholdReachedData>
   | WebhookEventEnvelope<"quota.exceeded", QuotaExceededData>
   | WebhookEventEnvelope<"seats.updated", SeatsUpdatedData>
@@ -1886,6 +1948,7 @@ export interface WebhookEventDataMap {
   "invoice.upcoming": InvoiceUpcomingData;
   "payment_method.attached": PaymentMethodAttachedData;
   "payment_method.updated": PaymentMethodUpdatedData;
+  "payment_method.detached": PaymentMethodDetachedData;
   "customer.created": CustomerCreatedData;
   "customer.updated": CustomerUpdatedData;
   "customer.state_changed": CustomerStateChangedData;
@@ -1898,9 +1961,11 @@ export interface WebhookEventDataMap {
   "credits.low": CreditsLowData;
   "credits.depleted": CreditsDepletedData;
   "credits.expired": CreditsExpiredData;
+  "balance.granted": BalanceGrantedData;
   "balance.topped_up": BalanceToppedUpData;
   "balance.low": BalanceLowData;
   "balance.depleted": BalanceDepletedData;
+  "balance.expired": BalanceExpiredData;
   "quota.threshold_reached": QuotaThresholdReachedData;
   "quota.exceeded": QuotaExceededData;
   "seats.updated": SeatsUpdatedData;

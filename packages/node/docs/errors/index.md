@@ -33,6 +33,7 @@ Use the response `code` to open the matching local reference. Preserve `x-reques
 - [`insufficient_seats`](./insufficient_seats.md) — The requested seat removal exceeds the subscription's available seat balance.
 - [`included_limit_reached`](./included_limit_reached.md) — The requested usage exceeds the plan's included usage limit.
 - [`plan_credit_limit_reached`](./plan_credit_limit_reached.md) — The usage event would spend more plan credits than the plan's credit limit allows in the current day or week, and purchased credits do not cover the rest.
+- [`plan_balance_limit_reached`](./plan_balance_limit_reached.md) — The usage event would spend more plan balance than the plan's balance limit allows in the current day or week, and purchased balance does not cover the rest.
 - [`missing_regional_price`](./missing_regional_price.md) — The plan has no price for the subscription's currency or resolved market.
 - [`payment_failed`](./payment_failed.md) — The operation could not complete its payment or required tax calculation.
 - [`payment_not_found`](./payment_not_found.md) — The requested payment does not exist in this organization.

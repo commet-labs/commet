@@ -46,7 +46,7 @@ Activate an add-on on a subscription. Charges a prorated amount for the current 
 
 `GET /subscriptions/{id}/auto-top-up` · operation `get-subscription-auto-top-up`
 
-Read whether the subscription buys credits automatically with its saved payment method when credits reach a threshold, with the top-ups used this period and the last failure.
+Read whether the subscription tops up automatically with its saved payment method when its available credits or balance reach a threshold, with the top-ups used this period and the last failure.
 
 ### Parameters
 
@@ -62,14 +62,15 @@ Read whether the subscription buys credits automatically with its saved payment 
 
 `PATCH /subscriptions/{id}/auto-top-up` · operation `update-subscription-auto-top-up`
 
-Turn automatic credit purchases on or off and set the threshold, the credits each top-up buys and the maximum top-ups per period. Send only the fields that change. Enabling requires a plan that sells credits. The quantity must be at least the plan's purchase minimum when auto top-up is enabled or when the quantity changes, so turning it off keeps working after the minimum rises. Saving it enabled resumes a paused auto top-up.
+Turn automatic top-ups on or off and set the threshold, the size of each top-up and the maximum top-ups per period. Send only the fields that change. On a credits plan each top-up buys `quantity` credits; on a balance plan it adds `amount` in minor units of the subscription currency, plus tax, and `threshold` is in the same minor units. Enabling requires a plan that sells credits or has balance top-ups on. The size must be at least the plan's minimum when auto top-up is enabled or when the size changes, so turning it off keeps working after the minimum rises. Saving it enabled resumes a paused auto top-up.
 
 ### Parameters
 
 - `id` (`string`, required)
 - `enabled` (`boolean`, optional)
 - `threshold` (`number`, optional)
-- `quantity` (`number`, optional)
+- `quantity` (`number`, optional) — Credits each top-up buys. Credits plans only.
+- `amount` (`number`, optional) — Minor units of the subscription currency each top-up adds. Balance plans only.
 - `maxPerPeriod` (`number`, optional)
 
 ### Request options
@@ -109,12 +110,12 @@ Adjust a subscription's balance or credits by a signed amount. Positive adds, ne
 
 `POST /subscriptions/{id}/balance/topup` · operation `topup-balance`
 
-Top up a subscription's balance. Charges the customer's payment method for the specified amount.
+Top up a balance subscription. Charges the customer's payment method for the amount plus tax, adds it to the subscription's purchased balance (after paying back any overage owed on the plan balance), creates its invoice and emits `balance.topped_up`. Purchased balance is spent after the plan balance and is kept until the subscription ends. Rejected with 400 when the subscription is not on a balance plan, its plan has top-ups turned off, or the amount is below the effective minimum: the plan's minimum top-up in the subscription currency, raised to the currency's minimum charge.
 
 ### Parameters
 
 - `id` (`string`, required)
-- `amount` (`number`, required)
+- `amount` (`number`, required) — The amount to add, in minor units of the subscription currency (cents; whole units for zero-decimal currencies).
 
 ### Request options
 
@@ -533,6 +534,7 @@ Create a subscription for a customer. Commet selects the default price when pric
 - `priceId` (`string`, optional) — Public price ID. When omitted, Commet selects the default price for the billing interval and still applies its market pricing.
 - `initialSeats` (`Record<string, number>`, optional)
 - `provider` (`"stripe" | "commet" | "dlocal" | string`, optional) — Payment provider name or exact public payment connection ID for the initial checkout. Overrides country routing when present.
+- `paymentMethodTypes` (`Array<"card" | "oxxo" | "mercado_pago" | "google_pay" | "smartpix">`, optional) — Payment methods the initial checkout may offer. Restricts what the checkout already offers for the buyer's country, currency and payment connection; it never enables a method the connection does not have and never changes routing. When none of them is available to the buyer, the checkout shows that it cannot accept payments.
 - `name` (`string`, optional)
 - `startDate` (`string`, optional)
 - `successUrl` (`string`, optional)

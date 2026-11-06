@@ -85,6 +85,7 @@ Use:
 - `email` for billing communication.
 - `address` and `taxDocument` for billing and tax context.
 - `metadata` for application-specific values that do not control billing behavior.
+- `planGroupId` to start the customer at once on the group's signup trial or default plan. See [Plan Groups](/docs/plan-groups#default-plan-and-signup-trial).
 
 ## Create customers in batch
 
@@ -154,7 +155,7 @@ $customerBatch = $commet->customers->createBatch(
 );
 ```
 
-A batch accepts up to 100 customers and returns successful and failed items independently.
+A batch accepts up to 100 customers and returns successful and failed items independently. With `planGroupId`, each customer without an open subscription starts on the group's starting plan.
 
 ## Retrieve a customer
 

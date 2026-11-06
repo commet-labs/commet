@@ -17,6 +17,8 @@ Customers can update their method through the [Customer Portal](/docs/customer-p
 
 In **Settings → Payments**, use **Payment routing** to assign countries to connected providers. You can select individual countries or region presets, then save the assignment. The map and routing list show which provider will handle each country.
 
+Each connected account gets its own countries, including [several Stripe or dLocal accounts](/docs/payment-providers#connect-several-accounts-of-the-same-provider) in one organization. Label them with **Edit alias** to tell them apart.
+
 For a new checkout or other new activity, Commet resolves the customer's billing country as an ISO country code and looks up that country's route. For example, a customer whose billing address has `BR` uses the provider assigned to Brazil. The route is based on the billing address supplied to Commet, not on the customer's IP address.
 
 If a subscription already has a saved payment connection, recurring charges continue through that connection. This preserves the location of the vaulted payment method. When there is no saved connection, Commet uses the country route; when no country is available, it uses the organization's default provider.
