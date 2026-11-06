@@ -15,42 +15,32 @@ Included: 5 seats (no charge)
 Extra:    3 seats × $25 = $75/mo
 ```
 
-## What Happens When You Change Included Seats
+## What Happens When You Change Included Seats or Seat Prices
 
-### Adding more included seats
-
-More included seats **benefits your customers**, so it applies right away.
+Changing included seats or the extra-seat price publishes a new [plan version](/docs/plan-versions). New customers get it at once. Existing customers keep the included seats and seat price of their version, in both directions, until you move them.
 
 ```
 You increase Plan Pro from 10 to 15 included seats.
-Your customer has 12 seats (was paying for 2 extra at $50/mo).
+Your customer has 12 seats (paying for 2 extra at $50/mo).
 
-After the change:
-  → All 12 seats are now within the 15 included
-  → Extra seat charges drop to $0
-  → Your customer sees the change immediately
+Without a move:      still 10 included + 2 extra = $50/mo
+After you move them: all 12 seats within the 15 included, $0 extra
 ```
-
-### Reducing included seats
-
-Fewer included seats harms your customers, so it applies **at renewal**.
 
 ```
 You decrease Plan Pro from 15 to 10 included seats.
 Your customer has 12 seats (all included, $0 extra).
 
-This period:  Still 12 included, $0 extra
-At renewal:   10 included + 2 extra = $50/mo
+Without a move:      still 15 included, $0 extra
+After you move them: 10 included + 2 extra = $50/mo
 ```
 
-## What Happens When You Change Seat Prices
+| Change                        | New customers      | Existing customers                      |
+| ----------------------------- | ------------------ | --------------------------------------- |
+| Raise or lower included seats | Get the new amount | Keep their version's amount until moved |
+| Raise or lower the seat price | Pay the new price  | Pay their version's price until moved   |
 
-Seat unit prices use current-period snapshots: a lower price applies immediately, while a higher price starts next period.
-
-| Change          | What your customer pays                      |
-| --------------- | -------------------------------------------- |
-| Lower the price | New lower price in the current period        |
-| Raise the price | Old price this period; new price next period |
+A move made now changes included seats today and the price from the next renewal; a move at renewal changes both then. A customer with more seats than the new version allows can't move until their seats fit; a plan move can lower them at renewal with `seatLimit`. See [Move subscribers](/docs/plan-versions#move-subscribers).
 
 ## Seats and Upgrades
 

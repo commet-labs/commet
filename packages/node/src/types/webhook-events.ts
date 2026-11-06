@@ -27,6 +27,8 @@ export type WebhookEvent =
   | "subscription.cancellation_revoked"
   | "subscription.plan_change_scheduled"
   | "subscription.plan_change_revoked"
+  | "subscription.version_changed"
+  | "subscription.version_change_canceled"
   | "subscription.past_due"
   | "trial.started"
   | "trial.converted"
@@ -368,6 +370,34 @@ export interface SubscriptionPlanChangeRevokedData {
   billingInterval: string | null;
   /** The previously scheduled billing interval, if the revoked change included one. */
   revokedBillingInterval: string | null;
+}
+
+/** Fired when a subscription moves to another version of its plan: a move applied now or a scheduled move that took effect at renewal. Making an experiment current moves nobody, so it sends none. The plan stays the same; the version's prices and features apply from now on. */
+export interface SubscriptionVersionChangedData {
+  /** The subscription ID. */
+  subscriptionId: string;
+  /** The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId. */
+  customerId: string;
+  /** The version the subscription left. */
+  fromVersionId: string;
+  /** The version the subscription is on now. */
+  toVersionId: string;
+  /** The currency the subscription pays in. */
+  currency: string;
+  /** The billing interval the subscription pays. */
+  billingInterval: string;
+}
+
+/** Fired when a scheduled move to another plan version will no longer take effect because the subscription no longer fit the version at its renewal, or because the merchant revoked the scheduled version change or canceled the plan move. A new move that replaces it, a move made now, a plan change or an immediate cancellation sends none. The subscription stays on its version; reason says why. */
+export interface SubscriptionVersionChangeCanceledData {
+  /** The subscription ID. */
+  subscriptionId: string;
+  /** The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId. */
+  customerId: string;
+  /** The version the subscription was going to move to. */
+  toVersionId: string;
+  /** Why the move was canceled: canceled_by_merchant, version_change_failed when the move could not be applied at renewal, or the code of what the subscription no longer fits (addon_unavailable, seat_limit_exceeded, price_not_found, missing_regional_price). */
+  reason: string;
 }
 
 /** Fired when a recurring payment fails on a previously paid subscription and its status becomes past_due. past_due is a grace window, not a cutoff: usage and seats keep working while new purchases are blocked, and dunning retries the charge — use this to notify the customer and recover the payment. */
@@ -1853,6 +1883,14 @@ export type WebhookEventPayload =
       "subscription.plan_change_revoked",
       SubscriptionPlanChangeRevokedData
     >
+  | WebhookEventEnvelope<
+      "subscription.version_changed",
+      SubscriptionVersionChangedData
+    >
+  | WebhookEventEnvelope<
+      "subscription.version_change_canceled",
+      SubscriptionVersionChangeCanceledData
+    >
   | WebhookEventEnvelope<"subscription.past_due", SubscriptionPastDueData>
   | WebhookEventEnvelope<"trial.started", TrialStartedData>
   | WebhookEventEnvelope<"trial.converted", TrialConvertedData>
@@ -1924,6 +1962,8 @@ export interface WebhookEventDataMap {
   "subscription.cancellation_revoked": SubscriptionCancellationRevokedData;
   "subscription.plan_change_scheduled": SubscriptionPlanChangeScheduledData;
   "subscription.plan_change_revoked": SubscriptionPlanChangeRevokedData;
+  "subscription.version_changed": SubscriptionVersionChangedData;
+  "subscription.version_change_canceled": SubscriptionVersionChangeCanceledData;
   "subscription.past_due": SubscriptionPastDueData;
   "trial.started": TrialStartedData;
   "trial.converted": TrialConvertedData;

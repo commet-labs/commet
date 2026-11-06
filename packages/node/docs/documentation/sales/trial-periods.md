@@ -7,7 +7,7 @@ A trial is a number of free days set on a plan price. [Offers](/docs/offers) hol
 
 ## Set trial days on a price
 
-In the dashboard, open **Plans**, select the plan, and choose **Edit price**. Enter the **Free trial** days and choose whether to **Require a payment method**.
+In the dashboard, open **Plans**, select the plan, and open the price. Enter the **Free trial** days, choose whether to **Require a payment method**, and choose **Save to draft**. The trial applies to new subscriptions once you [publish the draft](/docs/plan-versions#edit-in-the-dashboard).
 
 ```typescript
 await commet.plans.updatePrice({
@@ -24,7 +24,7 @@ await commet.plans.updatePrice({
 
 Price variants inherit the trial of their base price. One-time prices can't have a trial.
 
-A subscription keeps the trial days it accepted. Changing `trialDays` affects only new subscriptions.
+A subscription keeps the trial days it accepted. Changing `trialDays` publishes a new plan version and affects only new subscriptions.
 
 ## Start a trial with a payment method
 
@@ -37,7 +37,7 @@ const { checkoutUrl } = await commet.subscriptions.create({
 
 Redirect the customer to `checkoutUrl`. Checkout saves the payment method without charging it, and the subscription becomes `trialing` with `trialEndsAt` set.
 
-When the trial ends, Commet charges the current value of the selected price and the subscription becomes `active`. A promo code typed in the trial checkout discounts the first invoice after the trial.
+When the trial ends, Commet charges the selected price of the subscription's plan version and the subscription becomes `active`. A promo code typed in the trial checkout discounts the first invoice after the trial.
 
 ## Start a trial without a payment method
 

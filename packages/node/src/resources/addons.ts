@@ -17,6 +17,8 @@ export interface UpdateAddonParams {
   basePrice?: number;
   includedUnits?: number;
   overageRate?: number;
+  /** Plans that sell the add-on, replacing the current ones. Empty means every plan; omitted keeps them. Removing a plan is rejected with addon_has_activations while a subscription of that plan has the add-on active. */
+  planIds?: Array<string>;
 }
 
 export interface DeleteAddonParams {
@@ -34,6 +36,8 @@ export type CreateAddonParams =
       description?: string;
       basePrice: number;
       featureId: string;
+      /** Plans that sell the add-on. Omitted or empty, every plan sells it. Plans created later sell it too. */
+      planIds?: Array<string>;
       consumptionModel: "boolean";
     }
   | {
@@ -41,6 +45,8 @@ export type CreateAddonParams =
       description?: string;
       basePrice: number;
       featureId: string;
+      /** Plans that sell the add-on. Omitted or empty, every plan sells it. Plans created later sell it too. */
+      planIds?: Array<string>;
       consumptionModel: "metered";
       includedUnits: number;
       overageRate: number;
@@ -50,6 +56,8 @@ export type CreateAddonParams =
       description?: string;
       basePrice: number;
       featureId: string;
+      /** Plans that sell the add-on. Omitted or empty, every plan sells it. Plans created later sell it too. */
+      planIds?: Array<string>;
       consumptionModel: "credits";
       creditCost: number;
     }
@@ -58,6 +66,8 @@ export type CreateAddonParams =
       description?: string;
       basePrice: number;
       featureId: string;
+      /** Plans that sell the add-on. Omitted or empty, every plan sells it. Plans created later sell it too. */
+      planIds?: Array<string>;
       consumptionModel: "balance";
       overageRate: number;
     };
@@ -84,7 +94,7 @@ export class AddonsResource {
     return this.httpClient.get(`/addons/${id}`, undefined, options);
   }
 
-  /** Update an add-on's name, description, or pricing. */
+  /** Update an add-on's name, description, pricing, or the plans that sell it. */
   async update(
     params: UpdateAddonParams,
     options?: RequestOptions,

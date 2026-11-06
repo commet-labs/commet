@@ -19,7 +19,16 @@ Credit packs can be purchased on any subscription with a payment method — incl
 
 ## Create credit packs in the dashboard
 
-Go to **Credit Packs** and click **Create Credit Pack**. Pack names must be unique within your organization. Packs are available to all credits-based plans.
+Go to **Credit Packs** and click **Create Credit Pack**. Pack names must be unique within your organization. A new pack is sold on the current version of every credits plan, or of the plans you choose in `planIds`.
+
+## Credit packs and plan versions
+
+Each [plan version](/docs/plan-versions) lists the credit packs it sells, with their prices. Creating or editing a pack publishes a new version of each plan that sells it:
+
+- New customers can buy the pack at its price on the plan's current version.
+- Existing subscribers keep the packs and prices of their version. Buying a pack their version doesn't sell returns `409 credit_pack_unavailable` until you [move them](/docs/plan-versions#move-subscribers) to a version that sells it.
+
+Send `planIds` when you create or update a pack to choose the plans that sell it. Left out on create, or empty, every plan sells it, including plans created later.
 
 ## List credit packs via SDK
 
@@ -78,11 +87,11 @@ curl https://commet.co/api/v1/credit-packs \
 }
 ```
 
-The `price` field is in **cents** (1000 = $10.00). Prices are always in USD.
+The `price` field is the USD price in **cents** (1000 = $10.00). For other currencies, Commet converts it with the plan's exchange rate, unless the plan version sets the pack's price by hand for the buyer's country in the [Regional prices](/docs/regional-prices#set-prices-by-country) tab.
 
 ## Buy a chosen quantity of credits
 
-Set a price per credit on the plan to let customers buy any whole quantity instead of a fixed pack. Open **Plans**, select a credits plan, and edit **Credit purchases**: **Price per credit** and an optional **Minimum purchase**.
+Set a price per credit on the plan to let customers buy any whole quantity instead of a fixed pack. Open **Plans**, select a credits plan, and edit **Buying credits** under **Credit rules**: the **Price per credit** and an optional minimum. The change goes into a draft until you [publish it](/docs/plan-versions#edit-in-the-dashboard).
 
 ```typescript
 await commet.subscriptions.purchaseCredits({
@@ -91,13 +100,14 @@ await commet.subscriptions.purchaseCredits({
 })
 ```
 
-Commet charges the saved payment method at the plan's price per credit and adds purchased credits. Send `creditPackId` instead of `quantity` to buy a pack. Both fire [`credits.purchased`](/docs/webhooks/credits-purchased).
+Commet charges the saved payment method at the price per credit of the subscription's plan version and adds purchased credits. Send `creditPackId` instead of `quantity` to buy a pack. Both fire [`credits.purchased`](/docs/webhooks/credits-purchased).
 
-| Response                | Cause                                                                      |
-| ----------------------- | -------------------------------------------------------------------------- |
-| `400 validation_error`  | The quantity is below the plan's minimum, or the plan doesn't sell credits |
-| `402 no_payment_method` | The subscription has no saved payment method Commet can charge             |
-| `402 payment_failed`    | The charge was declined                                                    |
+| Response                      | Cause                                                                      |
+| ----------------------------- | -------------------------------------------------------------------------- |
+| `400 validation_error`        | The quantity is below the plan's minimum, or the plan doesn't sell credits |
+| `402 no_payment_method`       | The subscription has no saved payment method Commet can charge             |
+| `402 payment_failed`          | The charge was declined                                                    |
+| `409 credit_pack_unavailable` | The subscription's plan version doesn't sell the pack                      |
 
 The effective minimum is the larger of the configured minimum and the smallest quantity that reaches the currency's minimum charge.
 

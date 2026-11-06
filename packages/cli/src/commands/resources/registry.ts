@@ -40,7 +40,8 @@ export const resourceDefinitions: ResourceDef[] = [
       },
       update: {
         method: "update",
-        description: "Update an add-on's name, description, or pricing.",
+        description:
+          "Update an add-on's name, description, pricing, or the plans that sell it.",
         hasParams: true,
         params: [
           {
@@ -72,6 +73,13 @@ export const resourceDefinitions: ResourceDef[] = [
             description: "Overage rate",
             parse: parseNumber,
             sdkKey: "overageRate",
+          },
+          {
+            flag: "--plan-ids <json>",
+            description:
+              "Plans that sell the add-on, replacing the current ones.",
+            parse: parseJson,
+            sdkKey: "planIds",
           },
           {
             flag: "--idempotency-key <key>",
@@ -141,6 +149,12 @@ export const resourceDefinitions: ResourceDef[] = [
             description: "Feature id",
             required: true,
             sdkKey: "featureId",
+          },
+          {
+            flag: "--plan-ids <json>",
+            description: "Plans that sell the add-on.",
+            parse: parseJson,
+            sdkKey: "planIds",
           },
           {
             flag: "--consumption-model <consumption-model>",
@@ -290,7 +304,7 @@ export const resourceDefinitions: ResourceDef[] = [
       update: {
         method: "update",
         description:
-          "Update a credit pack's name, description, credits, price, or active status.",
+          "Update a credit pack's name, description, credits, price, active status, or the plans that sell it.",
         hasParams: true,
         params: [
           {
@@ -322,6 +336,13 @@ export const resourceDefinitions: ResourceDef[] = [
             description: "Is active",
             parse: parseBool,
             sdkKey: "isActive",
+          },
+          {
+            flag: "--plan-ids <json>",
+            description:
+              "Plans that sell the credit pack, replacing the current ones.",
+            parse: parseJson,
+            sdkKey: "planIds",
           },
           {
             flag: "--idempotency-key <key>",
@@ -386,6 +407,12 @@ export const resourceDefinitions: ResourceDef[] = [
             description: "Is active",
             parse: parseBool,
             sdkKey: "isActive",
+          },
+          {
+            flag: "--plan-ids <json>",
+            description: "Plans that sell the credit pack.",
+            parse: parseJson,
+            sdkKey: "planIds",
           },
           {
             flag: "--idempotency-key <key>",
@@ -1883,6 +1910,417 @@ export const resourceDefinitions: ResourceDef[] = [
     description: "Manage plans",
     sdkProperty: "plans",
     actions: {
+      "publish-draft": {
+        method: "publishDraft",
+        description:
+          "Publish a draft as the plan's current version, as a new experiment with its own code, or as the next version of the experiment it started from.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--draft-id <draft-id>",
+            description: "Draft id",
+            required: true,
+            sdkKey: "draftId",
+          },
+          {
+            flag: "--publish-as <publish-as>",
+            description: "current sells the draft to every new buyer.",
+            required: true,
+            sdkKey: "publishAs",
+          },
+          {
+            flag: "--move <move>",
+            description:
+              "What happens to subscribers of earlier versions: keep them, move them at their next renewal, or move them now (features and balance change today, the price at renewal).",
+            sdkKey: "move",
+          },
+          {
+            flag: "--changes <json>",
+            description:
+              "Per-subscriber changes that make each one fit, applied at its renewal.",
+            parse: parseJson,
+            sdkKey: "changes",
+          },
+          {
+            flag: "--preview <boolean>",
+            description: "Check everything without publishing.",
+            parse: parseBool,
+            sdkKey: "preview",
+          },
+          {
+            flag: "--experiment-code <experiment-code>",
+            description: "The experiment's own code, after the plan's code.",
+            sdkKey: "experimentCode",
+          },
+          {
+            flag: "--idempotency-key <key>",
+            description:
+              "Unique key used to safely retry this write for 24 hours without applying it twice.",
+            sdkKey: "idempotencyKey",
+            requestOption: true,
+          },
+        ],
+        requiredAlternatives: [
+          ["publishAs"],
+          ["publishAs", "experimentCode"],
+          ["publishAs"],
+        ],
+      },
+      "get-draft": {
+        method: "getDraft",
+        description:
+          "Retrieve a draft with the version it started from and what it changes.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--draft-id <draft-id>",
+            description: "Draft id",
+            required: true,
+            sdkKey: "draftId",
+          },
+        ],
+      },
+      "update-draft": {
+        method: "updateDraft",
+        description:
+          "Change a draft's prices per interval, trials, the interval shown first, countries with their currency and prices, and credit or balance rules, or undo single changes.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--draft-id <draft-id>",
+            description: "Draft id",
+            required: true,
+            sdkKey: "draftId",
+          },
+          {
+            flag: "--prices <json>",
+            description: "Every interval the draft sells.",
+            parse: parseJson,
+            sdkKey: "prices",
+          },
+          {
+            flag: "--countries <json>",
+            description: "Every country with its own currency or prices.",
+            parse: parseJson,
+            sdkKey: "countries",
+          },
+          {
+            flag: "--rules <json>",
+            description:
+              "Credit or balance rules; fields left out stay as they are.",
+            parse: parseJson,
+            sdkKey: "rules",
+          },
+          {
+            flag: "--undo <json>",
+            description:
+              "Change keys to put back as the version the draft started from had them.",
+            parse: parseJson,
+            sdkKey: "undo",
+          },
+          {
+            flag: "--idempotency-key <key>",
+            description:
+              "Unique key used to safely retry this write for 24 hours without applying it twice.",
+            sdkKey: "idempotencyKey",
+            requestOption: true,
+          },
+        ],
+      },
+      "delete-draft": {
+        method: "deleteDraft",
+        description: "Discard a draft.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--draft-id <draft-id>",
+            description: "Draft id",
+            required: true,
+            sdkKey: "draftId",
+          },
+        ],
+      },
+      "list-drafts": {
+        method: "listDrafts",
+        description:
+          "List the plan's open drafts, oldest first, each with the version it started from and what it changes.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+        ],
+      },
+      "create-draft": {
+        method: "createDraft",
+        description:
+          "Start a draft from a version of the plan: the current one, an experiment's version or an older one.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--from-version-id <from-version-id>",
+            description:
+              "The version to start from: the current version, an experiment's version or an older version.",
+            sdkKey: "fromVersionId",
+          },
+          {
+            flag: "--idempotency-key <key>",
+            description:
+              "Unique key used to safely retry this write for 24 hours without applying it twice.",
+            sdkKey: "idempotencyKey",
+            requestOption: true,
+          },
+        ],
+      },
+      "archive-experiment": {
+        method: "archiveExperiment",
+        description: "Stop selling the experiment.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--code <code>",
+            description: "Code",
+            required: true,
+            sdkKey: "code",
+          },
+          {
+            flag: "--subscribers <subscribers>",
+            description:
+              "What happens to the experiment's subscribers: keep them on its versions, move them to the plan's current version at their next renewal, or move them now.",
+            sdkKey: "subscribers",
+          },
+          {
+            flag: "--changes <json>",
+            description:
+              "Per-subscriber changes that make each one fit, applied at its renewal.",
+            parse: parseJson,
+            sdkKey: "changes",
+          },
+          {
+            flag: "--preview <boolean>",
+            description:
+              "Check the archive and the move without changing anything.",
+            parse: parseBool,
+            sdkKey: "preview",
+          },
+          {
+            flag: "--idempotency-key <key>",
+            description:
+              "Unique key used to safely retry this write for 24 hours without applying it twice.",
+            sdkKey: "idempotencyKey",
+            requestOption: true,
+          },
+        ],
+      },
+      "make-experiment-current": {
+        method: "makeExperimentCurrent",
+        description:
+          "Make the experiment's latest version the plan's current version, with exactly its content and the next version number.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--code <code>",
+            description: "Code",
+            required: true,
+            sdkKey: "code",
+          },
+          {
+            flag: "--idempotency-key <key>",
+            description:
+              "Unique key used to safely retry this write for 24 hours without applying it twice.",
+            sdkKey: "idempotencyKey",
+            requestOption: true,
+          },
+        ],
+      },
+      "get-experiment": {
+        method: "getExperiment",
+        description:
+          "Get one experiment of a plan by its own code, with the version it sells and how many subscriptions are on it.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--code <code>",
+            description: "Code",
+            required: true,
+            sdkKey: "code",
+          },
+        ],
+      },
+      "create-experiment-version": {
+        method: "createExperimentVersion",
+        description:
+          "Publish the experiment's next version from its latest version with the changes given.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--code <code>",
+            description: "Code",
+            required: true,
+            sdkKey: "code",
+          },
+          {
+            flag: "--prices <json>",
+            description: "Prices",
+            parse: parseJson,
+            sdkKey: "prices",
+          },
+          {
+            flag: "--currencies <json>",
+            description:
+              "Currencies the current version does not sell, with the exchange rate (local units per USD) used for the amounts not listed, credit purchases, add-ons and overage.",
+            parse: parseJson,
+            sdkKey: "currencies",
+          },
+          {
+            flag: "--max-plan-credits <number|null>",
+            description:
+              "Credits plans that roll over unused credits: the most plan credits a subscription can hold.",
+            parse: parseNullableNumber,
+            sdkKey: "maxPlanCredits",
+          },
+          {
+            flag: "--max-plan-balance <number|null>",
+            description:
+              "Balance plans that roll over unused balance: the most plan balance a subscription can hold, in USD cents.",
+            parse: parseNullableNumber,
+            sdkKey: "maxPlanBalance",
+          },
+          {
+            flag: "--idempotency-key <key>",
+            description:
+              "Unique key used to safely retry this write for 24 hours without applying it twice.",
+            sdkKey: "idempotencyKey",
+            requestOption: true,
+          },
+        ],
+      },
+      "list-experiments": {
+        method: "listExperiments",
+        description:
+          "List a plan's experiments, newest first, with the version each one sells and how many subscriptions are on them.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+        ],
+      },
+      "create-experiment": {
+        method: "createExperiment",
+        description:
+          "Start an experiment from the plan's current version with the changes given.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--prices <json>",
+            description: "Prices",
+            parse: parseJson,
+            sdkKey: "prices",
+          },
+          {
+            flag: "--currencies <json>",
+            description:
+              "Currencies the current version does not sell, with the exchange rate (local units per USD) used for the amounts not listed, credit purchases, add-ons and overage.",
+            parse: parseJson,
+            sdkKey: "currencies",
+          },
+          {
+            flag: "--max-plan-credits <number|null>",
+            description:
+              "Credits plans that roll over unused credits: the most plan credits a subscription can hold.",
+            parse: parseNullableNumber,
+            sdkKey: "maxPlanCredits",
+          },
+          {
+            flag: "--max-plan-balance <number|null>",
+            description:
+              "Balance plans that roll over unused balance: the most plan balance a subscription can hold, in USD cents.",
+            parse: parseNullableNumber,
+            sdkKey: "maxPlanBalance",
+          },
+          {
+            flag: "--code <code>",
+            description:
+              "The experiment's own code: lowercase letters, numbers, hyphens and underscores.",
+            required: true,
+            sdkKey: "code",
+          },
+          {
+            flag: "--idempotency-key <key>",
+            description:
+              "Unique key used to safely retry this write for 24 hours without applying it twice.",
+            sdkKey: "idempotencyKey",
+            requestOption: true,
+          },
+        ],
+      },
       "update-feature": {
         method: "updateFeature",
         description:
@@ -2024,6 +2462,202 @@ export const resourceDefinitions: ResourceDef[] = [
               "Unique key used to safely retry this write for 24 hours without applying it twice.",
             sdkKey: "idempotencyKey",
             requestOption: true,
+          },
+        ],
+      },
+      "cancel-move": {
+        method: "cancelMove",
+        description:
+          "Cancel a move for every subscriber who has not moved yet.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--move-id <move-id>",
+            description: "Move id",
+            required: true,
+            sdkKey: "moveId",
+          },
+          {
+            flag: "--idempotency-key <key>",
+            description:
+              "Unique key used to safely retry this write for 24 hours without applying it twice.",
+            sdkKey: "idempotencyKey",
+            requestOption: true,
+          },
+        ],
+      },
+      "get-move": {
+        method: "getMove",
+        description:
+          "Read a move of subscribers between plan versions with each subscriber's status: moving, moved, needs a change, left out, canceled or kept on its version.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--move-id <move-id>",
+            description: "Move id",
+            required: true,
+            sdkKey: "moveId",
+          },
+        ],
+      },
+      "cancel-move-subscription": {
+        method: "cancelMoveSubscription",
+        description: "Cancel a move for one subscriber who has not moved yet.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--move-id <move-id>",
+            description: "Move id",
+            required: true,
+            sdkKey: "moveId",
+          },
+          {
+            flag: "--subscription-id <subscription-id>",
+            description: "Subscription id",
+            required: true,
+            sdkKey: "subscriptionId",
+          },
+          {
+            flag: "--idempotency-key <key>",
+            description:
+              "Unique key used to safely retry this write for 24 hours without applying it twice.",
+            sdkKey: "idempotencyKey",
+            requestOption: true,
+          },
+        ],
+      },
+      "list-moves": {
+        method: "listMoves",
+        description:
+          "List a plan's latest moves of subscribers between versions, newest first, with how many are moving, moved, need a change, were left out, canceled or kept on their version.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+        ],
+      },
+      "create-move": {
+        method: "createMove",
+        description:
+          "Move a list of subscriptions, or every subscription of another version, to a newer version of the plan, at their next renewal or now.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--subscription-ids <json>",
+            description: "Public IDs of the subscriptions to move.",
+            parse: parseJson,
+            sdkKey: "subscriptionIds",
+          },
+          {
+            flag: "--to-version-id <to-version-id>",
+            description: "The version subscribers move to.",
+            required: true,
+            sdkKey: "toVersionId",
+          },
+          {
+            flag: "--effective <effective>",
+            description:
+              "now changes features and the included amount today and the price at renewal; period_end moves each subscriber at its next renewal.",
+            required: true,
+            sdkKey: "effective",
+          },
+          {
+            flag: "--changes <json>",
+            description:
+              "Per-subscriber changes that make each one fit, applied at its renewal.",
+            parse: parseJson,
+            sdkKey: "changes",
+          },
+          {
+            flag: "--preview <boolean>",
+            description: "Check every subscriber without moving anyone.",
+            parse: parseBool,
+            sdkKey: "preview",
+          },
+          {
+            flag: "--from-version-id <from-version-id>",
+            description:
+              "Move every active, trialing and past due subscription on this version of the plan.",
+            sdkKey: "fromVersionId",
+          },
+          {
+            flag: "--idempotency-key <key>",
+            description:
+              "Unique key used to safely retry this write for 24 hours without applying it twice.",
+            sdkKey: "idempotencyKey",
+            requestOption: true,
+          },
+        ],
+        requiredAlternatives: [
+          ["subscriptionIds", "toVersionId", "effective"],
+          ["fromVersionId", "toVersionId", "effective"],
+        ],
+      },
+      "keep-subscriber-on-version": {
+        method: "keepSubscriberOnVersion",
+        description: "Leave a subscriber that needs a change on its version.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--subscription-id <subscription-id>",
+            description: "Subscription id",
+            required: true,
+            sdkKey: "subscriptionId",
+          },
+          {
+            flag: "--idempotency-key <key>",
+            description:
+              "Unique key used to safely retry this write for 24 hours without applying it twice.",
+            sdkKey: "idempotencyKey",
+            requestOption: true,
+          },
+        ],
+      },
+      "list-subscribers-needing-achange": {
+        method: "listSubscribersNeedingAChange",
+        description:
+          "List the plan's subscribers whose move could not complete, with the version they stay on, the one they could not move to and why.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
           },
         ],
       },
@@ -2432,6 +3066,125 @@ export const resourceDefinitions: ResourceDef[] = [
             description: "Id",
             required: true,
             sdkKey: "id",
+          },
+        ],
+      },
+      "compare-versions": {
+        method: "compareVersions",
+        description:
+          "List what changes from one version of a plan to another: prices, trials, features, rules, add-ons, credit packs and countries.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--version-id <version-id>",
+            description: "Version id",
+            required: true,
+            sdkKey: "versionId",
+          },
+          {
+            flag: "--against <against>",
+            description: "Against",
+            required: true,
+            sdkKey: "against",
+          },
+        ],
+      },
+      "get-version": {
+        method: "getVersion",
+        description:
+          "Get one published version of a plan with its prices and how many subscriptions are on it.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--version-id <version-id>",
+            description: "Version id",
+            required: true,
+            sdkKey: "versionId",
+          },
+        ],
+      },
+      "list-versions": {
+        method: "listVersions",
+        description:
+          "List a plan's published versions, newest first, with their prices and how many subscriptions are on each.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--cursor <cursor>",
+            description: "Cursor",
+            sdkKey: "cursor",
+          },
+          {
+            flag: "--limit <number>",
+            description: "Limit",
+            parse: parseNumber,
+            sdkKey: "limit",
+          },
+        ],
+      },
+      "create-version": {
+        method: "createVersion",
+        description:
+          "Publish a new current version of the plan from its current version, changing prices per interval, included credits or balance, per-currency amounts and the rollover cap.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--prices <json>",
+            description: "Prices",
+            parse: parseJson,
+            sdkKey: "prices",
+          },
+          {
+            flag: "--currencies <json>",
+            description:
+              "Currencies the current version does not sell, with the exchange rate (local units per USD) used for the amounts not listed, credit purchases, add-ons and overage.",
+            parse: parseJson,
+            sdkKey: "currencies",
+          },
+          {
+            flag: "--max-plan-credits <number|null>",
+            description:
+              "Credits plans that roll over unused credits: the most plan credits a subscription can hold.",
+            parse: parseNullableNumber,
+            sdkKey: "maxPlanCredits",
+          },
+          {
+            flag: "--max-plan-balance <number|null>",
+            description:
+              "Balance plans that roll over unused balance: the most plan balance a subscription can hold, in USD cents.",
+            parse: parseNullableNumber,
+            sdkKey: "maxPlanBalance",
+          },
+          {
+            flag: "--idempotency-key <key>",
+            description:
+              "Unique key used to safely retry this write for 24 hours without applying it twice.",
+            sdkKey: "idempotencyKey",
+            requestOption: true,
           },
         ],
       },
@@ -3182,6 +3935,40 @@ export const resourceDefinitions: ResourceDef[] = [
         ],
         requiredAlternatives: [["promoCode"]],
       },
+      "change-version": {
+        method: "changeVersion",
+        description:
+          "Move a subscription to a newer published version of its plan, now or at the end of the period, without proration; an older version is rejected with version_not_newer, and a subscription on a running experiment moves only to a later version of that experiment.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+          {
+            flag: "--plan-version-id <plan-version-id>",
+            description: "A published version of the subscription's plan.",
+            required: true,
+            sdkKey: "planVersionId",
+          },
+          {
+            flag: "--effective <effective>",
+            description:
+              "now changes features, limits and the included credits or balance at once (the included difference is added to or subtracted from the plan credits or plan balance: an increase first pays any plan-part debt, a decrease never creates new debt, and purchased credits and purchased balance are untouched) and charges the new price from the next renewal.",
+            required: true,
+            sdkKey: "effective",
+          },
+          {
+            flag: "--idempotency-key <key>",
+            description:
+              "Unique key used to safely retry this write for 24 hours without applying it twice.",
+            sdkKey: "idempotencyKey",
+            requestOption: true,
+          },
+        ],
+      },
       "purchase-credits": {
         method: "purchaseCredits",
         description:
@@ -3537,6 +4324,20 @@ export const resourceDefinitions: ResourceDef[] = [
           },
         ],
       },
+      "revoke-scheduled-version-change": {
+        method: "revokeScheduledVersionChange",
+        description:
+          "Cancel the move to another plan version pending for the next renewal, so the subscription stays on its version, and send subscription.version_change_canceled with reason canceled_by_merchant.",
+        hasParams: true,
+        params: [
+          {
+            flag: "--id <id>",
+            description: "Id",
+            required: true,
+            sdkKey: "id",
+          },
+        ],
+      },
       uncancel: {
         method: "uncancel",
         description:
@@ -3585,6 +4386,11 @@ export const resourceDefinitions: ResourceDef[] = [
             flag: "--status <status>",
             description: "Status",
             sdkKey: "status",
+          },
+          {
+            flag: "--plan-version-id <plan-version-id>",
+            description: "Plan version id",
+            sdkKey: "planVersionId",
           },
         ],
       },
@@ -3653,6 +4459,12 @@ export const resourceDefinitions: ResourceDef[] = [
             sdkKey: "cancelAtPeriodEnd",
           },
           {
+            flag: "--plan-version-id <plan-version-id>",
+            description:
+              "Public ID of a published version of the plan, current or not, including an experiment's versions.",
+            sdkKey: "planVersionId",
+          },
+          {
             flag: "--offer-id <offer-id>",
             description: "Offer id",
             sdkKey: "offerId",
@@ -3681,7 +4493,8 @@ export const resourceDefinitions: ResourceDef[] = [
           },
           {
             flag: "--plan-code <plan-code>",
-            description: "Plan code",
+            description:
+              "The plan code, or an experiment code as `<plan code>:<experiment code>` to sell the version the experiment sells.",
             sdkKey: "planCode",
           },
           {

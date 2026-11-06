@@ -118,6 +118,8 @@ After `commet pull`, your SDK calls get autocomplete for plan codes and feature 
 
 Push your local `commet.config.ts` to Commet. Creates or updates features and plans to match your config.
 
+A plan whose prices, features or credit and balance rules change gets a new current version. New buyers get it; existing subscriptions stay on their version until you move them through the API or MCP, with [Change subscription version](/docs/api-reference/subscriptions/change-subscription-version) or [Move subscribers to a plan version](/docs/api-reference/plans/create-plan-move).
+
 ```bash
 commet push
 ```
@@ -327,6 +329,8 @@ commet subscriptions update-auto-top-up --id sub_xxx --enabled true --threshold 
 ## Plans
 
 Create plans, attach features and prices, and configure regional pricing.
+
+Commands that change a plan's prices, features or credit and balance rules publish a new current version of the plan. New buyers get it; existing subscriptions stay on their version until you move them through the API or MCP, with [Change subscription version](/docs/api-reference/subscriptions/change-subscription-version) or [Move subscribers to a plan version](/docs/api-reference/plans/create-plan-move).
 
 **`commet plans create`**
 

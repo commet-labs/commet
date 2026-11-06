@@ -20,6 +20,8 @@ const webhookEventHandlerNames = {
   "subscription.cancellation_revoked": "onSubscriptionCancellationRevoked",
   "subscription.plan_change_scheduled": "onSubscriptionPlanChangeScheduled",
   "subscription.plan_change_revoked": "onSubscriptionPlanChangeRevoked",
+  "subscription.version_changed": "onSubscriptionVersionChanged",
+  "subscription.version_change_canceled": "onSubscriptionVersionChangeCanceled",
   "subscription.past_due": "onSubscriptionPastDue",
   "trial.started": "onTrialStarted",
   "trial.converted": "onTrialConverted",

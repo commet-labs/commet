@@ -45,10 +45,16 @@ A new version ships whenever a breaking change needs one — sometimes several l
 Non-breaking changes ship continuously and never require a version bump:
 
 - New fields added to responses
-- New event types
+- New event types. An endpoint receives only the events it lists, so a new type reaches an endpoint only after you add it
 - New API endpoints
 - New optional request parameters
 - New values in existing enums, such as a new billing interval. Your integration should accept values it does not recognize instead of failing
+
+### Plan edits publish plan versions
+
+Editing a plan's prices, features or credit and balance rules through the API, MCP or CLI publishes a new version of the plan. New buyers get the new version; existing subscriptions keep the version they are on until you move them with [Change subscription version](/docs/api-reference/subscriptions/change-subscription-version) or [Move subscribers to a plan version](/docs/api-reference/plans/create-plan-move). Before plan versions, some of these edits also changed existing subscriptions, at once or at their renewal.
+
+This is a change in product behavior, not in the shape of requests or responses. Unlike the breaking changes listed above, it did not ship behind a new API version: it applies to every API version, including pinned ones.
 
 ## Backward compatibility policy
 
@@ -97,4 +103,4 @@ Webhook payloads include an `apiVersion` field in the envelope so you always kno
 }
 ```
 
-Each webhook endpoint can be pinned independently. When migrating, create a second endpoint pinned to the new version — both receive every event, each transformed to its own version. Once the new endpoint is working, delete the old one.
+Each webhook endpoint can be pinned independently. When migrating, create a second endpoint pinned to the new version — both receive every event they list, each transformed to its own version. Once the new endpoint is working, delete the old one.

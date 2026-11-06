@@ -2115,6 +2115,236 @@
         }
       }
     },
+    "subscription.version_changed": {
+      "post": {
+        "summary": "subscription.version_changed",
+        "description": "Fired when a subscription moves to another version of its plan: a move applied now or a scheduled move that took effect at renewal. Making an experiment current moves nobody, so it sends none. The plan stays the same; the version's prices and features apply from now on.",
+        "tags": [
+          "Webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "event": {
+                    "type": "string",
+                    "const": "subscription.version_changed"
+                  },
+                  "timestamp": {
+                    "type": "string"
+                  },
+                  "organizationId": {
+                    "type": "string"
+                  },
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "live",
+                      "sandbox"
+                    ]
+                  },
+                  "apiVersion": {
+                    "type": "string"
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "subscriptionId": {
+                        "type": "string",
+                        "description": "The subscription ID."
+                      },
+                      "customerId": {
+                        "type": "string",
+                        "description": "The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId."
+                      },
+                      "fromVersionId": {
+                        "type": "string",
+                        "description": "The version the subscription left."
+                      },
+                      "toVersionId": {
+                        "type": "string",
+                        "description": "The version the subscription is on now."
+                      },
+                      "currency": {
+                        "type": "string",
+                        "description": "The currency the subscription pays in."
+                      },
+                      "billingInterval": {
+                        "type": "string",
+                        "description": "The billing interval the subscription pays."
+                      }
+                    },
+                    "required": [
+                      "subscriptionId",
+                      "customerId",
+                      "fromVersionId",
+                      "toVersionId",
+                      "currency",
+                      "billingInterval"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "id",
+                  "event",
+                  "timestamp",
+                  "organizationId",
+                  "mode",
+                  "apiVersion",
+                  "data"
+                ],
+                "additionalProperties": false
+              },
+              "example": {
+                "event": "subscription.version_changed",
+                "timestamp": "2026-06-23T14:30:00.000Z",
+                "organizationId": "8f14e45f-ceea-4e7a-9c3d-1c2b3a4d5e6f",
+                "mode": "live",
+                "apiVersion": "2026-08-27",
+                "data": {
+                  "subscriptionId": "sub_1a2b3c4d",
+                  "customerId": "user_123",
+                  "fromVersionId": "plnrel_v3",
+                  "toVersionId": "plnrel_v4",
+                  "currency": "usd",
+                  "billingInterval": "monthly"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Return any 2xx status code to acknowledge receipt of the event."
+          }
+        },
+        "x-mint": {
+          "href": "/webhooks/subscription-version-changed",
+          "metadata": {
+            "title": "subscription.version_changed",
+            "description": "Fired when a subscription moves to another version of its plan, now or at its renewal.",
+            "playground": "none"
+          },
+          "content": "## When this fires\n\nA subscription moves to another version of the same plan:\n\n- right away, after [Change subscription version](/api-reference/subscriptions/change-subscription-version) or a plan move made now;\n- at its renewal, when a move scheduled for the end of the period takes effect.\n\nFrom this event the subscription has the destination version's features, limits and included credits or balance. A move made now charges the new version's price from the next renewal; a move never creates a proration charge or refund.\n\n`currency` is the subscription's currency, which a move never changes. `billingInterval` is the interval it pays after the move.\n\n| Moment | Event | What to do |\n| --- | --- | --- |\n| Move scheduled for renewal | None. The subscription shows it in `scheduledVersionChange`. | Show the upcoming change if your UI lists plan terms. |\n| Move takes effect | `subscription.version_changed` | Refresh the features and limits you keep for the subscription. |\n| Scheduled move no longer happens | `subscription.version_change_canceled` | Remove the upcoming change. |\n\nOnly endpoints that list this event receive it. New event types are not added to existing endpoints: add it to the endpoint's events in **Settings → Webhooks** or with [Update webhook endpoint](/api-reference/webhooks/update-webhook-endpoint)."
+        }
+      }
+    },
+    "subscription.version_change_canceled": {
+      "post": {
+        "summary": "subscription.version_change_canceled",
+        "description": "Fired when a scheduled move to another plan version will no longer take effect because the subscription no longer fit the version at its renewal, or because the merchant revoked the scheduled version change or canceled the plan move. A new move that replaces it, a move made now, a plan change or an immediate cancellation sends none. The subscription stays on its version; reason says why.",
+        "tags": [
+          "Webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "event": {
+                    "type": "string",
+                    "const": "subscription.version_change_canceled"
+                  },
+                  "timestamp": {
+                    "type": "string"
+                  },
+                  "organizationId": {
+                    "type": "string"
+                  },
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "live",
+                      "sandbox"
+                    ]
+                  },
+                  "apiVersion": {
+                    "type": "string"
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "subscriptionId": {
+                        "type": "string",
+                        "description": "The subscription ID."
+                      },
+                      "customerId": {
+                        "type": "string",
+                        "description": "The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId."
+                      },
+                      "toVersionId": {
+                        "type": "string",
+                        "description": "The version the subscription was going to move to."
+                      },
+                      "reason": {
+                        "type": "string",
+                        "description": "Why the move was canceled: canceled_by_merchant, version_change_failed when the move could not be applied at renewal, or the code of what the subscription no longer fits (addon_unavailable, seat_limit_exceeded, price_not_found, missing_regional_price)."
+                      }
+                    },
+                    "required": [
+                      "subscriptionId",
+                      "customerId",
+                      "toVersionId",
+                      "reason"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "id",
+                  "event",
+                  "timestamp",
+                  "organizationId",
+                  "mode",
+                  "apiVersion",
+                  "data"
+                ],
+                "additionalProperties": false
+              },
+              "example": {
+                "event": "subscription.version_change_canceled",
+                "timestamp": "2026-06-23T14:30:00.000Z",
+                "organizationId": "8f14e45f-ceea-4e7a-9c3d-1c2b3a4d5e6f",
+                "mode": "live",
+                "apiVersion": "2026-08-27",
+                "data": {
+                  "subscriptionId": "sub_1a2b3c4d",
+                  "customerId": "user_123",
+                  "toVersionId": "plnrel_v4",
+                  "reason": "addon_unavailable"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Return any 2xx status code to acknowledge receipt of the event."
+          }
+        },
+        "x-mint": {
+          "href": "/webhooks/subscription-version-change-canceled",
+          "metadata": {
+            "title": "subscription.version_change_canceled",
+            "description": "Fired when a move to another plan version scheduled for renewal will no longer happen.",
+            "playground": "none"
+          },
+          "content": "## When this fires\n\nA move to another version that was waiting for the subscription's renewal will not happen, and the subscription stays on its version. `toVersionId` is the version it was going to move to, and `reason` says why:\n\n| `reason` | What happened |\n| --- | --- |\n| `canceled_by_merchant` | You canceled the move with [Revoke scheduled version change](/api-reference/subscriptions/revoke-scheduled-version-change), or canceled the plan move for every subscriber or for this one. |\n| `addon_unavailable` | At renewal the subscription has an active add-on the destination version does not sell. |\n| `seat_limit_exceeded` | At renewal the subscription has more seats than the destination version allows. |\n| `price_not_found` | The destination version does not sell the price the subscription pays. |\n| `missing_regional_price` | The destination version does not sell the subscription's currency. A move never changes the currency. |\n| `version_change_failed` | The move could not be applied at renewal. |\n\nA move made now has nothing pending, so it never fires this event. To move the subscription later, resolve what `reason` names and request the move again.\n\nOnly endpoints that list this event receive it. New event types are not added to existing endpoints: add it to the endpoint's events in **Settings → Webhooks** or with [Update webhook endpoint](/api-reference/webhooks/update-webhook-endpoint)."
+        }
+      }
+    },
     "subscription.past_due": {
       "post": {
         "summary": "subscription.past_due",

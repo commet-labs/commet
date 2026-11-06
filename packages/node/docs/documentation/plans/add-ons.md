@@ -36,7 +36,7 @@ Add-ons declare their own consumption model. Boolean add-ons are compatible with
 
 Go to **Add-ons** and click **Create Add-on**. Configure the name, base price, feature, and consumption model. For metered add-ons, set included units and overage rate. For credits, set the credit cost per unit.
 
-The feature dropdown only shows features not already assigned to another add-on. Once created, the add-on is available to any customer whose plan is compatible.
+The feature dropdown only shows features not already assigned to another add-on. Once created, the add-on is sold on the current version of every compatible plan, or of the plans you choose in `planIds`.
 
 ## Availability by subscription status
 
@@ -47,6 +47,16 @@ Add-ons can be activated on any subscription with a payment method:
 | **Active**    | Yes                                               |
 | **Trialing**  | Yes — with a saved payment method                 |
 | **Free plan** | Yes — first purchase prompts for a payment method |
+
+## Add-ons and plan versions
+
+Each [plan version](/docs/plan-versions) lists the add-ons it sells, with their prices. Creating or editing an add-on publishes a new version of each plan that sells it:
+
+- New customers get the add-on and its price on the plan's current version.
+- Existing subscribers keep the add-ons and prices of their version. Activating an add-on their version doesn't sell returns `409 addon_unavailable` until you [move them](/docs/plan-versions#move-subscribers) to a version that sells it.
+- A subscription with an active add-on can't move to a version that doesn't sell it until the add-on is removed. A plan move can remove it at renewal with `removeAddonIds`.
+
+Send `planIds` when you create or update an add-on to choose the plans that sell it. Left out on create, or empty, every plan sells it, including plans created later. Removing a plan returns `409 addon_has_activations` while a subscription of that plan has the add-on active.
 
 ## Manage add-ons
 
@@ -228,13 +238,13 @@ Subtotal                                   $213.00
 
 ### Multi-currency
 
-Add-on prices are defined in USD. For non-USD subscriptions, the price is converted using the plan's exchange rate — the same mechanism used for plan base prices.
+Add-on prices are defined in USD. For non-USD subscriptions, the price is converted using the plan's exchange rate — the same mechanism used for plan base prices. A plan version can also set an add-on's price by hand for a country in the [Regional prices](/docs/regional-prices#set-prices-by-country) tab.
 
 ## Customer portal
 
 Customers can self-service add-ons from the portal:
 
-- **Available add-ons** — see compatible add-ons with pricing
+- **Available add-ons** — see the compatible add-ons their plan version sells, with pricing
 - **Activate** — confirmation dialog with prorated charge preview
 - **Active add-ons** — manage active add-ons
 - **Deactivate** — instant, no refund

@@ -192,6 +192,8 @@ Each generated tool groups its input the same way:
 
 Generated tools always execute the latest API version published by Commet. They do not read or change an older API version pinned for the organization's SDKs.
 
+Tools that change a plan's prices, features or credit and balance rules publish a new current version of the plan. New buyers get it; existing subscriptions stay on their version until you move them with `api_change_subscription_version` or `api_create_plan_move`.
+
 The following Commet-specific tools remain available:
 
 | Tool                       | Description                                            |

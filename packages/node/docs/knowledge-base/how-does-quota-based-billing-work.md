@@ -33,42 +33,32 @@ The charge is the same whether they keep the 10 tasks until the end of the perio
 
 These charges land on the next renewal invoice.
 
-## What happens when you change the included amount
+## What happens when you change the included amount or the price
 
-### Adding more included units
-
-More included units **benefits your customers**, so it applies right away.
+Changing the included amount or the price per extra unit publishes a new [plan version](/docs/plan-versions). New customers get it at once. Existing customers keep the included amount and unit price of their version, in both directions, until you move them.
 
 ```
 You increase Plan Pro from 15 to 30 included tasks.
-Your customer has 25 tasks (was paying for 10 extra at $7.50/mo).
+Your customer has 25 tasks (paying for 10 extra at $7.50/mo).
 
-After the change:
-  → All 25 tasks are now within the 30 included
-  → Extra charges drop to $0
-  → Your customer sees the change immediately
+Without a move:      still 15 included + 10 extra = $7.50/mo
+After you move them: all 25 tasks within the 30 included, $0 extra
 ```
-
-### Reducing included units
-
-Fewer included units harms your customers, so it applies **at renewal**.
 
 ```
 You decrease Plan Pro from 30 to 15 included tasks.
 Your customer has 25 tasks (all included, $0 extra).
 
-This period:  Still 25 within the included amount, $0 extra
-At renewal:   15 included + 10 extra = $7.50/mo
+Without a move:      still 30 included, $0 extra
+After you move them: 15 included + 10 extra = $7.50/mo
 ```
 
-## What happens when you change the price
+| Change                             | New customers      | Existing customers                      |
+| ---------------------------------- | ------------------ | --------------------------------------- |
+| Raise or lower the included amount | Get the new amount | Keep their version's amount until moved |
+| Raise or lower the unit price      | Pay the new price  | Pay their version's price until moved   |
 
-Quota unit prices use current-period snapshots: a lower price applies immediately, while a higher price starts next period.
-
-| Change          | What your customer pays                      |
-| --------------- | -------------------------------------------- |
-| Lower the price | New lower price in the current period        |
-| Raise the price | Old price this period; new price next period |
+A move made now changes the included amount today and the price from the next renewal; a move at renewal changes both then. See [Move subscribers](/docs/plan-versions#move-subscribers).
 
 ## Quota and upgrades
 
