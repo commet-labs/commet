@@ -1952,8 +1952,8 @@ export interface SentInvoice {
 
 export interface SubscriberNeedingAChange {
   subscriptionId: string;
-  /** The move it could not complete, or null for a single change. */
-  moveId: string | null;
+  /** The move it could not complete. */
+  moveId: string;
   /** The version it stays on. */
   fromVersionId: string;
   /** The version it could not move to. */

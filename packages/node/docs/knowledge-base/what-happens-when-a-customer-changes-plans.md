@@ -5,7 +5,7 @@ description: What happens when your customer upgrades, downgrades, or switches p
 
 Your customers can switch between plans in the same plan group through the [Customer Portal](/docs/customer-portal). The group's `sortOrder` defines upgrade and downgrade direction; Commet does not infer it from price.
 
-A change to another plan lands on that plan's current [version](/docs/plan-versions). The destination must sell the customer's currency in their country.
+A change to another plan lands on that plan's current [version](/docs/plan-versions). The destination must sell the customer's currency in their country. When the change takes effect, a pending move to a newer version of the current plan is dropped, without a version webhook. While a downgrade is only scheduled, that move stays pending, and it applies at the renewal if the downgrade is revoked.
 
 ## Upgrades
 
@@ -74,7 +74,7 @@ Deleting a plan is a **soft delete**. The plan disappears from your pricing page
 
 A canceled subscription can be **reactivated** — from the dashboard, the API, or the Customer Portal.
 
-Reactivation generates a fresh invoice at the plan's current price, charges the saved card, and starts a new billing period on the reactivation date. If the charge is declined, the subscription stays canceled and your customer gets a link to update their card.
+Reactivation returns the subscription on the latest [version](/docs/plan-versions#reactivate-a-canceled-subscription) of what your customer bought: the plan's current version when they bought it with the plan code. It generates a fresh invoice at that version's price, charges the saved card, and starts a new billing period on the reactivation date. If the charge is declined, the subscription stays canceled and your customer gets a link to update their card.
 
 If the cancellation is only scheduled for the end of the period, your customer can undo it in the portal before it takes effect.
 

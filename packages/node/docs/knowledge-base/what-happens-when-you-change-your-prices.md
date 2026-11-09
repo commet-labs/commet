@@ -52,8 +52,21 @@ An existing customer → $35 per extra seat until you move them
 
 Market prices apply to every version. When you edit a Market price, new customers get it at once, and subscribers who pay it get it at their next renewal, whether you raise or lower it. A move to another version keeps a subscriber's Market price.
 
+## Unpaid Checkouts and Reactivations
+
+A checkout that hasn't been paid isn't a subscriber yet, so it charges the latest version of what was requested. Its link, and a repeated `POST /subscriptions` that returns the same checkout, charge the new price, unless the checkout was created with `planVersionId`. A canceled subscription that is reactivated also returns on the latest version of what was bought. See [Unpaid checkouts](/docs/plan-versions#unpaid-checkouts).
+
+```
+You raise Plan Pro from $99/mo to $129/mo while a checkout for Pro is still unpaid.
+
+The customer opens the same link → pays $129/mo on version 2.
+A canceled customer who bought Pro by its plan code on version 1 reactivates → pays $129/mo on version 2.
+```
+
 ## Moving Existing Subscribers
 
-When you publish a draft in the dashboard, choose whether subscribers of earlier versions stay on their version, move at their next renewal, or move now. Through the API, move them with `POST /subscriptions/{id}/change-version` or `POST /plans/{id}/moves`.
+When you publish a draft in the dashboard, choose whether subscribers of earlier versions stay on their version, move at their next renewal, or move now. Later, move them from the plan's **Subscribers** tab. Through the API, move them with `POST /subscriptions/{id}/change-version` or `POST /plans/{id}/moves`. Commet never moves subscribers on its own.
+
+A move at the next renewal changes nothing before it. A subscription that ends or changes to another plan by that renewal never moves.
 
 A move never prorates or refunds, and it never changes a subscription's currency. A move made now changes features and limits today and the price from the next renewal. See [Move subscribers](/docs/plan-versions#move-subscribers).

@@ -117,9 +117,9 @@ To sell an [experiment](/docs/plan-versions#run-an-experiment), send `planCode` 
 
 To charge several billing periods in the first payment, see [Pay in Advance](/docs/pay-in-advance). To sell a period that doesn't renew, see [One-Time Payments](/docs/one-time-payments#sell-a-period-without-renewal).
 
-A compatible `pending_payment` checkout on the version being sold may be reused. An incompatible pending selection can be replaced without duplicating a paid subscription.
+A compatible `pending_payment` checkout may be reused: repeating the same request returns `200` with the same subscription ID and `checkoutUrl`. An incompatible pending selection can be replaced without duplicating a paid subscription.
 
-An unpaid checkout keeps the price of the plan version it was opened on. After you edit the plan, a new create request for that customer returns a checkout on the current version and replaces the old one: its invoice is voided and the previous link stops working.
+An unpaid checkout follows the latest version of what was requested: the plan's current version for a plan code, the experiment's latest version for an experiment code, and that version for `planVersionId`. After you edit the plan, its link and a repeated request charge that latest version. Another plan, experiment, version, interval, or price replaces it: its invoice is voided and the previous link stops working. See [Unpaid checkouts](/docs/plan-versions#unpaid-checkouts).
 
 Omitting a `promoCode` or `offerId` that the pending checkout carries, including an Offer assigned through `PUT /subscriptions/{id}/offer`, replaces it with a new subscription and checkout without that benefit. Redirect to the returned `checkoutUrl`; the previous link stops working. To keep the Offer, send it again or assign it to the returned subscription ID.
 
@@ -549,7 +549,11 @@ curl -X POST https://commet.co/api/v1/subscriptions/sub_xxx/change-version \
   -d '{"planVersionId":"plr_xxx","effective":"period_end"}'
 ```
 
-`period_end` changes everything at the next renewal. `now` changes features, limits, and included credits or balance today and the price from the next renewal. A version change never prorates, never changes the subscription's currency, and keeps a free subscription on a free version and a paid one on a paid version. The response is the subscription: after a move made now, `planVersion` shows the new version; after a move at renewal, `scheduledVersionChange` shows the pending one.
+`period_end` changes everything at the next renewal and nothing before it. `now` changes features, limits, and included credits or balance today and the price from the next renewal. A version change never prorates, never changes the subscription's currency, and keeps a free subscription on a free version and a paid one on a paid version. The response is the subscription: after a move made now, `planVersion` shows the new version; after a move at renewal, `scheduledVersionChange` shows the pending one.
+
+A trialing subscription moves when its trial ends, so its first charge is on the new version. A past-due one, once it pays, moves at the end of the period it's paying for. `scheduledVersionChange.effectiveAt` shows that date. If the subscription ends or changes to another plan first, it never moves and no version webhook is sent. A one-time subscription never renews, so `period_end` returns `409 invalid_subscription_status`; move it with `now`.
+
+Each change is recorded as a move of this one subscriber, listed in the plan's moves with `GET /plans/{id}/moves` and in the plan's **Moves** tab. See [When a move at renewal applies](/docs/plan-versions#when-a-move-at-renewal-applies).
 
 Revoke a pending move before the renewal:
 
@@ -563,7 +567,7 @@ The subscription stays on its version, and [`subscription.version_change_cancele
 
 ## Recover a past-due subscription
 
-Reactivate retries the outstanding renewal charge and keeps the original billing relationship:
+Reactivate retries the outstanding renewal charge and keeps the original billing relationship and plan version:
 
 **TypeScript**
 
@@ -690,5 +694,7 @@ Automatic dunning retries are anchored to the original decline on days 1, 3, 5, 
 ## Reactivate a canceled subscription
 
 The same `reactivate` operation charges the saved payment method, reuses the subscription record, and starts a fresh period anchored to the reactivation date. You may pass an `offerId`; accepted phases are persisted as an immutable Offer Application.
+
+The subscription returns on the latest version of what was bought: the plan's current version for a plan code, the experiment's latest version for an experiment code (the plan's current version once the experiment is no longer running), and the same version for `planVersionId`. Add-ons that version doesn't sell are deactivated. If it doesn't sell the subscription's currency, reactivation returns `422 missing_regional_price`.
 
 The selected price is not snapshotted. Future renewals use its price in the subscription's plan version, or the current value of the Market price it pays. Archiving that price prevents new selection but does not break the existing subscription.

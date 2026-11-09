@@ -39,7 +39,7 @@ In the dashboard, the plan's **Regional prices** tab sets prices country by coun
 
 Publishing the draft publishes every country together in one plan version. A country missing a price blocks publishing. Through the API, the `countries` block of `PATCH /plans/{id}/drafts/{draftId}` sets the same terms.
 
-A subscriber pays the prices of its own country in its version; a buyer from a country the version doesn't list pays the USD base price. A move to another version never changes a subscription's currency, and a version that doesn't sell it can't receive the subscription.
+A subscriber pays the prices of its own country in its version; a buyer from a country the version doesn't list pays the USD base price. A move to another version never changes a subscription's currency, and a version that doesn't sell it can't receive the subscription. The same applies when a canceled subscription is reactivated on the latest version of what was bought: if that version doesn't sell its currency, reactivation returns `422 missing_regional_price`.
 
 ## Create a Market
 

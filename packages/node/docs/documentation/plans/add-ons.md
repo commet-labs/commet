@@ -55,6 +55,7 @@ Each [plan version](/docs/plan-versions) lists the add-ons it sells, with their 
 - New customers get the add-on and its price on the plan's current version.
 - Existing subscribers keep the add-ons and prices of their version. Activating an add-on their version doesn't sell returns `409 addon_unavailable` until you [move them](/docs/plan-versions#move-subscribers) to a version that sells it.
 - A subscription with an active add-on can't move to a version that doesn't sell it until the add-on is removed. A plan move can remove it at renewal with `removeAddonIds`.
+- A canceled subscription that is [reactivated](/docs/plan-versions#reactivate-a-canceled-subscription) returns on the latest version of what was bought, and the add-ons that version doesn't sell are deactivated.
 
 Send `planIds` when you create or update an add-on to choose the plans that sell it. Left out on create, or empty, every plan sells it, including plans created later. Removing a plan returns `409 addon_has_activations` while a subscription of that plan has the add-on active.
 

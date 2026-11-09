@@ -395,7 +395,7 @@ Cancel a move for one subscriber who has not moved yet. It stays on its version;
 
 `GET /plans/{id}/moves` · operation `list-plan-moves`
 
-List a plan's latest moves of subscribers between versions, newest first, with how many are moving, moved, need a change, were left out, canceled or kept on their version.
+List a plan's latest moves of subscribers between versions, newest first, including the change of a single subscription, with how many are moving, moved, need a change, were left out, canceled or kept on their version.
 
 ### Parameters
 

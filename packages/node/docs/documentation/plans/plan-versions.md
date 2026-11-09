@@ -24,11 +24,20 @@ The plan's versions are numbered 1, 2, 3. An experiment's own versions carry its
 
 ## Edit in the dashboard
 
-Open a plan from **Plans**. Its page has four tabs: **Plan**, **Regional prices**, **Subscribers**, and **History**. The version menu opens the current version, drafts, experiments, and older versions.
+Open a plan from **Plans**. The version menu opens the current version, drafts, experiments, and older versions. The plan page has six tabs:
 
-1. Edit any version. The first change starts a draft from it. A draft is saved as you edit, and nobody sees it until you publish it.
-2. Open **Changes in this draft** to review the changes or undo any of them, or choose **Discard draft**.
-3. Choose **Review and publish**, then publish it as:
+| Tab                 | What it shows                                                                                                                           |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| **Plan**            | The prices, features, rules, add-ons, and credit packs of the version you opened                                                        |
+| **Regional prices** | The version's countries, with their currency and prices                                                                                 |
+| **Subscribers**     | The plan's subscribers with their version and any move pending, with its date, plus **Needs a change**                                  |
+| **Versions**        | The published versions with what changed in each, and the plan's drafts                                                                 |
+| **Experiments**     | Each experiment with its status, the version it sells, and its subscribers                                                              |
+| **Moves**           | Every move with how many subscribers moved, are on track, need a change, or were left out. A move not yet finished can be canceled here |
+
+1. Edit any version. The first change starts a draft from it. A draft is saved as you edit, and nobody sees it until you publish it. A removed price, feature, add-on, or credit pack stays in place, struck through, with **Undo**. Disabling a feature appears in the changes as **Disabled**; only removing it appears as removed.
+2. The plan header shows the draft's number of changes. Open it to review **Changes in this draft** and undo any of them, or choose **Discard draft**.
+3. Choose **Review and publish** in the header, then publish it as:
    - **The current version**, which new buyers get.
    - **A new experiment**, sold only through its own code. Only for drafts started from the current version.
    - **Next version of an experiment**, for drafts started from an experiment's latest version.
@@ -106,10 +115,10 @@ curl -X POST https://commet.co/api/v1/plans/pln_xxx/moves \
   -d '{"fromVersionId":"plr_old","toVersionId":"plr_new","effective":"period_end","preview":true}'
 ```
 
-| `effective`  | What changes                                                                                                                            |
-| ------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `now`        | Features, limits, and included credits or balance change today, without resetting usage. The new price is charged from the next renewal |
-| `period_end` | Everything changes at the next renewal                                                                                                  |
+| `effective`  | What changes                                                                                                                                           |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `now`        | Features, limits, and included credits or balance change today, without resetting usage. The new price is charged from the next renewal                |
+| `period_end` | Everything changes at the next renewal. Until then nothing in the current period changes: balance, usage checks, features, and access stay as they are |
 
 A move never prorates or refunds. With `now`, a larger included amount first pays any plan credit or balance debt, a smaller one never creates new debt, and purchased credits and balance are untouched.
 
@@ -122,7 +131,8 @@ A move never prorates or refunds. With `now`, a larger included amount first pay
 ### Who can move
 
 - Subscriptions move only to a newer version (`422 version_not_newer`). One on a running experiment moves only to a later version of that experiment.
-- Only `active`, `trialing`, and `past_due` subscriptions move. A plan move leaves out the others, such as paused ones, and listed subscriptions already on the destination; they stay on their version. A scheduled cancellation, pause, downgrade, or interval change doesn't leave a subscription out.
+- Only `active`, `trialing`, and `past_due` subscriptions move; `change-version` rejects the others with `409 invalid_subscription_status`. A plan move leaves out the others, such as paused ones, and listed subscriptions already on the destination; they stay on their version. A scheduled cancellation, pause, downgrade, or interval change doesn't leave a subscription out.
+- A one-time subscription never renews, so it moves only now. `change-version` with `period_end` returns `409 invalid_subscription_status`, and a plan move at renewal leaves it out.
 - An active add-on the version doesn't sell (`409 addon_unavailable`), or more seats than the version allows (`400 seat_limit_exceeded`), keeps a subscription from moving until you resolve it.
 
 ### Resolve conflicts
@@ -147,13 +157,31 @@ A plan move, a publish with `move`, and an experiment archive check every subscr
 
 A subscriber with a change always moves at its renewal, even in a move made now.
 
+### When a move at renewal applies
+
+A move at renewal waits for the subscription's next renewal, the date `scheduledVersionChange.effectiveAt` shows. The renewal invoices the new period on the new version and sends one `subscription.version_changed`.
+
+| Subscription                             | When it moves                                                                                                                                                            |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `active`                                 | At the end of its current period                                                                                                                                         |
+| `trialing`                               | When the trial ends. Its first charge is already on the new version                                                                                                      |
+| `past_due`                               | It keeps its version while Commet collects the overdue renewal. Once that's paid, it moves at the end of the period it paid for; `effectiveAt` shows that date meanwhile |
+| Paused and resumed, or changing interval | At its next renewal after that, with that date                                                                                                                           |
+
+A subscription that ends instead of renewing ends on its version, whether by a cancellation at the end of its period or trial, exhausted dunning, the suspension of the organization, or an immediate cancellation. It sends no version webhook, `scheduledVersionChange` becomes `null`, and its plan move stops waiting for it. A change to another plan, now or at that renewal, such as a scheduled downgrade or the plan group's default plan, lands on the other plan's current version, also without a version webhook.
+
+While a cancellation or a downgrade is scheduled, the API and the Subscribers tab still show the move with its date. If the cancellation or downgrade is revoked, the subscription moves at its renewal.
+
 ### Track and cancel moves
 
-- `GET /plans/{id}/moves/{moveId}` reports each subscriber as `moving`, `moved`, `needs_a_change`, `left_out`, `canceled`, or `kept_on_version`.
+- `GET /plans/{id}/moves` lists the plan's moves, and `GET /plans/{id}/moves/{moveId}` reports each subscriber as `moving`, `moved`, `needs_a_change`, `left_out`, `canceled`, or `kept_on_version`.
+- A change of one subscription with `change-version` is recorded as a move of that one subscriber. It appears in `GET /plans/{id}/moves` and the **Moves** tab like any other move.
 - `POST /plans/{id}/moves/{moveId}/cancel` cancels the move for everyone who hasn't moved yet. `POST /plans/{id}/moves/{moveId}/subscriptions/{subscriptionId}/cancel` cancels it for one.
 - `DELETE /subscriptions/{id}/scheduled-version-change` revokes one subscription's pending move.
 
-A move scheduled for renewal is checked again at the renewal. If the subscription no longer fits, it renews on its version and appears in `GET /plans/{id}/needs-a-change` and under **Needs a change** on the Subscribers tab. Move it again with a change, or leave it with `POST /plans/{id}/needs-a-change/{subscriptionId}/keep`.
+Canceling or revoking a pending move sends `subscription.version_change_canceled` with `reason: "canceled_by_merchant"` for each subscriber it cancels, and records them as `canceled`.
+
+A move scheduled for renewal is checked again at the renewal. If the subscription no longer fits, it renews on its version and appears in `GET /plans/{id}/needs-a-change` and under **Needs a change** on the Subscribers tab. Each entry carries the `moveId` of the move it couldn't complete. Move it again with a change, or leave it with `POST /plans/{id}/needs-a-change/{subscriptionId}/keep`.
 
 ## Run an experiment
 
@@ -183,7 +211,29 @@ Making an experiment current through the API moves nobody else. The dashboard al
 
 Send `planVersionId` on `POST /subscriptions` to create the subscription on any published version, current or not, including an experiment's versions. Checkout charges that version's price, and activation grants its credits, add-ons, and credit packs. Sending `planVersionId` with an experiment code returns `400`.
 
-An unpaid checkout keeps the price of the version it was opened on. After you edit the plan, a new `POST /subscriptions` for that customer creates a checkout on the current version and replaces the old one: its invoice is voided and its link stops working.
+## Unpaid checkouts
+
+A checkout that hasn't been paid isn't a subscriber yet, so it follows the latest version of what was requested:
+
+| Requested with                               | The checkout charges                                          |
+| -------------------------------------------- | ------------------------------------------------------------- |
+| The plan code, such as `pro`                 | The plan's current version                                    |
+| An experiment code, such as `pro:price-test` | The experiment's latest version, never the plan's current one |
+| `planVersionId`                              | That version                                                  |
+
+Its link charges that version without a new request. Repeating the same `POST /subscriptions` after you edit the plan reuses the checkout: the response is `200` with the same subscription ID and `checkoutUrl`.
+
+A different request replaces it: another plan, experiment, version, interval, or price, the plan code after an experiment code, or `planVersionId` instead of a code or the other way round. The old subscription is canceled, its invoice is voided, and its link stops working.
+
+## Reactivate a canceled subscription
+
+Reactivating a canceled subscription returns it on the latest version of what was bought:
+
+- the plan's current version, when it was bought with the plan code;
+- the experiment's latest version, when it was bought with an experiment code, or the plan's current version once the experiment is no longer running;
+- the same version, when it was bought with `planVersionId`.
+
+Add-ons that version doesn't sell are deactivated. A version that doesn't sell the subscription's currency returns `422 missing_regional_price`. Reactivating a `past_due` subscription keeps its version.
 
 ## Add-ons, credit packs, and countries
 
@@ -193,21 +243,23 @@ Each version also sets countries with their own currency and prices. See [Set pr
 
 ## Read versions
 
-| Request                                                                 | Returns                                                                                |
-| ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| `GET /plans/{id}/versions`                                              | The plan's published versions, newest first, with their prices and subscription counts |
-| `GET /plans/{id}/versions/{versionId}`                                  | One version                                                                            |
-| `GET /plans/{id}/versions/{versionId}/changes?against={otherVersionId}` | Every term that differs between two versions                                           |
+| Request                                                                 | Returns                                                                                                             |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `GET /plans/{id}/versions`                                              | The plan's published versions, newest first, with their prices and subscription counts                              |
+| `GET /plans/{id}/versions/{versionId}`                                  | One version                                                                                                         |
+| `GET /plans/{id}/versions/{versionId}/changes?against={otherVersionId}` | Every term that differs between two versions. A disabled feature reads `Disabled`; a removed term has `after: null` |
 
 Versions published before Commet recorded every term are not listed, and reading one by ID returns `404 plan_version_not_found`.
 
-Every subscription includes `planVersion`, with its `id` and `label`, and `scheduledVersionChange`, with the `planVersionId`, `label`, and `effectiveAt` of the move pending for its next renewal, or `null`. Filter `GET /subscriptions` by version with `planVersionId`.
+Every subscription includes `planVersion`, with its `id` and `label`, and `scheduledVersionChange`, with the `planVersionId`, `label`, and `effectiveAt` of the move pending for its next renewal, or `null`. See [When a move at renewal applies](#when-a-move-at-renewal-applies). Filter `GET /subscriptions` by version with `planVersionId`.
 
 ## Webhooks
 
-| Event                                                                                         | When it fires                                                                                                                                                         |
-| --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`subscription.version_changed`](/docs/webhooks/subscription-version-changed)                 | A subscription changed version: a move made now or a scheduled move at renewal. Making an experiment current moves nobody, so it sends none                           |
-| [`subscription.version_change_canceled`](/docs/webhooks/subscription-version-change-canceled) | A pending move will not happen. `reason` is `canceled_by_merchant` when you canceled it, `version_change_failed`, or the code of what the subscription no longer fits |
+| Event                                                                                         | When it fires                                                                                                                                                                    |
+| --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`subscription.version_changed`](/docs/webhooks/subscription-version-changed)                 | A subscription changed version: a move made now or a scheduled move at renewal. Making an experiment current moves nobody, so it sends none                                      |
+| [`subscription.version_change_canceled`](/docs/webhooks/subscription-version-change-canceled) | A pending move will not happen. `reason` is `canceled_by_merchant` when you canceled or revoked it, `version_change_failed`, or the code of what the subscription no longer fits |
+
+Neither is sent when the subscription ends or changes to another plan before the move applies, or when a new move replaces the pending one.
 
 Both reach only the webhook endpoints that list them. Add them to your endpoint's events to receive them.

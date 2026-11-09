@@ -2547,7 +2547,7 @@ export const resourceDefinitions: ResourceDef[] = [
       "list-moves": {
         method: "listMoves",
         description:
-          "List a plan's latest moves of subscribers between versions, newest first, with how many are moving, moved, need a change, were left out, canceled or kept on their version.",
+          "List a plan's latest moves of subscribers between versions, newest first, including the change of a single subscription, with how many are moving, moved, need a change, were left out, canceled or kept on their version.",
         hasParams: true,
         params: [
           {
