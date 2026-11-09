@@ -2469,6 +2469,8 @@ export interface Transaction {
   taxAmount: number | null;
   /** Amount in the charge currency's smallest unit, as presented to the customer. Set for non-USD charges; null when the charge was made in USD. */
   presentmentAmount: number | null;
+  /** Cumulative confirmed refunds in the payment currency’s smallest unit. */
+  amountRefunded: number;
   currency: string;
   /** The payment provider the charge was routed to: stripe, commet, or dlocal. */
   provider: PaymentProvider;
@@ -2529,6 +2531,8 @@ export interface TransactionListItem {
   taxAmount: number | null;
   /** Amount in the charge currency's smallest unit, as presented to the customer. Set for non-USD charges; null when the charge was made in USD. */
   presentmentAmount: number | null;
+  /** Cumulative confirmed refunds in the payment currency’s smallest unit. */
+  amountRefunded: number;
   currency: string;
   /** The payment provider the charge was routed to: stripe, commet, or dlocal. */
   provider: PaymentProvider;

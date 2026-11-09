@@ -676,6 +676,8 @@ export interface PaymentRefundedData {
   customerId: string | null;
   /** The subscription ID, if the invoice is linked to a subscription. */
   subscriptionId: string | null;
+  /** Cumulative confirmed refunds in the payment currency’s smallest unit. */
+  amountRefunded: number;
   /** The refunded amount in cents (100 = $1.00). */
   refundAmount: number;
   /** The refund currency code. */

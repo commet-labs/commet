@@ -415,6 +415,7 @@ Fired when a payment is refunded, fully or partially. A refund does not change t
 - `invoiceNumber` (`string | null`, required) — The human-readable invoice number, if available.
 - `customerId` (`string | null`, required) — The customer ID, when the payment is linked to an invoice. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.
 - `subscriptionId` (`string | null`, required) — The subscription ID, if the invoice is linked to a subscription.
+- `amountRefunded` (`number`, required) — Cumulative confirmed refunds in the payment currency’s smallest unit.
 - `refundAmount` (`number`, required) — The refunded amount in cents (100 = $1.00).
 - `currency` (`string`, required) — The refund currency code.
 

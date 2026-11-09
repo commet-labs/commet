@@ -4584,7 +4584,7 @@ export const resourceDefinitions: ResourceDef[] = [
       refund: {
         method: "refund",
         description:
-          "Issue a full refund and return the provider-neutral refund resource with its actual status.",
+          "Refund a positive amount in the payment currency’s smallest unit, or omit amount to refund the remaining amount.",
         hasParams: true,
         params: [
           {
@@ -4592,6 +4592,13 @@ export const resourceDefinitions: ResourceDef[] = [
             description: "Id",
             required: true,
             sdkKey: "id",
+          },
+          {
+            flag: "--amount <number>",
+            description:
+              "Amount returned to the customer, including tax, in the payment currency’s smallest unit.",
+            parse: parseNumber,
+            sdkKey: "amount",
           },
           {
             flag: "--idempotency-key <key>",
