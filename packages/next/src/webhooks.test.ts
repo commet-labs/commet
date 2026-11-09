@@ -71,6 +71,14 @@ const webhookHandlerCases = [
     handlerName: "onSubscriptionPlanChangeRevoked",
   },
   {
+    event: "subscription.version_changed",
+    handlerName: "onSubscriptionVersionChanged",
+  },
+  {
+    event: "subscription.version_change_canceled",
+    handlerName: "onSubscriptionVersionChangeCanceled",
+  },
+  {
     event: "subscription.past_due",
     handlerName: "onSubscriptionPastDue",
   },
@@ -413,9 +421,9 @@ describe("Webhooks", () => {
 
   describe("event routing", () => {
     it("should cover every typed webhook event and named handler", () => {
-      expect(webhookHandlerCases).toHaveLength(69);
+      expect(webhookHandlerCases).toHaveLength(71);
       expect(new Set(webhookHandlerCases.map(({ event }) => event)).size).toBe(
-        69,
+        71,
       );
       expect(webhookEventCoverage).toBe(true);
       expect(webhookHandlerCoverage).toBe(true);

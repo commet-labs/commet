@@ -1,6 +1,6 @@
 # addon_has_activations
 
-The add-on cannot be deleted while subscriptions use it.
+The add-on cannot be deleted, or removed from a plan, while subscriptions use it.
 
 - **Error type:** `conflict_error`
 - **`code`:** `addon_has_activations`
@@ -9,7 +9,7 @@ The add-on cannot be deleted while subscriptions use it.
 
 ## What to do
 
-Remove or migrate its active subscription assignments before deleting the add-on.
+Remove or migrate its active subscription assignments before deleting the add-on or removing the plan from it.
 
 The response `message`, `param`, and `details` fields describe the condition observed by the specific operation.
 

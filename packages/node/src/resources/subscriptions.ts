@@ -93,6 +93,14 @@ export type ChangePlanParams =
       promoCode: string;
     };
 
+export interface ChangeSubscriptionVersionParams {
+  id: string;
+  /** A published version of the subscription's plan. */
+  planVersionId: string;
+  /** now changes features, limits and the included credits or balance at once (the included difference is added to or subtracted from the plan credits or plan balance: an increase first pays any plan-part debt, a decrease never creates new debt, and purchased credits and purchased balance are untouched) and charges the new price from the next renewal. period_end changes everything at the next renewal. There is never a proration charge or refund. */
+  effective: "now" | "period_end";
+}
+
 export type PurchaseCreditsParams =
   | {
       id: string;
@@ -194,6 +202,10 @@ export interface RevokeScheduledPlanChangeParams {
   id: string;
 }
 
+export interface RevokeScheduledVersionChangeParams {
+  id: string;
+}
+
 export interface UncancelSubscriptionParams {
   id: string;
 }
@@ -205,6 +217,7 @@ export interface GetActiveSubscriptionParams {
 export interface ListSubscriptionsParams {
   customerId?: string;
   status?: SubscriptionStatus;
+  planVersionId?: string;
 }
 
 export type CreateSubscriptionParams =
@@ -235,6 +248,8 @@ export type CreateSubscriptionParams =
       prepaidPeriods?: number;
       /** Schedules the cancellation from creation so the subscription ends after its last paid period and never renews with any payment method. */
       cancelAtPeriodEnd?: boolean;
+      /** Public ID of a published version of the plan, current or not, including an experiment's versions. The subscription is created on that version and stays on it: checkout charges its price and activation grants its credits, add-ons and credit packs. When omitted, the subscription gets the current version, or the version an experiment code (planCode `<plan code>:<experiment code>`) sells. */
+      planVersionId?: string;
       offerId?: never;
       promoCode?: string;
       /** Trial length in days, replacing the price's trial. A customer who already had this plan, in a trial or paying, gets no trial and goes through the regular checkout. */
@@ -269,11 +284,14 @@ export type CreateSubscriptionParams =
       prepaidPeriods?: number;
       /** Schedules the cancellation from creation so the subscription ends after its last paid period and never renews with any payment method. */
       cancelAtPeriodEnd?: boolean;
+      /** Public ID of a published version of the plan, current or not, including an experiment's versions. The subscription is created on that version and stays on it: checkout charges its price and activation grants its credits, add-ons and credit packs. When omitted, the subscription gets the current version, or the version an experiment code (planCode `<plan code>:<experiment code>`) sells. */
+      planVersionId?: string;
       offerId?: never;
       promoCode?: string;
       /** Trial length in days, replacing the price's trial. A customer who already had this plan, in a trial or paying, gets no trial and goes through the regular checkout. */
       customTrialDays?: number;
       skipTrial?: boolean;
+      /** The plan code, or an experiment code as `<plan code>:<experiment code>` to sell the version the experiment sells. */
       planCode: string;
     }
   | {
@@ -303,6 +321,8 @@ export type CreateSubscriptionParams =
       prepaidPeriods?: number;
       /** Schedules the cancellation from creation so the subscription ends after its last paid period and never renews with any payment method. */
       cancelAtPeriodEnd?: boolean;
+      /** Public ID of a published version of the plan, current or not, including an experiment's versions. The subscription is created on that version and stays on it: checkout charges its price and activation grants its credits, add-ons and credit packs. When omitted, the subscription gets the current version, or the version an experiment code (planCode `<plan code>:<experiment code>`) sells. */
+      planVersionId?: string;
       offerId: string;
       promoCode?: never;
       /** Trial length in days, replacing the price's trial. A customer who already had this plan, in a trial or paying, gets no trial and goes through the regular checkout. */
@@ -337,11 +357,14 @@ export type CreateSubscriptionParams =
       prepaidPeriods?: number;
       /** Schedules the cancellation from creation so the subscription ends after its last paid period and never renews with any payment method. */
       cancelAtPeriodEnd?: boolean;
+      /** Public ID of a published version of the plan, current or not, including an experiment's versions. The subscription is created on that version and stays on it: checkout charges its price and activation grants its credits, add-ons and credit packs. When omitted, the subscription gets the current version, or the version an experiment code (planCode `<plan code>:<experiment code>`) sells. */
+      planVersionId?: string;
       offerId: string;
       promoCode?: never;
       /** Trial length in days, replacing the price's trial. A customer who already had this plan, in a trial or paying, gets no trial and goes through the regular checkout. */
       customTrialDays?: number;
       skipTrial?: boolean;
+      /** The plan code, or an experiment code as `<plan code>:<experiment code>` to sell the version the experiment sells. */
       planCode: string;
     }
   | {
@@ -371,6 +394,8 @@ export type CreateSubscriptionParams =
       prepaidPeriods?: number;
       /** Schedules the cancellation from creation so the subscription ends after its last paid period and never renews with any payment method. */
       cancelAtPeriodEnd?: boolean;
+      /** Public ID of a published version of the plan, current or not, including an experiment's versions. The subscription is created on that version and stays on it: checkout charges its price and activation grants its credits, add-ons and credit packs. When omitted, the subscription gets the current version, or the version an experiment code (planCode `<plan code>:<experiment code>`) sells. */
+      planVersionId?: string;
       offerId?: never;
       /** Public card promotion ID. The offer is shown immediately and remains conditional on card eligibility until checkout confirmation. */
       cardPromotionId: string;
@@ -406,12 +431,15 @@ export type CreateSubscriptionParams =
       prepaidPeriods?: number;
       /** Schedules the cancellation from creation so the subscription ends after its last paid period and never renews with any payment method. */
       cancelAtPeriodEnd?: boolean;
+      /** Public ID of a published version of the plan, current or not, including an experiment's versions. The subscription is created on that version and stays on it: checkout charges its price and activation grants its credits, add-ons and credit packs. When omitted, the subscription gets the current version, or the version an experiment code (planCode `<plan code>:<experiment code>`) sells. */
+      planVersionId?: string;
       offerId?: never;
       /** Public card promotion ID. The offer is shown immediately and remains conditional on card eligibility until checkout confirmation. */
       cardPromotionId: string;
       promoCode?: never;
       customTrialDays?: never;
       skipTrial?: false;
+      /** The plan code, or an experiment code as `<plan code>:<experiment code>` to sell the version the experiment sells. */
       planCode: string;
     };
 
@@ -431,7 +459,7 @@ export class SubscriptionsResource {
     );
   }
 
-  /** Activate an add-on on a subscription. Charges a prorated amount for the current billing period. */
+  /** Activate an add-on on a subscription. Charges a prorated amount for the current billing period. An add-on that the subscription's plan version does not sell is rejected with addon_unavailable. */
   async activateAddon(
     params: ActivateAddonParams,
     options?: RequestOptions,
@@ -514,7 +542,20 @@ export class SubscriptionsResource {
     );
   }
 
-  /** Purchase a fixed credit pack or choose a whole credit quantity at the subscription plan price and minimum. Charges the saved payment method and adds purchased credits. */
+  /** Move a subscription to a newer published version of its plan, now or at the end of the period, without proration; an older version is rejected with version_not_newer, and a subscription on a running experiment moves only to a later version of that experiment. The subscription keeps its currency and its price: a destination that does not sell its currency is rejected with missing_regional_price, and one that does not sell the price it pays with price_not_found. A free version moves only to a free version and a paid one only to a paid one (validation_error). A subscription whose usage does not fit the destination, or with an active add-on the destination does not sell, is not moved either, and the error says why. Each change is recorded as a move of this one subscription in the plan's moves. Repeating the same request changes nothing; a new one replaces the pending move. */
+  async changeVersion(
+    params: ChangeSubscriptionVersionParams,
+    options?: RequestOptions,
+  ): Promise<Subscription> {
+    const { id, ...rest } = params;
+    return this.httpClient.post(
+      `/subscriptions/${id}/change-version`,
+      rest,
+      options,
+    );
+  }
+
+  /** Purchase a fixed credit pack or choose a whole credit quantity at the subscription plan price and minimum. Charges the saved payment method and adds purchased credits. A credit pack that the subscription's plan version does not sell is rejected with credit_pack_unavailable. */
   async purchaseCredits(
     params: PurchaseCreditsParams,
     options?: RequestOptions,
@@ -667,6 +708,19 @@ export class SubscriptionsResource {
     const { id } = params;
     return this.httpClient.delete(
       `/subscriptions/${id}/scheduled-plan-change`,
+      undefined,
+      options,
+    );
+  }
+
+  /** Cancel the move to another plan version pending for the next renewal, so the subscription stays on its version, and send subscription.version_change_canceled with reason canceled_by_merchant. A move made now has nothing pending to revoke. With nothing pending it changes nothing. Returns the subscription. */
+  async revokeScheduledVersionChange(
+    params: RevokeScheduledVersionChangeParams,
+    options?: RequestOptions,
+  ): Promise<Subscription> {
+    const { id } = params;
+    return this.httpClient.delete(
+      `/subscriptions/${id}/scheduled-version-change`,
       undefined,
       options,
     );

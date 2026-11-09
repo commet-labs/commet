@@ -23,14 +23,14 @@ The trial with a payment method starts after setup succeeds. If the card require
 2. With a payment method required, checkout saves it without charging.
    Without one, the subscription starts trialing at once.
 3. The subscription is trialing and records trialEndsAt.
-4. At the end, Commet charges the current value of the selected price.
+4. At the end, Commet charges the selected price of the subscription's plan version.
    Without a card, it moves to the default plan or is canceled, with no invoice.
 5. A discount from an Offer starts with the first invoice after the trial.
 ```
 
-> **Warning**
+> **Note**
 >
-> The subscription keeps its accepted trial days, but the selected catalog price can change. A price change during the trial changes the first paid charge.
+> The subscription keeps its accepted trial days and its [plan version](/docs/plan-versions). A price change during the trial publishes a new version and doesn't change the first paid charge, unless you move the subscription.
 
 ## Customer-specific trials
 

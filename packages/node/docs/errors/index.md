@@ -15,6 +15,8 @@ Use the response `code` to open the matching local reference. Preserve `x-reques
 - [`customer_deleted`](./customer_deleted.md) — The externalId belongs to a deleted customer, so the plan group's default plan cannot start for it.
 - [`feature_not_found`](./feature_not_found.md) — The requested feature, seat feature, or quota feature does not exist in this organization.
 - [`plan_not_found`](./plan_not_found.md) — The requested plan does not exist or is not available in this organization.
+- [`plan_version_not_found`](./plan_version_not_found.md) — The requested plan version does not exist, is not published, or belongs to another plan.
+- [`plan_experiment_not_found`](./plan_experiment_not_found.md) — The plan has no experiment with that code, or the plan belongs to another organization.
 - [`subscription_not_found`](./subscription_not_found.md) — The requested subscription does not exist in this organization.
 - [`no_active_subscription`](./no_active_subscription.md) — The customer has no subscription that is active for this operation.
 - [`no_prices_configured`](./no_prices_configured.md) — The selected plan has no price available for the request.
@@ -26,6 +28,7 @@ Use the response `code` to open the matching local reference. Preserve `x-reques
 - [`no_payment_method`](./no_payment_method.md) — The subscription has no reusable payment method for this operation.
 - [`duplicate`](./duplicate.md) — The request conflicts with an existing resource, unique value, or previously recorded event.
 - [`already_scheduled`](./already_scheduled.md) — The requested subscription action is already scheduled.
+- [`subscribers_do_not_fit`](./subscribers_do_not_fit.md) — Some subscribers of earlier versions do not fit the version being published, so nothing was published and nobody moved.
 - [`feature_not_in_plan`](./feature_not_in_plan.md) — The requested feature is not included in the customer's plan or subscription.
 - [`feature_disabled`](./feature_disabled.md) — The requested feature is disabled for the customer's subscription.
 - [`insufficient_balance`](./insufficient_balance.md) — The operation cannot be charged against the available balance, or the required regional overage price is missing.
@@ -34,7 +37,7 @@ Use the response `code` to open the matching local reference. Preserve `x-reques
 - [`included_limit_reached`](./included_limit_reached.md) — The requested usage exceeds the plan's included usage limit.
 - [`plan_credit_limit_reached`](./plan_credit_limit_reached.md) — The usage event would spend more plan credits than the plan's credit limit allows in the current day or week, and purchased credits do not cover the rest.
 - [`plan_balance_limit_reached`](./plan_balance_limit_reached.md) — The usage event would spend more plan balance than the plan's balance limit allows in the current day or week, and purchased balance does not cover the rest.
-- [`missing_regional_price`](./missing_regional_price.md) — The plan has no price for the subscription's currency or resolved market.
+- [`missing_regional_price`](./missing_regional_price.md) — The plan, or the plan version a subscription is moving to, has no price for the subscription's currency or resolved market. A version move never changes the subscription's currency.
 - [`payment_failed`](./payment_failed.md) — The operation could not complete its payment or required tax calculation.
 - [`payment_not_found`](./payment_not_found.md) — The requested payment does not exist in this organization.
 - [`payment_method_not_found`](./payment_method_not_found.md) — The requested or required payment method could not be found.
@@ -56,6 +59,7 @@ Use the response `code` to open the matching local reference. Preserve `x-reques
 - [`idempotency_unavailable`](./idempotency_unavailable.md) — Platform could not safely establish, release, or persist the idempotent response for this operation.
 - [`seat_limit_exceeded`](./seat_limit_exceeded.md) — The requested plan change would exceed the available seat limit.
 - [`no_change_requested`](./no_change_requested.md) — The request would not change the current subscription state.
+- [`version_not_newer`](./version_not_newer.md) — Subscriptions move only to a newer version than the one they are on. A subscription on a running experiment moves only to a later version of the same experiment until the experiment is archived or made current.
 - [`plans_not_in_same_group`](./plans_not_in_same_group.md) — The current and target plans do not belong to the same plan group.
 - [`free_plan_change_not_supported`](./free_plan_change_not_supported.md) — This plan-change operation does not support the selected free plan.
 - [`plan_change_scheduled`](./plan_change_scheduled.md) — The requested plan change takes effect at the end of the current billing period instead of being prorated immediately.
@@ -63,12 +67,14 @@ Use the response `code` to open the matching local reference. Preserve `x-reques
 - [`addon_not_found`](./addon_not_found.md) — The requested add-on does not exist in this organization.
 - [`addon_already_active`](./addon_already_active.md) — The add-on is already active on this subscription.
 - [`addon_not_active`](./addon_not_active.md) — The add-on is not active on this subscription.
-- [`addon_has_activations`](./addon_has_activations.md) — The add-on cannot be deleted while subscriptions use it.
+- [`addon_has_activations`](./addon_has_activations.md) — The add-on cannot be deleted, or removed from a plan, while subscriptions use it.
+- [`addon_unavailable`](./addon_unavailable.md) — The plan version the subscription is on, or is moving to, does not sell the add-on.
 - [`feature_already_exists`](./feature_already_exists.md) — A feature with the same code or name already exists, or the feature is already assigned where uniqueness is required.
 - [`feature_in_use`](./feature_in_use.md) — The feature cannot be deleted while a plan or add-on uses it.
 - [`model_not_found`](./model_not_found.md) — The requested AI model does not exist in the current model catalog.
 - [`pricing_mode_mismatch`](./pricing_mode_mismatch.md) — The submitted usage shape does not match the feature's configured pricing mode.
 - [`credit_pack_not_found`](./credit_pack_not_found.md) — The requested credit pack does not exist in this organization.
+- [`credit_pack_unavailable`](./credit_pack_unavailable.md) — The subscription's plan version does not sell the credit pack.
 - [`plan_group_not_found`](./plan_group_not_found.md) — The requested plan group does not exist in this organization.
 - [`offer_not_found`](./offer_not_found.md) — The requested offer does not exist or is not compatible with the selected operation.
 - [`offer_not_applicable`](./offer_not_applicable.md) — The selected offer does not satisfy the eligibility or lifecycle conditions for this operation.

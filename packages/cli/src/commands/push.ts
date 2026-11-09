@@ -240,4 +240,15 @@ Examples:
         ),
       );
     }
+
+    const existingCatalogChanged =
+      diff.plans.changes.some((change) => change.action === "update") ||
+      diff.features.changes.some((change) => change.action === "update");
+    if (existingCatalogChanged) {
+      console.log(
+        chalk.dim(
+          "\n  Existing subscriptions stay on their plan version. Move them with `commet plans create-move` or `commet subscriptions change-version`.",
+        ),
+      );
+    }
   });

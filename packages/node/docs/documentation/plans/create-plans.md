@@ -24,6 +24,10 @@ A free plan has a price of $0 and no billing cycle. Customers are activated imme
 
 Go to **Plans** and click **Create Plan**. Fill in each component from the table above, then save. For detailed feature configuration, see [Configure Features](/docs/configure-features).
 
+## Edit a plan
+
+Editing a plan's prices, trials, features, rules, add-ons, credit packs, or country prices publishes a new [plan version](/docs/plan-versions). New customers get it; existing subscribers keep their version until you move them. In the dashboard, edits go into a draft that you publish when ready. The name, description, and visibility are not versioned and change at once with **Edit details**.
+
 ## Retrieve plans via SDK
 
 ### TypeScript
@@ -107,7 +111,7 @@ curl "https://commet.co/api/v1/plans?includePrivate=true" \
   -H "x-api-key: $COMMET_API_KEY"
 ```
 
-Get a specific plan:
+Get a specific plan. Plan reads return the terms of the current version; list a plan's versions with `GET /plans/{id}/versions`.
 
 ### TypeScript
 

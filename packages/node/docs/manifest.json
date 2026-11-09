@@ -12,7 +12,7 @@
   "platformDocumentation": {
     "source": "commet-labs/docs",
     "index": "platform-documentation.md",
-    "count": 97,
+    "count": 98,
     "entries": [
       "documentation/introduction.md",
       "documentation/create-api-key.md",
@@ -39,6 +39,7 @@
       "documentation/customers/customer-credits.md",
       "documentation/customers/customer-portal.md",
       "documentation/plans/create-plans.md",
+      "documentation/plans/plan-versions.md",
       "documentation/plans/add-ons.md",
       "documentation/plans/configure-features.md",
       "documentation/plans/consumption-models.md",
@@ -115,7 +116,7 @@
   },
   "errorReferences": {
     "index": "errors/index.md",
-    "count": 88,
+    "count": 94,
     "entries": [
       {
         "code": "validation_error",
@@ -184,6 +185,18 @@
         "canonicalUrl": "/docs/api-reference/2026-08-27/errors/plan_not_found.md"
       },
       {
+        "code": "plan_version_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/plan_version_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-08-27/errors/plan_version_not_found.md"
+      },
+      {
+        "code": "plan_experiment_not_found",
+        "type": "not_found_error",
+        "documentation": "errors/plan_experiment_not_found.md",
+        "canonicalUrl": "/docs/api-reference/2026-08-27/errors/plan_experiment_not_found.md"
+      },
+      {
         "code": "subscription_not_found",
         "type": "not_found_error",
         "documentation": "errors/subscription_not_found.md",
@@ -248,6 +261,12 @@
         "type": "conflict_error",
         "documentation": "errors/already_scheduled.md",
         "canonicalUrl": "/docs/api-reference/2026-08-27/errors/already_scheduled.md"
+      },
+      {
+        "code": "subscribers_do_not_fit",
+        "type": "conflict_error",
+        "documentation": "errors/subscribers_do_not_fit.md",
+        "canonicalUrl": "/docs/api-reference/2026-08-27/errors/subscribers_do_not_fit.md"
       },
       {
         "code": "feature_not_in_plan",
@@ -430,6 +449,12 @@
         "canonicalUrl": "/docs/api-reference/2026-08-27/errors/no_change_requested.md"
       },
       {
+        "code": "version_not_newer",
+        "type": "validation_error",
+        "documentation": "errors/version_not_newer.md",
+        "canonicalUrl": "/docs/api-reference/2026-08-27/errors/version_not_newer.md"
+      },
+      {
         "code": "plans_not_in_same_group",
         "type": "validation_error",
         "documentation": "errors/plans_not_in_same_group.md",
@@ -478,6 +503,12 @@
         "canonicalUrl": "/docs/api-reference/2026-08-27/errors/addon_has_activations.md"
       },
       {
+        "code": "addon_unavailable",
+        "type": "conflict_error",
+        "documentation": "errors/addon_unavailable.md",
+        "canonicalUrl": "/docs/api-reference/2026-08-27/errors/addon_unavailable.md"
+      },
+      {
         "code": "feature_already_exists",
         "type": "conflict_error",
         "documentation": "errors/feature_already_exists.md",
@@ -506,6 +537,12 @@
         "type": "not_found_error",
         "documentation": "errors/credit_pack_not_found.md",
         "canonicalUrl": "/docs/api-reference/2026-08-27/errors/credit_pack_not_found.md"
+      },
+      {
+        "code": "credit_pack_unavailable",
+        "type": "conflict_error",
+        "documentation": "errors/credit_pack_unavailable.md",
+        "canonicalUrl": "/docs/api-reference/2026-08-27/errors/credit_pack_unavailable.md"
       },
       {
         "code": "plan_group_not_found",
@@ -1121,6 +1158,78 @@
       "documentation": "api-reference/plans.md",
       "operations": [
         {
+          "name": "publishDraft",
+          "operationId": "publish-plan-draft",
+          "method": "POST",
+          "path": "/plans/{id}/drafts/{draftId}/publish"
+        },
+        {
+          "name": "getDraft",
+          "operationId": "get-plan-draft",
+          "method": "GET",
+          "path": "/plans/{id}/drafts/{draftId}"
+        },
+        {
+          "name": "updateDraft",
+          "operationId": "update-plan-draft",
+          "method": "PATCH",
+          "path": "/plans/{id}/drafts/{draftId}"
+        },
+        {
+          "name": "deleteDraft",
+          "operationId": "delete-plan-draft",
+          "method": "DELETE",
+          "path": "/plans/{id}/drafts/{draftId}"
+        },
+        {
+          "name": "listDrafts",
+          "operationId": "list-plan-drafts",
+          "method": "GET",
+          "path": "/plans/{id}/drafts"
+        },
+        {
+          "name": "createDraft",
+          "operationId": "create-plan-draft",
+          "method": "POST",
+          "path": "/plans/{id}/drafts"
+        },
+        {
+          "name": "archiveExperiment",
+          "operationId": "archive-plan-experiment",
+          "method": "POST",
+          "path": "/plans/{id}/experiments/{code}/archive"
+        },
+        {
+          "name": "makeExperimentCurrent",
+          "operationId": "make-plan-experiment-current",
+          "method": "POST",
+          "path": "/plans/{id}/experiments/{code}/make-current"
+        },
+        {
+          "name": "getExperiment",
+          "operationId": "get-plan-experiment",
+          "method": "GET",
+          "path": "/plans/{id}/experiments/{code}"
+        },
+        {
+          "name": "createExperimentVersion",
+          "operationId": "create-plan-experiment-version",
+          "method": "POST",
+          "path": "/plans/{id}/experiments/{code}/versions"
+        },
+        {
+          "name": "listExperiments",
+          "operationId": "list-plan-experiments",
+          "method": "GET",
+          "path": "/plans/{id}/experiments"
+        },
+        {
+          "name": "createExperiment",
+          "operationId": "create-plan-experiment",
+          "method": "POST",
+          "path": "/plans/{id}/experiments"
+        },
+        {
           "name": "updateFeature",
           "operationId": "update-plan-feature",
           "method": "PATCH",
@@ -1137,6 +1246,48 @@
           "operationId": "add-plan-feature",
           "method": "POST",
           "path": "/plans/{id}/features"
+        },
+        {
+          "name": "cancelMove",
+          "operationId": "cancel-plan-move",
+          "method": "POST",
+          "path": "/plans/{id}/moves/{moveId}/cancel"
+        },
+        {
+          "name": "getMove",
+          "operationId": "get-plan-move",
+          "method": "GET",
+          "path": "/plans/{id}/moves/{moveId}"
+        },
+        {
+          "name": "cancelMoveSubscription",
+          "operationId": "cancel-plan-move-subscription",
+          "method": "POST",
+          "path": "/plans/{id}/moves/{moveId}/subscriptions/{subscriptionId}/cancel"
+        },
+        {
+          "name": "listMoves",
+          "operationId": "list-plan-moves",
+          "method": "GET",
+          "path": "/plans/{id}/moves"
+        },
+        {
+          "name": "createMove",
+          "operationId": "create-plan-move",
+          "method": "POST",
+          "path": "/plans/{id}/moves"
+        },
+        {
+          "name": "keepSubscriberOnVersion",
+          "operationId": "keep-plan-subscriber-on-version",
+          "method": "POST",
+          "path": "/plans/{id}/needs-a-change/{subscriptionId}/keep"
+        },
+        {
+          "name": "listSubscribersNeedingAChange",
+          "operationId": "list-plan-subscribers-needing-a-change",
+          "method": "GET",
+          "path": "/plans/{id}/needs-a-change"
         },
         {
           "name": "setDefaultPrice",
@@ -1197,6 +1348,30 @@
           "operationId": "delete-plan",
           "method": "DELETE",
           "path": "/plans/{id}"
+        },
+        {
+          "name": "compareVersions",
+          "operationId": "compare-plan-versions",
+          "method": "GET",
+          "path": "/plans/{id}/versions/{versionId}/changes"
+        },
+        {
+          "name": "getVersion",
+          "operationId": "get-plan-version",
+          "method": "GET",
+          "path": "/plans/{id}/versions/{versionId}"
+        },
+        {
+          "name": "listVersions",
+          "operationId": "list-plan-versions",
+          "method": "GET",
+          "path": "/plans/{id}/versions"
+        },
+        {
+          "name": "createVersion",
+          "operationId": "create-plan-version",
+          "method": "POST",
+          "path": "/plans/{id}/versions"
         },
         {
           "name": "setVisibility",
@@ -1355,6 +1530,12 @@
           "path": "/subscriptions/{id}/change-plan"
         },
         {
+          "name": "changeVersion",
+          "operationId": "change-subscription-version",
+          "method": "POST",
+          "path": "/subscriptions/{id}/change-version"
+        },
+        {
           "name": "purchaseCredits",
           "operationId": "purchase-credits",
           "method": "POST",
@@ -1437,6 +1618,12 @@
           "operationId": "revoke-scheduled-plan-change",
           "method": "DELETE",
           "path": "/subscriptions/{id}/scheduled-plan-change"
+        },
+        {
+          "name": "revokeScheduledVersionChange",
+          "operationId": "revoke-scheduled-version-change",
+          "method": "DELETE",
+          "path": "/subscriptions/{id}/scheduled-version-change"
         },
         {
           "name": "uncancel",
@@ -1638,6 +1825,8 @@
     "subscription.cancellation_revoked",
     "subscription.plan_change_scheduled",
     "subscription.plan_change_revoked",
+    "subscription.version_changed",
+    "subscription.version_change_canceled",
     "subscription.past_due",
     "trial.started",
     "trial.converted",

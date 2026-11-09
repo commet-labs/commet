@@ -1,6 +1,6 @@
 ---
 title: Manage Subscriptions
-description: Create, retrieve, pause, resume, cancel, and reactivate subscriptions.
+description: Create, retrieve, pause, resume, cancel, and reactivate subscriptions, and move them to a newer version of their plan.
 ---
 
 Install the Commet Skill so your coding agent can implement the current subscription lifecycle and verify the result.
@@ -101,20 +101,25 @@ For a paid plan, redirect the customer to `checkoutUrl`. Free plans and [trials 
 
 The normal path needs only `customerId` and either `planCode` or `planId`. Optional selection fields are:
 
-| Field                            | When to send it                                                                            |
-| -------------------------------- | ------------------------------------------------------------------------------------------ |
-| `billingInterval`                | The customer selected a non-default interval                                               |
-| `priceId`                        | The customer selected a concrete price variant                                             |
-| `offerId`                        | Your application selected an Offer directly; it overrides automatic introductory selection |
-| `promoCode`                      | The customer entered a Promo Code                                                          |
-| `initialSeats`                   | You know the initial seat quantities at creation                                           |
-| `skipTrial` or `customTrialDays` | You intentionally override the price's [trial](/docs/trial-periods)                        |
+| Field                            | When to send it                                                                              |
+| -------------------------------- | -------------------------------------------------------------------------------------------- |
+| `billingInterval`                | The customer selected a non-default interval                                                 |
+| `priceId`                        | The customer selected a concrete price variant                                               |
+| `offerId`                        | Your application selected an Offer directly; it overrides automatic introductory selection   |
+| `promoCode`                      | The customer entered a Promo Code                                                            |
+| `initialSeats`                   | You know the initial seat quantities at creation                                             |
+| `skipTrial` or `customTrialDays` | You intentionally override the price's [trial](/docs/trial-periods)                          |
+| `planVersionId`                  | You sell a specific published [plan version](/docs/plan-versions) instead of the current one |
 
 Omitting `priceId` preserves default price and Market resolution. Omitting `offerId` preserves automatic Introductory Offer selection.
 
+To sell an [experiment](/docs/plan-versions#run-an-experiment), send `planCode` as `<plan code>:<experiment code>`, such as `pro:price-test`. An experiment code already chooses the version, so it can't be combined with `planVersionId`.
+
 To charge several billing periods in the first payment, see [Pay in Advance](/docs/pay-in-advance). To sell a period that doesn't renew, see [One-Time Payments](/docs/one-time-payments#sell-a-period-without-renewal).
 
-A compatible `pending_payment` checkout may be reused. An incompatible pending selection can be replaced without duplicating a paid subscription.
+A compatible `pending_payment` checkout may be reused: repeating the same request returns `200` with the same subscription ID and `checkoutUrl`. An incompatible pending selection can be replaced without duplicating a paid subscription.
+
+An unpaid checkout follows the latest version of what was requested: the plan's current version for a plan code, the experiment's latest version for an experiment code, and that version for `planVersionId`. After you edit the plan, its link and a repeated request charge that latest version. Another plan, experiment, version, interval, or price replaces it: its invoice is voided and the previous link stops working. See [Unpaid checkouts](/docs/plan-versions#unpaid-checkouts).
 
 Omitting a `promoCode` or `offerId` that the pending checkout carries, including an Offer assigned through `PUT /subscriptions/{id}/offer`, replaces it with a new subscription and checkout without that benefit. Redirect to the returned `checkoutUrl`; the previous link stops working. To keep the Offer, send it again or assign it to the returned subscription ID.
 
@@ -239,6 +244,8 @@ $subscription = $commet->subscriptions->get(id: 'sub_xxx');
 
 Use `get` with a public subscription ID to retrieve any persisted status, including `pending_payment`, `past_due`, and `canceled`.
 
+Every subscription includes `planVersion`, the [plan version](/docs/plan-versions) it is on, and `scheduledVersionChange`, the move pending for its next renewal or `null`. Filter `GET /subscriptions` by version with `planVersionId`.
+
 ## Pause and resume
 
 A pause temporarily stops subscription access and renewals without canceling the subscription. You can pause a paid recurring subscription in `active` or `trialing` status. Free, one-time, pending-payment, past-due, and canceled subscriptions are not eligible. Resolve any scheduled cancellation, scheduled plan change, or pending plan-change checkout before creating a pause.
@@ -324,7 +331,7 @@ The response includes `subscriptionId`, `invoiceId`, and `status`. An immediate 
 
 A declined resume keeps its invoice outstanding. Automatic payment retries follow days 1, 3, 5, and 7 from the original failure and reuse that invoice. The subscription stays paused during retries. If all retries fail, it is canceled and the resume invoice becomes uncollectible. Manual resume attempts do not consume automatic retry slots.
 
-A period-end resume uses the current base price when its new invoice is created. An outstanding resume invoice keeps its original amounts and included credits or balance on retry, even if the catalog changes again. Accepted Introductory Offers and discounts preserve their unconsumed terms; resume does not grant a new Introductory Offer or redeem a promo code again.
+A period-end resume uses the base price of the subscription's plan version when its new invoice is created. An outstanding resume invoice keeps its original amounts and included credits or balance on retry, even if the catalog changes again. Accepted Introductory Offers and discounts preserve their unconsumed terms; resume does not grant a new Introductory Offer or redeem a promo code again.
 
 See the [Pause API reference](/docs/api-reference/subscriptions/pause-subscription) and [Resume API reference](/docs/api-reference/subscriptions/resume-subscription) for the complete schemas.
 
@@ -530,9 +537,37 @@ $subscription = $commet->subscriptions->revokeScheduledPlanChange(id: 'sub_xxx')
 
 This also revokes a scheduled move to the plan group's default plan. A subscription with nothing scheduled returns `409 no_scheduled_plan_change`.
 
+## Change the plan version
+
+Move a subscription to a newer version of its plan, at its next renewal or now:
+
+```bash
+curl -X POST https://commet.co/api/v1/subscriptions/sub_xxx/change-version \
+  -H "x-api-key: $COMMET_API_KEY" \
+  -H "commet-version: 2026-08-27" \
+  -H "Content-Type: application/json" \
+  -d '{"planVersionId":"plr_xxx","effective":"period_end"}'
+```
+
+`period_end` changes everything at the next renewal and nothing before it. `now` changes features, limits, and included credits or balance today and the price from the next renewal. A version change never prorates, never changes the subscription's currency, and keeps a free subscription on a free version and a paid one on a paid version. The response is the subscription: after a move made now, `planVersion` shows the new version; after a move at renewal, `scheduledVersionChange` shows the pending one.
+
+A trialing subscription moves when its trial ends, so its first charge is on the new version. A past-due one, once it pays, moves at the end of the period it's paying for. `scheduledVersionChange.effectiveAt` shows that date. If the subscription ends or changes to another plan first, it never moves and no version webhook is sent. A one-time subscription never renews, so `period_end` returns `409 invalid_subscription_status`; move it with `now`.
+
+Each change is recorded as a move of this one subscriber, listed in the plan's moves with `GET /plans/{id}/moves` and in the plan's **Moves** tab. See [When a move at renewal applies](/docs/plan-versions#when-a-move-at-renewal-applies).
+
+Revoke a pending move before the renewal:
+
+```bash
+curl -X DELETE https://commet.co/api/v1/subscriptions/sub_xxx/scheduled-version-change \
+  -H "x-api-key: $COMMET_API_KEY" \
+  -H "commet-version: 2026-08-27"
+```
+
+The subscription stays on its version, and [`subscription.version_change_canceled`](/docs/webhooks/subscription-version-change-canceled) fires with `reason: "canceled_by_merchant"`. With nothing pending, the request changes nothing. To move many subscriptions at once, see [Move subscribers](/docs/plan-versions#move-subscribers).
+
 ## Recover a past-due subscription
 
-Reactivate retries the outstanding renewal charge and keeps the original billing relationship:
+Reactivate retries the outstanding renewal charge and keeps the original billing relationship and plan version:
 
 **TypeScript**
 
@@ -660,4 +695,6 @@ Automatic dunning retries are anchored to the original decline on days 1, 3, 5, 
 
 The same `reactivate` operation charges the saved payment method, reuses the subscription record, and starts a fresh period anchored to the reactivation date. You may pass an `offerId`; accepted phases are persisted as an immutable Offer Application.
 
-The selected price is not snapshotted. Future renewals use its current catalog value. Archiving that price prevents new selection but does not break the existing subscription.
+The subscription returns on the latest version of what was bought: the plan's current version for a plan code, the experiment's latest version for an experiment code (the plan's current version once the experiment is no longer running), and the same version for `planVersionId`. Add-ons that version doesn't sell are deactivated. If it doesn't sell the subscription's currency, reactivation returns `422 missing_regional_price`.
+
+The selected price is not snapshotted. Future renewals use its price in the subscription's plan version, or the current value of the Market price it pays. Archiving that price prevents new selection but does not break the existing subscription.

@@ -54,15 +54,16 @@ Free plan customers can purchase add-ons, credit packs, and balance top-ups — 
 
 ## Changing a Free Plan's Included Balance or Credits
 
-If you change the included balance or credits on a free plan, the change applies at **each customer's next monthly reset**. Balances already granted for the current month don't change.
+If you change the included balance or credits on a free plan, Commet publishes a new [plan version](/docs/plan-versions). New customers get the new amount at once. Existing customers keep their version's amount until you move them: a move at their next renewal grants it at that monthly reset, and a move made now adds or removes the difference today.
 
 ### Example
 
 ```
 You increase the free plan's included balance from $100 to $150.
 
-A customer whose billing day is the 20th keeps their current balance until the 20th.
-On the 20th, their monthly reset grants $150.
+A new customer gets $150 from the start.
+A customer whose billing day is the 20th keeps getting $100 until you move them.
+Moved at their next renewal, their reset on the 20th grants $150.
 ```
 
 ## When Your Customer Upgrades to a Paid Plan

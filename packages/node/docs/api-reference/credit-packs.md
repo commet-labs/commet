@@ -8,7 +8,7 @@ API version: `2026-08-27`
 
 `PATCH /credit-packs/{id}` · operation `update-credit-pack`
 
-Update a credit pack's name, description, credits, price, or active status.
+Update a credit pack's name, description, credits, price, active status, or the plans that sell it.
 
 ### Parameters
 
@@ -18,6 +18,7 @@ Update a credit pack's name, description, credits, price, or active status.
 - `credits` (`number`, optional)
 - `price` (`number`, optional)
 - `isActive` (`boolean`, optional)
+- `planIds` (`Array<string>`, optional) — Plans that sell the credit pack, replacing the current ones. Empty means every plan; omitted keeps them.
 
 ### Request options
 
@@ -70,6 +71,7 @@ Create a new credit pack.
 - `credits` (`number`, required)
 - `price` (`number`, required)
 - `isActive` (`boolean`, optional)
+- `planIds` (`Array<string>`, optional) — Plans that sell the credit pack. Omitted or empty, every plan sells it. Plans created later sell it too.
 
 ### Request options
 

@@ -1,67 +1,72 @@
 ---
 title: Pricing Changes
-description: New customers pay new prices at once; existing customers get decreases now and increases at renewal, and base plan prices always change at renewal.
+description: New customers pay a new price at once; existing subscribers keep the prices of their plan version until you move them, except Market prices.
 ---
 
-When you change a price, **new customers pay the new price immediately**. For existing customers, the rule is asymmetric: **decreases apply immediately, increases apply at renewal**.
+When you change a price, Commet publishes a new [version](/docs/plan-versions) of the plan. **New customers pay the new price immediately.** **Existing subscribers keep the prices of their version**, also at renewal, whether you raise or lower them, until you move them to the new version.
 
-The exception is a plan's selected base price or variant, which changes at renewal in both directions.
+The rule is the same for every price of the plan: base and variant prices, overage, seats, quota, and the add-ons and credit packs it sells. The exception is a [Market](/docs/regional-prices#create-a-market) price, which is not versioned.
 
 ## Base and Variant Prices
 
-The subscription keeps the selected price ID. Changes to that catalog row take effect **at renewal**, whether you raise or lower it — the current period is already paid. If the selected row is a regional variant, its own current market price is used.
+The subscription keeps the selected price ID and reads its amount from the subscription's plan version.
 
-|                     | New customers | Existing customers               |
-| ------------------- | ------------- | -------------------------------- |
-| You raise the price | Pay new price | Keep current price until renewal |
-| You lower the price | Pay new price | Keep current price until renewal |
+|                     | New customers | Existing subscribers                   |
+| ------------------- | ------------- | -------------------------------------- |
+| You raise the price | Pay new price | Keep their version's price until moved |
+| You lower the price | Pay new price | Keep their version's price until moved |
 
 ### Example
 
 ```
-You change Plan Pro from $99/mo to $129/mo.
+You change Plan Pro from $99/mo to $129/mo. That publishes version 2.
 
-A new customer signs up today → pays $129/mo.
-An existing customer on day 15 of their month → keeps paying $99/mo.
-That same customer at renewal → starts paying $129/mo.
+A new customer signs up today → pays $129/mo on version 2.
+An existing customer on version 1 → keeps paying $99/mo, also at renewal.
+You move them at their next renewal → they pay $129/mo from then on.
 ```
 
 > **Note**
 >
 > Archiving a price prevents new selection but does not break subscriptions already bound to it. Accepted Offer phases remain snapshotted separately.
 
-## Usage-Based Pricing (Overage)
+## Usage, Seat, and Quota Prices
 
-Per-unit price changes are asymmetric: a **decrease applies immediately** to the current period, an **increase applies at renewal**.
+Per-unit prices follow the same rule, in both directions: existing subscribers keep their version's overage, seat, and quota prices until you move them.
 
 ### Example
 
 ```
 You raise the overage price from $0.002/call to $0.005/call.
-Your customer has already used 5,000 extra calls this month.
 
-This month's invoice → still charged at $0.002
-Next month's invoice → charged at $0.005
+A new customer → charged $0.005 per extra call
+An existing customer → still charged $0.002 per extra call until you move them
 
-You lower the overage price from $0.005/call to $0.002/call.
+You lower the extra seat price from $35/seat to $25/seat.
 
-This month's invoice → charged at $0.002 — the cheaper price applies immediately
+A new customer → $25 per extra seat
+An existing customer → $35 per extra seat until you move them
 ```
 
-## Seat Pricing
+## Market Prices
 
-Per-seat prices follow the same asymmetry: cheaper applies now, more expensive applies at renewal.
+Market prices apply to every version. When you edit a Market price, new customers get it at once, and subscribers who pay it get it at their next renewal, whether you raise or lower it. A move to another version keeps a subscriber's Market price.
 
-### Example
+## Unpaid Checkouts and Reactivations
+
+A checkout that hasn't been paid isn't a subscriber yet, so it charges the latest version of what was requested. Its link, and a repeated `POST /subscriptions` that returns the same checkout, charge the new price, unless the checkout was created with `planVersionId`. A canceled subscription that is reactivated also returns on the latest version of what was bought. See [Unpaid checkouts](/docs/plan-versions#unpaid-checkouts).
 
 ```
-You raise the extra seat price from $25/seat to $35/seat.
-Your customer has 3 extra seats.
+You raise Plan Pro from $99/mo to $129/mo while a checkout for Pro is still unpaid.
 
-This month → 3 × $25 = $75
-Next month → 3 × $35 = $105
-
-You lower it from $35/seat to $25/seat.
-
-This month → 3 × $25 = $75 — applied immediately
+The customer opens the same link → pays $129/mo on version 2.
+A canceled customer who bought Pro by its plan code on version 1 reactivates → pays $129/mo on version 2.
 ```
+
+## Moving Existing Subscribers
+
+When you publish a draft in the dashboard, choose whether subscribers of earlier versions stay on their version, move at their next renewal, or move now. Later, move them from the plan's **Subscribers** tab. Through the API, move them with `POST /subscriptions/{id}/change-version` or `POST /plans/{id}/moves`. Commet never moves subscribers on its own.
+
+A move at the next renewal changes nothing before it. A subscription that ends or changes to another plan by that renewal never moves.
+
+A move never prorates or refunds, and it never changes a subscription's currency. A move made now changes features and limits today and the price from the next renewal. See [Move subscribers](/docs/plan-versions#move-subscribers).

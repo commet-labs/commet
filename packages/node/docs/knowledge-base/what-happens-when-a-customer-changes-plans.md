@@ -5,6 +5,8 @@ description: What happens when your customer upgrades, downgrades, or switches p
 
 Your customers can switch between plans in the same plan group through the [Customer Portal](/docs/customer-portal). The group's `sortOrder` defines upgrade and downgrade direction; Commet does not infer it from price.
 
+A change to another plan lands on that plan's current [version](/docs/plan-versions). The destination must sell the customer's currency in their country. When the change takes effect, a pending move to a newer version of the current plan is dropped, without a version webhook. While a downgrade is only scheduled, that move stays pending, and it applies at the renewal if the downgrade is revoked.
+
 ## Upgrades
 
 When the billing interval stays the same, moving to a plan with a higher `sortOrder` is an **immediate** change. The customer is charged the new plan's full price, credited for the unused days of the old effective base price, and their billing cycle restarts on the day of the change.
@@ -72,7 +74,7 @@ Deleting a plan is a **soft delete**. The plan disappears from your pricing page
 
 A canceled subscription can be **reactivated** — from the dashboard, the API, or the Customer Portal.
 
-Reactivation generates a fresh invoice at the plan's current price, charges the saved card, and starts a new billing period on the reactivation date. If the charge is declined, the subscription stays canceled and your customer gets a link to update their card.
+Reactivation returns the subscription on the latest [version](/docs/plan-versions#reactivate-a-canceled-subscription) of what your customer bought: the plan's current version when they bought it with the plan code. It generates a fresh invoice at that version's price, charges the saved card, and starts a new billing period on the reactivation date. If the charge is declined, the subscription stays canceled and your customer gets a link to update their card.
 
 If the cancellation is only scheduled for the end of the period, your customer can undo it in the portal before it takes effect.
 
@@ -82,12 +84,12 @@ If the cancellation is only scheduled for the end of the period, your customer c
 
 ## Feature Changes
 
-Feature changes use the current-period subscription snapshot:
+Changing a plan's features publishes a new [plan version](/docs/plan-versions). New customers get it at once; existing customers keep the features and limits of their version until you move them:
 
-| What you do                                                                                        | Existing customers                      |
-| -------------------------------------------------------------------------------------------------- | --------------------------------------- |
-| Add a feature, enable it, increase its included amount, make it unlimited, or lower its unit price | **Applied to the current period**       |
-| Remove a feature, disable it, reduce its included amount, or raise its unit price                  | Existing snapshot remains until renewal |
+| What you do                                                                                        | New customers       | Existing customers             |
+| -------------------------------------------------------------------------------------------------- | ------------------- | ------------------------------ |
+| Add a feature, enable it, increase its included amount, make it unlimited, or lower its unit price | Get the new version | Keep their version until moved |
+| Remove a feature, disable it, reduce its included amount, or raise its unit price                  | Get the new version | Keep their version until moved |
 
 ### Example
 
@@ -95,11 +97,12 @@ Feature changes use the current-period subscription snapshot:
 You lower Plan Pro from 10,000 API calls to 5,000.
 
 New customers get 5,000.
-Existing customers keep 10,000 until renewal, then switch to 5,000.
+Existing customers keep 10,000, also at renewal, until you move them.
 ```
 
 ```
 You raise Plan Pro from 5,000 API calls to 10,000.
 
-All customers — new and existing — get 10,000 right away.
+New customers get 10,000.
+Existing customers moved now get 10,000 today, without resetting their usage.
 ```

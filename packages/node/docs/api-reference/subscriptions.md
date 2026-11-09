@@ -25,7 +25,7 @@ Deactivate an add-on from a subscription.
 
 `POST /subscriptions/{id}/addons` · operation `activate-addon`
 
-Activate an add-on on a subscription. Charges a prorated amount for the current billing period.
+Activate an add-on on a subscription. Charges a prorated amount for the current billing period. An add-on that the subscription's plan version does not sell is rejected with addon_unavailable.
 
 ### Parameters
 
@@ -176,13 +176,35 @@ Upgrade or change billing interval immediately, optionally applying an Offer by 
 
 `PlanChange`
 
+## changeVersion
+
+`commet.subscriptions.changeVersion(params, options?)`
+
+`POST /subscriptions/{id}/change-version` · operation `change-subscription-version`
+
+Move a subscription to a newer published version of its plan, now or at the end of the period, without proration; an older version is rejected with version_not_newer, and a subscription on a running experiment moves only to a later version of that experiment. The subscription keeps its currency and its price: a destination that does not sell its currency is rejected with missing_regional_price, and one that does not sell the price it pays with price_not_found. A free version moves only to a free version and a paid one only to a paid one (validation_error). A subscription whose usage does not fit the destination, or with an active add-on the destination does not sell, is not moved either, and the error says why. Each change is recorded as a move of this one subscription in the plan's moves. Repeating the same request changes nothing; a new one replaces the pending move.
+
+### Parameters
+
+- `id` (`string`, required)
+- `planVersionId` (`string`, required) — A published version of the subscription's plan.
+- `effective` (`"now" | "period_end"`, required) — now changes features, limits and the included credits or balance at once (the included difference is added to or subtracted from the plan credits or plan balance: an increase first pays any plan-part debt, a decrease never creates new debt, and purchased credits and purchased balance are untouched) and charges the new price from the next renewal. period_end changes everything at the next renewal. There is never a proration charge or refund.
+
+### Request options
+
+- `idempotencyKey` (`string`, optional) — Unique key used to safely retry this write for 24 hours without applying it twice.
+
+### Returns
+
+`Subscription`
+
 ## purchaseCredits
 
 `commet.subscriptions.purchaseCredits(params, options?)`
 
 `POST /subscriptions/{id}/credits` · operation `purchase-credits`
 
-Purchase a fixed credit pack or choose a whole credit quantity at the subscription plan price and minimum. Charges the saved payment method and adds purchased credits.
+Purchase a fixed credit pack or choose a whole credit quantity at the subscription plan price and minimum. Charges the saved payment method and adds purchased credits. A credit pack that the subscription's plan version does not sell is rejected with credit_pack_unavailable.
 
 ### Parameters
 
@@ -466,6 +488,22 @@ Revoke the plan or interval change scheduled for the end of the period, so the s
 
 `Subscription`
 
+## revokeScheduledVersionChange
+
+`commet.subscriptions.revokeScheduledVersionChange(params, options?)`
+
+`DELETE /subscriptions/{id}/scheduled-version-change` · operation `revoke-scheduled-version-change`
+
+Cancel the move to another plan version pending for the next renewal, so the subscription stays on its version, and send subscription.version_change_canceled with reason canceled_by_merchant. A move made now has nothing pending to revoke. With nothing pending it changes nothing. Returns the subscription.
+
+### Parameters
+
+- `id` (`string`, required)
+
+### Returns
+
+`Subscription`
+
 ## uncancel
 
 `commet.subscriptions.uncancel(params, options?)`
@@ -514,6 +552,7 @@ List all subscriptions. Filter by customer ID or status.
 
 - `customerId` (`string`, optional)
 - `status` (`SubscriptionStatus`, optional)
+- `planVersionId` (`string`, optional)
 
 ### Returns
 
@@ -540,12 +579,13 @@ Create a subscription for a customer. Commet selects the default price when pric
 - `successUrl` (`string`, optional)
 - `prepaidPeriods` (`number`, optional) — Billing periods of the subscription's interval paid with the first payment, including the current one. Defaults to 1. The interval does not change: each paid period renews at zero and the subscription renews normally after the last one unless `cancelAtPeriodEnd` is true.
 - `cancelAtPeriodEnd` (`boolean`, optional) — Schedules the cancellation from creation so the subscription ends after its last paid period and never renews with any payment method.
+- `planVersionId` (`string`, optional) — Public ID of a published version of the plan, current or not, including an experiment's versions. The subscription is created on that version and stays on it: checkout charges its price and activation grants its credits, add-ons and credit packs. When omitted, the subscription gets the current version, or the version an experiment code (planCode `<plan code>:<experiment code>`) sells.
 - `offerId` (`string`, optional)
 - `promoCode` (`string`, optional)
 - `customTrialDays` (`number`, optional) — Trial length in days, replacing the price's trial. A customer who already had this plan, in a trial or paying, gets no trial and goes through the regular checkout.
 - `skipTrial` (`boolean`, optional)
 - `planId` (`string`, optional)
-- `planCode` (`string`, optional)
+- `planCode` (`string`, optional) — The plan code, or an experiment code as `<plan code>:<experiment code>` to sell the version the experiment sells.
 - `cardPromotionId` (`string`, optional) — Public card promotion ID. The offer is shown immediately and remains conditional on card eligibility until checkout confirmation.
 
 ### Valid parameter combinations

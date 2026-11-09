@@ -75,7 +75,7 @@ Customer upgrades from Starter ($29/mo) to Pro ($99/mo) on day 15:
 - **Balance top-up** — when your customer adds funds to their balance.
 - **Add-on activation** — when your customer activates an add-on mid-cycle; the first charge is prorated.
 - **One-time payment** — when your customer pays a payment link or a standalone charge, outside any subscription.
-- **Reactivation** — when a canceled subscription is reactivated; a fresh invoice at the plan's current price, starting a new billing period.
+- **Reactivation** — when a canceled subscription is reactivated; a fresh invoice at the price of the latest [plan version](/docs/plan-versions#reactivate-a-canceled-subscription) of what was bought, starting a new billing period.
 - **Adjustment** — when you manually create a correction, refund, or one-off charge from the dashboard.
 
 ## Invoice Line Types

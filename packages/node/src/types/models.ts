@@ -46,6 +46,8 @@ export interface Addon {
   includedUnits: number | null;
   overageRate: number | null;
   creditCost: number | null;
+  /** Plans that sell the add-on. */
+  planIds: Array<string>;
   object: "addon";
   livemode: boolean;
 }
@@ -150,6 +152,13 @@ export interface CreatedSubscription {
   createdAt: string;
   /** @format date-time */
   updatedAt: string;
+  /** The plan version whose terms the subscription has now. It keeps paying and receiving everything from this version until it is moved. */
+  planVersion: {
+    /** Public plan version ID. */
+    id: string;
+    /** Main versions are 1, 2, 3; an experiment's versions carry its own code, like price-test 2. */
+    label: string;
+  } | null;
   offerApplications: Array<SubscriptionOfferApplication>;
   pause:
     | {
@@ -204,6 +213,8 @@ export interface CreditPack {
   description: string | null;
   credits: number;
   price: number;
+  /** Plans that sell the credit pack. */
+  planIds: Array<string>;
   isActive: boolean;
   /** @format date-time */
   createdAt: string;
@@ -219,6 +230,8 @@ export interface CreditPackListItem {
   description: string | null;
   credits: number;
   price: number;
+  /** Plans that sell the credit pack. */
+  planIds: Array<string>;
   currency: string;
   object: "credit_pack";
   livemode: boolean;
@@ -693,6 +706,13 @@ export interface InvoiceListItem {
   livemode: boolean;
 }
 
+export interface KeptOnVersion {
+  subscriptionId: string;
+  keptOnVersion: true;
+  object: "kept_on_version";
+  livemode: boolean;
+}
+
 export type ManagedBy = "dub" | null;
 
 export interface Market {
@@ -982,6 +1002,36 @@ export interface Plan {
     currency: string;
     exchangeRate: number;
   }>;
+  /** Countries with their own currency or prices in the current version. Buyers from any other country pay the USD prices. */
+  countries: Array<{
+    /** ISO country code. */
+    country: string;
+    /** The currency buyers from the country pay, USD included. */
+    currency: string;
+    prices: Array<{
+      billingInterval: BillingInterval;
+      /** The country's price in the currency's minor unit. */
+      price: number;
+      /** True when set by hand; false when it follows the USD base at the exchange rate. */
+      manual: boolean;
+    }>;
+    /** Every add-on the version sells, priced for the country. */
+    addons: Array<{
+      addonId: string;
+      /** What buyers from the country pay for the add-on, in the currency's minor unit. */
+      price: number;
+      /** True when set by hand; false when it follows the add-on's USD price at the exchange rate. */
+      manual: boolean;
+    }>;
+    /** Every credit pack the version sells, priced for the country. */
+    creditPacks: Array<{
+      creditPackId: string;
+      /** What buyers from the country pay for the pack, in the currency's minor unit. */
+      price: number;
+      /** True when set by hand; false when it follows the pack's USD price at the exchange rate. */
+      manual: boolean;
+    }>;
+  }>;
   object: "plan";
   livemode: boolean;
 }
@@ -1205,6 +1255,146 @@ export type PlanChange =
       livemode: boolean;
     };
 
+export interface PlanDraft {
+  /** Public plan draft ID. */
+  id: string;
+  /** The version the draft started from. */
+  fromVersionId: string;
+  /** What the draft changes against the version it started from. */
+  changes: Array<{
+    /** Identifies the change; send it to undo just this change. */
+    key: string;
+    /** Where the change is: Price, Trial, a rules section, Add-ons, or a country. */
+    section: string;
+    /** ISO country code when the change belongs to one country. */
+    country: string | null;
+    /** What changed, such as Monthly price. */
+    label: string;
+    /** The value before, formatted. */
+    before: string | null;
+    /** The value now, formatted. */
+    after: string | null;
+  }>;
+  /** @format date-time */
+  createdAt: string;
+  /** @format date-time */
+  updatedAt: string;
+  object: "plan_draft";
+  livemode: boolean;
+}
+
+export interface PlanDraftPublication {
+  preview: boolean;
+  /** The published version. Null for a preview. */
+  version: {
+    /** Public plan version ID. */
+    id: string;
+    /** The plan's versions are numbered 1, 2, 3; an experiment's own versions read with its code, such as price-test 2. */
+    label: string;
+    /** The plan's version number. Null for a version that only belongs to an experiment; an experiment version made current takes the next number. */
+    number: number | null;
+    /** The experiment this version belongs to, if any. */
+    experiment: {
+      /** The experiment's code, as sold with planCode. */
+      code: string;
+      /** Its number within the experiment. */
+      version: number;
+    } | null;
+    /** Whether new buyers get this version. */
+    isCurrent: boolean;
+    /** The version this one was created from. */
+    parentVersionId: string | null;
+    /** Active, trialing, past due and paused subscriptions on it. */
+    subscriptionCount: number;
+    maxPlanCredits: number | null;
+    maxPlanBalance: number | null;
+    prices: Array<{
+      /** Public plan price ID. */
+      id: string;
+      billingInterval:
+        | "weekly"
+        | "monthly"
+        | "quarterly"
+        | "semiannual"
+        | "yearly"
+        | "one_time";
+      price: number;
+      includedCredits: number | null;
+      includedBalance: number | null;
+      regionalPrices: Array<{
+        currency: string;
+        price: number;
+        includedBalance: number | null;
+      }>;
+    }>;
+    /** @format date-time */
+    createdAt: string;
+  } | null;
+  /** The move of subscribers, if any. */
+  moveId: string | null;
+  subscribers: {
+    moving: number;
+    keptOnVersion: number;
+    /** Left on their version because no change makes them fit; they show among the subscribers that need a change. */
+    needsAChange: number;
+    leftOut: Array<{
+      subscriptionId: string;
+      code: string;
+      message: string;
+    }>;
+  } | null;
+  object: "plan_draft_publication";
+  livemode: boolean;
+}
+
+export interface PlanExperiment {
+  /** Public plan experiment ID. */
+  id: string;
+  /** The code to sell it with as planCode, such as pro:price-test. It always sells the experiment's latest version while running, and the plan's current version once closed. */
+  code: string;
+  /** running sells its latest version; won became the plan's current version; archived stopped selling. */
+  status: "running" | "won" | "archived";
+  /** The plan's version that was current when it started. */
+  startedFromVersionId: string;
+  /** Its latest version. */
+  latestVersionId: string;
+  /** The version its code sells to new buyers today. */
+  sellsVersionId: string;
+  /** Active, trialing, past due and paused subscriptions on its versions. */
+  subscriptionCount: number;
+  /** @format date-time */
+  createdAt: string;
+  closedAt: string | null;
+  object: "plan_experiment";
+  livemode: boolean;
+}
+
+export interface PlanExperimentArchive {
+  experiment: {
+    /** Public plan experiment ID. */
+    id: string;
+    /** The code to sell it with as planCode, such as pro:price-test. It always sells the experiment's latest version while running, and the plan's current version once closed. */
+    code: string;
+    /** running sells its latest version; won became the plan's current version; archived stopped selling. */
+    status: "running" | "won" | "archived";
+    /** The plan's version that was current when it started. */
+    startedFromVersionId: string;
+    /** Its latest version. */
+    latestVersionId: string;
+    /** The version its code sells to new buyers today. */
+    sellsVersionId: string;
+    /** Active, trialing, past due and paused subscriptions on its versions. */
+    subscriptionCount: number;
+    /** @format date-time */
+    createdAt: string;
+    closedAt: string | null;
+  };
+  /** The move of its subscribers, or null when they stay. */
+  moveId: string | null;
+  object: "plan_experiment_archive";
+  livemode: boolean;
+}
+
 export interface PlanFeature {
   planId: string;
   featureId: string;
@@ -1290,6 +1480,50 @@ export interface PlanGroupDetail {
   livemode: boolean;
 }
 
+export interface PlanMove {
+  /** Public move ID. Null for a preview, which records nothing. */
+  id: string | null;
+  toVersionId: string;
+  /** The versions its subscribers are moving from. */
+  fromVersionIds: Array<string>;
+  effective: "now" | "period_end";
+  preview: boolean;
+  /** checked is a preview where everyone fits; moving while subscribers wait for their move; completed once every move ran; canceled after it was canceled. */
+  status:
+    | "checking"
+    | "blocked"
+    | "checked"
+    | "moving"
+    | "completed"
+    | "canceled";
+  counts: {
+    moving: number;
+    moved: number;
+    needsAChange: number;
+    leftOut: number;
+    canceled: number;
+    keptOnVersion: number;
+  };
+  subscriptions: Array<{
+    subscriptionId: string;
+    /** moving waits for its renewal or is being moved; moved is on the destination; needs_a_change could not move and keeps its version until it is resolved or kept; left_out was not moved because it was not active, trialing or past due, such as a paused subscription (invalid_subscription_status), or because a listed subscription was already on the destination (no_change_requested); canceled was canceled before it moved; kept_on_version was left on its version by the merchant. */
+    status:
+      | "moving"
+      | "moved"
+      | "needs_a_change"
+      | "left_out"
+      | "canceled"
+      | "kept_on_version";
+    code: string | null;
+    message: string | null;
+  }>;
+  createdAt: string | null;
+  completedAt: string | null;
+  canceledAt: string | null;
+  object: "plan_move";
+  livemode: boolean;
+}
+
 export interface PlanPrice {
   /** Public plan price ID. */
   id: string;
@@ -1347,6 +1581,77 @@ export interface PlanRegionalPricingResult {
   livemode: boolean;
 }
 
+export interface PlanVersion {
+  /** Public plan version ID. */
+  id: string;
+  /** The plan's versions are numbered 1, 2, 3; an experiment's own versions read with its code, such as price-test 2. */
+  label: string;
+  /** The plan's version number. Null for a version that only belongs to an experiment; an experiment version made current takes the next number. */
+  number: number | null;
+  /** The experiment this version belongs to, if any. */
+  experiment: {
+    /** The experiment's code, as sold with planCode. */
+    code: string;
+    /** Its number within the experiment. */
+    version: number;
+  } | null;
+  /** Whether new buyers get this version. */
+  isCurrent: boolean;
+  /** The version this one was created from. */
+  parentVersionId: string | null;
+  /** Active, trialing, past due and paused subscriptions on it. */
+  subscriptionCount: number;
+  maxPlanCredits: number | null;
+  maxPlanBalance: number | null;
+  prices: Array<{
+    /** Public plan price ID. */
+    id: string;
+    billingInterval:
+      | "weekly"
+      | "monthly"
+      | "quarterly"
+      | "semiannual"
+      | "yearly"
+      | "one_time";
+    price: number;
+    includedCredits: number | null;
+    includedBalance: number | null;
+    regionalPrices: Array<{
+      currency: string;
+      price: number;
+      includedBalance: number | null;
+    }>;
+  }>;
+  /** @format date-time */
+  createdAt: string;
+  object: "plan_version";
+  livemode: boolean;
+}
+
+export interface PlanVersionComparison {
+  /** The version the changes start from. */
+  versionId: string;
+  /** The version they end at. */
+  againstVersionId: string;
+  /** Every term that differs, the plan's first and then each country. */
+  changes: Array<{
+    /** Identifies the change; send it to undo just this change. */
+    key: string;
+    /** Where the change is: Price, Trial, a rules section, Add-ons, or a country. */
+    section: string;
+    /** ISO country code when the change belongs to one country. */
+    country: string | null;
+    /** What changed, such as Monthly price. */
+    label: string;
+    /** The value before, formatted. */
+    before: string | null;
+    /** The value now, formatted. */
+    after: string | null;
+  }>;
+  object: "plan_version_comparison";
+  livemode: boolean;
+}
+
 export interface PortalAccess {
   portalUrl: string;
   object: "portal_session";
@@ -1369,6 +1674,11 @@ export interface PreviewChange {
   daysRemaining: number;
   totalDays: number;
   isUpgrade: boolean;
+  /** Active add-ons that the version the change moves the subscription to does not sell. The change deactivates them when it applies. */
+  deactivatedAddons: Array<{
+    addonId: string;
+    name: string;
+  }>;
   offerApplication?: {
     id: string;
     offerId: string;
@@ -1640,6 +1950,21 @@ export interface SentInvoice {
   livemode: boolean;
 }
 
+export interface SubscriberNeedingAChange {
+  subscriptionId: string;
+  /** The move it could not complete. */
+  moveId: string;
+  /** The version it stays on. */
+  fromVersionId: string;
+  /** The version it could not move to. */
+  toVersionId: string;
+  /** Why it could not move. */
+  code: string;
+  message: string;
+  object: "subscriber_needing_a_change";
+  livemode: boolean;
+}
+
 export interface Subscription {
   id: string;
   customerId: string;
@@ -1688,6 +2013,13 @@ export interface Subscription {
   createdAt: string;
   /** @format date-time */
   updatedAt: string;
+  /** The plan version whose terms the subscription has now. It keeps paying and receiving everything from this version until it is moved. */
+  planVersion: {
+    /** Public plan version ID. */
+    id: string;
+    /** Main versions are 1, 2, 3; an experiment's versions carry its own code, like price-test 2. */
+    label: string;
+  } | null;
   offerApplications: Array<SubscriptionOfferApplication>;
   pause:
     | {
@@ -1709,6 +2041,13 @@ export interface Subscription {
         resumeAt: string | null;
       }
     | null;
+  /** A move to another version of the plan pending for the next renewal. */
+  scheduledVersionChange: {
+    planVersionId: string;
+    label: string;
+    /** @format date-time */
+    effectiveAt: string;
+  } | null;
   planGrant?: {
     /** The active Plan Grant ID. */
     id: string;
@@ -1995,6 +2334,13 @@ export interface SubscriptionSummary {
   createdAt: string;
   /** @format date-time */
   updatedAt: string;
+  /** The plan version whose terms the subscription has now. It keeps paying and receiving everything from this version until it is moved. */
+  planVersion: {
+    /** Public plan version ID. */
+    id: string;
+    /** Main versions are 1, 2, 3; an experiment's versions carry its own code, like price-test 2. */
+    label: string;
+  } | null;
   offerApplications: Array<SubscriptionOfferApplication>;
   pause:
     | {
