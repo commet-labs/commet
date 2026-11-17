@@ -159,7 +159,7 @@ $balanceTopup = $commet->subscriptions->topupBalance(
 );
 ```
 
-A top-up charges the payment method attached to the subscription. Customers can also buy balance from the [Customer Portal](/docs/customer-portal).
+A top-up creates its invoice and charges the payment method attached to the subscription. The balance is added once the payment is confirmed: the response's `status` is `succeeded`, or `processing` when the payment method confirms later, such as Pix. A declined payment adds nothing and voids the invoice. Customers can also buy balance from the [Customer Portal](/docs/customer-portal).
 
 ## Enforce before spending
 

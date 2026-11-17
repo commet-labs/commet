@@ -43,6 +43,8 @@ export type PublishPlanDraftParams =
         seatLimit?: true;
         /** Add-ons it stops paying at renewal. */
         removeAddonIds?: Array<string>;
+        /** usd to charge it in USD from its renewal when the version does not sell the currency it pays, or the USD price of its country. */
+        currency?: string;
       }>;
       /** Check everything without publishing. */
       preview?: boolean;
@@ -79,6 +81,8 @@ export type PublishPlanDraftParams =
         seatLimit?: true;
         /** Add-ons it stops paying at renewal. */
         removeAddonIds?: Array<string>;
+        /** usd to charge it in USD from its renewal when the version does not sell the currency it pays, or the USD price of its country. */
+        currency?: string;
       }>;
       /** Check everything without publishing. */
       preview?: boolean;
@@ -186,10 +190,14 @@ export interface UpdatePlanDraftParams {
     freeIncludedBalance?: number | null;
     unusedPlanCredits?: "expire" | "roll_over";
     maxPlanCredits?: number | null;
+    /** Credits plans only. true makes the plan credits unlimited: usage never spends them, only planCreditLimit caps it, and every price and the free plan include 0 credits. */
+    unlimitedPlanCredits?: boolean;
     planCreditLimit?: number | null;
     planCreditLimitInterval?: "day" | "week" | null;
     unusedPlanBalance?: "expire" | "roll_over";
     maxPlanBalance?: number | null;
+    /** Balance plans only. true makes the plan balance unlimited: usage never spends it, only planBalanceLimit caps it, and every price, country and the free plan include no balance. */
+    unlimitedPlanBalance?: boolean;
     planBalanceLimit?: number | null;
     planBalanceLimitInterval?: "day" | "week" | null;
     blockOnExhaustion?: boolean;
@@ -237,6 +245,8 @@ export interface ArchivePlanExperimentParams {
     seatLimit?: true;
     /** Add-ons it stops paying at renewal. */
     removeAddonIds?: Array<string>;
+    /** usd to charge it in USD from its renewal when the version does not sell the currency it pays, or the USD price of its country. */
+    currency?: string;
   }>;
   /** Check the archive and the move without changing anything. */
   preview?: boolean;
@@ -402,6 +412,8 @@ export type CreatePlanMoveParams =
         seatLimit?: true;
         /** Add-ons it stops paying at renewal. */
         removeAddonIds?: Array<string>;
+        /** usd to charge it in USD from its renewal when the version does not sell the currency it pays, or the USD price of its country. */
+        currency?: string;
       }>;
       /** Check every subscriber without moving anyone. */
       preview?: boolean;
@@ -429,6 +441,8 @@ export type CreatePlanMoveParams =
         seatLimit?: true;
         /** Add-ons it stops paying at renewal. */
         removeAddonIds?: Array<string>;
+        /** usd to charge it in USD from its renewal when the version does not sell the currency it pays, or the USD price of its country. */
+        currency?: string;
       }>;
       /** Check every subscriber without moving anyone. */
       preview?: boolean;
@@ -654,6 +668,8 @@ export interface UpdatePlanParams {
         /** The most plan credits a subscription holds after a reset, including the credits that reset grants; credits above it expire. At least the included credits of every price. null means no limit other than the largest storable balance, 2,147,483,647 plan credits. */
         maxPlanCredits: number | null;
       };
+  /** Credits plans only. true makes the plan credits unlimited: usage never spends them, only planCreditLimit caps it, and every price includes 0 credits. Changing it publishes a new version of the plan; each subscription stays on its version until moved. */
+  unlimitedPlanCredits?: boolean;
   /** Credits plans only. The most plan credits a subscription spends per day or per week; null removes the limit. Changing it publishes a new version of the plan; each subscription stays on its version until moved. */
   planCreditLimit?: {
     /** The most plan credits a subscription spends in one window. */
@@ -671,6 +687,8 @@ export interface UpdatePlanParams {
         /** The most plan balance a subscription holds after a reset, in USD cents, including the balance that reset grants; balance above it expires. At least the included balance of every price. Other currencies convert it with the plan's exchange rate unless the dashboard sets a custom amount for that currency. null means no limit other than the largest storable amount, 2,147,483,647 cents. */
         maxPlanBalance: number | null;
       };
+  /** Balance plans only. true makes the plan balance unlimited: usage never spends it, only planBalanceLimit caps it, and every price and country includes no balance. Changing it publishes a new version of the plan; each subscription stays on its version until moved. */
+  unlimitedPlanBalance?: boolean;
   /** Balance plans only. The most plan balance a subscription spends per day or per week, in USD cents; null removes the limit. Changing it publishes a new version of the plan; each subscription stays on its version until moved. */
   planBalanceLimit?: {
     /** The most plan balance a subscription spends in one window, in USD cents. Other currencies convert it with the plan's exchange rate unless the dashboard sets a custom amount for that currency. */
@@ -766,6 +784,8 @@ export interface CreatePlanParams {
         /** The most plan credits a subscription holds after a reset, including the credits that reset grants; credits above it expire. At least the included credits of every price. null means no limit other than the largest storable balance, 2,147,483,647 plan credits. */
         maxPlanCredits: number | null;
       };
+  /** Credits plans only. true makes the plan credits unlimited: usage never spends them, only planCreditLimit caps it, and every price includes 0 credits. Omitted means false. */
+  unlimitedPlanCredits?: boolean;
   /** Credits plans only. The most plan credits a subscription spends per day or per week; omitted or null means no limit. */
   planCreditLimit?: {
     /** The most plan credits a subscription spends in one window. */
@@ -783,6 +803,8 @@ export interface CreatePlanParams {
         /** The most plan balance a subscription holds after a reset, in USD cents, including the balance that reset grants; balance above it expires. At least the included balance of every price. Other currencies convert it with the plan's exchange rate unless the dashboard sets a custom amount for that currency. null means no limit other than the largest storable amount, 2,147,483,647 cents. */
         maxPlanBalance: number | null;
       };
+  /** Balance plans only. true makes the plan balance unlimited: usage never spends it, only planBalanceLimit caps it, and every price and country includes no balance. Omitted means false. */
+  unlimitedPlanBalance?: boolean;
   /** Balance plans only. The most plan balance a subscription spends per day or per week, in USD cents; omitted or null means no limit. */
   planBalanceLimit?: {
     /** The most plan balance a subscription spends in one window, in USD cents. Other currencies convert it with the plan's exchange rate unless the dashboard sets a custom amount for that currency. */

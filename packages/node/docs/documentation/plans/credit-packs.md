@@ -100,7 +100,7 @@ await commet.subscriptions.purchaseCredits({
 })
 ```
 
-Commet charges the saved payment method at the price per credit of the subscription's plan version and adds purchased credits. Send `creditPackId` instead of `quantity` to buy a pack. Both fire [`credits.purchased`](/docs/webhooks/credits-purchased).
+Commet creates the purchase invoice, charges the saved payment method at the price per credit of the subscription's plan version and adds the purchased credits once the payment is confirmed. Send `creditPackId` instead of `quantity` to buy a pack. The response's `status` is `succeeded` when the credits were added, or `processing` when the payment method confirms later, such as Pix: the credits are added and [`credits.purchased`](/docs/webhooks/credits-purchased) fires when the payment is confirmed. A declined payment adds nothing and voids the invoice.
 
 | Response                      | Cause                                                                      |
 | ----------------------------- | -------------------------------------------------------------------------- |
@@ -134,6 +134,8 @@ await commet.subscriptions.updateAutoTopUp({
 
 Send only the fields that change. Enabling requires a plan with a price per credit. Read the current settings, `status`, `topUpsThisPeriod`, and `lastFailure` with `getAutoTopUp`.
 
-Auto top-up pauses after 3 consecutive failed top-ups, or after one whose charge couldn't be refunded. It resumes when the payment method changes, a credit purchase succeeds, or you save it enabled again.
+While a credit purchase is still processing, auto top-up does not buy again. A top-up confirmed later counts in the period it was triggered; one declined later counts as a failed top-up.
+
+Auto top-up pauses after 3 consecutive failed top-ups, or after one whose charge couldn't be refunded. It resumes when the payment method changes, a credit purchase is paid, or you save it enabled again.
 
 Customers turn it on and edit it in the [Customer Portal](/docs/customer-portal) under **Auto top-up**. In the dashboard, it appears on the subscription detail.

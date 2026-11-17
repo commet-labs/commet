@@ -396,7 +396,7 @@ export interface SubscriptionVersionChangeCanceledData {
   customerId: string;
   /** The version the subscription was going to move to. */
   toVersionId: string;
-  /** Why the move was canceled: canceled_by_merchant, version_change_failed when the move could not be applied at renewal, or the code of what the subscription no longer fits (addon_unavailable, seat_limit_exceeded, price_not_found, missing_regional_price). */
+  /** Why the move was canceled: canceled_by_merchant, version_change_failed when the move could not be applied at renewal, the code of what the subscription no longer fits (addon_unavailable, seat_limit_exceeded, price_not_found, missing_regional_price), or, for a move that charges it in USD, what keeps it in its currency (currency_held_by_payment_method, currency_held_by_customer_credit, currency_held_by_balance_plan, currency_held_by_fixed_amount_discount, currency_held_by_prepaid_period, currency_held_by_scheduled_pause). */
   reason: string;
 }
 
@@ -676,6 +676,8 @@ export interface PaymentRefundedData {
   customerId: string | null;
   /** The subscription ID, if the invoice is linked to a subscription. */
   subscriptionId: string | null;
+  /** Cumulative confirmed refunds in the payment currency’s smallest unit. */
+  amountRefunded: number;
   /** The refunded amount in cents (100 = $1.00). */
   refundAmount: number;
   /** The refund currency code. */
@@ -902,7 +904,7 @@ export interface InvoiceCreatedData {
   subscriptionId: string | null;
 }
 
-/** Fired when an invoice is voided — nullified before collection, either manually or automatically when its subscription is canceled. Voiding is terminal: a void invoice is never retried or collected. */
+/** Fired when an invoice is voided — nullified before collection, for example when its subscription is canceled. Voiding is terminal: a void invoice is never retried or collected. */
 export interface InvoiceVoidedData {
   /** The invoice ID. */
   invoiceId: string;
@@ -1180,8 +1182,10 @@ export interface CustomerStateChangedData {
               creditsPerUnit: number;
               /** Actual credits deducted by this feature during the period. */
               creditsConsumed: number;
-              /** Additional product units available from the current shared credit pool at this feature's conversion rate. */
-              availableUnits: number;
+              /** Whether the plan credits are unlimited: usage never spends them and only the plan credit limit caps it. */
+              unlimited: boolean;
+              /** Additional product units available from the current shared credit pool at this feature's conversion rate. Absent when unlimited is true. */
+              availableUnits?: number;
             }
           | {
               /** Product usage deducts money from a shared balance. */
@@ -1208,7 +1212,9 @@ export interface CustomerStateChangedData {
                 /** Lowercase ISO 4217 currency code. */
                 currency: string;
               };
-              /** Estimated additional units available from the current shared balance at this feature's fixed price. Absent for dynamic pricing. */
+              /** Whether the plan balance is unlimited: usage never spends it and only the plan balance limit caps it. */
+              unlimited: boolean;
+              /** Estimated additional units available from the current shared balance at this feature's fixed price. Absent for dynamic pricing and when unlimited is true. */
               availableUnits?: number;
               /** Price for one additional product unit. */
               unitPrice?: {

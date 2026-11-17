@@ -69,4 +69,4 @@ When you publish a draft in the dashboard, choose whether subscribers of earlier
 
 A move at the next renewal changes nothing before it. A subscription that ends or changes to another plan by that renewal never moves.
 
-A move never prorates or refunds, and it never changes a subscription's currency. A move made now changes features and limits today and the price from the next renewal. See [Move subscribers](/docs/plan-versions#move-subscribers).
+A move never prorates or refunds, and it keeps a subscription's currency unless you charge it in USD from its next renewal. A move made now changes features and limits today and the price from the next renewal. See [Move subscribers](/docs/plan-versions#move-subscribers).
