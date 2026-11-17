@@ -194,7 +194,7 @@ Update a customer's name, external ID, or metadata.
 - `email` (`string`, optional)
 - `fullName` (`string`, optional)
 - `taxDocument` (`string`, optional)
-- `businessTaxId` (`string | null`, optional) — Business tax ID, such as an EU VAT number or a Peruvian RUC, for the country of the customer's address. Accepted only where Commet collects tax; a valid ID replaces consumer tax with the business treatment. Send null to remove it.
+- `businessTaxId` (`string | null`, optional) — Business tax ID, such as an EU VAT number, a Peruvian RUC or an Argentine CUIT, for the country of the customer's address; its type comes from that country. Where Commet collects tax and that ID exempts business buyers, a valid ID replaces consumer tax with the business treatment; elsewhere it is stored as sent and does not change any charge. Send null to remove it.
 - `externalId` (`string`, optional)
 - `timezone` (`Timezone`, optional)
 - `metadata` (`Record<string, unknown>`, optional)
@@ -218,7 +218,7 @@ Create up to 100 customers in a single request. With planGroupId, each customer 
 
 ### Parameters
 
-- `customers` (`Array<{ email: string; id?: string; externalId?: string; fullName?: string; taxDocument?: string; timezone?: Timezone; metadata?: Record<string, unknown>; address?: { line1: string; line2?: string; city: string; state?: string; postalCode: string; country: string; region?: string } }>`, required)
+- `customers` (`Array<{ email: string; id?: string; externalId?: string; fullName?: string; taxDocument?: string; businessTaxId?: string; timezone?: Timezone; metadata?: Record<string, unknown>; address?: { line1: string; line2?: string; city: string; state?: string; postalCode: string; country: string; region?: string } }>`, required)
 - `planGroupId` (`string`, optional) — Plan group whose starting plan the customer starts on when it has no open subscription: its signup trial, a trial without a payment method, when the group has one and the customer never had that plan, otherwise its default plan. A customer who already had the signup trial plan in a group without a default plan starts on none. Without it, no plan is assigned.
 
 ### Request options
@@ -261,7 +261,7 @@ Create a new customer. Idempotent when customerId is provided. With planGroupId,
 - `externalId` (`string`, optional)
 - `fullName` (`string`, optional)
 - `taxDocument` (`string`, optional)
-- `businessTaxId` (`string`, optional) — Business tax ID, such as an EU VAT number or a Peruvian RUC, for the country of the customer's address. Accepted only where Commet collects tax; a valid ID replaces consumer tax with the business treatment.
+- `businessTaxId` (`string`, optional) — Business tax ID, such as an EU VAT number, a Peruvian RUC or an Argentine CUIT, for the country of the customer's address; its type comes from that country. Where Commet collects tax and that ID exempts business buyers, a valid ID replaces consumer tax with the business treatment; elsewhere it is stored as sent and does not change any charge.
 - `address` (`{ line1: string; line2?: string; city: string; state?: string; postalCode: string; country: string; region?: string }`, optional)
 - `addressId` (`string`, optional)
 - `email` (`string`, required)

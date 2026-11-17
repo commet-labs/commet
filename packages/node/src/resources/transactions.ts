@@ -10,6 +10,8 @@ import type { CommetHTTPClient } from "../utils/http";
 
 export interface RefundTransactionParams {
   id: string;
+  /** Amount returned to the customer, including tax, in the payment currency’s smallest unit. Omit to refund the remainder. */
+  amount?: number;
 }
 
 export interface RetryTransactionParams {
@@ -30,13 +32,13 @@ export interface ListTransactionsParams {
 export class TransactionsResource {
   constructor(private httpClient: CommetHTTPClient) {}
 
-  /** Issue a full refund and return the provider-neutral refund resource with its actual status. */
+  /** Refund a positive amount in the payment currency’s smallest unit, or omit amount to refund the remaining amount. Returns the refund resource with its actual status. */
   async refund(
     params: RefundTransactionParams,
     options?: RequestOptions,
   ): Promise<Refund> {
-    const { id } = params;
-    return this.httpClient.post(`/transactions/${id}/refund`, {}, options);
+    const { id, ...rest } = params;
+    return this.httpClient.post(`/transactions/${id}/refund`, rest, options);
   }
 
   /** Retry a failed subscription renewal and return an honest retry result. The original failed transaction remains immutable. */

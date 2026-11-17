@@ -215,7 +215,7 @@ $invoice = $commet->invoices->updateStatus(
 );
 ```
 
-Only outstanding invoices can be marked `paid` or `void`. This records an external settlement or a deliberate write-off; it does not create a provider transaction.
+Only outstanding invoices can be marked `paid` or `void`. This records an external settlement or a deliberate write-off; it does not create a provider transaction. A credit purchase, top-up or add-on invoice still awaiting payment confirmation can't be marked `paid` by hand: it is paid when the payment provider confirms the payment. Marking it `void` cancels the purchase; if the payment is confirmed later, it is refunded.
 
 ## Send or download
 

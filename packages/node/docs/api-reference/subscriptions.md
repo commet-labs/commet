@@ -25,7 +25,7 @@ Deactivate an add-on from a subscription.
 
 `POST /subscriptions/{id}/addons` · operation `activate-addon`
 
-Activate an add-on on a subscription. Charges a prorated amount for the current billing period. An add-on that the subscription's plan version does not sell is rejected with addon_unavailable.
+Activate an add-on on a subscription. Creates the activation invoice and charges a prorated amount for the current billing period; the add-on is active once the payment is confirmed. Rejected with 409 while the add-on is active or an activation of it is still processing. An add-on that the subscription's plan version does not sell is rejected with addon_unavailable.
 
 ### Parameters
 
@@ -110,7 +110,7 @@ Adjust a subscription's balance or credits by a signed amount. Positive adds, ne
 
 `POST /subscriptions/{id}/balance/topup` · operation `topup-balance`
 
-Top up a balance subscription. Charges the customer's payment method for the amount plus tax, adds it to the subscription's purchased balance (after paying back any overage owed on the plan balance), creates its invoice and emits `balance.topped_up`. Purchased balance is spent after the plan balance and is kept until the subscription ends. Rejected with 400 when the subscription is not on a balance plan, its plan has top-ups turned off, or the amount is below the effective minimum: the plan's minimum top-up in the subscription currency, raised to the currency's minimum charge.
+Top up a balance subscription. Creates the top-up invoice and charges the customer's payment method for the amount plus tax. Once the payment is confirmed, adds the amount to the subscription's purchased balance (after paying back any overage owed on the plan balance), marks the invoice paid and emits `balance.topped_up`. Purchased balance is spent after the plan balance and is kept until the subscription ends. Rejected with 400 when the subscription is not on a balance plan, its plan has top-ups turned off, or the amount is below the effective minimum: the plan's minimum top-up in the subscription currency, raised to the currency's minimum charge.
 
 ### Parameters
 
@@ -182,13 +182,14 @@ Upgrade or change billing interval immediately, optionally applying an Offer by 
 
 `POST /subscriptions/{id}/change-version` · operation `change-subscription-version`
 
-Move a subscription to a newer published version of its plan, now or at the end of the period, without proration; an older version is rejected with version_not_newer, and a subscription on a running experiment moves only to a later version of that experiment. The subscription keeps its currency and its price: a destination that does not sell its currency is rejected with missing_regional_price, and one that does not sell the price it pays with price_not_found. A free version moves only to a free version and a paid one only to a paid one (validation_error). A subscription whose usage does not fit the destination, or with an active add-on the destination does not sell, is not moved either, and the error says why. Each change is recorded as a move of this one subscription in the plan's moves. Repeating the same request changes nothing; a new one replaces the pending move.
+Move a subscription to a newer published version of its plan, now or at the end of the period, without proration; an older version is rejected with version_not_newer, and a subscription on a running experiment moves only to a later version of that experiment. The subscription keeps its currency and its price: a destination that does not sell its currency is rejected with missing_regional_price unless currency asks to charge it in USD from its renewal, and one that does not sell the price it pays with price_not_found. A free version moves only to a free version and a paid one only to a paid one (validation_error). A subscription whose usage does not fit the destination, or with an active add-on the destination does not sell, is not moved either, and the error says why. Each change is recorded as a move of this one subscription in the plan's moves. Repeating the same request changes nothing; a new one replaces the pending move.
 
 ### Parameters
 
 - `id` (`string`, required)
 - `planVersionId` (`string`, required) — A published version of the subscription's plan.
 - `effective` (`"now" | "period_end"`, required) — now changes features, limits and the included credits or balance at once (the included difference is added to or subtracted from the plan credits or plan balance: an increase first pays any plan-part debt, a decrease never creates new debt, and purchased credits and purchased balance are untouched) and charges the new price from the next renewal. period_end changes everything at the next renewal. There is never a proration charge or refund.
+- `currency` (`string`, optional) — usd to charge the subscription in USD from its next renewal when the version does not sell the currency it pays, or the USD price of its country: it pays the version's USD price for its country, or the USD base price. The whole move then happens at that renewal, even with effective now. Rejected with missing_regional_price when the version still sells what the subscription pays or for another currency, and with a currency_held_by code naming what keeps it in its currency: currency_held_by_payment_method (it pays through dLocal), currency_held_by_customer_credit, currency_held_by_balance_plan, currency_held_by_fixed_amount_discount, currency_held_by_prepaid_period or currency_held_by_scheduled_pause.
 
 ### Request options
 
@@ -204,7 +205,7 @@ Move a subscription to a newer published version of its plan, now or at the end 
 
 `POST /subscriptions/{id}/credits` · operation `purchase-credits`
 
-Purchase a fixed credit pack or choose a whole credit quantity at the subscription plan price and minimum. Charges the saved payment method and adds purchased credits. A credit pack that the subscription's plan version does not sell is rejected with credit_pack_unavailable.
+Purchase a fixed credit pack or choose a whole credit quantity at the subscription plan price and minimum. Creates the purchase invoice, charges the saved payment method and adds the purchased credits once the payment is confirmed. A credit pack that the subscription's plan version does not sell is rejected with credit_pack_unavailable.
 
 ### Parameters
 

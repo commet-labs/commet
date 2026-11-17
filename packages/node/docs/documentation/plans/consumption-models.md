@@ -72,6 +72,26 @@ An event past the limit uses purchased credits. Without enough, [Track Usage](/d
 
 In the dashboard, open **Plans**, select a credits plan, and edit **Carry-over**, **Credit limit**, or **Buying credits** under **Credit rules**. The changes go into a draft until you publish it.
 
+### Make plan credits unlimited
+
+```bash
+curl -X PATCH https://commet.co/api/v1/plans/pln_xxx \
+  -H "x-api-key: $COMMET_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "unlimitedPlanCredits": true,
+    "planCreditLimit": { "credits": 300, "interval": "day" }
+  }'
+```
+
+With `unlimitedPlanCredits`, usage never spends plan credits: every event is accepted and still recorded per feature, so you see what each customer consumed. An unlimited plan includes no set amount, so every price includes `0` credits and unused credits can't roll over.
+
+`planCreditLimit` still applies. Past the limit, purchased credits are spent, then usage is rejected with `402 plan_credit_limit_reached` until the next window. Without a limit, purchased credits are never spent, so the plan sells no credits or packs. Automatic top-ups don't run while plan credits are unlimited.
+
+Usage checks, usage events, feature access and the subscription's `credits` report `unlimited: true` and leave out the plan credit numbers. The same field is `unlimitedPlanBalance` on a balance plan. Changing it publishes a new plan version; moving a subscription to an unlimited version at once expires its unused plan credits.
+
+In the dashboard, open **Plans**, select a credits plan, and choose **Unlimited** in **Plan credits** under **What's included**. The change goes into a draft until you publish it.
+
 ## Balance
 
 Customers pay a base price that becomes their spending balance. Feature usage costs real money deducted from the balance. Overage is charged at period end.

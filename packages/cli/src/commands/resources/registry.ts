@@ -717,7 +717,7 @@ export const resourceDefinitions: ResourceDef[] = [
           {
             flag: "--business-tax-id <business-tax-id>",
             description:
-              "Business tax ID, such as an EU VAT number or a Peruvian RUC, for the country of the customer's address.",
+              "Business tax ID, such as an EU VAT number, a Peruvian RUC or an Argentine CUIT, for the country of the customer's address; its type comes from that country.",
             sdkKey: "businessTaxId",
           },
           {
@@ -825,7 +825,7 @@ export const resourceDefinitions: ResourceDef[] = [
           {
             flag: "--business-tax-id <business-tax-id>",
             description:
-              "Business tax ID, such as an EU VAT number or a Peruvian RUC, for the country of the customer's address.",
+              "Business tax ID, such as an EU VAT number, a Peruvian RUC or an Argentine CUIT, for the country of the customer's address; its type comes from that country.",
             sdkKey: "businessTaxId",
           },
           {
@@ -1087,8 +1087,7 @@ export const resourceDefinitions: ResourceDef[] = [
       },
       "update-status": {
         method: "updateStatus",
-        description:
-          'Mark an outstanding invoice as "paid" or "void" and return the updated invoice.',
+        description: "Deprecated.",
         hasParams: true,
         params: [
           {
@@ -1096,12 +1095,6 @@ export const resourceDefinitions: ResourceDef[] = [
             description: "Id",
             required: true,
             sdkKey: "id",
-          },
-          {
-            flag: "--status <status>",
-            description: "Status",
-            required: true,
-            sdkKey: "status",
           },
           {
             flag: "--idempotency-key <key>",
@@ -3017,6 +3010,12 @@ export const resourceDefinitions: ResourceDef[] = [
             sdkKey: "unusedPlanCredits",
           },
           {
+            flag: "--unlimited-plan-credits <boolean>",
+            description: "Credits plans only.",
+            parse: parseBool,
+            sdkKey: "unlimitedPlanCredits",
+          },
+          {
             flag: "--plan-credit-limit <json>",
             description: "Credits plans only.",
             parse: parseJson,
@@ -3027,6 +3026,12 @@ export const resourceDefinitions: ResourceDef[] = [
             description: "Balance plans only.",
             parse: parseJson,
             sdkKey: "unusedPlanBalance",
+          },
+          {
+            flag: "--unlimited-plan-balance <boolean>",
+            description: "Balance plans only.",
+            parse: parseBool,
+            sdkKey: "unlimitedPlanBalance",
           },
           {
             flag: "--plan-balance-limit <json>",
@@ -3283,6 +3288,12 @@ export const resourceDefinitions: ResourceDef[] = [
             sdkKey: "unusedPlanCredits",
           },
           {
+            flag: "--unlimited-plan-credits <boolean>",
+            description: "Credits plans only.",
+            parse: parseBool,
+            sdkKey: "unlimitedPlanCredits",
+          },
+          {
             flag: "--plan-credit-limit <json>",
             description: "Credits plans only.",
             parse: parseJson,
@@ -3293,6 +3304,12 @@ export const resourceDefinitions: ResourceDef[] = [
             description: "Balance plans only.",
             parse: parseJson,
             sdkKey: "unusedPlanBalance",
+          },
+          {
+            flag: "--unlimited-plan-balance <boolean>",
+            description: "Balance plans only.",
+            parse: parseBool,
+            sdkKey: "unlimitedPlanBalance",
           },
           {
             flag: "--plan-balance-limit <json>",
@@ -3961,6 +3978,12 @@ export const resourceDefinitions: ResourceDef[] = [
             sdkKey: "effective",
           },
           {
+            flag: "--currency <currency>",
+            description:
+              "usd to charge the subscription in USD from its next renewal when the version does not sell the currency it pays, or the USD price of its country: it pays the version's USD price for its country, or the USD base price.",
+            sdkKey: "currency",
+          },
+          {
             flag: "--idempotency-key <key>",
             description:
               "Unique key used to safely retry this write for 24 hours without applying it twice.",
@@ -4584,7 +4607,7 @@ export const resourceDefinitions: ResourceDef[] = [
       refund: {
         method: "refund",
         description:
-          "Issue a full refund and return the provider-neutral refund resource with its actual status.",
+          "Refund a positive amount in the payment currency’s smallest unit, or omit amount to refund the remaining amount.",
         hasParams: true,
         params: [
           {
@@ -4592,6 +4615,13 @@ export const resourceDefinitions: ResourceDef[] = [
             description: "Id",
             required: true,
             sdkKey: "id",
+          },
+          {
+            flag: "--amount <number>",
+            description:
+              "Amount returned to the customer, including tax, in the payment currency’s smallest unit.",
+            parse: parseNumber,
+            sdkKey: "amount",
           },
           {
             flag: "--idempotency-key <key>",

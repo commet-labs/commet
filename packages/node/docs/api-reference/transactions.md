@@ -8,11 +8,12 @@ API version: `2026-08-27`
 
 `POST /transactions/{id}/refund` · operation `refund-transaction`
 
-Issue a full refund and return the provider-neutral refund resource with its actual status.
+Refund a positive amount in the payment currency’s smallest unit, or omit amount to refund the remaining amount. Returns the refund resource with its actual status.
 
 ### Parameters
 
 - `id` (`string`, required)
+- `amount` (`number`, optional) — Amount returned to the customer, including tax, in the payment currency’s smallest unit. Omit to refund the remainder.
 
 ### Request options
 

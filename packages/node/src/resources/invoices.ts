@@ -21,7 +21,6 @@ export interface SendInvoiceParams {
 
 export interface UpdateInvoiceStatusParams {
   id: string;
-  status: "paid" | "void";
 }
 
 export interface ListInvoicesParams {
@@ -69,13 +68,16 @@ export class InvoicesResource {
     return this.httpClient.post(`/invoices/${id}/send`, {}, options);
   }
 
-  /** Mark an outstanding invoice as "paid" or "void" and return the updated invoice. Cannot change the status of already paid or voided invoices. */
+  /**
+   * Deprecated. No longer changes the invoice. An invoice is paid when its charge settles: to collect a past-due subscription, reactivate it or send the customer a recovery link.
+   * @deprecated
+   */
   async updateStatus(
     params: UpdateInvoiceStatusParams,
     options?: RequestOptions,
-  ): Promise<Invoice> {
-    const { id, ...rest } = params;
-    return this.httpClient.patch(`/invoices/${id}/status`, rest, options);
+  ): Promise<void> {
+    const { id } = params;
+    return this.httpClient.patch(`/invoices/${id}/status`, {}, options);
   }
 
   /** List invoices with cursor-based pagination. Filter by customer, status, or subscription. */

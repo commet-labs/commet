@@ -549,7 +549,7 @@ curl -X POST https://commet.co/api/v1/subscriptions/sub_xxx/change-version \
   -d '{"planVersionId":"plr_xxx","effective":"period_end"}'
 ```
 
-`period_end` changes everything at the next renewal and nothing before it. `now` changes features, limits, and included credits or balance today and the price from the next renewal. A version change never prorates, never changes the subscription's currency, and keeps a free subscription on a free version and a paid one on a paid version. The response is the subscription: after a move made now, `planVersion` shows the new version; after a move at renewal, `scheduledVersionChange` shows the pending one.
+`period_end` changes everything at the next renewal and nothing before it. `now` changes features, limits, and included credits or balance today and the price from the next renewal. A version change never prorates, keeps the subscription's currency unless `currency: "usd"` charges it in USD from its next renewal (then the whole move happens at that renewal, even with `now`), and keeps a free subscription on a free version and a paid one on a paid version. The response is the subscription: after a move made now, `planVersion` shows the new version; after a move at renewal, `scheduledVersionChange` shows the pending one.
 
 A trialing subscription moves when its trial ends, so its first charge is on the new version. A past-due one, once it pays, moves at the end of the period it's paying for. `scheduledVersionChange.effectiveAt` shows that date. If the subscription ends or changes to another plan first, it never moves and no version webhook is sent. A one-time subscription never renews, so `period_end` returns `409 invalid_subscription_status`; move it with `now`.
 

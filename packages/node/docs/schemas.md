@@ -166,6 +166,7 @@ Generated from Commet API version `2026-08-27`.
 ### BalanceTopup
 
 - `amount` (`number`, required)
+- `status` (`"succeeded" | "processing"`, required) — `succeeded` when the payment was confirmed and the balance was added. `processing` when the payment method confirms later: the balance is added once the payment is confirmed, and nothing is added if it is declined.
 - `object` (`"balance_topup"`, required)
 - `livemode` (`boolean`, required)
 
@@ -239,6 +240,7 @@ Generated from Commet API version `2026-08-27`.
 ### CreditGrant
 
 - `credits` (`number`, required)
+- `status` (`"succeeded" | "processing"`, required) — `succeeded` when the payment was confirmed and the credits were added. `processing` when the payment method confirms later: the credits are added once the payment is confirmed, and nothing is added if it is declined.
 - `object` (`"credit_grant"`, required)
 - `livemode` (`boolean`, required)
 
@@ -287,7 +289,7 @@ Generated from Commet API version `2026-08-27`.
 ### CustomerBatch
 
 - `successful` (`Array<{ id: string; externalId: string | null; email: string }>`, required)
-- `failed` (`Array<{ index: number; error: string; data: { id?: string; externalId?: string; email: string; fullName?: string | null; taxDocument?: string | null; timezone?: string; metadata?: Record<string, unknown> | null; address?: { line1: string; line2?: string; city: string; state?: string; postalCode: string; country: string; region?: string } } }>`, required)
+- `failed` (`Array<{ index: number; error: string; data: { id?: string; externalId?: string; email: string; fullName?: string | null; taxDocument?: string | null; businessTaxId?: string; timezone?: string; metadata?: Record<string, unknown> | null; address?: { line1: string; line2?: string; city: string; state?: string; postalCode: string; country: string; region?: string } } }>`, required)
 - `object` (`"customer_batch"`, required)
 - `livemode` (`boolean`, required)
 
@@ -361,7 +363,7 @@ Generated from Commet API version `2026-08-27`.
 Variants:
 
 - `{ code: string; name: string; unitName: string | null; allowed: boolean; type: "boolean"; enabled: boolean; baseAccess?: { enabled: boolean } | null; object: "feature_access"; livemode: boolean }`
-- `{ code: string; name: string; unitName: string | null; allowed: boolean; type: "usage"; consumption: { model: "metered"; period: { start: string; end: string }; unitsUsed: number; includedUnits: number; remainingUnits?: number; unlimited: boolean; overage: { enabled: boolean; units: number; unitPrice?: { amount: number; currency: string; scale: 10000 } } } | { model: "credits"; period: { start: string; end: string }; unitsUsed: number; creditsPerUnit: number; creditsConsumed: number; availableUnits: number } | { model: "balance"; period: { start: string; end: string }; unitsUsed: number; spent: { amount: number; currency: string }; availableUnits?: number; unitPrice?: { amount: number; currency: string; scale: 10000 } }; baseAccess?: { includedUnits: number; unlimited: boolean } | null; object: "feature_access"; livemode: boolean }`
+- `{ code: string; name: string; unitName: string | null; allowed: boolean; type: "usage"; consumption: { model: "metered"; period: { start: string; end: string }; unitsUsed: number; includedUnits: number; remainingUnits?: number; unlimited: boolean; overage: { enabled: boolean; units: number; unitPrice?: { amount: number; currency: string; scale: 10000 } } } | { model: "credits"; period: { start: string; end: string }; unitsUsed: number; creditsPerUnit: number; creditsConsumed: number; unlimited: boolean; availableUnits?: number } | { model: "balance"; period: { start: string; end: string }; unitsUsed: number; spent: { amount: number; currency: string }; unlimited: boolean; availableUnits?: number; unitPrice?: { amount: number; currency: string; scale: 10000 } }; baseAccess?: { includedUnits: number; unlimited: boolean } | null; object: "feature_access"; livemode: boolean }`
 - `{ code: string; name: string; unitName: string | null; allowed: boolean; type: "seats"; usage: { period: { start: string; end: string }; unitsUsed: number; includedUnits: number; remainingUnits?: number; unlimited: boolean; overage: { enabled: boolean; units: number; unitPrice?: { amount: number; currency: string; scale: 10000 } } }; baseAccess?: { includedUnits: number; unlimited: boolean } | null; object: "feature_access"; livemode: boolean }`
 - `{ code: string; name: string; unitName: string | null; allowed: boolean; type: "quota"; usage: { period: { start: string; end: string }; unitsUsed: number; includedUnits: number; remainingUnits?: number; unlimited: boolean; overage: { enabled: boolean; units: number; unitPrice?: { amount: number; currency: string; scale: 10000 } }; billedUnits: number }; baseAccess?: { includedUnits: number; unlimited: boolean } | null; object: "feature_access"; livemode: boolean }`
 
@@ -534,8 +536,10 @@ Variants:
 - `isFree` (`boolean`, required)
 - `blockOnExhaustion` (`boolean | null`, required) — Credits and balance plans: true stops usage when the plan and purchased amounts run out; false lets usage continue and bills the missing amount as overage at the next renewal (credits at the price per credit). Trials and free plans always stop.
 - `unusedPlanCredits` (`{ type: "expire" } | { type: "roll_over"; maxPlanCredits: number | null } | null`, required) — Credits plans only; null for other consumption models. What happens to unused plan credits at each reset. Purchased credits never expire and never count toward maxPlanCredits.
+- `unlimitedPlanCredits` (`boolean | null`, required) — Credits plans only; null for other consumption models. true when the plan credits are unlimited: usage never spends them and only planCreditLimit caps it.
 - `planCreditLimit` (`{ credits: number; interval: "day" | "week" } | null`, required) — Credits plans only. The most plan credits a subscription spends per day or per week; null means no limit.
 - `unusedPlanBalance` (`{ type: "expire" } | { type: "roll_over"; maxPlanBalance: number | null } | null`, required) — Balance plans only; null for other consumption models. What happens to unused plan balance at each reset. Purchased balance never expires and never counts toward maxPlanBalance.
+- `unlimitedPlanBalance` (`boolean | null`, required) — Balance plans only; null for other consumption models. true when the plan balance is unlimited: usage never spends it and only planBalanceLimit caps it.
 - `planBalanceLimit` (`{ amount: number; interval: "day" | "week" } | null`, required) — Balance plans only. The most plan balance a subscription spends per day or per week, in USD cents; null means no limit.
 - `sortOrder` (`number`, required)
 - `planGroupId` (`string | null`, required)
@@ -893,12 +897,12 @@ Variants:
 - `planVersion` (`{ id: string; label: string } | null`, required) — The plan version whose terms the subscription has now. It keeps paying and receiving everything from this version until it is moved.
 - `offerApplications` (`Array<SubscriptionOfferApplication>`, required)
 - `pause` (`{ status: "scheduled"; mode: "period_end"; requestedAt: string; effectiveAt: string; resumeAt: string | null } | { status: "active"; mode: "immediate" | "period_end"; requestedAt: string; effectiveAt: string; resumeAt: string | null } | null`, required)
-- `scheduledVersionChange` (`{ planVersionId: string; label: string; effectiveAt: string } | null`, required) — A move to another version of the plan pending for the next renewal.
+- `scheduledVersionChange` (`{ planVersionId: string; label: string; effectiveAt: string; currency: string } | null`, required) — A move to another version of the plan pending for the next renewal.
 - `planGrant` (`{ id: string; plan: { id: string; name: string }; expiresAt: string | null }`, optional)
 - `consumptionModel` (`ConsumptionModel | null`, required)
 - `features` (`Array<{ code: string; name: string; type: "boolean"; enabled: boolean; baseAccess?: { enabled: boolean } | null } | { code: string; name: string; type: "usage"; usage?: { current: number; included: number; overageQuantity: number; overageUnitPrice?: number; unlimited?: boolean }; baseAccess?: { included: number; unlimited: boolean } | null } | { code: string; name: string; type: "seats"; usage: { current: number; included: number; overageQuantity: number; overageUnitPrice?: number; unlimited?: boolean }; baseAccess?: { included: number; unlimited: boolean } | null } | { code: string; name: string; type: "quota"; usage?: { current: number; included: number; overageQuantity: number; overageUnitPrice?: number; unlimited?: boolean }; baseAccess?: { included: number; unlimited: boolean } | null }>`, required)
-- `credits` (`{ remaining: number; included: number; purchased: number; plan: number; total: number } | null`, required)
-- `balance` (`{ remaining: number; included: number; currency: string; plan: number; purchased: number; total: number } | null`, required)
+- `credits` (`{ unlimited: boolean; remaining?: number; included: number; purchased: number; plan?: number; total?: number } | null`, required)
+- `balance` (`{ unlimited: boolean; remaining?: number; included: number; currency: string; plan?: number; purchased: number; total?: number } | null`, required)
 - `priceId` (`string | null`, required)
 - `object` (`"subscription"`, required)
 - `livemode` (`boolean`, required)
@@ -906,7 +910,7 @@ Variants:
 ### SubscriptionAddon
 
 - `addonId` (`string`, required)
-- `status` (`"active"`, required)
+- `status` (`"active" | "processing"`, required) — `active` when the add-on is active. `processing` when the payment method confirms later: the add-on is activated once the payment is confirmed, and stays inactive if it is declined.
 - `proratedCharge` (`number`, required)
 - `object` (`"subscription_addon"`, required)
 - `livemode` (`boolean`, required)
@@ -1020,6 +1024,7 @@ Variants:
 - `subtotal` (`number | null`, required) — Subtotal in USD cents (gross minus tax). Null when grossAmount is null.
 - `taxAmount` (`number | null`, required)
 - `presentmentAmount` (`number | null`, required) — Amount in the charge currency's smallest unit, as presented to the customer. Set for non-USD charges; null when the charge was made in USD.
+- `amountRefunded` (`number`, required) — Cumulative confirmed refunds in the payment currency’s smallest unit.
 - `currency` (`string`, required)
 - `provider` (`PaymentProvider`, required) — The payment provider the charge was routed to: stripe, commet, or dlocal.
 - `paymentMethod` (`PaymentMethod | null`, required) — The method used for this charge: card, oxxo, or mercado_pago. Null when unknown.
@@ -1043,6 +1048,7 @@ Variants:
 - `subtotal` (`number | null`, required) — Subtotal in USD cents (gross minus tax). Null when grossAmount is null.
 - `taxAmount` (`number | null`, required)
 - `presentmentAmount` (`number | null`, required) — Amount in the charge currency's smallest unit, as presented to the customer. Set for non-USD charges; null when the charge was made in USD.
+- `amountRefunded` (`number`, required) — Cumulative confirmed refunds in the payment currency’s smallest unit.
 - `currency` (`string`, required)
 - `provider` (`PaymentProvider`, required) — The payment provider the charge was routed to: stripe, commet, or dlocal.
 - `paymentMethod` (`PaymentMethod | null`, required) — The method used for this charge: card, oxxo, or mercado_pago. Null when unknown.
@@ -1083,8 +1089,8 @@ Variants:
 Variants:
 
 - `{ allowed: boolean; subscriptionStatus: string; featureCode: string; quantity: number; reason?: string; message?: string; consumptionModel: "metered"; current: number; remaining: number; unlimited: boolean; included: number; overageEnabled: boolean; overageUnitPrice: number | null; object: "usage_check"; livemode: boolean }`
-- `{ allowed: boolean; subscriptionStatus: string; featureCode: string; quantity: number; reason?: string; message?: string; consumptionModel: "credits"; creditsPerUnit: number; estimatedCredits: number; planCredits: number; purchasedCredits: number; totalCredits: number; planCreditLimit: { credits: number; interval: "day" | "week"; spent: number; remaining: number; resetsAt: string } | null; blockOnExhaustion: boolean; object: "usage_check"; livemode: boolean }`
-- `{ allowed: boolean; subscriptionStatus: string; featureCode: string; quantity: number; reason?: string; message?: string; consumptionModel: "balance"; unitPrice: number; estimatedAmount: number; currentBalance: number; planBalance: number; purchasedBalance: number; totalBalance: number; planBalanceLimit: { amount: number; interval: "day" | "week"; spent: number; remaining: number; resetsAt: string } | null; blockOnExhaustion: boolean; currency: string; object: "usage_check"; livemode: boolean }`
+- `{ allowed: boolean; subscriptionStatus: string; featureCode: string; quantity: number; reason?: string; message?: string; consumptionModel: "credits"; creditsPerUnit: number; estimatedCredits: number; unlimited: boolean; planCredits?: number; purchasedCredits: number; totalCredits?: number; planCreditLimit: { credits: number; interval: "day" | "week"; spent: number; remaining: number; resetsAt: string } | null; blockOnExhaustion: boolean; object: "usage_check"; livemode: boolean }`
+- `{ allowed: boolean; subscriptionStatus: string; featureCode: string; quantity: number; reason?: string; message?: string; consumptionModel: "balance"; unitPrice: number; estimatedAmount: number; unlimited: boolean; currentBalance?: number; planBalance?: number; purchasedBalance: number; totalBalance?: number; planBalanceLimit: { amount: number; interval: "day" | "week"; spent: number; remaining: number; resetsAt: string } | null; blockOnExhaustion: boolean; currency: string; object: "usage_check"; livemode: boolean }`
 
 ### UsageEvent
 
@@ -1096,7 +1102,7 @@ Variants:
 - `ts` (`string`, required)
 - `createdAt` (`string`, required)
 - `properties` (`Array<{ property: string; value: string }>`, required)
-- `consumption` (`{ model: "credits" | "balance"; deducted: number; remaining: number; blocked: boolean; planCreditLimit?: { credits: number; interval: "day" | "week"; spent: number; remaining: number; resetsAt: string } | null; planBalanceLimit?: { amount: number; interval: "day" | "week"; spent: number; remaining: number; resetsAt: string } | null }`, optional)
+- `consumption` (`{ model: "credits" | "balance"; deducted: number; unlimited: boolean; remaining?: number; blocked: boolean; planCreditLimit?: { credits: number; interval: "day" | "week"; spent: number; remaining: number; resetsAt: string } | null; planBalanceLimit?: { amount: number; interval: "day" | "week"; spent: number; remaining: number; resetsAt: string } | null }`, optional)
 - `object` (`"usage_event"`, required)
 - `livemode` (`boolean`, required)
 
@@ -1144,10 +1150,11 @@ Variants:
 
 ### WebhookBalance
 
-- `currentBalance` (`number`, required) — The available balance, plan plus purchased, in rate scale. Equal to totalBalance.
-- `planBalance` (`number`, required) — The plan part in rate scale: spent first, replaced or rolled over at each reset, negative while overage is owed.
+- `unlimited` (`boolean`, required) — true when the plan balance is unlimited: usage never spends it and only the plan balance limit caps it.
+- `currentBalance` (`number`, optional) — The available balance, plan plus purchased, in rate scale. Equal to totalBalance. Omitted when unlimited is true.
+- `planBalance` (`number`, optional) — The plan part in rate scale: spent first, replaced or rolled over at each reset, negative while overage is owed. Omitted when unlimited is true.
 - `purchasedBalance` (`number`, required) — The purchased part in rate scale: top-ups and manual adjustments, spent after the plan part and kept until the subscription ends.
-- `totalBalance` (`number`, required) — planBalance plus purchasedBalance, in rate scale.
+- `totalBalance` (`number`, optional) — planBalance plus purchasedBalance, in rate scale. Omitted when unlimited is true.
 
 ### WebhookBankRef
 
@@ -1163,9 +1170,10 @@ Variants:
 
 ### WebhookCreditsBalance
 
-- `planCredits` (`number`, required)
+- `unlimited` (`boolean`, required) — true when the plan credits are unlimited: usage never spends them and only the plan credit limit caps it.
+- `planCredits` (`number`, optional) — Plan credits left. Omitted when unlimited is true.
 - `purchasedCredits` (`number`, required)
-- `totalCredits` (`number`, required)
+- `totalCredits` (`number`, optional) — planCredits plus purchasedCredits. Omitted when unlimited is true.
 
 ### WebhookPlanGrantTimelineEvent
 

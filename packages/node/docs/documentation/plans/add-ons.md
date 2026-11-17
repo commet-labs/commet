@@ -69,7 +69,7 @@ Add-ons are managed through the dashboard, the customer portal, or the API.
 | **Activate / deactivate**             | Dashboard (subscription detail), Customer Portal, or the API |
 | **List active add-ons**               | API, Dashboard, or Customer Portal                           |
 
-Activate or deactivate an add-on on a subscription via the SDK. Activation charges the prorated amount for the current period; deactivation stops the feature immediately with no refund.
+Activate or deactivate an add-on on a subscription via the SDK. Activation charges the prorated amount for the current period and the add-on is active once the payment is confirmed: the response's `status` is `active`, or `processing` when the payment method confirms later, such as Pix. Activating it again while that payment is processing returns `409`. Deactivation stops the feature immediately with no refund.
 
 ```typescript
 await commet.subscriptions.activateAddon({
@@ -219,7 +219,7 @@ When a customer activates a $50/month add-on on day 11 of a 31-day period (20 da
 | **Prorated**     | $50 × (20/31) = **$32.26** |
 | **Invoice type** | `addon_activation`         |
 
-The charge goes through the subscription's payment provider immediately with its own invoice.
+The charge goes through the subscription's payment provider immediately with its own invoice. The add-on activates when the payment is confirmed; a declined payment voids the invoice and leaves the add-on inactive.
 
 ### Recurring invoices
 

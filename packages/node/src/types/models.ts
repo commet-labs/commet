@@ -74,6 +74,8 @@ export interface BalanceAdjustment {
 
 export interface BalanceTopup {
   amount: number;
+  /** `succeeded` when the payment was confirmed and the balance was added. `processing` when the payment method confirms later: the balance is added once the payment is confirmed, and nothing is added if it is declined. */
+  status: "succeeded" | "processing";
   object: "balance_topup";
   livemode: boolean;
 }
@@ -203,6 +205,8 @@ export interface CreatedWebhook {
 
 export interface CreditGrant {
   credits: number;
+  /** `succeeded` when the payment was confirmed and the credits were added. `processing` when the payment method confirms later: the credits are added once the payment is confirmed, and nothing is added if it is declined. */
+  status: "succeeded" | "processing";
   object: "credit_grant";
   livemode: boolean;
 }
@@ -270,6 +274,7 @@ export interface CustomerBatch {
       email: string;
       fullName?: string | null;
       taxDocument?: string | null;
+      businessTaxId?: string;
       timezone?: string;
       metadata?: Record<string, unknown> | null;
       address?: {
@@ -448,8 +453,10 @@ export type FeatureAccess =
             creditsPerUnit: number;
             /** Actual credits deducted by this feature during the period. */
             creditsConsumed: number;
-            /** Additional product units available from the current shared credit pool at this feature's conversion rate. */
-            availableUnits: number;
+            /** Whether the plan credits are unlimited: usage never spends them and only the plan credit limit caps it. */
+            unlimited: boolean;
+            /** Additional product units available from the current shared credit pool at this feature's conversion rate. Absent when unlimited is true. */
+            availableUnits?: number;
           }
         | {
             /** Product usage deducts money from a shared balance. */
@@ -476,7 +483,9 @@ export type FeatureAccess =
               /** Lowercase ISO 4217 currency code. */
               currency: string;
             };
-            /** Estimated additional units available from the current shared balance at this feature's fixed price. Absent for dynamic pricing. */
+            /** Whether the plan balance is unlimited: usage never spends it and only the plan balance limit caps it. */
+            unlimited: boolean;
+            /** Estimated additional units available from the current shared balance at this feature's fixed price. Absent for dynamic pricing and when unlimited is true. */
             availableUnits?: number;
             /** Price for one additional product unit. */
             unitPrice?: {
@@ -913,6 +922,8 @@ export interface Plan {
         maxPlanCredits: number | null;
       }
     | null;
+  /** Credits plans only; null for other consumption models. true when the plan credits are unlimited: usage never spends them and only planCreditLimit caps it. */
+  unlimitedPlanCredits: boolean | null;
   /** Credits plans only. The most plan credits a subscription spends per day or per week; null means no limit. */
   planCreditLimit: {
     /** The most plan credits a subscription spends in one window. */
@@ -931,6 +942,8 @@ export interface Plan {
         maxPlanBalance: number | null;
       }
     | null;
+  /** Balance plans only; null for other consumption models. true when the plan balance is unlimited: usage never spends it and only planBalanceLimit caps it. */
+  unlimitedPlanBalance: boolean | null;
   /** Balance plans only. The most plan balance a subscription spends per day or per week, in USD cents; null means no limit. */
   planBalanceLimit: {
     /** The most plan balance a subscription spends in one window, in USD cents. Other currencies convert it with the plan's exchange rate unless the dashboard sets a custom amount for that currency. */
@@ -2047,6 +2060,8 @@ export interface Subscription {
     label: string;
     /** @format date-time */
     effectiveAt: string;
+    /** The currency the subscription pays from the move on: its own, or usd when the move charges it in USD. */
+    currency: string;
   } | null;
   planGrant?: {
     /** The active Plan Grant ID. */
@@ -2120,27 +2135,31 @@ export interface Subscription {
       }
   >;
   credits: {
-    /** Plan credits left. Kept for compatibility; equal to `plan`. */
-    remaining: number;
+    /** true when the plan credits are unlimited: usage never spends them and only the plan credit limit caps it. */
+    unlimited: boolean;
+    /** Plan credits left. Kept for compatibility; equal to `plan`. Omitted when `unlimited` is true. */
+    remaining?: number;
     included: number;
     /** Purchased credits: purchases and manual adjustments. Spent after plan credits and kept until the subscription ends. */
     purchased: number;
-    /** Plan credits left this period. Spent first and replaced or rolled over at each reset; negative while overage is owed. */
-    plan: number;
-    /** Credits available: `plan` plus `purchased`. */
-    total: number;
+    /** Plan credits left this period. Spent first and replaced or rolled over at each reset; negative while overage is owed. Omitted when `unlimited` is true. */
+    plan?: number;
+    /** Credits available: `plan` plus `purchased`. Omitted when `unlimited` is true. */
+    total?: number;
   } | null;
   balance: {
-    /** Balance available in minor units of the subscription currency. Kept for compatibility; equal to `total`. */
-    remaining: number;
+    /** true when the plan balance is unlimited: usage never spends it and only the plan balance limit caps it. */
+    unlimited: boolean;
+    /** Balance available in minor units of the subscription currency. Kept for compatibility; equal to `total`. Omitted when `unlimited` is true. */
+    remaining?: number;
     included: number;
     currency: string;
-    /** Plan balance left this period, in minor units. Spent first and replaced or rolled over at each reset; negative while overage is owed. */
-    plan: number;
+    /** Plan balance left this period, in minor units. Spent first and replaced or rolled over at each reset; negative while overage is owed. Omitted when `unlimited` is true. */
+    plan?: number;
     /** Purchased balance in minor units: top-ups and manual adjustments. Spent after the plan balance and kept until the subscription ends. */
     purchased: number;
-    /** Balance available in minor units: `plan` plus `purchased`. */
-    total: number;
+    /** Balance available in minor units: `plan` plus `purchased`. Omitted when `unlimited` is true. */
+    total?: number;
   } | null;
   priceId: string | null;
   object: "subscription";
@@ -2149,7 +2168,8 @@ export interface Subscription {
 
 export interface SubscriptionAddon {
   addonId: string;
-  status: "active";
+  /** `active` when the add-on is active. `processing` when the payment method confirms later: the add-on is activated once the payment is confirmed, and stays inactive if it is declined. */
+  status: "active" | "processing";
   proratedCharge: number;
   object: "subscription_addon";
   livemode: boolean;
@@ -2469,6 +2489,8 @@ export interface Transaction {
   taxAmount: number | null;
   /** Amount in the charge currency's smallest unit, as presented to the customer. Set for non-USD charges; null when the charge was made in USD. */
   presentmentAmount: number | null;
+  /** Cumulative confirmed refunds in the payment currency’s smallest unit. */
+  amountRefunded: number;
   currency: string;
   /** The payment provider the charge was routed to: stripe, commet, or dlocal. */
   provider: PaymentProvider;
@@ -2529,6 +2551,8 @@ export interface TransactionListItem {
   taxAmount: number | null;
   /** Amount in the charge currency's smallest unit, as presented to the customer. Set for non-USD charges; null when the charge was made in USD. */
   presentmentAmount: number | null;
+  /** Cumulative confirmed refunds in the payment currency’s smallest unit. */
+  amountRefunded: number;
   currency: string;
   /** The payment provider the charge was routed to: stripe, commet, or dlocal. */
   provider: PaymentProvider;
@@ -2600,9 +2624,13 @@ export type UsageCheck =
       consumptionModel: "credits";
       creditsPerUnit: number;
       estimatedCredits: number;
-      planCredits: number;
+      /** true when the plan credits are unlimited: usage never spends them and only planCreditLimit caps it. */
+      unlimited: boolean;
+      /** Plan credits left. Omitted when unlimited is true. */
+      planCredits?: number;
       purchasedCredits: number;
-      totalCredits: number;
+      /** planCredits plus purchasedCredits. Omitted when unlimited is true. */
+      totalCredits?: number;
       planCreditLimit: {
         /** The most plan credits the subscription spends per window. */
         credits: number;
@@ -2633,14 +2661,16 @@ export type UsageCheck =
       consumptionModel: "balance";
       unitPrice: number;
       estimatedAmount: number;
-      /** The available balance, plan plus purchased, in rate scale (10000 = 1.00 of the subscription currency). Equal to totalBalance. */
-      currentBalance: number;
-      /** The plan part of the balance in rate scale. Consumed first, replaced or rolled over at each reset, and negative while overage is owed. */
-      planBalance: number;
+      /** true when the plan balance is unlimited: usage never spends it and only planBalanceLimit caps it. */
+      unlimited: boolean;
+      /** The available balance, plan plus purchased, in rate scale (10000 = 1.00 of the subscription currency). Equal to totalBalance. Omitted when unlimited is true. */
+      currentBalance?: number;
+      /** The plan part of the balance in rate scale. Consumed first, replaced or rolled over at each reset, and negative while overage is owed. Omitted when unlimited is true. */
+      planBalance?: number;
       /** The purchased part of the balance in rate scale: top-ups and adjustments. Consumed after the plan part and kept until the subscription ends. */
       purchasedBalance: number;
-      /** planBalance plus purchasedBalance, in rate scale. */
-      totalBalance: number;
+      /** planBalance plus purchasedBalance, in rate scale. Omitted when unlimited is true. */
+      totalBalance?: number;
       planBalanceLimit: {
         /** The most plan balance the subscription spends per window, in rate scale (10000 = 1.00 of the subscription currency). */
         amount: number;
@@ -2679,7 +2709,10 @@ export interface UsageEvent {
   consumption?: {
     model: "credits" | "balance";
     deducted: number;
-    remaining: number;
+    /** true when the plan credits or plan balance are unlimited: usage never spends them and only the plan limit caps it. */
+    unlimited: boolean;
+    /** Plan plus purchased amount left after this event. Omitted when unlimited is true. */
+    remaining?: number;
     blocked: boolean;
     /** Credits consumption only, omitted for balance. The plan credit limit after this event; null when the plan has no limit. */
     planCreditLimit?: {
@@ -2764,14 +2797,16 @@ export interface WebhookAddonRef {
 }
 
 export interface WebhookBalance {
-  /** The available balance, plan plus purchased, in rate scale. Equal to totalBalance. */
-  currentBalance: number;
-  /** The plan part in rate scale: spent first, replaced or rolled over at each reset, negative while overage is owed. */
-  planBalance: number;
+  /** true when the plan balance is unlimited: usage never spends it and only the plan balance limit caps it. */
+  unlimited: boolean;
+  /** The available balance, plan plus purchased, in rate scale. Equal to totalBalance. Omitted when unlimited is true. */
+  currentBalance?: number;
+  /** The plan part in rate scale: spent first, replaced or rolled over at each reset, negative while overage is owed. Omitted when unlimited is true. */
+  planBalance?: number;
   /** The purchased part in rate scale: top-ups and manual adjustments, spent after the plan part and kept until the subscription ends. */
   purchasedBalance: number;
-  /** planBalance plus purchasedBalance, in rate scale. */
-  totalBalance: number;
+  /** planBalance plus purchasedBalance, in rate scale. Omitted when unlimited is true. */
+  totalBalance?: number;
 }
 
 export interface WebhookBankRef {
@@ -2787,9 +2822,13 @@ export interface WebhookCardInfo {
 }
 
 export interface WebhookCreditsBalance {
-  planCredits: number;
+  /** true when the plan credits are unlimited: usage never spends them and only the plan credit limit caps it. */
+  unlimited: boolean;
+  /** Plan credits left. Omitted when unlimited is true. */
+  planCredits?: number;
   purchasedCredits: number;
-  totalCredits: number;
+  /** planCredits plus purchasedCredits. Omitted when unlimited is true. */
+  totalCredits?: number;
 }
 
 export interface WebhookPlanGrantTimelineEvent {

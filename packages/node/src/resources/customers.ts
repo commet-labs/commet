@@ -116,7 +116,7 @@ export interface UpdateCustomerParams {
   email?: string;
   fullName?: string;
   taxDocument?: string;
-  /** Business tax ID, such as an EU VAT number or a Peruvian RUC, for the country of the customer's address. Accepted only where Commet collects tax; a valid ID replaces consumer tax with the business treatment. Send null to remove it. */
+  /** Business tax ID, such as an EU VAT number, a Peruvian RUC or an Argentine CUIT, for the country of the customer's address; its type comes from that country. Where Commet collects tax and that ID exempts business buyers, a valid ID replaces consumer tax with the business treatment; elsewhere it is stored as sent and does not change any charge. Send null to remove it. */
   businessTaxId?: string | null;
   externalId?: string;
   timezone?: Timezone;
@@ -139,6 +139,8 @@ export interface BatchCreateCustomersParams {
     externalId?: string;
     fullName?: string;
     taxDocument?: string;
+    /** Business tax ID, such as an EU VAT number, a Peruvian RUC or an Argentine CUIT, for the country of the customer's address; its type comes from that country. Where Commet collects tax and that ID exempts business buyers, a valid ID replaces consumer tax with the business treatment; elsewhere it is stored as sent and does not change any charge. */
+    businessTaxId?: string;
     timezone?: Timezone;
     metadata?: Record<string, unknown>;
     address?: {
@@ -166,7 +168,7 @@ export interface CreateCustomerParams {
   externalId?: string;
   fullName?: string;
   taxDocument?: string;
-  /** Business tax ID, such as an EU VAT number or a Peruvian RUC, for the country of the customer's address. Accepted only where Commet collects tax; a valid ID replaces consumer tax with the business treatment. */
+  /** Business tax ID, such as an EU VAT number, a Peruvian RUC or an Argentine CUIT, for the country of the customer's address; its type comes from that country. Where Commet collects tax and that ID exempts business buyers, a valid ID replaces consumer tax with the business treatment; elsewhere it is stored as sent and does not change any charge. */
   businessTaxId?: string;
   address?: {
     line1: string;

@@ -124,7 +124,8 @@ A move never prorates or refunds. With `now`, a larger included amount first pay
 
 ### What a move keeps
 
-- **Currency, country, interval, and price.** A move never changes a subscription's currency. A version that doesn't sell its currency returns `422 missing_regional_price`, and one that doesn't sell the price it pays returns `404 price_not_found`.
+- **Currency, country, interval, and price.** A move keeps a subscription's currency unless you ask to charge it in USD. A version that doesn't sell its currency returns `422 missing_regional_price`, and one that doesn't sell the price it pays returns `404 price_not_found`.
+- **Charge in USD.** When the version doesn't sell the currency a subscriber pays in its country, or the USD price of its country, send `currency: "usd"` with the move: from its next renewal it pays the version's USD price for its country, or the USD base price. The currency changes only at a renewal, even for a move made now, and the usage of the period that closes is charged at the USD base rates of the version it leaves. Nothing is converted: when something keeps the subscription in its currency, the move is refused with a code that names it: `currency_held_by_payment_method` (it pays through dLocal), `currency_held_by_customer_credit`, `currency_held_by_balance_plan`, `currency_held_by_fixed_amount_discount`, `currency_held_by_prepaid_period` or `currency_held_by_scheduled_pause`. The same is checked again at the renewal; if it no longer fits, the move is canceled with that code as the `reason` of `subscription.version_change_canceled`.
 - **Market prices.** A subscription that pays a Market price keeps paying it.
 - **Free or paid.** A free version moves only to a free version, and a paid one only to a paid one (`400 validation_error`).
 
@@ -139,12 +140,13 @@ A move never prorates or refunds. With `now`, a larger included amount first pay
 
 A plan move, a publish with `move`, and an experiment archive check every subscriber first. If any of them doesn't fit, nobody moves and the response is `409 subscribers_do_not_fit`, listing each one with the reasons. Send a change for each one in `changes`:
 
-| Change                | Effect at the subscriber's renewal             |
-| --------------------- | ---------------------------------------------- |
-| `billingInterval`     | Moves it to another interval the version sells |
-| `seatLimit: true`     | Lowers its seats to the version's limit        |
-| `removeAddonIds`      | Stops charging the listed add-ons              |
-| `keepOnVersion: true` | Leaves it on its version                       |
+| Change                | Effect at the subscriber's renewal                                                            |
+| --------------------- | --------------------------------------------------------------------------------------------- |
+| `billingInterval`     | Moves it to another interval the version sells                                                |
+| `seatLimit: true`     | Lowers its seats to the version's limit                                                       |
+| `removeAddonIds`      | Stops charging the listed add-ons                                                             |
+| `currency: "usd"`     | Charges it in USD when the version doesn't sell its currency, or the USD price of its country |
+| `keepOnVersion: true` | Leaves it on its version                                                                      |
 
 ```json
 {

@@ -64,12 +64,13 @@ Send the invoice to the customer via email.
 
 `PATCH /invoices/{id}/status` · operation `update-invoice-status`
 
-Mark an outstanding invoice as "paid" or "void" and return the updated invoice. Cannot change the status of already paid or voided invoices.
+Deprecated. No longer changes the invoice. An invoice is paid when its charge settles: to collect a past-due subscription, reactivate it or send the customer a recovery link.
+
+Deprecated.
 
 ### Parameters
 
 - `id` (`string`, required)
-- `status` (`"paid" | "void"`, required)
 
 ### Request options
 
@@ -77,7 +78,7 @@ Mark an outstanding invoice as "paid" or "void" and return the updated invoice. 
 
 ### Returns
 
-`Invoice`
+`void`
 
 ## list
 
