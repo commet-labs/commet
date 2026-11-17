@@ -133,20 +133,6 @@ function applyUsageToFeatures(
       };
     }
 
-    if (feature.consumption.model === "credits") {
-      return {
-        ...feature,
-        consumption: {
-          ...feature.consumption,
-          unitsUsed,
-          availableUnits: Math.max(
-            feature.consumption.availableUnits - value,
-            0,
-          ),
-        },
-      };
-    }
-
     return {
       ...feature,
       consumption: {
