@@ -83,6 +83,8 @@ await commet.subscriptions.deactivateAddon({
 })
 ```
 
+Without a saved payment method, activation returns `400`. Send `successUrl` to receive a `status` of `requires_checkout` and a `checkoutUrl` instead: the customer pays the activation there and saves the payment method in one step, and the add-on is active when the payment is confirmed. An activation with nothing to charge opens no checkout.
+
 REST equivalents: `POST /api/v1/subscriptions/{id}/addons` and `DELETE /api/v1/subscriptions/{id}/addons/{addonId}`. Add-ons themselves support full CRUD through the `addons` resource: `commet.addons.list`, `get`, `create`, `update`, and `delete`.
 
 ## Feature access

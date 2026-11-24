@@ -47,6 +47,8 @@ Generated from Commet API version `2026-08-27`.
 - `"mercado_pago"`
 - `"google_pay"`
 - `"smartpix"`
+- `"apple_pay"`
+- `"link"`
 
 ### PaymentProvider
 
@@ -166,7 +168,8 @@ Generated from Commet API version `2026-08-27`.
 ### BalanceTopup
 
 - `amount` (`number`, required)
-- `status` (`"succeeded" | "processing"`, required) — `succeeded` when the payment was confirmed and the balance was added. `processing` when the payment method confirms later: the balance is added once the payment is confirmed, and nothing is added if it is declined.
+- `status` (`"succeeded" | "processing" | "requires_checkout"`, required) — `succeeded` when the payment was confirmed and the balance was added. `processing` when the payment method confirms later: the balance is added once the payment is confirmed, and nothing is added if it is declined. `requires_checkout` when the subscription has no saved payment method and `successUrl` was sent: the balance is added once the customer pays at `checkoutUrl`.
+- `checkoutUrl` (`string`, optional) — Hosted checkout where the customer pays the purchase and saves the payment method. Present only when `status` is `requires_checkout`.
 - `object` (`"balance_topup"`, required)
 - `livemode` (`boolean`, required)
 
@@ -240,7 +243,8 @@ Generated from Commet API version `2026-08-27`.
 ### CreditGrant
 
 - `credits` (`number`, required)
-- `status` (`"succeeded" | "processing"`, required) — `succeeded` when the payment was confirmed and the credits were added. `processing` when the payment method confirms later: the credits are added once the payment is confirmed, and nothing is added if it is declined.
+- `status` (`"succeeded" | "processing" | "requires_checkout"`, required) — `succeeded` when the payment was confirmed and the credits were added. `processing` when the payment method confirms later: the credits are added once the payment is confirmed, and nothing is added if it is declined. `requires_checkout` when the subscription has no saved payment method and `successUrl` was sent: the credits are added once the customer pays at `checkoutUrl`.
+- `checkoutUrl` (`string`, optional) — Hosted checkout where the customer pays the purchase and saves the payment method. Present only when `status` is `requires_checkout`.
 - `object` (`"credit_grant"`, required)
 - `livemode` (`boolean`, required)
 
@@ -557,6 +561,7 @@ Variants:
 
 Variants:
 
+- `{ outcome: "processing"; invoiceId: string; object: "plan_change"; livemode: boolean }`
 - `{ outcome: "requires_checkout"; requiresCheckout: true; checkoutUrl: string; offerApplication?: { id: string; offerId: string; name: string; currency: string; subtotal: number; discountAmount: number; total: number; phases: Array<{ type: "free_trial"; durationDays: number; startsAt: string | null; endsAt: string | null } | { type: "percentage"; durationCycles: number | null; durationInterval: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | null; startsAt: string | null; endsAt: string | null; percentage: number } | { type: "amount_off"; durationCycles: number | null; durationInterval: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | null; startsAt: string | null; endsAt: string | null; amount: number } | { type: "fixed_price"; durationCycles: number | null; durationInterval: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | null; startsAt: string | null; endsAt: string | null; price: number }>; appliesTo: { type: "plan_price"; id: string } | { type: "addon"; id: string } | { type: "credit_pack"; id: string } }; object: "plan_change"; livemode: boolean }`
 - `{ outcome: "scheduled"; id: string; scheduled: true; scheduledFor: string; changeType: "subscription.plan_downgrade" | "subscription.interval_change" | "subscription.cancel"; customerId: string; newPlanId?: string; newPlanName?: string; newBillingInterval?: string; seatLimitWarning?: { featureCode: string; featureName: string; currentSeats: number; included: number; newPlanName: string; effectiveDate: string }; object: "plan_change"; livemode: boolean }`
 - `{ outcome: "completed"; id: string; scheduled: false; customerId: string; previousPlan: { id: string; name: string }; currentPlan: { id: string; name: string; price: number }; billingInterval: string; billing: { credit: number; creditsApplied: number; charge: number; taxAmount: number; netAmount: number; totalCharged: number; remainingCreditBalance: number }; invoiceId?: string; offerApplication?: { id: string; offerId: string; name: string; currency: string; subtotal: number; discountAmount: number; total: number; phases: Array<{ type: "free_trial"; durationDays: number; startsAt: string | null; endsAt: string | null } | { type: "percentage"; durationCycles: number | null; durationInterval: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | null; startsAt: string | null; endsAt: string | null; percentage: number } | { type: "amount_off"; durationCycles: number | null; durationInterval: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | null; startsAt: string | null; endsAt: string | null; amount: number } | { type: "fixed_price"; durationCycles: number | null; durationInterval: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | null; startsAt: string | null; endsAt: string | null; price: number }>; appliesTo: { type: "plan_price"; id: string } | { type: "addon"; id: string } | { type: "credit_pack"; id: string } }; object: "plan_change"; livemode: boolean }`
@@ -910,8 +915,9 @@ Variants:
 ### SubscriptionAddon
 
 - `addonId` (`string`, required)
-- `status` (`"active" | "processing"`, required) — `active` when the add-on is active. `processing` when the payment method confirms later: the add-on is activated once the payment is confirmed, and stays inactive if it is declined.
+- `status` (`"active" | "processing" | "requires_checkout"`, required) — `active` when the add-on is active. `processing` when the payment method confirms later: the add-on is activated once the payment is confirmed, and stays inactive if it is declined. `requires_checkout` when the subscription has no saved payment method and `successUrl` was sent: the add-on is activated once the customer pays at `checkoutUrl`.
 - `proratedCharge` (`number`, required)
+- `checkoutUrl` (`string`, optional) — Hosted checkout where the customer pays the purchase and saves the payment method. Present only when `status` is `requires_checkout`.
 - `object` (`"subscription_addon"`, required)
 - `livemode` (`boolean`, required)
 
@@ -1027,7 +1033,7 @@ Variants:
 - `amountRefunded` (`number`, required) — Cumulative confirmed refunds in the payment currency’s smallest unit.
 - `currency` (`string`, required)
 - `provider` (`PaymentProvider`, required) — The payment provider the charge was routed to: stripe, commet, or dlocal.
-- `paymentMethod` (`PaymentMethod | null`, required) — The method used for this charge: card, oxxo, or mercado_pago. Null when unknown.
+- `paymentMethod` (`PaymentMethod | null`, required) — The method used for this charge: card, apple_pay, google_pay, link, smartpix, oxxo or mercado_pago. Null when unknown.
 - `subPaymentMethod` (`SubPaymentMethod | null`, required) — The source of funds for this charge, when reported by the provider. Null when unavailable or unknown.
 - `status` (`TransactionStatus`, required)
 - `customerEmail` (`string | null`, required)
@@ -1051,7 +1057,7 @@ Variants:
 - `amountRefunded` (`number`, required) — Cumulative confirmed refunds in the payment currency’s smallest unit.
 - `currency` (`string`, required)
 - `provider` (`PaymentProvider`, required) — The payment provider the charge was routed to: stripe, commet, or dlocal.
-- `paymentMethod` (`PaymentMethod | null`, required) — The method used for this charge: card, oxxo, or mercado_pago. Null when unknown.
+- `paymentMethod` (`PaymentMethod | null`, required) — The method used for this charge: card, apple_pay, google_pay, link, smartpix, oxxo or mercado_pago. Null when unknown.
 - `subPaymentMethod` (`SubPaymentMethod | null`, required) — The source of funds for this charge, when reported by the provider. Null when unavailable or unknown.
 - `status` (`TransactionStatus`, required)
 - `customerEmail` (`string | null`, required)

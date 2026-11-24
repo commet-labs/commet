@@ -127,7 +127,7 @@ export interface SubscriptionActivatedData {
   provider: "stripe" | "commet" | "dlocal" | null;
 }
 
-/** Fired when a canceled subscription is reactivated and its reactivation charge succeeds. The subscription returns to active with a fresh invoice and a billing period anchored to the reactivation date. Distinct from subscription.activated (first activation) and payment.recovered (past_due recovery, which keeps the original anchor). */
+/** Fired when a canceled subscription is reactivated: its reactivation charge succeeds, or its reactivation invoice totals zero and is paid without a charge. The subscription returns to active with a fresh invoice and a billing period anchored to the reactivation date. Distinct from subscription.activated (first activation) and payment.recovered (past_due recovery, which keeps the original anchor). */
 export interface SubscriptionReactivatedData {
   /** The subscription ID. */
   subscriptionId: string;
@@ -149,7 +149,7 @@ export interface SubscriptionReactivatedData {
   invoiceTotal: number;
   /** The invoice currency code. */
   invoiceCurrency: string;
-  /** The payment provider that processed the reactivation charge: stripe, commet, or dlocal. */
+  /** The subscription's payment provider, which processed the reactivation charge: stripe, commet, or dlocal. A reactivation whose invoice totals zero runs no charge and still carries the subscription's provider. */
   provider: "stripe" | "commet" | "dlocal";
 }
 
@@ -460,7 +460,7 @@ export interface TrialExpiredData {
   trialEndsAt: string;
 }
 
-/** Predictive event fired once, 3 days before a trial ends. Use it to remind the customer that billing starts soon. Emitted by a daily scan with a deterministic idempotency key, so it never fires twice for the same trial end date. */
+/** Predictive event fired once, 3 days before a trial ends. Use it to remind the customer that billing starts soon. Emitted by a recurring scan with a deterministic idempotency key, so it never fires twice for the same trial end date. */
 export interface TrialWillEndData {
   /** The subscription ID. */
   subscriptionId: string;
@@ -554,7 +554,7 @@ export interface PaymentReceivedData {
   paymentTransactionId: string | null;
   /** The payment provider the charge was routed to: stripe, commet, or dlocal. Null for billing-only charges with no Commet ledger row. */
   provider: "stripe" | "commet" | "dlocal" | null;
-  /** The payment method: card, oxxo, or mercado_pago. Null when unknown. */
+  /** The payment method: card, apple_pay, google_pay, link, smartpix, oxxo or mercado_pago. Null when unknown. */
   paymentMethod: PaymentMethod | null;
   /** The source of funds for this charge, when reported by the provider. Null when unavailable or unknown. */
   subPaymentMethod: SubPaymentMethod | null;
@@ -612,7 +612,7 @@ export interface PaymentFailedData {
   subscriptionId: string | null;
   /** The payment provider the charge was routed to: stripe, commet, or dlocal. */
   provider: "stripe" | "commet" | "dlocal";
-  /** The payment method: card, oxxo, or mercado_pago. Null when unknown. */
+  /** The payment method: card, apple_pay, google_pay, link, smartpix, oxxo or mercado_pago. Null when unknown. */
   paymentMethod: PaymentMethod | null;
   /** The source of funds for this charge, when reported by the provider. Null when unavailable or unknown. */
   subPaymentMethod: SubPaymentMethod | null;
@@ -638,7 +638,7 @@ export interface PaymentRecoveredData {
   subscriptionId: string | null;
   /** The payment provider that recovered the payment, or null when the invoice was recovered without a processor charge. */
   provider: "stripe" | "commet" | "dlocal" | null;
-  /** The payment method: card, oxxo, or mercado_pago. Null when unknown. */
+  /** The payment method: card, apple_pay, google_pay, link, smartpix, oxxo or mercado_pago. Null when unknown. */
   paymentMethod: PaymentMethod | null;
   /** The source of funds for this charge, when reported by the provider. Null when unavailable or unknown. */
   subPaymentMethod: SubPaymentMethod | null;
@@ -800,7 +800,7 @@ export interface PaymentLinkCompletedData {
   invoiceNumber: string;
   /** The payment transaction ID for the settled charge. */
   paymentTransactionId: string | null;
-  /** The payment method: card, oxxo, or mercado_pago. Null when unknown. */
+  /** The payment method: card, apple_pay, google_pay, link, smartpix, oxxo or mercado_pago. Null when unknown. */
   paymentMethod: PaymentMethod | null;
   /** The source of funds for this charge, when reported by the provider. Null when unavailable or unknown. */
   subPaymentMethod: SubPaymentMethod | null;
@@ -854,7 +854,7 @@ export interface PaymentLinkFailedData {
   failureCode: string;
   /** A human-readable failure message. */
   failureMessage: string;
-  /** The payment method: card, oxxo, or mercado_pago. Null when unknown. */
+  /** The payment method: card, apple_pay, google_pay, link, smartpix, oxxo or mercado_pago. Null when unknown. */
   paymentMethod: PaymentMethod | null;
   /** The source of funds for this charge, when reported by the provider. Null when unavailable or unknown. */
   subPaymentMethod: SubPaymentMethod | null;
@@ -932,7 +932,7 @@ export interface InvoiceVoidedData {
   subscriptionId: string | null;
 }
 
-/** Fired once when an outstanding invoice passes its due date without payment. The invoice keeps its outstanding status — overdue is a fact about the due date, not a new status. Use it to start your own dunning flow. */
+/** Fired once when an invoice is still outstanding 24 hours after its due date. The invoice keeps its outstanding status — overdue is a fact about the due date, not a new status. Use it to start your own dunning flow. */
 export interface InvoiceOverdueData {
   /** The invoice ID. */
   invoiceId: string;
@@ -960,7 +960,7 @@ export interface InvoiceOverdueData {
   subscriptionId: string | null;
 }
 
-/** Predictive event fired once, 3 days before an active subscription renews. Use it to notify the customer before they are charged. Carries no amount — usage-based charges are only final at renewal, when invoice.created delivers the actual invoice. */
+/** Predictive event fired once, 3 days before an active subscription renews. A subscription on a free plan issues no renewal invoice and does not fire it. Use it to notify the customer before they are charged. Carries no amount — usage-based charges are only final at renewal, when invoice.created delivers the actual invoice. */
 export interface InvoiceUpcomingData {
   /** The subscription ID. */
   subscriptionId: string;
@@ -984,7 +984,7 @@ export interface PaymentMethodAttachedData {
   subscriptionId: string;
   /** The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId. */
   customerId: string;
-  /** The payment method: card, oxxo, or mercado_pago. Null when unknown. */
+  /** The payment method: card, apple_pay, google_pay, link, smartpix, oxxo or mercado_pago. Null when unknown. */
   paymentMethod: PaymentMethod | null;
   /** Card display metadata: brand, last4, expMonth, expYear. Null when the method is not a card or its details cannot be retrieved. */
   card: WebhookCardInfo | null;
@@ -994,7 +994,7 @@ export interface PaymentMethodAttachedData {
 export interface PaymentMethodUpdatedData {
   /** The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId. */
   customerId: string;
-  /** The payment method: card, oxxo, or mercado_pago. Null when unknown. */
+  /** The payment method: card, apple_pay, google_pay, link, smartpix, oxxo or mercado_pago. Null when unknown. */
   paymentMethod: PaymentMethod | null;
   /** Card display metadata for the new method: brand, last4, expMonth, expYear. Null when the method is not a card or its details cannot be retrieved. */
   card: WebhookCardInfo | null;
@@ -1004,7 +1004,7 @@ export interface PaymentMethodUpdatedData {
 export interface PaymentMethodDetachedData {
   /** The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId. */
   customerId: string;
-  /** The payment method: card, oxxo, or mercado_pago. Null when unknown. */
+  /** The payment method: card, apple_pay, google_pay, link, smartpix, oxxo or mercado_pago. Null when unknown. */
   paymentMethod: PaymentMethod | null;
   /** Card display metadata of the removed method: brand, last4, expMonth, expYear. Null when the method is not a card or its details cannot be retrieved. */
   card: WebhookCardInfo | null;
@@ -1576,7 +1576,7 @@ export interface CreditsDepletedData {
   remainingCredits: number;
 }
 
-/** Fired at a reset when unused plan credits are discarded. On a plan whose unused plan credits expire, every unused plan credit expires at each reset. On a plan that rolls them over, a reset keeps them, up to the plan's maxPlanCredits when it has one, and only the excess expires. A change to another credits plan applies the new plan's terms the same way. Purchased credits never expire and are not affected. */
+/** Fired at a reset when unused plan credits are discarded. On a plan whose unused plan credits expire, every unused plan credit expires at each reset. On a plan that rolls them over, a reset keeps them, up to the plan's maxPlanCredits when it has one, and only the excess expires. A change to another credits plan applies the new plan's terms the same way, and an immediate change also discards the credits the previous plan gave for the period it cuts short. Purchased credits never expire and are not affected. */
 export interface CreditsExpiredData {
   /** The subscription ID. */
   subscriptionId: string;

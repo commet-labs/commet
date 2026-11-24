@@ -40,7 +40,25 @@ Trials are not Offer phases. When the price has a [trial](/docs/trial-periods), 
 
 ## Plan changes
 
-The Offer Application belongs to the price target accepted by the subscription. An immediate plan change ends that application. The change may pass a new `offerId` or a `promoCode`; otherwise the new plan begins at its normal price. Scheduled plan changes accept neither.
+A discount belongs to the subscription, not to the plan. When the customer changes to another paid plan or billing interval, the same Offer Application keeps going on the new plan with the billing periods it still had to discount. The charge for the change is the next of those periods, so no cycle is added and none is lost. A discount without an end keeps applying.
+
+```
+Starter costs $20/month with 50% off for 3 cycles.
+The customer pays cycle 1 and upgrades to Pro ($40/month):
+
+Change to Pro: $20.00 (cycle 2), minus the credit for unused Starter time
+Next renewal:  $20.00 (cycle 3)
+Renewal after: $40.00
+```
+
+- A percentage is the same percentage of the new price. An amount off is the same amount.
+- A `fixed_price` phase, free cycles included, is the price of the plan it was accepted on: it ends with the change, and the other phases of the Offer continue.
+- When the billing interval changes, the discount keeps the time it had left. With two monthly cycles left, a yearly charge made within those two months is discounted in full and the next yearly renewal is not.
+- A Promo Code or Card Promotion restricted to plans or to a billing interval ends with the change when the new plan or interval is outside its restriction.
+- A change that passes its own `offerId` or `promoCode` applies that Offer with its full duration and ends the previous one. Scheduled plan changes accept neither.
+- A move to a free plan ends the discount.
+
+Plan-change previews and the Customer Portal quote the new plan with the discount the change will charge.
 
 ## What gets discounted
 

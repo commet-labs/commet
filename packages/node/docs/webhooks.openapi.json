@@ -304,7 +304,7 @@
     "subscription.reactivated": {
       "post": {
         "summary": "subscription.reactivated",
-        "description": "Fired when a canceled subscription is reactivated and its reactivation charge succeeds. The subscription returns to active with a fresh invoice and a billing period anchored to the reactivation date. Distinct from subscription.activated (first activation) and payment.recovered (past_due recovery, which keeps the original anchor).",
+        "description": "Fired when a canceled subscription is reactivated: its reactivation charge succeeds, or its reactivation invoice totals zero and is paid without a charge. The subscription returns to active with a fresh invoice and a billing period anchored to the reactivation date. Distinct from subscription.activated (first activation) and payment.recovered (past_due recovery, which keeps the original anchor).",
         "tags": [
           "Webhooks"
         ],
@@ -391,7 +391,7 @@
                           "commet",
                           "dlocal"
                         ],
-                        "description": "The payment provider that processed the reactivation charge: stripe, commet, or dlocal."
+                        "description": "The subscription's payment provider, which processed the reactivation charge: stripe, commet, or dlocal. A reactivation whose invoice totals zero runs no charge and still carries the subscription's provider."
                       }
                     },
                     "required": [
@@ -2290,7 +2290,7 @@
                       },
                       "reason": {
                         "type": "string",
-                        "description": "Why the move was canceled: canceled_by_merchant, version_change_failed when the move could not be applied at renewal, or the code of what the subscription no longer fits (addon_unavailable, seat_limit_exceeded, price_not_found, missing_regional_price)."
+                        "description": "Why the move was canceled: canceled_by_merchant, version_change_failed when the move could not be applied at renewal, the code of what the subscription no longer fits (addon_unavailable, seat_limit_exceeded, price_not_found, missing_regional_price), or, for a move that charges it in USD, what keeps it in its currency (currency_held_by_payment_method, currency_held_by_customer_credit, currency_held_by_balance_plan, currency_held_by_fixed_amount_discount, currency_held_by_prepaid_period, currency_held_by_scheduled_pause)."
                       }
                     },
                     "required": [
@@ -2820,7 +2820,7 @@
     "trial.will_end": {
       "post": {
         "summary": "trial.will_end",
-        "description": "Predictive event fired once, 3 days before a trial ends. Use it to remind the customer that billing starts soon. Emitted by a daily scan with a deterministic idempotency key, so it never fires twice for the same trial end date.",
+        "description": "Predictive event fired once, 3 days before a trial ends. Use it to remind the customer that billing starts soon. Emitted by a recurring scan with a deterministic idempotency key, so it never fires twice for the same trial end date.",
         "tags": [
           "Webhooks"
         ],
@@ -2934,7 +2934,7 @@
             "description": "Predictive event fired once, 3 days before a trial ends.",
             "playground": "none"
           },
-          "content": "## When this fires\n\nA daily scan finds trials ending within the next 3 days and emits this event once per trial. The idempotency key is derived from the subscription and the trial end date, so re-running the scan never sends a duplicate.\n\nUse it to remind the customer that billing starts on `trialEndsAt` — the single most effective moment to prevent involuntary churn and surprise charges.\n\nIf the trial end date changes after this event fired (for example, the customer converts early), `trial.converted` or `trial.expired` reflects the final outcome."
+          "content": "## When this fires\n\nA recurring scan finds trials ending within the next 3 days and emits this event once per trial. The idempotency key is derived from the subscription and the trial end date, so re-running the scan never sends a duplicate.\n\nUse it to remind the customer that billing starts on `trialEndsAt` — the single most effective moment to prevent involuntary churn and surprise charges.\n\nIf the trial end date changes after this event fired (for example, the customer converts early), `trial.converted` or `trial.expired` reflects the final outcome."
         }
       }
     },
@@ -3370,7 +3370,7 @@
                             "type": "null"
                           }
                         ],
-                        "description": "The payment method: card, oxxo, or mercado_pago. Null when unknown."
+                        "description": "The payment method: card, apple_pay, google_pay, link, smartpix, oxxo or mercado_pago. Null when unknown."
                       },
                       "subPaymentMethod": {
                         "anyOf": [
@@ -3664,7 +3664,7 @@
                             "type": "null"
                           }
                         ],
-                        "description": "The payment method: card, oxxo, or mercado_pago. Null when unknown."
+                        "description": "The payment method: card, apple_pay, google_pay, link, smartpix, oxxo or mercado_pago. Null when unknown."
                       },
                       "subPaymentMethod": {
                         "anyOf": [
@@ -3852,7 +3852,7 @@
                             "type": "null"
                           }
                         ],
-                        "description": "The payment method: card, oxxo, or mercado_pago. Null when unknown."
+                        "description": "The payment method: card, apple_pay, google_pay, link, smartpix, oxxo or mercado_pago. Null when unknown."
                       },
                       "subPaymentMethod": {
                         "anyOf": [
@@ -4140,6 +4140,12 @@
                           "null"
                         ]
                       },
+                      "amountRefunded": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991,
+                        "description": "Cumulative confirmed refunds in the payment currency’s smallest unit."
+                      },
                       "refundAmount": {
                         "type": "number",
                         "description": "The refunded amount in cents (100 = $1.00)."
@@ -4157,6 +4163,7 @@
                       "invoiceNumber",
                       "customerId",
                       "subscriptionId",
+                      "amountRefunded",
                       "refundAmount",
                       "currency"
                     ],
@@ -4189,6 +4196,7 @@
                   "customerId": "user_123",
                   "subscriptionId": "sub_1a2b3c4d",
                   "refundAmount": 9900,
+                  "amountRefunded": 9900,
                   "currency": "usd"
                 }
               }
@@ -4862,7 +4870,7 @@
                             "type": "null"
                           }
                         ],
-                        "description": "The payment method: card, oxxo, or mercado_pago. Null when unknown."
+                        "description": "The payment method: card, apple_pay, google_pay, link, smartpix, oxxo or mercado_pago. Null when unknown."
                       },
                       "subPaymentMethod": {
                         "anyOf": [
@@ -5126,7 +5134,7 @@
                             "type": "null"
                           }
                         ],
-                        "description": "The payment method: card, oxxo, or mercado_pago. Null when unknown."
+                        "description": "The payment method: card, apple_pay, google_pay, link, smartpix, oxxo or mercado_pago. Null when unknown."
                       },
                       "subPaymentMethod": {
                         "anyOf": [
@@ -5497,7 +5505,7 @@
     "invoice.voided": {
       "post": {
         "summary": "invoice.voided",
-        "description": "Fired when an invoice is voided — nullified before collection, either manually or automatically when its subscription is canceled. Voiding is terminal: a void invoice is never retried or collected.",
+        "description": "Fired when an invoice is voided — nullified before collection, for example when its subscription is canceled. Voiding is terminal: a void invoice is never retried or collected.",
         "tags": [
           "Webhooks"
         ],
@@ -5657,7 +5665,7 @@
     "invoice.overdue": {
       "post": {
         "summary": "invoice.overdue",
-        "description": "Fired once when an outstanding invoice passes its due date without payment. The invoice keeps its outstanding status — overdue is a fact about the due date, not a new status. Use it to start your own dunning flow.",
+        "description": "Fired once when an invoice is still outstanding 24 hours after its due date. The invoice keeps its outstanding status — overdue is a fact about the due date, not a new status. Use it to start your own dunning flow.",
         "tags": [
           "Webhooks"
         ],
@@ -5810,14 +5818,14 @@
             "description": "An outstanding invoice passed its due date without payment.",
             "playground": "none"
           },
-          "content": "## When this fires\n\nA daily scan finds outstanding invoices whose `dueDate` is in the past and emits this event once per invoice. The idempotency key is derived from the invoice, so re-running the scan never sends a duplicate.\n\nThe invoice keeps its `\"outstanding\"` status — overdue is a fact about the due date, not a new status. If the invoice is later paid or voided, `payment.received` or `invoice.voided` reflects the outcome.\n\nUse it to start your own dunning flow: email the customer, show an in-app banner, or flag the account for follow-up."
+          "content": "## When this fires\n\nA recurring scan finds invoices that are still outstanding 24 hours after their `dueDate` and emits this event once per invoice. The idempotency key is derived from the invoice, so re-running the scan never sends a duplicate.\n\nThe invoice keeps its `\"outstanding\"` status — overdue is a fact about the due date, not a new status. If the invoice is later paid or voided, `payment.received` or `invoice.voided` reflects the outcome.\n\nUse it to start your own dunning flow: email the customer, show an in-app banner, or flag the account for follow-up."
         }
       }
     },
     "invoice.upcoming": {
       "post": {
         "summary": "invoice.upcoming",
-        "description": "Predictive event fired once, 3 days before an active subscription renews. Use it to notify the customer before they are charged. Carries no amount — usage-based charges are only final at renewal, when invoice.created delivers the actual invoice.",
+        "description": "Predictive event fired once, 3 days before an active subscription renews. A subscription on a free plan issues no renewal invoice and does not fire it. Use it to notify the customer before they are charged. Carries no amount — usage-based charges are only final at renewal, when invoice.created delivers the actual invoice.",
         "tags": [
           "Webhooks"
         ],
@@ -5940,7 +5948,7 @@
             "description": "Predictive event fired once, 3 days before a subscription renews.",
             "playground": "none"
           },
-          "content": "## When this fires\n\nA daily scan finds active subscriptions renewing within the next 3 days and emits this event once per renewal. The idempotency key is derived from the subscription and the renewal date, so re-running the scan never sends a duplicate.\n\nSubscriptions with a scheduled cancellation are excluded — no renewal invoice will be issued for them.\n\nUse it to notify the customer before they are charged. The payload intentionally carries no amount: usage-based charges are only final at renewal time, when `invoice.created` delivers the actual invoice."
+          "content": "## When this fires\n\nA recurring scan finds active subscriptions renewing within the next 3 days and emits this event once per renewal. The idempotency key is derived from the subscription and the renewal date, so re-running the scan never sends a duplicate.\n\nSubscriptions with a scheduled cancellation and subscriptions on a free plan are excluded — no renewal invoice will be issued for them.\n\nUse it to notify the customer before they are charged. The payload intentionally carries no amount: usage-based charges are only final at renewal time, when `invoice.created` delivers the actual invoice."
         }
       }
     },
@@ -6001,7 +6009,7 @@
                             "type": "null"
                           }
                         ],
-                        "description": "The payment method: card, oxxo, or mercado_pago. Null when unknown."
+                        "description": "The payment method: card, apple_pay, google_pay, link, smartpix, oxxo or mercado_pago. Null when unknown."
                       },
                       "card": {
                         "anyOf": [
@@ -6125,7 +6133,7 @@
                             "type": "null"
                           }
                         ],
-                        "description": "The payment method: card, oxxo, or mercado_pago. Null when unknown."
+                        "description": "The payment method: card, apple_pay, google_pay, link, smartpix, oxxo or mercado_pago. Null when unknown."
                       },
                       "card": {
                         "anyOf": [
@@ -6242,7 +6250,7 @@
                             "type": "null"
                           }
                         ],
-                        "description": "The payment method: card, oxxo, or mercado_pago. Null when unknown."
+                        "description": "The payment method: card, apple_pay, google_pay, link, smartpix, oxxo or mercado_pago. Null when unknown."
                       },
                       "card": {
                         "anyOf": [
@@ -7027,11 +7035,15 @@
                                           "minimum": 0,
                                           "description": "Actual credits deducted by this feature during the period."
                                         },
+                                        "unlimited": {
+                                          "type": "boolean",
+                                          "description": "Whether the plan credits are unlimited: usage never spends them and only the plan credit limit caps it."
+                                        },
                                         "availableUnits": {
                                           "type": "integer",
                                           "minimum": 0,
                                           "maximum": 9007199254740991,
-                                          "description": "Additional product units available from the current shared credit pool at this feature's conversion rate."
+                                          "description": "Additional product units available from the current shared credit pool at this feature's conversion rate. Absent when unlimited is true."
                                         }
                                       },
                                       "required": [
@@ -7040,7 +7052,7 @@
                                         "unitsUsed",
                                         "creditsPerUnit",
                                         "creditsConsumed",
-                                        "availableUnits"
+                                        "unlimited"
                                       ],
                                       "additionalProperties": false
                                     },
@@ -7098,11 +7110,15 @@
                                           "additionalProperties": false,
                                           "description": "Actual money deducted for this feature during the period."
                                         },
+                                        "unlimited": {
+                                          "type": "boolean",
+                                          "description": "Whether the plan balance is unlimited: usage never spends it and only the plan balance limit caps it."
+                                        },
                                         "availableUnits": {
                                           "type": "integer",
                                           "minimum": 0,
                                           "maximum": 9007199254740991,
-                                          "description": "Estimated additional units available from the current shared balance at this feature's fixed price. Absent for dynamic pricing."
+                                          "description": "Estimated additional units available from the current shared balance at this feature's fixed price. Absent for dynamic pricing and when unlimited is true."
                                         },
                                         "unitPrice": {
                                           "type": "object",
@@ -7136,7 +7152,8 @@
                                         "model",
                                         "period",
                                         "unitsUsed",
-                                        "spent"
+                                        "spent",
+                                        "unlimited"
                                       ],
                                       "additionalProperties": false
                                     }
@@ -9053,7 +9070,7 @@
     "credits.expired": {
       "post": {
         "summary": "credits.expired",
-        "description": "Fired at a reset when unused plan credits are discarded. On a plan whose unused plan credits expire, every unused plan credit expires at each reset. On a plan that rolls them over, a reset keeps them, up to the plan's maxPlanCredits when it has one, and only the excess expires. A change to another credits plan applies the new plan's terms the same way. Purchased credits never expire and are not affected.",
+        "description": "Fired at a reset when unused plan credits are discarded. On a plan whose unused plan credits expire, every unused plan credit expires at each reset. On a plan that rolls them over, a reset keeps them, up to the plan's maxPlanCredits when it has one, and only the excess expires. A change to another credits plan applies the new plan's terms the same way, and an immediate change also discards the credits the previous plan gave for the period it cuts short. Purchased credits never expire and are not affected.",
         "tags": [
           "Webhooks"
         ],
@@ -11130,7 +11147,9 @@
           "oxxo",
           "mercado_pago",
           "google_pay",
-          "smartpix"
+          "smartpix",
+          "apple_pay",
+          "link"
         ]
       },
       "SubPaymentMethod": {
@@ -11210,48 +11229,55 @@
       "WebhookCreditsBalance": {
         "type": "object",
         "properties": {
+          "unlimited": {
+            "type": "boolean",
+            "description": "true when the plan credits are unlimited: usage never spends them and only the plan credit limit caps it."
+          },
           "planCredits": {
+            "description": "Plan credits left. Omitted when unlimited is true.",
             "type": "number"
           },
           "purchasedCredits": {
             "type": "number"
           },
           "totalCredits": {
+            "description": "planCredits plus purchasedCredits. Omitted when unlimited is true.",
             "type": "number"
           }
         },
         "required": [
-          "planCredits",
-          "purchasedCredits",
-          "totalCredits"
+          "unlimited",
+          "purchasedCredits"
         ],
         "additionalProperties": false
       },
       "WebhookBalance": {
         "type": "object",
         "properties": {
+          "unlimited": {
+            "type": "boolean",
+            "description": "true when the plan balance is unlimited: usage never spends it and only the plan balance limit caps it."
+          },
           "currentBalance": {
-            "type": "number",
-            "description": "The available balance, plan plus purchased, in rate scale. Equal to totalBalance."
+            "description": "The available balance, plan plus purchased, in rate scale. Equal to totalBalance. Omitted when unlimited is true.",
+            "type": "number"
           },
           "planBalance": {
-            "type": "number",
-            "description": "The plan part in rate scale: spent first, replaced or rolled over at each reset, negative while overage is owed."
+            "description": "The plan part in rate scale: spent first, replaced or rolled over at each reset, negative while overage is owed. Omitted when unlimited is true.",
+            "type": "number"
           },
           "purchasedBalance": {
             "type": "number",
             "description": "The purchased part in rate scale: top-ups and manual adjustments, spent after the plan part and kept until the subscription ends."
           },
           "totalBalance": {
-            "type": "number",
-            "description": "planBalance plus purchasedBalance, in rate scale."
+            "description": "planBalance plus purchasedBalance, in rate scale. Omitted when unlimited is true.",
+            "type": "number"
           }
         },
         "required": [
-          "currentBalance",
-          "planBalance",
-          "purchasedBalance",
-          "totalBalance"
+          "unlimited",
+          "purchasedBalance"
         ],
         "additionalProperties": false
       },

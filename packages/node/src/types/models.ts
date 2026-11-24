@@ -74,8 +74,10 @@ export interface BalanceAdjustment {
 
 export interface BalanceTopup {
   amount: number;
-  /** `succeeded` when the payment was confirmed and the balance was added. `processing` when the payment method confirms later: the balance is added once the payment is confirmed, and nothing is added if it is declined. */
-  status: "succeeded" | "processing";
+  /** `succeeded` when the payment was confirmed and the balance was added. `processing` when the payment method confirms later: the balance is added once the payment is confirmed, and nothing is added if it is declined. `requires_checkout` when the subscription has no saved payment method and `successUrl` was sent: the balance is added once the customer pays at `checkoutUrl`. */
+  status: "succeeded" | "processing" | "requires_checkout";
+  /** Hosted checkout where the customer pays the purchase and saves the payment method. Present only when `status` is `requires_checkout`. */
+  checkoutUrl?: string;
   object: "balance_topup";
   livemode: boolean;
 }
@@ -205,8 +207,10 @@ export interface CreatedWebhook {
 
 export interface CreditGrant {
   credits: number;
-  /** `succeeded` when the payment was confirmed and the credits were added. `processing` when the payment method confirms later: the credits are added once the payment is confirmed, and nothing is added if it is declined. */
-  status: "succeeded" | "processing";
+  /** `succeeded` when the payment was confirmed and the credits were added. `processing` when the payment method confirms later: the credits are added once the payment is confirmed, and nothing is added if it is declined. `requires_checkout` when the subscription has no saved payment method and `successUrl` was sent: the credits are added once the customer pays at `checkoutUrl`. */
+  status: "succeeded" | "processing" | "requires_checkout";
+  /** Hosted checkout where the customer pays the purchase and saves the payment method. Present only when `status` is `requires_checkout`. */
+  checkoutUrl?: string;
   object: "credit_grant";
   livemode: boolean;
 }
@@ -1050,6 +1054,12 @@ export interface Plan {
 }
 
 export type PlanChange =
+  | {
+      outcome: "processing";
+      invoiceId: string;
+      object: "plan_change";
+      livemode: boolean;
+    }
   | {
       outcome: "requires_checkout";
       requiresCheckout: true;
@@ -2168,9 +2178,11 @@ export interface Subscription {
 
 export interface SubscriptionAddon {
   addonId: string;
-  /** `active` when the add-on is active. `processing` when the payment method confirms later: the add-on is activated once the payment is confirmed, and stays inactive if it is declined. */
-  status: "active" | "processing";
+  /** `active` when the add-on is active. `processing` when the payment method confirms later: the add-on is activated once the payment is confirmed, and stays inactive if it is declined. `requires_checkout` when the subscription has no saved payment method and `successUrl` was sent: the add-on is activated once the customer pays at `checkoutUrl`. */
+  status: "active" | "processing" | "requires_checkout";
   proratedCharge: number;
+  /** Hosted checkout where the customer pays the purchase and saves the payment method. Present only when `status` is `requires_checkout`. */
+  checkoutUrl?: string;
   object: "subscription_addon";
   livemode: boolean;
 }
@@ -2494,7 +2506,7 @@ export interface Transaction {
   currency: string;
   /** The payment provider the charge was routed to: stripe, commet, or dlocal. */
   provider: PaymentProvider;
-  /** The method used for this charge: card, oxxo, or mercado_pago. Null when unknown. */
+  /** The method used for this charge: card, apple_pay, google_pay, link, smartpix, oxxo or mercado_pago. Null when unknown. */
   paymentMethod: PaymentMethod | null;
   /** The source of funds for this charge, when reported by the provider. Null when unavailable or unknown. */
   subPaymentMethod: SubPaymentMethod | null;
@@ -2556,7 +2568,7 @@ export interface TransactionListItem {
   currency: string;
   /** The payment provider the charge was routed to: stripe, commet, or dlocal. */
   provider: PaymentProvider;
-  /** The method used for this charge: card, oxxo, or mercado_pago. Null when unknown. */
+  /** The method used for this charge: card, apple_pay, google_pay, link, smartpix, oxxo or mercado_pago. Null when unknown. */
   paymentMethod: PaymentMethod | null;
   /** The source of funds for this charge, when reported by the provider. Null when unavailable or unknown. */
   subPaymentMethod: SubPaymentMethod | null;

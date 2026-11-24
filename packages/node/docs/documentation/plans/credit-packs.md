@@ -102,12 +102,30 @@ await commet.subscriptions.purchaseCredits({
 
 Commet creates the purchase invoice, charges the saved payment method at the price per credit of the subscription's plan version and adds the purchased credits once the payment is confirmed. Send `creditPackId` instead of `quantity` to buy a pack. The response's `status` is `succeeded` when the credits were added, or `processing` when the payment method confirms later, such as Pix: the credits are added and [`credits.purchased`](/docs/webhooks/credits-purchased) fires when the payment is confirmed. A declined payment adds nothing and voids the invoice.
 
-| Response                      | Cause                                                                      |
-| ----------------------------- | -------------------------------------------------------------------------- |
-| `400 validation_error`        | The quantity is below the plan's minimum, or the plan doesn't sell credits |
-| `402 no_payment_method`       | The subscription has no saved payment method Commet can charge             |
-| `402 payment_failed`          | The charge was declined                                                    |
-| `409 credit_pack_unavailable` | The subscription's plan version doesn't sell the pack                      |
+| Response                      | Cause                                                                                               |
+| ----------------------------- | --------------------------------------------------------------------------------------------------- |
+| `400 validation_error`        | The quantity is below the plan's minimum, or the plan doesn't sell credits                          |
+| `402 no_payment_method`       | The subscription has no saved payment method Commet can charge, and the request has no `successUrl` |
+| `402 payment_failed`          | The charge was declined                                                                             |
+| `409 credit_pack_unavailable` | The subscription's plan version doesn't sell the pack                                               |
+
+### Customers without a saved payment method
+
+Send `successUrl` to let a customer without a saved payment method buy a quantity or a pack. The response's `status` is `requires_checkout`, with a `checkoutUrl` where the customer pays the purchase and saves the payment method in one step:
+
+```typescript
+const purchase = await commet.subscriptions.purchaseCredits({
+  id: 'sub_xxx',
+  quantity: 500,
+  successUrl: 'https://your-app.com/credits',
+})
+
+if (purchase.status === 'requires_checkout') {
+  redirect(purchase.checkoutUrl)
+}
+```
+
+Nothing is charged until the customer pays. The credits are added and [`credits.purchased`](/docs/webhooks/credits-purchased) fires when the payment is confirmed, so don't send the purchase again after the customer returns. An unpaid checkout expires after 24 hours and leaves nothing owed. A subscription with a saved payment method is charged directly, and a declined charge returns `402` with or without `successUrl`.
 
 The effective minimum is the larger of the configured minimum and the smallest quantity that reaches the currency's minimum charge.
 

@@ -55,7 +55,15 @@ Month 1: 800 unused → 800 + 1,000 = 1,800
 Month 2: 1,800 unused → 2,800, capped at 2,500. 300 expire.
 ```
 
-`{ type: 'expire' }` restores the default. Changing it publishes a new [plan version](/docs/plan-versions); each subscription keeps its version's setting until you move it. A plan change applies the new plan's setting.
+`{ type: 'expire' }` restores the default. Changing it publishes a new [plan version](/docs/plan-versions); each subscription keeps its version's setting until you move it.
+
+A plan change applies the new plan's setting to the credits the customer holds. An immediate change cuts the current period short, so the credits the previous plan gave for that period do not pass: only what the customer holds above that allocation carries over, and the new plan adds its own. A change applied at the end of the period carries every unused plan credit.
+
+```
+Pro grants 240 credits per month. The customer holds 400 and upgrades today to Studio, which grants 1,000 and rolls over.
+
+400 − 240 = 160 carried → 160 + 1,000 = 1,160
+```
 
 ### Limit plan credit spending
 

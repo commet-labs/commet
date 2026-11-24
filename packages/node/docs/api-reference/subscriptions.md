@@ -25,12 +25,13 @@ Deactivate an add-on from a subscription.
 
 `POST /subscriptions/{id}/addons` · operation `activate-addon`
 
-Activate an add-on on a subscription. Creates the activation invoice and charges a prorated amount for the current billing period; the add-on is active once the payment is confirmed. Rejected with 409 while the add-on is active or an activation of it is still processing. An add-on that the subscription's plan version does not sell is rejected with addon_unavailable.
+Activate an add-on on a subscription. Creates the activation invoice and charges a prorated amount for the current billing period; the add-on is active once the payment is confirmed. Without a saved payment method, send successUrl to receive a checkout that charges the activation and saves the method. Rejected with 409 while the add-on is active or an activation of it is still processing. An add-on that the subscription's plan version does not sell is rejected with addon_unavailable.
 
 ### Parameters
 
 - `id` (`string`, required)
 - `addonId` (`string`, required)
+- `successUrl` (`string`, optional) — Where the customer returns after paying. When it is set and the subscription has no saved payment method, the response has status `requires_checkout` and a `checkoutUrl` where the customer pays this purchase and saves the method in one step. Without it, the request is rejected when there is no saved payment method. A saved method is always charged directly, and a declined charge is rejected either way.
 
 ### Request options
 
@@ -110,12 +111,13 @@ Adjust a subscription's balance or credits by a signed amount. Positive adds, ne
 
 `POST /subscriptions/{id}/balance/topup` · operation `topup-balance`
 
-Top up a balance subscription. Creates the top-up invoice and charges the customer's payment method for the amount plus tax. Once the payment is confirmed, adds the amount to the subscription's purchased balance (after paying back any overage owed on the plan balance), marks the invoice paid and emits `balance.topped_up`. Purchased balance is spent after the plan balance and is kept until the subscription ends. Rejected with 400 when the subscription is not on a balance plan, its plan has top-ups turned off, or the amount is below the effective minimum: the plan's minimum top-up in the subscription currency, raised to the currency's minimum charge.
+Top up a balance subscription. Creates the top-up invoice and charges the customer's payment method for the amount plus tax. Once the payment is confirmed, adds the amount to the subscription's purchased balance (after paying back any overage owed on the plan balance), marks the invoice paid and emits `balance.topped_up`. Purchased balance is spent after the plan balance and is kept until the subscription ends. Without a saved payment method, send successUrl to receive a checkout that charges the top-up and saves the method. Rejected with 400 when the subscription is not on a balance plan, its plan has top-ups turned off, or the amount is below the effective minimum: the plan's minimum top-up in the subscription currency, raised to the currency's minimum charge.
 
 ### Parameters
 
 - `id` (`string`, required)
 - `amount` (`number`, required) — The amount to add, in minor units of the subscription currency (cents; whole units for zero-decimal currencies).
+- `successUrl` (`string`, optional) — Where the customer returns after paying. When it is set and the subscription has no saved payment method, the response has status `requires_checkout` and a `checkoutUrl` where the customer pays this purchase and saves the method in one step. Without it, the request is rejected when there is no saved payment method. A saved method is always charged directly, and a declined charge is rejected either way.
 
 ### Request options
 
@@ -205,13 +207,14 @@ Move a subscription to a newer published version of its plan, now or at the end 
 
 `POST /subscriptions/{id}/credits` · operation `purchase-credits`
 
-Purchase a fixed credit pack or choose a whole credit quantity at the subscription plan price and minimum. Creates the purchase invoice, charges the saved payment method and adds the purchased credits once the payment is confirmed. A credit pack that the subscription's plan version does not sell is rejected with credit_pack_unavailable.
+Purchase a fixed credit pack or choose a whole credit quantity at the subscription plan price and minimum. Creates the purchase invoice, charges the saved payment method and adds the purchased credits once the payment is confirmed. Without a saved payment method, send successUrl to receive a checkout that charges the purchase and saves the method. A credit pack that the subscription's plan version does not sell is rejected with credit_pack_unavailable.
 
 ### Parameters
 
 - `id` (`string`, required)
 - `creditPackId` (`string`, optional)
 - `quantity` (`number`, optional)
+- `successUrl` (`string`, optional) — Where the customer returns after paying. When it is set and the subscription has no saved payment method, the response has status `requires_checkout` and a `checkoutUrl` where the customer pays this purchase and saves the method in one step. Without it, the request is rejected when there is no saved payment method. A saved method is always charged directly, and a declined charge is rejected either way.
 
 ### Valid parameter combinations
 
@@ -402,7 +405,7 @@ Preview proration details for an immediate plan change without applying it. Free
 
 `POST /subscriptions/{id}/reactivate` · operation `reactivate-subscription`
 
-Reactivates a subscription. A past_due subscription retries its outstanding renewal charge (recovering to active on success). A canceled subscription generates a fresh invoice, charges the saved card, and resets the billing period. On a successful charge the subscription becomes active; a declined charge returns an error with a recoveryUrl in the error details that can be sent to the customer to update their card. A canceled subscription may apply an Offer by offerId; past-due recovery cannot.
+Reactivates a subscription. A past_due subscription retries its outstanding renewal charge (recovering to active on success). A canceled subscription generates a fresh invoice, charges the saved card, and resets the billing period; when that invoice totals zero, for example under an Offer, it is marked paid without a charge and the subscription becomes active at once, still requiring a saved payment method. On a successful charge the subscription becomes active; a declined charge returns an error with a recoveryUrl in the error details that can be sent to the customer to update their card. A canceled subscription may apply an Offer by offerId; past-due recovery cannot.
 
 ### Parameters
 
@@ -574,7 +577,7 @@ Create a subscription for a customer. Commet selects the default price when pric
 - `priceId` (`string`, optional) — Public price ID. When omitted, Commet selects the default price for the billing interval and still applies its market pricing.
 - `initialSeats` (`Record<string, number>`, optional)
 - `provider` (`"stripe" | "commet" | "dlocal" | string`, optional) — Payment provider name or exact public payment connection ID for the initial checkout. Overrides country routing when present.
-- `paymentMethodTypes` (`Array<"card" | "oxxo" | "mercado_pago" | "google_pay" | "smartpix">`, optional) — Payment methods the initial checkout may offer. Restricts what the checkout already offers for the buyer's country, currency and payment connection; it never enables a method the connection does not have and never changes routing. When none of them is available to the buyer, the checkout shows that it cannot accept payments.
+- `paymentMethodTypes` (`Array<"card" | "mercado_pago" | "oxxo" | "google_pay" | "smartpix" | "apple_pay" | "link">`, optional) — Payment methods the initial checkout may offer. Restricts what the checkout already offers for the buyer's country, currency and payment connection; it never enables a method the connection does not have and never changes routing. When none of them is available to the buyer, the checkout shows that it cannot accept payments.
 - `name` (`string`, optional)
 - `startDate` (`string`, optional)
 - `successUrl` (`string`, optional)

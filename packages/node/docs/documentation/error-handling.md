@@ -109,6 +109,17 @@ Every current API error includes a stable `code` and a version-matched `doc_url`
 
 Keep the `x-request-id` response header when logging or reporting an error. Commet records the same identifier in Platform, allowing the request to be correlated without including credentials or customer data.
 
+## Rate Limits
+
+Each API key, and each person connected through OAuth, has two limits over a sliding 10-second window. Every request counts toward exactly one of them, so a burst of usage checks never uses up the room your other calls need.
+
+| Limit                         | Routes                                                                                                                                                                                                                                                                                                   |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1,000 requests per 10 seconds | `POST /v1/usage/events`, `POST /v1/usage/check`, `GET /v1/feature-access`, `GET /v1/feature-access/{code}`, `GET /v1/features/{code}`, `GET /v1/active-addons`, `GET /v1/addons/active`, `GET /v1/seats/balance`, `GET /v1/seats/balances`, `GET /v1/subscriptions/active`, `GET /v1/subscriptions/{id}` |
+| 300 requests per 10 seconds   | Every other route                                                                                                                                                                                                                                                                                        |
+
+Every authenticated response carries `RateLimit-Limit`, the limit of the route you called, and `RateLimit-Remaining`. Above the limit the API answers `429` with the code [`rate_limited`](/docs/api-reference/errors/rate_limited.md), plus `RateLimit-Reset` and `Retry-After` in seconds.
+
 ## Automatic Retries
 
 Failed requests retry with exponential backoff (1s → 2s → 4s, max 8s).
