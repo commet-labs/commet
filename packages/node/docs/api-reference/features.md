@@ -47,7 +47,7 @@ Update a feature's name, description, or unit name. At least one field must be p
 
 `DELETE /features/{code}` · operation `delete-feature`
 
-Delete a feature. Fails if the feature is attached to active plans or has an active add-on.
+Delete a feature. Fails while a plan's current version, a running experiment or a draft includes it, or while it has an active add-on. Subscribers whose plan version includes it keep it, and its code can be used by a new feature right away.
 
 ### Parameters
 

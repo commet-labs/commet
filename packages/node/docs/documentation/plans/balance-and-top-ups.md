@@ -161,6 +161,8 @@ $balanceTopup = $commet->subscriptions->topupBalance(
 
 A top-up creates its invoice and charges the payment method attached to the subscription. The balance is added once the payment is confirmed: the response's `status` is `succeeded`, or `processing` when the payment method confirms later, such as Pix. A declined payment adds nothing and voids the invoice. Customers can also buy balance from the [Customer Portal](/docs/customer-portal).
 
+Without a saved payment method, the request returns `402`. Send `successUrl` to receive a `status` of `requires_checkout` and a `checkoutUrl` instead: the customer pays the top-up there and saves the payment method in one step, and the balance is added when the payment is confirmed. Don't send the top-up again after the customer returns.
+
 ## Enforce before spending
 
 Check usage before work that should not run with insufficient balance, then track only completed work. Use a stable idempotency key so a retry does not deduct twice.

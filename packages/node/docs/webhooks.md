@@ -38,7 +38,7 @@ Fired once, when the subscription's first charge succeeds and it becomes active 
 
 ## subscription.reactivated
 
-Fired when a canceled subscription is reactivated and its reactivation charge succeeds. The subscription returns to active with a fresh invoice and a billing period anchored to the reactivation date. Distinct from subscription.activated (first activation) and payment.recovered (past_due recovery, which keeps the original anchor).
+Fired when a canceled subscription is reactivated: its reactivation charge succeeds, or its reactivation invoice totals zero and is paid without a charge. The subscription returns to active with a fresh invoice and a billing period anchored to the reactivation date. Distinct from subscription.activated (first activation) and payment.recovered (past_due recovery, which keeps the original anchor).
 
 ### Data
 
@@ -52,7 +52,7 @@ Fired when a canceled subscription is reactivated and its reactivation charge su
 - `invoiceNumber` (`string`, required) — The human-readable invoice number.
 - `invoiceTotal` (`number`, required) — Invoice total in cents (100 = $1.00).
 - `invoiceCurrency` (`string`, required) — The invoice currency code.
-- `provider` (`"stripe" | "commet" | "dlocal"`, required) — The payment provider that processed the reactivation charge: stripe, commet, or dlocal.
+- `provider` (`"stripe" | "commet" | "dlocal"`, required) — The subscription's payment provider, which processed the reactivation charge: stripe, commet, or dlocal. A reactivation whose invoice totals zero runs no charge and still carries the subscription's provider.
 
 ## subscription.pause_scheduled
 
@@ -297,7 +297,7 @@ Fired when a trial period runs out. With a payment method the billing cycle acti
 
 ## trial.will_end
 
-Predictive event fired once, 3 days before a trial ends. Use it to remind the customer that billing starts soon. Emitted by a daily scan with a deterministic idempotency key, so it never fires twice for the same trial end date.
+Predictive event fired once, 3 days before a trial ends. Use it to remind the customer that billing starts soon. Emitted by a recurring scan with a deterministic idempotency key, so it never fires twice for the same trial end date.
 
 ### Data
 
@@ -348,7 +348,7 @@ Fired every time a payment settles successfully — the first payment and every 
 - `subscriptionId` (`string | null`, required) — The subscription ID.
 - `paymentTransactionId` (`string | null`, required) — The payment transaction ID.
 - `provider` (`"stripe" | "commet" | "dlocal" | null`, required) — The payment provider the charge was routed to: stripe, commet, or dlocal. Null for billing-only charges with no Commet ledger row.
-- `paymentMethod` (`PaymentMethod | null`, required) — The payment method: card, oxxo, or mercado_pago. Null when unknown.
+- `paymentMethod` (`PaymentMethod | null`, required) — The payment method: card, apple_pay, google_pay, link, smartpix, oxxo or mercado_pago. Null when unknown.
 - `subPaymentMethod` (`SubPaymentMethod | null`, required) — The source of funds for this charge, when reported by the provider. Null when unavailable or unknown.
 - `grossAmount` (`number | null`, required) — Gross amount in cents before fees.
 - `currency` (`string | null`, required) — The payment currency code.
@@ -368,7 +368,7 @@ Fired when an invoice-linked subscription charge fails.
 - `customerId` (`string`, required) — The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.
 - `subscriptionId` (`string | null`, required) — The subscription ID, if the invoice is linked to a subscription.
 - `provider` (`"stripe" | "commet" | "dlocal"`, required) — The payment provider the charge was routed to: stripe, commet, or dlocal.
-- `paymentMethod` (`PaymentMethod | null`, required) — The payment method: card, oxxo, or mercado_pago. Null when unknown.
+- `paymentMethod` (`PaymentMethod | null`, required) — The payment method: card, apple_pay, google_pay, link, smartpix, oxxo or mercado_pago. Null when unknown.
 - `subPaymentMethod` (`SubPaymentMethod | null`, required) — The source of funds for this charge, when reported by the provider. Null when unavailable or unknown.
 - `failureCode` (`string`, required) — The failure code from the payment processor.
 - `failureMessage` (`string`, required) — A human-readable failure message.
@@ -386,7 +386,7 @@ Fired when an outstanding invoice that previously failed is successfully paid �
 - `customerId` (`string`, required) — The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.
 - `subscriptionId` (`string | null`, required) — The subscription ID, if the invoice is linked to a subscription.
 - `provider` (`"stripe" | "commet" | "dlocal" | null`, required) — The payment provider that recovered the payment, or null when the invoice was recovered without a processor charge.
-- `paymentMethod` (`PaymentMethod | null`, required) — The payment method: card, oxxo, or mercado_pago. Null when unknown.
+- `paymentMethod` (`PaymentMethod | null`, required) — The payment method: card, apple_pay, google_pay, link, smartpix, oxxo or mercado_pago. Null when unknown.
 - `subPaymentMethod` (`SubPaymentMethod | null`, required) — The source of funds for this charge, when reported by the provider. Null when unavailable or unknown.
 
 ## payment.retry_failed
@@ -483,7 +483,7 @@ Fired when a payment link is paid. The charge settled and a one-time invoice was
 - `invoiceId` (`string`, required) — The one-time invoice generated for this payment.
 - `invoiceNumber` (`string`, required) — The human-readable invoice number.
 - `paymentTransactionId` (`string | null`, required) — The payment transaction ID for the settled charge.
-- `paymentMethod` (`PaymentMethod | null`, required) — The payment method: card, oxxo, or mercado_pago. Null when unknown.
+- `paymentMethod` (`PaymentMethod | null`, required) — The payment method: card, apple_pay, google_pay, link, smartpix, oxxo or mercado_pago. Null when unknown.
 - `subPaymentMethod` (`SubPaymentMethod | null`, required) — The source of funds for this charge, when reported by the provider. Null when unavailable or unknown.
 
 ## payment_link.failed
@@ -501,7 +501,7 @@ Fired when a payment link charge attempt is declined. The link stays open and ca
 - `customerId` (`string | null`, required) — The customer ID, or null when the link is not tied to a customer. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.
 - `failureCode` (`string`, required) — The failure code from the payment processor.
 - `failureMessage` (`string`, required) — A human-readable failure message.
-- `paymentMethod` (`PaymentMethod | null`, required) — The payment method: card, oxxo, or mercado_pago. Null when unknown.
+- `paymentMethod` (`PaymentMethod | null`, required) — The payment method: card, apple_pay, google_pay, link, smartpix, oxxo or mercado_pago. Null when unknown.
 - `subPaymentMethod` (`SubPaymentMethod | null`, required) — The source of funds for this charge, when reported by the provider. Null when unavailable or unknown.
 
 ## payment_link.canceled
@@ -557,7 +557,7 @@ Fired when an invoice is voided — nullified before collection, for example whe
 
 ## invoice.overdue
 
-Fired once when an outstanding invoice passes its due date without payment. The invoice keeps its outstanding status — overdue is a fact about the due date, not a new status. Use it to start your own dunning flow.
+Fired once when an invoice is still outstanding 24 hours after its due date. The invoice keeps its outstanding status — overdue is a fact about the due date, not a new status. Use it to start your own dunning flow.
 
 ### Data
 
@@ -576,7 +576,7 @@ Fired once when an outstanding invoice passes its due date without payment. The 
 
 ## invoice.upcoming
 
-Predictive event fired once, 3 days before an active subscription renews. Use it to notify the customer before they are charged. Carries no amount — usage-based charges are only final at renewal, when invoice.created delivers the actual invoice.
+Predictive event fired once, 3 days before an active subscription renews. A subscription on a free plan issues no renewal invoice and does not fire it. Use it to notify the customer before they are charged. Carries no amount — usage-based charges are only final at renewal, when invoice.created delivers the actual invoice.
 
 ### Data
 
@@ -596,7 +596,7 @@ Fired when Commet records a payment method for a subscription: after a paid chec
 
 - `subscriptionId` (`string`, required) — The subscription the payment method was saved for.
 - `customerId` (`string`, required) — The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.
-- `paymentMethod` (`PaymentMethod | null`, required) — The payment method: card, oxxo, or mercado_pago. Null when unknown.
+- `paymentMethod` (`PaymentMethod | null`, required) — The payment method: card, apple_pay, google_pay, link, smartpix, oxxo or mercado_pago. Null when unknown.
 - `card` (`WebhookCardInfo | null`, required) — Card display metadata: brand, last4, expMonth, expYear. Null when the method is not a card or its details cannot be retrieved.
 
 ## payment_method.updated
@@ -606,7 +606,7 @@ Fired when a customer replaces their default payment method through the customer
 ### Data
 
 - `customerId` (`string`, required) — The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.
-- `paymentMethod` (`PaymentMethod | null`, required) — The payment method: card, oxxo, or mercado_pago. Null when unknown.
+- `paymentMethod` (`PaymentMethod | null`, required) — The payment method: card, apple_pay, google_pay, link, smartpix, oxxo or mercado_pago. Null when unknown.
 - `card` (`WebhookCardInfo | null`, required) — Card display metadata for the new method: brand, last4, expMonth, expYear. Null when the method is not a card or its details cannot be retrieved.
 
 ## payment_method.detached
@@ -616,7 +616,7 @@ Fired when a saved payment method is removed from a customer: the customer unlin
 ### Data
 
 - `customerId` (`string`, required) — The customer ID. Returns your externalId if you provided one when creating the customer, otherwise returns the Commet publicId.
-- `paymentMethod` (`PaymentMethod | null`, required) — The payment method: card, oxxo, or mercado_pago. Null when unknown.
+- `paymentMethod` (`PaymentMethod | null`, required) — The payment method: card, apple_pay, google_pay, link, smartpix, oxxo or mercado_pago. Null when unknown.
 - `card` (`WebhookCardInfo | null`, required) — Card display metadata of the removed method: brand, last4, expMonth, expYear. Null when the method is not a card or its details cannot be retrieved.
 - `reason` (`"unlinked_at_provider" | "removed_by_customer"`, required) — Why the method was removed: `unlinked_at_provider` when the customer revoked it at the payment provider, `removed_by_customer` when the customer removed it through the customer portal.
 
@@ -818,7 +818,7 @@ Fired each time a subscription's available credits cross to zero or below. Usage
 
 ## credits.expired
 
-Fired at a reset when unused plan credits are discarded. On a plan whose unused plan credits expire, every unused plan credit expires at each reset. On a plan that rolls them over, a reset keeps them, up to the plan's maxPlanCredits when it has one, and only the excess expires. A change to another credits plan applies the new plan's terms the same way. Purchased credits never expire and are not affected.
+Fired at a reset when unused plan credits are discarded. On a plan whose unused plan credits expire, every unused plan credit expires at each reset. On a plan that rolls them over, a reset keeps them, up to the plan's maxPlanCredits when it has one, and only the excess expires. A change to another credits plan applies the new plan's terms the same way, and an immediate change also discards the credits the previous plan gave for the period it cuts short. Purchased credits never expire and are not affected.
 
 ### Data
 

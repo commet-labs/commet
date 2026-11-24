@@ -28,7 +28,9 @@ export type PaymentMethod =
   | "oxxo"
   | "mercado_pago"
   | "google_pay"
-  | "smartpix";
+  | "smartpix"
+  | "apple_pay"
+  | "link";
 
 export type PaymentProvider = "stripe" | "commet" | "dlocal";
 

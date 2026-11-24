@@ -3737,6 +3737,11 @@ export const resourceDefinitions: ResourceDef[] = [
             sdkKey: "addonId",
           },
           {
+            flag: "--success-url <success-url>",
+            description: "Where the customer returns after paying.",
+            sdkKey: "successUrl",
+          },
+          {
             flag: "--idempotency-key <key>",
             description:
               "Unique key used to safely retry this write for 24 hours without applying it twice.",
@@ -3863,6 +3868,11 @@ export const resourceDefinitions: ResourceDef[] = [
             required: true,
             parse: parseNumber,
             sdkKey: "amount",
+          },
+          {
+            flag: "--success-url <success-url>",
+            description: "Where the customer returns after paying.",
+            sdkKey: "successUrl",
           },
           {
             flag: "--idempotency-key <key>",
@@ -4014,6 +4024,11 @@ export const resourceDefinitions: ResourceDef[] = [
             description: "Quantity",
             parse: parseNumber,
             sdkKey: "quantity",
+          },
+          {
+            flag: "--success-url <success-url>",
+            description: "Where the customer returns after paying.",
+            sdkKey: "successUrl",
           },
           {
             flag: "--idempotency-key <key>",

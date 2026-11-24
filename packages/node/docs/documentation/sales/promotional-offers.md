@@ -55,7 +55,7 @@ await commet.subscriptions.applyOffer({
 
 Only one Offer applies at a time: while an accepted Offer still has active or upcoming discount phases, a new application is rejected. Once its phases are exhausted, the subscription accepts a new Offer. The discount applies to the plan base price only.
 
-The applied Offer belongs to that subscription and plan: it ends with a cancellation and a plan change removes it.
+The applied Offer belongs to that subscription: it ends with a cancellation, and it [keeps going through a plan change](/docs/how-do-discounts-work#plan-changes) with the cycles it had left.
 
 The same operation on a subscription with a pending checkout quotes or replaces the checkout discount instead; there it accepts an optional `expiresAt` for the quote. When the price has a trial, the discount starts after it.
 
