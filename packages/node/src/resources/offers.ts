@@ -63,6 +63,17 @@ export interface UpdateOfferParams {
   startsAt?: string | null;
   endsAt?: string | null;
   active?: boolean;
+  /** Plans the offer is limited to: it cannot be applied to a subscription on another plan, and an applied offer ends when the subscriber changes to one. An empty list removes the limit. Omit to keep the current limit. */
+  planIds?: Array<string>;
+  /** Billing interval the offer is limited to: it cannot be applied to a subscription on another interval, and an applied offer ends when the subscriber changes to one. Null removes the limit. Omit to keep the current limit. */
+  billingInterval?:
+    | "weekly"
+    | "monthly"
+    | "quarterly"
+    | "semiannual"
+    | "yearly"
+    | "one_time"
+    | null;
 }
 
 export interface DeleteOfferParams {
@@ -131,6 +142,17 @@ export interface CreateOfferParams {
   startsAt?: string | null;
   endsAt?: string | null;
   active?: boolean;
+  /** Plans the offer is limited to: it cannot be applied to a subscription on another plan, and an applied offer ends when the subscriber changes to one. An empty list removes the limit. Omit to keep the current limit. */
+  planIds?: Array<string>;
+  /** Billing interval the offer is limited to: it cannot be applied to a subscription on another interval, and an applied offer ends when the subscriber changes to one. Null removes the limit. Omit to keep the current limit. */
+  billingInterval?:
+    | "weekly"
+    | "monthly"
+    | "quarterly"
+    | "semiannual"
+    | "yearly"
+    | "one_time"
+    | null;
 }
 
 export class OffersResource {
@@ -173,7 +195,7 @@ export class OffersResource {
     return this.httpClient.get("/offers", params, options);
   }
 
-  /** Create reusable offer terms without assigning a plan, price, eligibility rule, or distribution channel. */
+  /** Create reusable offer terms. An offer applies to any plan and billing interval unless `planIds` or `billingInterval` limit it. */
   async create(
     params: CreateOfferParams,
     options?: RequestOptions,

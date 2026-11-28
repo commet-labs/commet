@@ -304,6 +304,8 @@ export interface SubscriptionPlanChangedData {
   charge: number;
   /** Total amount charged in cents. */
   totalCharged: number;
+  /** The cancellation reason when a cancellation moved the subscription to its group's default plan instead of ending it. Null for any other plan change. */
+  cancelReason: string | null;
 }
 
 /** Fired when a cancellation is scheduled for the end of the billing period. The subscription stays active until effectiveAt — do NOT revoke access here. subscription.updated also fires for backward compatibility. */
@@ -352,6 +354,8 @@ export interface SubscriptionPlanChangeScheduledData {
   scheduledBillingInterval: string | null;
   /** ISO 8601 datetime when the change executes (the billing period end). */
   effectiveAt: string;
+  /** The cancellation reason when a cancellation scheduled the move to the group's default plan instead of ending the subscription. Null for any other scheduled change. */
+  cancelReason: string | null;
 }
 
 /** Fired when a scheduled plan change will no longer take effect: it was revoked through the API, the dashboard or the customer portal, an immediate plan change or an immediate cancellation voided it, or a different change replaced it. A replacement also fires subscription.plan_change_scheduled with the new target plan. */

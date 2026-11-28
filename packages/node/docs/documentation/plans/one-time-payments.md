@@ -163,6 +163,7 @@ curl -X POST https://commet.co/api/v1/subscriptions \
 ```
 
 - The cancellation is scheduled from creation: the response already shows `cancelAtPeriodEnd: true` and `cancellation` before the customer pays.
+- The checkout shows `1 month · one-time payment, doesn't renew`, or the periods paid, and no charges after them.
 - The purchase keeps ending even if the customer saves a card through a payment method update link, and the Customer Portal doesn't offer **Keep subscription** for it.
 - Free trials don't combine with it: `customTrialDays` above `0` returns `400` and the price's trial is skipped.
 - When the purchase ends, Commet emits [`subscription.canceled`](/docs/webhooks/subscription-canceled).

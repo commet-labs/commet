@@ -9,7 +9,7 @@ The customer already has a draft, trialing, active, or past-due subscription tha
 
 ## What to do
 
-Inspect the existing subscription and continue, recover, cancel, or change it instead of creating a conflicting subscription.
+Inspect the existing subscription and continue, recover, cancel, or change it instead of creating a conflicting subscription. When it is past due, details carry its subscriptionId, its status and, while its renewal is unpaid, a recoveryUrl where the customer can pay it.
 
 The response `message`, `param`, and `details` fields describe the condition observed by the specific operation.
 

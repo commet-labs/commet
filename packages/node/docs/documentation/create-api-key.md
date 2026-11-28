@@ -16,7 +16,7 @@ Choose the path that fits where you are working. You only need one to get starte
 1. Select your **sandbox organization** in the dashboard.
 2. Go to **Settings → API Keys** and click **Create API Key**.
 3. Choose **Full Access** for a backend or **AI Agents** to select resource permissions.
-4. Enter a descriptive name of up to 32 characters, such as `Local development`, and choose **Expires In (Days)**. The dashboard accepts **1–365 days** and defaults to **365**.
+4. Enter a descriptive name of up to 32 characters, such as `Local development`. A key created from the dashboard does not expire.
 5. Create the key and copy it before closing the dialog. The full secret is shown only once.
 
 ### CLI
@@ -110,7 +110,9 @@ For other languages, follow the [Python](/docs/integrate-with-python), [Go](/doc
 
 ## Rotate and promote to live
 
-Use a separate key for each application or deployment that needs independent rotation. To replace a key before it expires:
+Keys created from the dashboard or by linking the CLI do not expire. Keys created through the API, `commet api-keys create` or MCP expire after `expiresInDays`, 365 when omitted; **Expires** in the dashboard and `expiresAt` in [List API keys](/docs/api-reference/api-keys/list-api-keys) show the date. An expired key stops authenticating and cannot be extended.
+
+Use a separate key for each application or deployment that needs independent rotation. To replace a key:
 
 1. Create a replacement in the **same organization**.
 2. Update the secret in every process using the old key and deploy or restart those processes.

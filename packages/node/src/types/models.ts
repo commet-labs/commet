@@ -74,7 +74,7 @@ export interface BalanceAdjustment {
 
 export interface BalanceTopup {
   amount: number;
-  /** `succeeded` when the payment was confirmed and the balance was added. `processing` when the payment method confirms later: the balance is added once the payment is confirmed, and nothing is added if it is declined. `requires_checkout` when the subscription has no saved payment method and `successUrl` was sent: the balance is added once the customer pays at `checkoutUrl`. */
+  /** `succeeded` when the payment was confirmed and the balance was added. `processing` when the payment method confirms later: the balance is added once the payment is confirmed, and nothing is added if it is declined. `requires_checkout` when `successUrl` was sent and the subscription has no saved payment method or the saved one was declined: the balance is added once the customer pays at `checkoutUrl`. */
   status: "succeeded" | "processing" | "requires_checkout";
   /** Hosted checkout where the customer pays the purchase and saves the payment method. Present only when `status` is `requires_checkout`. */
   checkoutUrl?: string;
@@ -207,7 +207,7 @@ export interface CreatedWebhook {
 
 export interface CreditGrant {
   credits: number;
-  /** `succeeded` when the payment was confirmed and the credits were added. `processing` when the payment method confirms later: the credits are added once the payment is confirmed, and nothing is added if it is declined. `requires_checkout` when the subscription has no saved payment method and `successUrl` was sent: the credits are added once the customer pays at `checkoutUrl`. */
+  /** `succeeded` when the payment was confirmed and the credits were added. `processing` when the payment method confirms later: the credits are added once the payment is confirmed, and nothing is added if it is declined. `requires_checkout` when `successUrl` was sent and the subscription has no saved payment method or the saved one was declined: the credits are added once the customer pays at `checkoutUrl`. */
   status: "succeeded" | "processing" | "requires_checkout";
   /** Hosted checkout where the customer pays the purchase and saves the payment method. Present only when `status` is `requires_checkout`. */
   checkoutUrl?: string;
@@ -798,6 +798,17 @@ export interface Offer {
   startsAt: string | null;
   endsAt: string | null;
   active: boolean;
+  /** Plans the offer is limited to. Empty when it applies to any plan. */
+  planIds: Array<string>;
+  /** Billing interval the offer is limited to. Null when it applies to any interval. */
+  billingInterval:
+    | "weekly"
+    | "monthly"
+    | "quarterly"
+    | "semiannual"
+    | "yearly"
+    | "one_time"
+    | null;
   /** Integration that manages this record, or null when the merchant does. While an integration manages it, its terms change only in that integration and edits answer 409 managed_by_integration. */
   managedBy: ManagedBy;
   /** @format date-time */
@@ -1055,12 +1066,6 @@ export interface Plan {
 
 export type PlanChange =
   | {
-      outcome: "processing";
-      invoiceId: string;
-      object: "plan_change";
-      livemode: boolean;
-    }
-  | {
       outcome: "requires_checkout";
       requiresCheckout: true;
       checkoutUrl: string;
@@ -1274,6 +1279,12 @@ export type PlanChange =
               id: string;
             };
       };
+      object: "plan_change";
+      livemode: boolean;
+    }
+  | {
+      outcome: "processing";
+      invoiceId: string;
       object: "plan_change";
       livemode: boolean;
     };
@@ -2178,7 +2189,7 @@ export interface Subscription {
 
 export interface SubscriptionAddon {
   addonId: string;
-  /** `active` when the add-on is active. `processing` when the payment method confirms later: the add-on is activated once the payment is confirmed, and stays inactive if it is declined. `requires_checkout` when the subscription has no saved payment method and `successUrl` was sent: the add-on is activated once the customer pays at `checkoutUrl`. */
+  /** `active` when the add-on is active. `processing` when the payment method confirms later: the add-on is activated once the payment is confirmed, and stays inactive if it is declined. `requires_checkout` when `successUrl` was sent and the subscription has no saved payment method or the saved one was declined: the add-on is activated once the customer pays at `checkoutUrl`. */
   status: "active" | "processing" | "requires_checkout";
   proratedCharge: number;
   /** Hosted checkout where the customer pays the purchase and saves the payment method. Present only when `status` is `requires_checkout`. */

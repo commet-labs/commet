@@ -25,13 +25,13 @@ Deactivate an add-on from a subscription.
 
 `POST /subscriptions/{id}/addons` · operation `activate-addon`
 
-Activate an add-on on a subscription. Creates the activation invoice and charges a prorated amount for the current billing period; the add-on is active once the payment is confirmed. Without a saved payment method, send successUrl to receive a checkout that charges the activation and saves the method. Rejected with 409 while the add-on is active or an activation of it is still processing. An add-on that the subscription's plan version does not sell is rejected with addon_unavailable.
+Activate an add-on on a subscription. Creates the activation invoice and charges a prorated amount for the current billing period; the add-on is active once the payment is confirmed. Send successUrl to receive, when there is no saved payment method or it is declined, a checkout that charges the activation and saves the method. Rejected with 409 while the add-on is active or an activation of it is still processing. An add-on that the subscription's plan version does not sell is rejected with addon_unavailable.
 
 ### Parameters
 
 - `id` (`string`, required)
 - `addonId` (`string`, required)
-- `successUrl` (`string`, optional) — Where the customer returns after paying. When it is set and the subscription has no saved payment method, the response has status `requires_checkout` and a `checkoutUrl` where the customer pays this purchase and saves the method in one step. Without it, the request is rejected when there is no saved payment method. A saved method is always charged directly, and a declined charge is rejected either way.
+- `successUrl` (`string`, optional) — Where the customer returns after paying. When it is set and the subscription has no saved payment method, or the saved method is declined or asks for authentication, the response has status `requires_checkout` and a `checkoutUrl` where the customer pays this purchase and saves the method in one step. Without it, the request is rejected in both cases. A saved method is always charged directly first, and a payment that fails for any other reason is rejected either way.
 
 ### Request options
 
@@ -111,13 +111,13 @@ Adjust a subscription's balance or credits by a signed amount. Positive adds, ne
 
 `POST /subscriptions/{id}/balance/topup` · operation `topup-balance`
 
-Top up a balance subscription. Creates the top-up invoice and charges the customer's payment method for the amount plus tax. Once the payment is confirmed, adds the amount to the subscription's purchased balance (after paying back any overage owed on the plan balance), marks the invoice paid and emits `balance.topped_up`. Purchased balance is spent after the plan balance and is kept until the subscription ends. Without a saved payment method, send successUrl to receive a checkout that charges the top-up and saves the method. Rejected with 400 when the subscription is not on a balance plan, its plan has top-ups turned off, or the amount is below the effective minimum: the plan's minimum top-up in the subscription currency, raised to the currency's minimum charge.
+Top up a balance subscription. Creates the top-up invoice and charges the customer's payment method for the amount plus tax. Once the payment is confirmed, adds the amount to the subscription's purchased balance (after paying back any overage owed on the plan balance), marks the invoice paid and emits `balance.topped_up`. Purchased balance is spent after the plan balance and is kept until the subscription ends. Send successUrl to receive, when there is no saved payment method or it is declined, a checkout that charges the top-up and saves the method. Rejected with 400 when the subscription is not on a balance plan, its plan has top-ups turned off, or the amount is below the effective minimum: the plan's minimum top-up in the subscription currency, raised to the currency's minimum charge.
 
 ### Parameters
 
 - `id` (`string`, required)
 - `amount` (`number`, required) — The amount to add, in minor units of the subscription currency (cents; whole units for zero-decimal currencies).
-- `successUrl` (`string`, optional) — Where the customer returns after paying. When it is set and the subscription has no saved payment method, the response has status `requires_checkout` and a `checkoutUrl` where the customer pays this purchase and saves the method in one step. Without it, the request is rejected when there is no saved payment method. A saved method is always charged directly, and a declined charge is rejected either way.
+- `successUrl` (`string`, optional) — Where the customer returns after paying. When it is set and the subscription has no saved payment method, or the saved method is declined or asks for authentication, the response has status `requires_checkout` and a `checkoutUrl` where the customer pays this purchase and saves the method in one step. Without it, the request is rejected in both cases. A saved method is always charged directly first, and a payment that fails for any other reason is rejected either way.
 
 ### Request options
 
@@ -133,7 +133,7 @@ Top up a balance subscription. Creates the top-up invoice and charges the custom
 
 `POST /subscriptions/{id}/cancel` · operation `cancel-subscription`
 
-Cancel immediately or at period end and return the updated subscription.
+Cancel immediately or at period end and return the updated subscription. When the plan's group has a default free plan, a paid subscription moves to that plan instead of ending: now when `immediate` is true, otherwise at the end of the period or trial as a scheduled plan change that `POST /subscriptions/{id}/uncancel` undoes. The move sends `subscription.plan_change_scheduled` and `subscription.plan_changed` with the `reason` as `cancelReason`, never `subscription.canceled`. Cancelling the default plan itself ends the subscription.
 
 ### Parameters
 
@@ -160,14 +160,20 @@ Upgrade or change billing interval immediately, optionally applying an Offer by 
 ### Parameters
 
 - `id` (`string`, required)
-- `newPlanId` (`string`, optional)
 - `newBillingInterval` (`"weekly" | "monthly" | "quarterly" | "semiannual" | "yearly"`, optional)
 - `successUrl` (`string`, optional)
 - `offerId` (`string`, optional)
 - `promoCode` (`string`, optional)
+- `newPlanId` (`string`, optional)
+- `planCode` (`string`, optional)
+- `planVersionId` (`string`, optional) — Public ID of a published version of the destination plan, current or not, including a running experiment's versions. The change is priced, checked out and activated on that version. Only for an immediate change to another paid plan, and not with an experiment code. When omitted, the change lands on the plan's current version, or the version its experiment code sells.
 
 ### Valid parameter combinations
 
+- `newPlanId`
+- `planCode`
+- `promoCode` + `newPlanId`
+- `promoCode` + `planCode`
 - `promoCode`
 
 ### Request options
@@ -207,14 +213,14 @@ Move a subscription to a newer published version of its plan, now or at the end 
 
 `POST /subscriptions/{id}/credits` · operation `purchase-credits`
 
-Purchase a fixed credit pack or choose a whole credit quantity at the subscription plan price and minimum. Creates the purchase invoice, charges the saved payment method and adds the purchased credits once the payment is confirmed. Without a saved payment method, send successUrl to receive a checkout that charges the purchase and saves the method. A credit pack that the subscription's plan version does not sell is rejected with credit_pack_unavailable.
+Purchase a fixed credit pack or choose a whole credit quantity at the subscription plan price and minimum. Creates the purchase invoice, charges the saved payment method and adds the purchased credits once the payment is confirmed. Send successUrl to receive, when there is no saved payment method or it is declined, a checkout that charges the purchase and saves the method. A credit pack that the subscription's plan version does not sell is rejected with credit_pack_unavailable.
 
 ### Parameters
 
 - `id` (`string`, required)
 - `creditPackId` (`string`, optional)
 - `quantity` (`number`, optional)
-- `successUrl` (`string`, optional) — Where the customer returns after paying. When it is set and the subscription has no saved payment method, the response has status `requires_checkout` and a `checkoutUrl` where the customer pays this purchase and saves the method in one step. Without it, the request is rejected when there is no saved payment method. A saved method is always charged directly, and a declined charge is rejected either way.
+- `successUrl` (`string`, optional) — Where the customer returns after paying. When it is set and the subscription has no saved payment method, or the saved method is declined or asks for authentication, the response has status `requires_checkout` and a `checkoutUrl` where the customer pays this purchase and saves the method in one step. Without it, the request is rejected in both cases. A saved method is always charged directly first, and a payment that fails for any other reason is rejected either way.
 
 ### Valid parameter combinations
 
@@ -381,15 +387,19 @@ Preview proration details for an immediate plan change without applying it. Free
 ### Parameters
 
 - `id` (`string`, required)
-- `planId` (`string`, required)
 - `billingInterval` (`"weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | "one_time"`, optional)
 - `offerId` (`string`, optional)
 - `promoCode` (`string`, optional)
+- `planId` (`string`, optional)
+- `planCode` (`string`, optional)
+- `planVersionId` (`string`, optional) — Public ID of a published version of the destination plan, current or not, including a running experiment's versions. The change is priced, checked out and activated on that version. Only for an immediate change to another paid plan, and not with an experiment code. When omitted, the change lands on the plan's current version, or the version its experiment code sells.
 
 ### Valid parameter combinations
 
 - `planId`
-- `planId` + `promoCode`
+- `planCode`
+- `promoCode` + `planId`
+- `promoCode` + `planCode`
 
 ### Request options
 
@@ -405,7 +415,7 @@ Preview proration details for an immediate plan change without applying it. Free
 
 `POST /subscriptions/{id}/reactivate` · operation `reactivate-subscription`
 
-Reactivates a subscription. A past_due subscription retries its outstanding renewal charge (recovering to active on success). A canceled subscription generates a fresh invoice, charges the saved card, and resets the billing period; when that invoice totals zero, for example under an Offer, it is marked paid without a charge and the subscription becomes active at once, still requiring a saved payment method. On a successful charge the subscription becomes active; a declined charge returns an error with a recoveryUrl in the error details that can be sent to the customer to update their card. A canceled subscription may apply an Offer by offerId; past-due recovery cannot.
+Reactivates a subscription. A past_due subscription retries its outstanding renewal charge (recovering to active on success). A canceled subscription generates a fresh invoice, charges the saved card, and resets the billing period; when that invoice totals zero, for example under an Offer, it is marked paid without a charge and the subscription becomes active at once, still requiring a saved payment method. On a successful charge the subscription becomes active; a declined charge returns an error with a recoveryUrl in the error details that can be sent to the customer to update their card. A past_due subscription without a payment method returns no_payment_method with the same recoveryUrl. A canceled subscription may apply an Offer by offerId; past-due recovery cannot.
 
 ### Parameters
 
@@ -514,7 +524,7 @@ Cancel the move to another plan version pending for the next renewal, so the sub
 
 `POST /subscriptions/{id}/uncancel` · operation `uncancel-subscription`
 
-Revert a scheduled cancellation and return the updated subscription. Only works before cancellation takes effect.
+Revert a scheduled cancellation and return the updated subscription. Only works before cancellation takes effect. When the cancellation scheduled a move to the group's default plan instead, it reverts that move: the subscription keeps its plan and renews normally.
 
 ### Parameters
 
@@ -550,10 +560,12 @@ Get the active subscription for a customer. Returns null if none.
 
 `GET /subscriptions` · operation `list-subscriptions`
 
-List all subscriptions. Filter by customer ID or status.
+List subscriptions, newest first. Filter by customer ID, status or plan version. Send `limit` or `cursor` to receive them in pages and follow `nextCursor` while `hasMore` is true; without them the response holds every matching subscription, up to 80,000.
 
 ### Parameters
 
+- `cursor` (`string`, optional)
+- `limit` (`number`, optional)
 - `customerId` (`string`, optional)
 - `status` (`SubscriptionStatus`, optional)
 - `planVersionId` (`string`, optional)
@@ -568,7 +580,7 @@ List all subscriptions. Filter by customer ID or status.
 
 `POST /subscriptions` · operation `create-subscription`
 
-Create a subscription for a customer. Commet selects the default price when priceId is omitted. The subscription starts at the base USD price; market and currency are resolved from the buyer's request country when the checkout opens. Without an offer override, Commet applies the price's automatic introductory Offer. Pass offerId to apply an active compatible Offer directly, or cardPromotionId to preselect a card-eligible Promotional Offer for the initial checkout when card promotions are enabled for the organization. For the initial checkout, provider accepts either a processor name or an exact payment connection ID. When the price's free trial requires no payment method, the subscription starts trialing right away with no checkout (checkoutUrl null, hasPaymentMethod false); it cannot be combined with offerId, promoCode, cardPromotionId or provider, and an organization that cannot charge yet receives 403.
+Create a subscription for a customer. Commet selects the default price when priceId is omitted. The subscription starts at the base USD price; market and currency are resolved from the buyer's request country when the checkout opens. Without an offer override, Commet applies the price's automatic introductory Offer. Pass offerId to apply an active compatible Offer directly, or cardPromotionId to preselect a card-eligible Promotional Offer for the initial checkout when card promotions are enabled for the organization. For the initial checkout, provider accepts either a processor name or an exact payment connection ID. When the price's free trial requires no payment method, the subscription starts trialing right away with no checkout (checkoutUrl null, hasPaymentMethod false); it cannot be combined with offerId, promoCode, cardPromotionId or provider, and an organization that cannot charge yet receives 403. When the customer already has a past_due subscription, the 409 error details carry its subscriptionId, its status and, while its renewal is unpaid, a recoveryUrl where the customer can pay it.
 
 ### Parameters
 
@@ -582,7 +594,7 @@ Create a subscription for a customer. Commet selects the default price when pric
 - `startDate` (`string`, optional)
 - `successUrl` (`string`, optional)
 - `prepaidPeriods` (`number`, optional) — Billing periods of the subscription's interval paid with the first payment, including the current one. Defaults to 1. The interval does not change: each paid period renews at zero and the subscription renews normally after the last one unless `cancelAtPeriodEnd` is true.
-- `cancelAtPeriodEnd` (`boolean`, optional) — Schedules the cancellation from creation so the subscription ends after its last paid period and never renews with any payment method.
+- `cancelAtPeriodEnd` (`boolean`, optional) — Schedules the cancellation from creation so the subscription ends after its last paid period and never renews with any payment method. When the plan's group has a default free plan, it moves to that plan then instead of ending.
 - `planVersionId` (`string`, optional) — Public ID of a published version of the plan, current or not, including an experiment's versions. The subscription is created on that version and stays on it: checkout charges its price and activation grants its credits, add-ons and credit packs. When omitted, the subscription gets the current version, or the version an experiment code (planCode `<plan code>:<experiment code>`) sells.
 - `offerId` (`string`, optional)
 - `promoCode` (`string`, optional)

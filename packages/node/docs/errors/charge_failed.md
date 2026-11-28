@@ -9,7 +9,7 @@ The charge required by the subscription operation failed.
 
 ## What to do
 
-Use the response message and decline information to resolve the payment failure.
+Use the response message and decline information to resolve the payment failure. When a subscription reactivation was declined, details.recoveryUrl is a link where the customer can pay it.
 
 The response `message`, `param`, and `details` fields describe the condition observed by the specific operation.
 

@@ -167,6 +167,7 @@ Fired when a subscription changes from one plan to another, including upgrades, 
 - `credit` (`number`, required) — Prorated credit in cents from the previous plan.
 - `charge` (`number`, required) — Prorated charge in cents for the new plan.
 - `totalCharged` (`number`, required) — Total amount charged in cents.
+- `cancelReason` (`string | null`, required) — The cancellation reason when a cancellation moved the subscription to its group's default plan instead of ending it. Null for any other plan change.
 
 ## subscription.cancellation_scheduled
 
@@ -206,6 +207,7 @@ Fired when a plan change (downgrade or shorter interval) is scheduled for the en
 - `billingInterval` (`string | null`, required) — The current billing interval.
 - `scheduledBillingInterval` (`string | null`, required) — The new billing interval, if the change includes one. Null when only the plan changes.
 - `effectiveAt` (`string`, required) — ISO 8601 datetime when the change executes (the billing period end).
+- `cancelReason` (`string | null`, required) — The cancellation reason when a cancellation scheduled the move to the group's default plan instead of ending the subscription. Null for any other scheduled change.
 
 ## subscription.plan_change_revoked
 

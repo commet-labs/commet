@@ -676,7 +676,7 @@ Update a plan's name, description, visibility, default status, metadata, overage
 - `unlimitedPlanBalance` (`boolean`, optional) — Balance plans only. true makes the plan balance unlimited: usage never spends it, only planBalanceLimit caps it, and every price and country includes no balance. Changing it publishes a new version of the plan; each subscription stays on its version until moved.
 - `planBalanceLimit` (`{ amount: number; interval: "day" | "week" } | null`, optional) — Balance plans only. The most plan balance a subscription spends per day or per week, in USD cents; null removes the limit. Changing it publishes a new version of the plan; each subscription stays on its version until moved.
 - `blockOnExhaustion` (`boolean`, optional) — Credits and balance plans only. false lets usage continue past the plan and purchased amounts and bills the missing amount as overage at the next renewal; a credits plan bills it at the price per credit and needs one. Trials and free plans always stop, so free plans accept only true. Changing it publishes a new version of the plan; each subscription stays on its version until moved.
-- `isDefault` (`boolean`, optional) — Make this plan the default plan of its plan group: customers created with that planGroupId start on it, and a paid plan of the group that ends from the customer portal, a revoked payment authorization or exhausted dunning moves to it instead of canceling. Requires a free plan in a plan group; replaces the group's previous default plan. false unmarks it.
+- `isDefault` (`boolean`, optional) — Make this plan the default plan of its plan group: customers created with that planGroupId start on it, and a paid plan of the group that ends (a cancellation from the API, dashboard or customer portal, a lost dispute, exhausted dunning or a card-less trial end) moves to it instead of canceling. Requires a free plan in a plan group; replaces the group's previous default plan. false unmarks it.
 
 ### Request options
 
@@ -840,7 +840,7 @@ Create a new plan with optional consumption model, visibility, plan group assign
 - `unlimitedPlanBalance` (`boolean`, optional) — Balance plans only. true makes the plan balance unlimited: usage never spends it, only planBalanceLimit caps it, and every price and country includes no balance. Omitted means false.
 - `planBalanceLimit` (`{ amount: number; interval: "day" | "week" } | null`, optional) — Balance plans only. The most plan balance a subscription spends per day or per week, in USD cents; omitted or null means no limit.
 - `planGroupId` (`string`, optional)
-- `isDefault` (`boolean`, optional) — Make this plan the default plan of its plan group: customers created with that planGroupId start on it, and a paid plan of the group that ends from the customer portal, a revoked payment authorization or exhausted dunning moves to it instead of canceling. Requires a free plan with a planGroupId; replaces the group's previous default plan.
+- `isDefault` (`boolean`, optional) — Make this plan the default plan of its plan group: customers created with that planGroupId start on it, and a paid plan of the group that ends (a cancellation from the API, dashboard or customer portal, a lost dispute, exhausted dunning or a card-less trial end) moves to it instead of canceling. Requires a free plan with a planGroupId; replaces the group's previous default plan.
 - `metadata` (`Record<string, unknown>`, optional)
 
 ### Request options

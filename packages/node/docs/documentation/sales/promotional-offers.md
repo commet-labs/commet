@@ -36,7 +36,7 @@ await commet.subscriptions.create({
 })
 ```
 
-The Offer must be active, inside its availability window, and resolvable in the selected currency. It does not need a prior association with the plan or price.
+The Offer must be active, inside its availability window, and resolvable in the selected currency. It does not need a prior association with the plan or price, but an Offer [limited to other plans or another billing interval](/docs/offers#limit-an-offer-to-plans-or-a-billing-interval) is rejected.
 
 An explicit `offerId` overrides automatic introductory selection. It cannot be combined with `promoCode`. It combines with `customTrialDays` and `skipTrial`; when the price has a trial, the discount starts after it.
 

@@ -91,8 +91,8 @@ A rejected code returns `400 validation_error` with `param: "promoCode"` and the
 - `max_redemptions_reached`: the redemption limit was reached.
 - `first_purchase_only`: the customer already paid or has a paid subscription.
 - `already_redeemed`: the customer already redeemed the code.
-- `plan_not_eligible`: the code is restricted to other plans.
-- `billing_interval_not_eligible`: the code is restricted to another billing interval.
+- `plan_not_eligible`: the code, or its Offer, is limited to other plans.
+- `billing_interval_not_eligible`: the code, or its Offer, is limited to another billing interval.
 - `intro_offer_active`: an Introductory Offer applies.
 
 Checkout also rejects a positive total below the currency's minimum charge.

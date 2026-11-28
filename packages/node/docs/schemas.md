@@ -168,7 +168,7 @@ Generated from Commet API version `2026-08-27`.
 ### BalanceTopup
 
 - `amount` (`number`, required)
-- `status` (`"succeeded" | "processing" | "requires_checkout"`, required) — `succeeded` when the payment was confirmed and the balance was added. `processing` when the payment method confirms later: the balance is added once the payment is confirmed, and nothing is added if it is declined. `requires_checkout` when the subscription has no saved payment method and `successUrl` was sent: the balance is added once the customer pays at `checkoutUrl`.
+- `status` (`"succeeded" | "processing" | "requires_checkout"`, required) — `succeeded` when the payment was confirmed and the balance was added. `processing` when the payment method confirms later: the balance is added once the payment is confirmed, and nothing is added if it is declined. `requires_checkout` when `successUrl` was sent and the subscription has no saved payment method or the saved one was declined: the balance is added once the customer pays at `checkoutUrl`.
 - `checkoutUrl` (`string`, optional) — Hosted checkout where the customer pays the purchase and saves the payment method. Present only when `status` is `requires_checkout`.
 - `object` (`"balance_topup"`, required)
 - `livemode` (`boolean`, required)
@@ -243,7 +243,7 @@ Generated from Commet API version `2026-08-27`.
 ### CreditGrant
 
 - `credits` (`number`, required)
-- `status` (`"succeeded" | "processing" | "requires_checkout"`, required) — `succeeded` when the payment was confirmed and the credits were added. `processing` when the payment method confirms later: the credits are added once the payment is confirmed, and nothing is added if it is declined. `requires_checkout` when the subscription has no saved payment method and `successUrl` was sent: the credits are added once the customer pays at `checkoutUrl`.
+- `status` (`"succeeded" | "processing" | "requires_checkout"`, required) — `succeeded` when the payment was confirmed and the credits were added. `processing` when the payment method confirms later: the credits are added once the payment is confirmed, and nothing is added if it is declined. `requires_checkout` when `successUrl` was sent and the subscription has no saved payment method or the saved one was declined: the credits are added once the customer pays at `checkoutUrl`.
 - `checkoutUrl` (`string`, optional) — Hosted checkout where the customer pays the purchase and saves the payment method. Present only when `status` is `requires_checkout`.
 - `object` (`"credit_grant"`, required)
 - `livemode` (`boolean`, required)
@@ -465,6 +465,8 @@ Variants:
 - `startsAt` (`string | null`, required)
 - `endsAt` (`string | null`, required)
 - `active` (`boolean`, required)
+- `planIds` (`Array<string>`, required) — Plans the offer is limited to. Empty when it applies to any plan.
+- `billingInterval` (`"weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | "one_time" | null`, required) — Billing interval the offer is limited to. Null when it applies to any interval.
 - `managedBy` (`ManagedBy`, required) — Integration that manages this record, or null when the merchant does. While an integration manages it, its terms change only in that integration and edits answer 409 managed_by_integration.
 - `createdAt` (`string`, required)
 - `updatedAt` (`string`, required)
@@ -561,10 +563,10 @@ Variants:
 
 Variants:
 
-- `{ outcome: "processing"; invoiceId: string; object: "plan_change"; livemode: boolean }`
 - `{ outcome: "requires_checkout"; requiresCheckout: true; checkoutUrl: string; offerApplication?: { id: string; offerId: string; name: string; currency: string; subtotal: number; discountAmount: number; total: number; phases: Array<{ type: "free_trial"; durationDays: number; startsAt: string | null; endsAt: string | null } | { type: "percentage"; durationCycles: number | null; durationInterval: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | null; startsAt: string | null; endsAt: string | null; percentage: number } | { type: "amount_off"; durationCycles: number | null; durationInterval: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | null; startsAt: string | null; endsAt: string | null; amount: number } | { type: "fixed_price"; durationCycles: number | null; durationInterval: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | null; startsAt: string | null; endsAt: string | null; price: number }>; appliesTo: { type: "plan_price"; id: string } | { type: "addon"; id: string } | { type: "credit_pack"; id: string } }; object: "plan_change"; livemode: boolean }`
 - `{ outcome: "scheduled"; id: string; scheduled: true; scheduledFor: string; changeType: "subscription.plan_downgrade" | "subscription.interval_change" | "subscription.cancel"; customerId: string; newPlanId?: string; newPlanName?: string; newBillingInterval?: string; seatLimitWarning?: { featureCode: string; featureName: string; currentSeats: number; included: number; newPlanName: string; effectiveDate: string }; object: "plan_change"; livemode: boolean }`
 - `{ outcome: "completed"; id: string; scheduled: false; customerId: string; previousPlan: { id: string; name: string }; currentPlan: { id: string; name: string; price: number }; billingInterval: string; billing: { credit: number; creditsApplied: number; charge: number; taxAmount: number; netAmount: number; totalCharged: number; remainingCreditBalance: number }; invoiceId?: string; offerApplication?: { id: string; offerId: string; name: string; currency: string; subtotal: number; discountAmount: number; total: number; phases: Array<{ type: "free_trial"; durationDays: number; startsAt: string | null; endsAt: string | null } | { type: "percentage"; durationCycles: number | null; durationInterval: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | null; startsAt: string | null; endsAt: string | null; percentage: number } | { type: "amount_off"; durationCycles: number | null; durationInterval: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | null; startsAt: string | null; endsAt: string | null; amount: number } | { type: "fixed_price"; durationCycles: number | null; durationInterval: "weekly" | "monthly" | "quarterly" | "semiannual" | "yearly" | null; startsAt: string | null; endsAt: string | null; price: number }>; appliesTo: { type: "plan_price"; id: string } | { type: "addon"; id: string } | { type: "credit_pack"; id: string } }; object: "plan_change"; livemode: boolean }`
+- `{ outcome: "processing"; invoiceId: string; object: "plan_change"; livemode: boolean }`
 
 ### PlanDraft
 
@@ -915,7 +917,7 @@ Variants:
 ### SubscriptionAddon
 
 - `addonId` (`string`, required)
-- `status` (`"active" | "processing" | "requires_checkout"`, required) — `active` when the add-on is active. `processing` when the payment method confirms later: the add-on is activated once the payment is confirmed, and stays inactive if it is declined. `requires_checkout` when the subscription has no saved payment method and `successUrl` was sent: the add-on is activated once the customer pays at `checkoutUrl`.
+- `status` (`"active" | "processing" | "requires_checkout"`, required) — `active` when the add-on is active. `processing` when the payment method confirms later: the add-on is activated once the payment is confirmed, and stays inactive if it is declined. `requires_checkout` when `successUrl` was sent and the subscription has no saved payment method or the saved one was declined: the add-on is activated once the customer pays at `checkoutUrl`.
 - `proratedCharge` (`number`, required)
 - `checkoutUrl` (`string`, optional) — Hosted checkout where the customer pays the purchase and saves the payment method. Present only when `status` is `requires_checkout`.
 - `object` (`"subscription_addon"`, required)

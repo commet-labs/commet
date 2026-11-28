@@ -1,6 +1,6 @@
 ---
 title: Payment Failures
-description: Usage and seats keep working while Commet retries a failed charge on days 1, 3, 5 and 7; if all fail, the subscription ends or moves to the default plan.
+description: Usage and seats keep working while Commet retries a failed charge for the window you chose; if all retries fail, the subscription ends or moves to the default plan.
 ---
 
 When a payment fails, your customer's usage and seats keep working while Commet retries the charge — but new purchases are blocked. If all retries fail, their subscription is canceled, or moves to the plan group's [default plan](/docs/plan-groups#default-plan-and-signup-trial).
@@ -18,11 +18,11 @@ All retries fail
   → Paid access is revoked
 ```
 
-| Stage                 | Access                                  | What's happening                                                                   |
-| --------------------- | --------------------------------------- | ---------------------------------------------------------------------------------- |
-| Payment fails         | **Usage and seats keep working**        | Subscription moves to `past_due`, invoice becomes `outstanding`, retries scheduled |
-| During grace period   | **Usage and seats keep working**        | Automatic retries on day 1, day 3, day 5, and day 7; usage keeps accruing as debt  |
-| All retries exhausted | Revoked, or limited to the default plan | Subscription canceled or moved to the default plan, invoice marked `uncollectible` |
+| Stage                 | Access                                  | What's happening                                                                                                                                        |
+| --------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Payment fails         | **Usage and seats keep working**        | Subscription moves to `past_due`, invoice becomes `outstanding`, retries scheduled                                                                      |
+| During grace period   | **Usage and seats keep working**        | Automatic retries during the [retry window](/docs/handle-failed-payments#automatic-retries) you chose (7 days by default); usage keeps accruing as debt |
+| All retries exhausted | Revoked, or limited to the default plan | Subscription canceled or moved to the default plan, invoice marked `uncollectible`                                                                      |
 
 > **Warning**
 >

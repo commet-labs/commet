@@ -105,10 +105,12 @@ A Promo Code for that Offer entered on a prepaid checkout is rejected with "This
 
 ## What the customer sees at checkout
 
-| Purchase                                                                                                     | Checkout shows                                                |
-| ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------- |
-| Renews after the paid periods                                                                                | `3 months · then $10.00/mo` or `2 quarters · then $30.00/qtr` |
-| One-time purchase, a subscription scheduled to end, or a first payment with a method that can't renew (OXXO) | `3 months · one-time payment, doesn't renew`                  |
+| Purchase                                                                                                     | Checkout shows                                                                                                   |
+| ------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| Renews after the paid periods                                                                                | `3 months · then $10.00/mo` or `2 quarters · then $30.00/qtr`                                                    |
+| One-time purchase, a subscription scheduled to end, or a first payment with a method that can't renew (OXXO) | `3 months · one-time payment, doesn't renew`, or `1 month · one-time payment, doesn't renew` for a single period |
+
+A single period that renews keeps the plan interval, such as `per month`. A purchase that doesn't renew shows no charges after its paid periods, even with a discount. The pending payment page and an unavailable checkout show the same label.
 
 On a link that adds periods to an active subscription, the label follows whether the subscription renews, not the method chosen in that checkout. An OXXO payment on a card subscription shows `then …`.
 

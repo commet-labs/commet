@@ -9,7 +9,7 @@ The subscription has no reusable payment method for this operation.
 
 ## What to do
 
-Collect or update the customer's payment method through the supported checkout or payment-method flow.
+Collect or update the customer's payment method through the supported checkout or payment-method flow. When a past-due subscription is reactivated, details.recoveryUrl is a link where the customer can pay it.
 
 The response `message`, `param`, and `details` fields describe the condition observed by the specific operation.
 

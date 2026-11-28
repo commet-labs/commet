@@ -1532,6 +1532,13 @@
                       "totalCharged": {
                         "type": "number",
                         "description": "Total amount charged in cents."
+                      },
+                      "cancelReason": {
+                        "description": "The cancellation reason when a cancellation moved the subscription to its group's default plan instead of ending it. Null for any other plan change.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       }
                     },
                     "required": [
@@ -1542,7 +1549,8 @@
                       "billingInterval",
                       "credit",
                       "charge",
-                      "totalCharged"
+                      "totalCharged",
+                      "cancelReason"
                     ],
                     "additionalProperties": false
                   }
@@ -1578,7 +1586,8 @@
                   "billingInterval": "monthly",
                   "credit": 1500,
                   "charge": 4900,
-                  "totalCharged": 3400
+                  "totalCharged": 3400,
+                  "cancelReason": null
                 }
               }
             }
@@ -1908,6 +1917,13 @@
                       "effectiveAt": {
                         "type": "string",
                         "description": "ISO 8601 datetime when the change executes (the billing period end)."
+                      },
+                      "cancelReason": {
+                        "description": "The cancellation reason when a cancellation scheduled the move to the group's default plan instead of ending the subscription. Null for any other scheduled change.",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       }
                     },
                     "required": [
@@ -1918,7 +1934,8 @@
                       "scheduledPlan",
                       "billingInterval",
                       "scheduledBillingInterval",
-                      "effectiveAt"
+                      "effectiveAt",
+                      "cancelReason"
                     ],
                     "additionalProperties": false
                   }
@@ -1954,7 +1971,8 @@
                   },
                   "billingInterval": "monthly",
                   "scheduledBillingInterval": null,
-                  "effectiveAt": "2026-04-25T00:00:00.000Z"
+                  "effectiveAt": "2026-04-25T00:00:00.000Z",
+                  "cancelReason": null
                 }
               }
             }

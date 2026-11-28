@@ -52,9 +52,9 @@ Renewal after: $40.00
 ```
 
 - A percentage is the same percentage of the new price. An amount off is the same amount.
-- A `fixed_price` phase, free cycles included, is the price of the plan it was accepted on: it ends with the change, and the other phases of the Offer continue.
+- A `fixed_price` phase, free cycles included, keeps its price on the new plan for the cycles it had left. A phase counted in its own `durationInterval` ends when the change moves the subscription to another billing interval, and the other phases of the Offer continue.
 - When the billing interval changes, the discount keeps the time it had left. With two monthly cycles left, a yearly charge made within those two months is discounted in full and the next yearly renewal is not.
-- A Promo Code or Card Promotion restricted to plans or to a billing interval ends with the change when the new plan or interval is outside its restriction.
+- An Offer, Promo Code or Card Promotion limited to plans or to a billing interval ends with the change when the new plan or interval is outside its limit. See [how to limit an Offer](/docs/offers#limit-an-offer-to-plans-or-a-billing-interval).
 - A change that passes its own `offerId` or `promoCode` applies that Offer with its full duration and ends the previous one. Scheduled plan changes accept neither.
 - A move to a free plan ends the discount.
 
@@ -73,4 +73,4 @@ Total:      $130.00
 
 > **Note**
 >
-> Accepted phases are stored in an immutable Offer Application. Editing, deactivating, or archiving the catalog Offer changes future applications only.
+> Accepted phases are stored in an immutable Offer Application. Editing, deactivating, or archiving the catalog Offer changes future applications only, except its plan and interval limits, which are read at each plan change.

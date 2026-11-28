@@ -11,7 +11,7 @@ When a renewal payment fails, the subscription moves to `past_due` and enters du
 2. The failed invoice is marked as `outstanding`
 3. The customer keeps service: usage events and seat events still work (usage accrues as debt)
 4. The customer receives an email notification
-5. Commet retries the charge on a fixed schedule (dunning)
+5. Commet retries the charge on the calendar of your retry window (dunning)
 
 If a retry succeeds, the subscription returns to `active`. If all retries fail, the invoice is marked as `uncollectible` and the subscription is canceled. When the plan's group has a [default plan](/docs/plan-groups#default-plan-and-signup-trial), the subscription moves to it instead and `subscription.plan_changed` fires.
 
@@ -30,7 +30,16 @@ Initial checkout card declines do not emit `payment.failed`; the checkout respon
 
 ## Automatic retries
 
-Retries run on day 1, day 3, day 5, and day 7 after the original failure (4 retries). The calendar is anchored to the failure and never moves. After the last failed retry the subscription is canceled, or moves to the plan group's default plan.
+You choose how long Commet retries in **Settings → Revenue recovery**: 7, 14, 21 or 30 days. Each window has a fixed calendar counted from the original failure, and 7 days is the default:
+
+| Window           | Retries | Days after the failure        |
+| ---------------- | ------- | ----------------------------- |
+| 7 days (default) | 4       | 1, 3, 5 and 7                 |
+| 14 days          | 6       | 1, 3, 5, 7, 10 and 13         |
+| 21 days          | 8       | 1, 3, 5, 9, 11, 13, 15 and 20 |
+| 30 days          | 8       | 1, 3, 5, 9, 14, 19, 24 and 29 |
+
+A subscription never retries for longer than its billing period: weekly subscriptions always use the 7-day calendar, and monthly subscriptions use the 21-day calendar when the window is 30 days. A subscription keeps the window it had when its payment failed, even if you change the setting later. The calendar is anchored to the failure and never moves. After the last failed retry the subscription is canceled, or moves to the plan group's default plan.
 
 Manual retries from the Customer Portal or [`reactivate`](#retry-the-charge-server-to-server) use the default payment method and have separate daily limits. They do not consume automatic retry slots or start another charge while an automatic retry is in progress.
 
@@ -179,7 +188,7 @@ The SDK exposes three server-side recovery primitives. For `past_due` subscripti
 `reactivate` charges the subscription's saved payment method. It works on both `past_due` and `canceled` subscriptions, with different effects:
 
 - `past_due`: retries the same outstanding renewal invoice. The billing anchor stays fixed. On success the subscription returns to `active` and `payment.recovered` fires.
-- `canceled`: generates a fresh invoice, resets the billing period anchor to now, and charges the saved card. On success the subscription returns to `active` and `subscription.reactivated` fires. Requires the plan to still be available in the subscription's currency, otherwise it returns `PLAN_UNAVAILABLE` (422).
+- `canceled`: generates a fresh invoice, resets the billing period anchor to now, and charges the saved card. On success the subscription returns to `active` and `subscription.reactivated` fires. When the fresh invoice totals zero, for example under an Offer with a fixed price of 0, it is marked paid without a charge, the subscription returns to `active` at once, and `subscription.reactivated` fires with `invoiceTotal: 0`; a saved payment method is still required. Requires the plan to still be available in the subscription's currency, otherwise it returns `PLAN_UNAVAILABLE` (422).
 
 ```typescript
 const result = await commet.subscriptions.reactivate({ id: 'sub_123' })

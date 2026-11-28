@@ -329,7 +329,7 @@ The response includes `subscriptionId`, `invoiceId`, and `status`. An immediate 
 | `422`, `no_payment_method`    | A period-end resume needs a saved payment method.                                                      |
 | `500`, `internal_error`       | An internal failure prevented completion; this is distinct from a declined payment.                    |
 
-A declined resume keeps its invoice outstanding. Automatic payment retries follow days 1, 3, 5, and 7 from the original failure and reuse that invoice. The subscription stays paused during retries. If all retries fail, it is canceled and the resume invoice becomes uncollectible. Manual resume attempts do not consume automatic retry slots.
+A declined resume keeps its invoice outstanding. Automatic payment retries follow the calendar of your [retry window](/docs/handle-failed-payments#automatic-retries) from the original failure and reuse that invoice. The subscription stays paused during retries. If all retries fail, it is canceled and the resume invoice becomes uncollectible. Manual resume attempts do not consume automatic retry slots.
 
 A period-end resume uses the base price of the subscription's plan version when its new invoice is created. An outstanding resume invoice keeps its original amounts and included credits or balance on retry, even if the catalog changes again. Accepted Introductory Offers and discounts preserve their unconsumed terms; resume does not grant a new Introductory Offer or redeem a promo code again.
 
@@ -689,11 +689,11 @@ $commet = new Commet('ck_xxx');
 $recoveryLink = $commet->subscriptions->createRecoveryLink(id: 'sub_xxx');
 ```
 
-Automatic dunning retries are anchored to the original decline on days 1, 3, 5, and 7. A successful retry returns the subscription to `active`.
+Automatic dunning retries are anchored to the original decline and follow the calendar of your [retry window](/docs/handle-failed-payments#automatic-retries). A successful retry returns the subscription to `active`.
 
 ## Reactivate a canceled subscription
 
-The same `reactivate` operation charges the saved payment method, reuses the subscription record, and starts a fresh period anchored to the reactivation date. You may pass an `offerId`; accepted phases are persisted as an immutable Offer Application.
+The same `reactivate` operation charges the saved payment method, reuses the subscription record, and starts a fresh period anchored to the reactivation date. You may pass an `offerId`; accepted phases are persisted as an immutable Offer Application. When the reactivation invoice totals zero, for example under an Offer with a fixed price of 0, it is marked paid without a charge and the subscription becomes active at once; a saved payment method is still required.
 
 The subscription returns on the latest version of what was bought: the plan's current version for a plan code, the experiment's latest version for an experiment code (the plan's current version once the experiment is no longer running), and the same version for `planVersionId`. Add-ons that version doesn't sell are deactivated. If it doesn't sell the subscription's currency, reactivation returns `422 missing_regional_price`.
 

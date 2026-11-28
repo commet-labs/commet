@@ -698,7 +698,7 @@ export interface UpdatePlanParams {
   } | null;
   /** Credits and balance plans only. false lets usage continue past the plan and purchased amounts and bills the missing amount as overage at the next renewal; a credits plan bills it at the price per credit and needs one. Trials and free plans always stop, so free plans accept only true. Changing it publishes a new version of the plan; each subscription stays on its version until moved. */
   blockOnExhaustion?: boolean;
-  /** Make this plan the default plan of its plan group: customers created with that planGroupId start on it, and a paid plan of the group that ends from the customer portal, a revoked payment authorization or exhausted dunning moves to it instead of canceling. Requires a free plan in a plan group; replaces the group's previous default plan. false unmarks it. */
+  /** Make this plan the default plan of its plan group: customers created with that planGroupId start on it, and a paid plan of the group that ends (a cancellation from the API, dashboard or customer portal, a lost dispute, exhausted dunning or a card-less trial end) moves to it instead of canceling. Requires a free plan in a plan group; replaces the group's previous default plan. false unmarks it. */
   isDefault?: boolean;
 }
 
@@ -813,7 +813,7 @@ export interface CreatePlanParams {
     interval: "day" | "week";
   } | null;
   planGroupId?: string;
-  /** Make this plan the default plan of its plan group: customers created with that planGroupId start on it, and a paid plan of the group that ends from the customer portal, a revoked payment authorization or exhausted dunning moves to it instead of canceling. Requires a free plan with a planGroupId; replaces the group's previous default plan. */
+  /** Make this plan the default plan of its plan group: customers created with that planGroupId start on it, and a paid plan of the group that ends (a cancellation from the API, dashboard or customer portal, a lost dispute, exhausted dunning or a card-less trial end) moves to it instead of canceling. Requires a free plan with a planGroupId; replaces the group's previous default plan. */
   isDefault?: boolean;
   metadata?: Record<string, unknown>;
 }

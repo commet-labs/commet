@@ -1358,6 +1358,19 @@ export const resourceDefinitions: ResourceDef[] = [
             sdkKey: "active",
           },
           {
+            flag: "--plan-ids <json>",
+            description:
+              "Plans the offer is limited to: it cannot be applied to a subscription on another plan, and an applied offer ends when the subscriber changes to one.",
+            parse: parseJson,
+            sdkKey: "planIds",
+          },
+          {
+            flag: "--billing-interval <billing-interval>",
+            description:
+              "Billing interval the offer is limited to: it cannot be applied to a subscription on another interval, and an applied offer ends when the subscriber changes to one.",
+            sdkKey: "billingInterval",
+          },
+          {
             flag: "--idempotency-key <key>",
             description:
               "Unique key used to safely retry this write for 24 hours without applying it twice.",
@@ -1405,8 +1418,7 @@ export const resourceDefinitions: ResourceDef[] = [
       },
       create: {
         method: "create",
-        description:
-          "Create reusable offer terms without assigning a plan, price, eligibility rule, or distribution channel.",
+        description: "Create reusable offer terms.",
         hasParams: true,
         params: [
           {
@@ -1443,6 +1455,19 @@ export const resourceDefinitions: ResourceDef[] = [
             description: "Active",
             parse: parseBool,
             sdkKey: "active",
+          },
+          {
+            flag: "--plan-ids <json>",
+            description:
+              "Plans the offer is limited to: it cannot be applied to a subscription on another plan, and an applied offer ends when the subscriber changes to one.",
+            parse: parseJson,
+            sdkKey: "planIds",
+          },
+          {
+            flag: "--billing-interval <billing-interval>",
+            description:
+              "Billing interval the offer is limited to: it cannot be applied to a subscription on another interval, and an applied offer ends when the subscriber changes to one.",
+            sdkKey: "billingInterval",
           },
           {
             flag: "--idempotency-key <key>",
@@ -3048,7 +3073,7 @@ export const resourceDefinitions: ResourceDef[] = [
           {
             flag: "--is-default <boolean>",
             description:
-              "Make this plan the default plan of its plan group: customers created with that planGroupId start on it, and a paid plan of the group that ends from the customer portal, a revoked payment authorization or exhausted dunning moves to it instead of canceling.",
+              "Make this plan the default plan of its plan group: customers created with that planGroupId start on it, and a paid plan of the group that ends (a cancellation from the API, dashboard or customer portal, a lost dispute, exhausted dunning or a card-less trial end) moves to it instead of canceling.",
             parse: parseBool,
             sdkKey: "isDefault",
           },
@@ -3325,7 +3350,7 @@ export const resourceDefinitions: ResourceDef[] = [
           {
             flag: "--is-default <boolean>",
             description:
-              "Make this plan the default plan of its plan group: customers created with that planGroupId start on it, and a paid plan of the group that ends from the customer portal, a revoked payment authorization or exhausted dunning moves to it instead of canceling.",
+              "Make this plan the default plan of its plan group: customers created with that planGroupId start on it, and a paid plan of the group that ends (a cancellation from the API, dashboard or customer portal, a lost dispute, exhausted dunning or a card-less trial end) moves to it instead of canceling.",
             parse: parseBool,
             sdkKey: "isDefault",
           },
@@ -3928,11 +3953,6 @@ export const resourceDefinitions: ResourceDef[] = [
             sdkKey: "id",
           },
           {
-            flag: "--new-plan-id <new-plan-id>",
-            description: "New plan id",
-            sdkKey: "newPlanId",
-          },
-          {
             flag: "--new-billing-interval <new-billing-interval>",
             description: "New billing interval",
             sdkKey: "newBillingInterval",
@@ -3953,6 +3973,22 @@ export const resourceDefinitions: ResourceDef[] = [
             sdkKey: "promoCode",
           },
           {
+            flag: "--new-plan-id <new-plan-id>",
+            description: "New plan id",
+            sdkKey: "newPlanId",
+          },
+          {
+            flag: "--plan-code <plan-code>",
+            description: "Plan code",
+            sdkKey: "planCode",
+          },
+          {
+            flag: "--plan-version-id <plan-version-id>",
+            description:
+              "Public ID of a published version of the destination plan, current or not, including a running experiment's versions.",
+            sdkKey: "planVersionId",
+          },
+          {
             flag: "--idempotency-key <key>",
             description:
               "Unique key used to safely retry this write for 24 hours without applying it twice.",
@@ -3960,7 +3996,13 @@ export const resourceDefinitions: ResourceDef[] = [
             requestOption: true,
           },
         ],
-        requiredAlternatives: [["promoCode"]],
+        requiredAlternatives: [
+          ["newPlanId"],
+          ["planCode"],
+          ["promoCode", "newPlanId"],
+          ["promoCode", "planCode"],
+          ["promoCode"],
+        ],
       },
       "change-version": {
         method: "changeVersion",
@@ -4238,12 +4280,6 @@ export const resourceDefinitions: ResourceDef[] = [
             sdkKey: "id",
           },
           {
-            flag: "--plan-id <plan-id>",
-            description: "Plan id",
-            required: true,
-            sdkKey: "planId",
-          },
-          {
             flag: "--billing-interval <billing-interval>",
             description: "Billing interval",
             sdkKey: "billingInterval",
@@ -4259,6 +4295,22 @@ export const resourceDefinitions: ResourceDef[] = [
             sdkKey: "promoCode",
           },
           {
+            flag: "--plan-id <plan-id>",
+            description: "Plan id",
+            sdkKey: "planId",
+          },
+          {
+            flag: "--plan-code <plan-code>",
+            description: "Plan code",
+            sdkKey: "planCode",
+          },
+          {
+            flag: "--plan-version-id <plan-version-id>",
+            description:
+              "Public ID of a published version of the destination plan, current or not, including a running experiment's versions.",
+            sdkKey: "planVersionId",
+          },
+          {
             flag: "--idempotency-key <key>",
             description:
               "Unique key used to safely retry this write for 24 hours without applying it twice.",
@@ -4266,7 +4318,12 @@ export const resourceDefinitions: ResourceDef[] = [
             requestOption: true,
           },
         ],
-        requiredAlternatives: [["planId"], ["planId", "promoCode"]],
+        requiredAlternatives: [
+          ["planId"],
+          ["planCode"],
+          ["promoCode", "planId"],
+          ["promoCode", "planCode"],
+        ],
       },
       reactivate: {
         method: "reactivate",
@@ -4412,9 +4469,20 @@ export const resourceDefinitions: ResourceDef[] = [
       },
       list: {
         method: "list",
-        description: "List all subscriptions.",
+        description: "List subscriptions, newest first.",
         hasParams: true,
         params: [
+          {
+            flag: "--cursor <cursor>",
+            description: "Cursor",
+            sdkKey: "cursor",
+          },
+          {
+            flag: "--limit <number>",
+            description: "Limit",
+            parse: parseNumber,
+            sdkKey: "limit",
+          },
           {
             flag: "--customer-id <customer-id>",
             description: "Customer id",

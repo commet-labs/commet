@@ -28,7 +28,7 @@ export interface DeactivateAddonParams {
 export interface ActivateAddonParams {
   id: string;
   addonId: string;
-  /** Where the customer returns after paying. When it is set and the subscription has no saved payment method, the response has status `requires_checkout` and a `checkoutUrl` where the customer pays this purchase and saves the method in one step. Without it, the request is rejected when there is no saved payment method. A saved method is always charged directly, and a declined charge is rejected either way. */
+  /** Where the customer returns after paying. When it is set and the subscription has no saved payment method, or the saved method is declined or asks for authentication, the response has status `requires_checkout` and a `checkoutUrl` where the customer pays this purchase and saves the method in one step. Without it, the request is rejected in both cases. A saved method is always charged directly first, and a payment that fails for any other reason is rejected either way. */
   successUrl?: string;
 }
 
@@ -58,7 +58,7 @@ export interface TopupBalanceParams {
   id: string;
   /** The amount to add, in minor units of the subscription currency (cents; whole units for zero-decimal currencies). */
   amount: number;
-  /** Where the customer returns after paying. When it is set and the subscription has no saved payment method, the response has status `requires_checkout` and a `checkoutUrl` where the customer pays this purchase and saves the method in one step. Without it, the request is rejected when there is no saved payment method. A saved method is always charged directly, and a declined charge is rejected either way. */
+  /** Where the customer returns after paying. When it is set and the subscription has no saved payment method, or the saved method is declined or asks for authentication, the response has status `requires_checkout` and a `checkoutUrl` where the customer pays this purchase and saves the method in one step. Without it, the request is rejected in both cases. A saved method is always charged directly first, and a payment that fails for any other reason is rejected either way. */
   successUrl?: string;
 }
 
@@ -71,7 +71,6 @@ export interface CancelSubscriptionParams {
 export type ChangePlanParams =
   | {
       id: string;
-      newPlanId?: string;
       newBillingInterval?:
         | "weekly"
         | "monthly"
@@ -81,10 +80,45 @@ export type ChangePlanParams =
       successUrl?: string;
       offerId?: string;
       promoCode?: never;
+      newPlanId: string;
+      planCode?: never;
+      /** Public ID of a published version of the destination plan, current or not, including a running experiment's versions. The change is priced, checked out and activated on that version. Only for an immediate change to another paid plan, and not with an experiment code. When omitted, the change lands on the plan's current version, or the version its experiment code sells. */
+      planVersionId?: string;
     }
   | {
       id: string;
-      newPlanId?: string;
+      newBillingInterval?:
+        | "weekly"
+        | "monthly"
+        | "quarterly"
+        | "semiannual"
+        | "yearly";
+      successUrl?: string;
+      offerId?: string;
+      promoCode?: never;
+      newPlanId?: never;
+      /** Code of the destination plan, or `<plan code>:<experiment code>` to change to the experiment's latest version while it runs (the plan's current version once the experiment is won or archived). Same rules as planCode on subscription creation. */
+      planCode: string;
+      /** Public ID of a published version of the destination plan, current or not, including a running experiment's versions. The change is priced, checked out and activated on that version. Only for an immediate change to another paid plan, and not with an experiment code. When omitted, the change lands on the plan's current version, or the version its experiment code sells. */
+      planVersionId?: string;
+    }
+  | {
+      id: string;
+      newBillingInterval?:
+        | "weekly"
+        | "monthly"
+        | "quarterly"
+        | "semiannual"
+        | "yearly";
+      successUrl?: string;
+      offerId?: string;
+      promoCode?: never;
+      newPlanId?: never;
+      planCode?: never;
+      planVersionId?: never;
+    }
+  | {
+      id: string;
       newBillingInterval?:
         | "weekly"
         | "monthly"
@@ -95,6 +129,44 @@ export type ChangePlanParams =
       offerId?: never;
       /** Promo code whose Offer prices the change, validated with the checkout's rules: a code the checkout would refuse returns 400 validation_error with the checkout's reason in details.reason. Cannot be combined with offerId. */
       promoCode: string;
+      newPlanId: string;
+      planCode?: never;
+      /** Public ID of a published version of the destination plan, current or not, including a running experiment's versions. The change is priced, checked out and activated on that version. Only for an immediate change to another paid plan, and not with an experiment code. When omitted, the change lands on the plan's current version, or the version its experiment code sells. */
+      planVersionId?: string;
+    }
+  | {
+      id: string;
+      newBillingInterval?:
+        | "weekly"
+        | "monthly"
+        | "quarterly"
+        | "semiannual"
+        | "yearly";
+      successUrl?: string;
+      offerId?: never;
+      /** Promo code whose Offer prices the change, validated with the checkout's rules: a code the checkout would refuse returns 400 validation_error with the checkout's reason in details.reason. Cannot be combined with offerId. */
+      promoCode: string;
+      newPlanId?: never;
+      /** Code of the destination plan, or `<plan code>:<experiment code>` to change to the experiment's latest version while it runs (the plan's current version once the experiment is won or archived). Same rules as planCode on subscription creation. */
+      planCode: string;
+      /** Public ID of a published version of the destination plan, current or not, including a running experiment's versions. The change is priced, checked out and activated on that version. Only for an immediate change to another paid plan, and not with an experiment code. When omitted, the change lands on the plan's current version, or the version its experiment code sells. */
+      planVersionId?: string;
+    }
+  | {
+      id: string;
+      newBillingInterval?:
+        | "weekly"
+        | "monthly"
+        | "quarterly"
+        | "semiannual"
+        | "yearly";
+      successUrl?: string;
+      offerId?: never;
+      /** Promo code whose Offer prices the change, validated with the checkout's rules: a code the checkout would refuse returns 400 validation_error with the checkout's reason in details.reason. Cannot be combined with offerId. */
+      promoCode: string;
+      newPlanId?: never;
+      planCode?: never;
+      planVersionId?: never;
     };
 
 export interface ChangeSubscriptionVersionParams {
@@ -112,13 +184,13 @@ export type PurchaseCreditsParams =
       id: string;
       creditPackId: string;
       quantity?: never;
-      /** Where the customer returns after paying. When it is set and the subscription has no saved payment method, the response has status `requires_checkout` and a `checkoutUrl` where the customer pays this purchase and saves the method in one step. Without it, the request is rejected when there is no saved payment method. A saved method is always charged directly, and a declined charge is rejected either way. */
+      /** Where the customer returns after paying. When it is set and the subscription has no saved payment method, or the saved method is declined or asks for authentication, the response has status `requires_checkout` and a `checkoutUrl` where the customer pays this purchase and saves the method in one step. Without it, the request is rejected in both cases. A saved method is always charged directly first, and a payment that fails for any other reason is rejected either way. */
       successUrl?: string;
     }
   | {
       id: string;
       quantity: number;
-      /** Where the customer returns after paying. When it is set and the subscription has no saved payment method, the response has status `requires_checkout` and a `checkoutUrl` where the customer pays this purchase and saves the method in one step. Without it, the request is rejected when there is no saved payment method. A saved method is always charged directly, and a declined charge is rejected either way. */
+      /** Where the customer returns after paying. When it is set and the subscription has no saved payment method, or the saved method is declined or asks for authentication, the response has status `requires_checkout` and a `checkoutUrl` where the customer pays this purchase and saves the method in one step. Without it, the request is rejected in both cases. A saved method is always charged directly first, and a payment that fails for any other reason is rejected either way. */
       successUrl?: string;
     };
 
@@ -165,7 +237,6 @@ export interface CreatePrepaidPeriodsCheckoutParams {
 export type PreviewChangePlanParams =
   | {
       id: string;
-      planId: string;
       billingInterval?:
         | "weekly"
         | "monthly"
@@ -175,10 +246,30 @@ export type PreviewChangePlanParams =
         | "one_time";
       offerId?: string;
       promoCode?: never;
+      planId: string;
+      planCode?: never;
+      /** Public ID of a published version of the destination plan, current or not, including a running experiment's versions. The change is priced, checked out and activated on that version. Only for an immediate change to another paid plan, and not with an experiment code. When omitted, the change lands on the plan's current version, or the version its experiment code sells. */
+      planVersionId?: string;
     }
   | {
       id: string;
-      planId: string;
+      billingInterval?:
+        | "weekly"
+        | "monthly"
+        | "quarterly"
+        | "semiannual"
+        | "yearly"
+        | "one_time";
+      offerId?: string;
+      promoCode?: never;
+      planId?: never;
+      /** Code of the destination plan, or `<plan code>:<experiment code>` to change to the experiment's latest version while it runs (the plan's current version once the experiment is won or archived). Same rules as planCode on subscription creation. */
+      planCode: string;
+      /** Public ID of a published version of the destination plan, current or not, including a running experiment's versions. The change is priced, checked out and activated on that version. Only for an immediate change to another paid plan, and not with an experiment code. When omitted, the change lands on the plan's current version, or the version its experiment code sells. */
+      planVersionId?: string;
+    }
+  | {
+      id: string;
       billingInterval?:
         | "weekly"
         | "monthly"
@@ -189,6 +280,28 @@ export type PreviewChangePlanParams =
       offerId?: never;
       /** Promo code whose Offer prices the change, validated with the checkout's rules: a code the checkout would refuse returns 400 validation_error with the checkout's reason in details.reason. Cannot be combined with offerId. */
       promoCode: string;
+      planId: string;
+      planCode?: never;
+      /** Public ID of a published version of the destination plan, current or not, including a running experiment's versions. The change is priced, checked out and activated on that version. Only for an immediate change to another paid plan, and not with an experiment code. When omitted, the change lands on the plan's current version, or the version its experiment code sells. */
+      planVersionId?: string;
+    }
+  | {
+      id: string;
+      billingInterval?:
+        | "weekly"
+        | "monthly"
+        | "quarterly"
+        | "semiannual"
+        | "yearly"
+        | "one_time";
+      offerId?: never;
+      /** Promo code whose Offer prices the change, validated with the checkout's rules: a code the checkout would refuse returns 400 validation_error with the checkout's reason in details.reason. Cannot be combined with offerId. */
+      promoCode: string;
+      planId?: never;
+      /** Code of the destination plan, or `<plan code>:<experiment code>` to change to the experiment's latest version while it runs (the plan's current version once the experiment is won or archived). Same rules as planCode on subscription creation. */
+      planCode: string;
+      /** Public ID of a published version of the destination plan, current or not, including a running experiment's versions. The change is priced, checked out and activated on that version. Only for an immediate change to another paid plan, and not with an experiment code. When omitted, the change lands on the plan's current version, or the version its experiment code sells. */
+      planVersionId?: string;
     };
 
 export interface ReactivateSubscriptionParams {
@@ -225,6 +338,8 @@ export interface GetActiveSubscriptionParams {
 }
 
 export interface ListSubscriptionsParams {
+  cursor?: string;
+  limit?: number;
   customerId?: string;
   status?: SubscriptionStatus;
   planVersionId?: string;
@@ -262,7 +377,7 @@ export type CreateSubscriptionParams =
       successUrl?: string;
       /** Billing periods of the subscription's interval paid with the first payment, including the current one. Defaults to 1. The interval does not change: each paid period renews at zero and the subscription renews normally after the last one unless `cancelAtPeriodEnd` is true. */
       prepaidPeriods?: number;
-      /** Schedules the cancellation from creation so the subscription ends after its last paid period and never renews with any payment method. */
+      /** Schedules the cancellation from creation so the subscription ends after its last paid period and never renews with any payment method. When the plan's group has a default free plan, it moves to that plan then instead of ending. */
       cancelAtPeriodEnd?: boolean;
       /** Public ID of a published version of the plan, current or not, including an experiment's versions. The subscription is created on that version and stays on it: checkout charges its price and activation grants its credits, add-ons and credit packs. When omitted, the subscription gets the current version, or the version an experiment code (planCode `<plan code>:<experiment code>`) sells. */
       planVersionId?: string;
@@ -304,7 +419,7 @@ export type CreateSubscriptionParams =
       successUrl?: string;
       /** Billing periods of the subscription's interval paid with the first payment, including the current one. Defaults to 1. The interval does not change: each paid period renews at zero and the subscription renews normally after the last one unless `cancelAtPeriodEnd` is true. */
       prepaidPeriods?: number;
-      /** Schedules the cancellation from creation so the subscription ends after its last paid period and never renews with any payment method. */
+      /** Schedules the cancellation from creation so the subscription ends after its last paid period and never renews with any payment method. When the plan's group has a default free plan, it moves to that plan then instead of ending. */
       cancelAtPeriodEnd?: boolean;
       /** Public ID of a published version of the plan, current or not, including an experiment's versions. The subscription is created on that version and stays on it: checkout charges its price and activation grants its credits, add-ons and credit packs. When omitted, the subscription gets the current version, or the version an experiment code (planCode `<plan code>:<experiment code>`) sells. */
       planVersionId?: string;
@@ -347,7 +462,7 @@ export type CreateSubscriptionParams =
       successUrl?: string;
       /** Billing periods of the subscription's interval paid with the first payment, including the current one. Defaults to 1. The interval does not change: each paid period renews at zero and the subscription renews normally after the last one unless `cancelAtPeriodEnd` is true. */
       prepaidPeriods?: number;
-      /** Schedules the cancellation from creation so the subscription ends after its last paid period and never renews with any payment method. */
+      /** Schedules the cancellation from creation so the subscription ends after its last paid period and never renews with any payment method. When the plan's group has a default free plan, it moves to that plan then instead of ending. */
       cancelAtPeriodEnd?: boolean;
       /** Public ID of a published version of the plan, current or not, including an experiment's versions. The subscription is created on that version and stays on it: checkout charges its price and activation grants its credits, add-ons and credit packs. When omitted, the subscription gets the current version, or the version an experiment code (planCode `<plan code>:<experiment code>`) sells. */
       planVersionId?: string;
@@ -389,7 +504,7 @@ export type CreateSubscriptionParams =
       successUrl?: string;
       /** Billing periods of the subscription's interval paid with the first payment, including the current one. Defaults to 1. The interval does not change: each paid period renews at zero and the subscription renews normally after the last one unless `cancelAtPeriodEnd` is true. */
       prepaidPeriods?: number;
-      /** Schedules the cancellation from creation so the subscription ends after its last paid period and never renews with any payment method. */
+      /** Schedules the cancellation from creation so the subscription ends after its last paid period and never renews with any payment method. When the plan's group has a default free plan, it moves to that plan then instead of ending. */
       cancelAtPeriodEnd?: boolean;
       /** Public ID of a published version of the plan, current or not, including an experiment's versions. The subscription is created on that version and stays on it: checkout charges its price and activation grants its credits, add-ons and credit packs. When omitted, the subscription gets the current version, or the version an experiment code (planCode `<plan code>:<experiment code>`) sells. */
       planVersionId?: string;
@@ -432,7 +547,7 @@ export type CreateSubscriptionParams =
       successUrl?: string;
       /** Billing periods of the subscription's interval paid with the first payment, including the current one. Defaults to 1. The interval does not change: each paid period renews at zero and the subscription renews normally after the last one unless `cancelAtPeriodEnd` is true. */
       prepaidPeriods?: number;
-      /** Schedules the cancellation from creation so the subscription ends after its last paid period and never renews with any payment method. */
+      /** Schedules the cancellation from creation so the subscription ends after its last paid period and never renews with any payment method. When the plan's group has a default free plan, it moves to that plan then instead of ending. */
       cancelAtPeriodEnd?: boolean;
       /** Public ID of a published version of the plan, current or not, including an experiment's versions. The subscription is created on that version and stays on it: checkout charges its price and activation grants its credits, add-ons and credit packs. When omitted, the subscription gets the current version, or the version an experiment code (planCode `<plan code>:<experiment code>`) sells. */
       planVersionId?: string;
@@ -475,7 +590,7 @@ export type CreateSubscriptionParams =
       successUrl?: string;
       /** Billing periods of the subscription's interval paid with the first payment, including the current one. Defaults to 1. The interval does not change: each paid period renews at zero and the subscription renews normally after the last one unless `cancelAtPeriodEnd` is true. */
       prepaidPeriods?: number;
-      /** Schedules the cancellation from creation so the subscription ends after its last paid period and never renews with any payment method. */
+      /** Schedules the cancellation from creation so the subscription ends after its last paid period and never renews with any payment method. When the plan's group has a default free plan, it moves to that plan then instead of ending. */
       cancelAtPeriodEnd?: boolean;
       /** Public ID of a published version of the plan, current or not, including an experiment's versions. The subscription is created on that version and stays on it: checkout charges its price and activation grants its credits, add-ons and credit packs. When omitted, the subscription gets the current version, or the version an experiment code (planCode `<plan code>:<experiment code>`) sells. */
       planVersionId?: string;
@@ -505,7 +620,7 @@ export class SubscriptionsResource {
     );
   }
 
-  /** Activate an add-on on a subscription. Creates the activation invoice and charges a prorated amount for the current billing period; the add-on is active once the payment is confirmed. Without a saved payment method, send successUrl to receive a checkout that charges the activation and saves the method. Rejected with 409 while the add-on is active or an activation of it is still processing. An add-on that the subscription's plan version does not sell is rejected with addon_unavailable. */
+  /** Activate an add-on on a subscription. Creates the activation invoice and charges a prorated amount for the current billing period; the add-on is active once the payment is confirmed. Send successUrl to receive, when there is no saved payment method or it is declined, a checkout that charges the activation and saves the method. Rejected with 409 while the add-on is active or an activation of it is still processing. An add-on that the subscription's plan version does not sell is rejected with addon_unavailable. */
   async activateAddon(
     params: ActivateAddonParams,
     options?: RequestOptions,
@@ -553,7 +668,7 @@ export class SubscriptionsResource {
     );
   }
 
-  /** Top up a balance subscription. Creates the top-up invoice and charges the customer's payment method for the amount plus tax. Once the payment is confirmed, adds the amount to the subscription's purchased balance (after paying back any overage owed on the plan balance), marks the invoice paid and emits `balance.topped_up`. Purchased balance is spent after the plan balance and is kept until the subscription ends. Without a saved payment method, send successUrl to receive a checkout that charges the top-up and saves the method. Rejected with 400 when the subscription is not on a balance plan, its plan has top-ups turned off, or the amount is below the effective minimum: the plan's minimum top-up in the subscription currency, raised to the currency's minimum charge. */
+  /** Top up a balance subscription. Creates the top-up invoice and charges the customer's payment method for the amount plus tax. Once the payment is confirmed, adds the amount to the subscription's purchased balance (after paying back any overage owed on the plan balance), marks the invoice paid and emits `balance.topped_up`. Purchased balance is spent after the plan balance and is kept until the subscription ends. Send successUrl to receive, when there is no saved payment method or it is declined, a checkout that charges the top-up and saves the method. Rejected with 400 when the subscription is not on a balance plan, its plan has top-ups turned off, or the amount is below the effective minimum: the plan's minimum top-up in the subscription currency, raised to the currency's minimum charge. */
   async topupBalance(
     params: TopupBalanceParams,
     options?: RequestOptions,
@@ -566,7 +681,7 @@ export class SubscriptionsResource {
     );
   }
 
-  /** Cancel immediately or at period end and return the updated subscription. */
+  /** Cancel immediately or at period end and return the updated subscription. When the plan's group has a default free plan, a paid subscription moves to that plan instead of ending: now when `immediate` is true, otherwise at the end of the period or trial as a scheduled plan change that `POST /subscriptions/{id}/uncancel` undoes. The move sends `subscription.plan_change_scheduled` and `subscription.plan_changed` with the `reason` as `cancelReason`, never `subscription.canceled`. Cancelling the default plan itself ends the subscription. */
   async cancel(
     params: CancelSubscriptionParams,
     options?: RequestOptions,
@@ -601,7 +716,7 @@ export class SubscriptionsResource {
     );
   }
 
-  /** Purchase a fixed credit pack or choose a whole credit quantity at the subscription plan price and minimum. Creates the purchase invoice, charges the saved payment method and adds the purchased credits once the payment is confirmed. Without a saved payment method, send successUrl to receive a checkout that charges the purchase and saves the method. A credit pack that the subscription's plan version does not sell is rejected with credit_pack_unavailable. */
+  /** Purchase a fixed credit pack or choose a whole credit quantity at the subscription plan price and minimum. Creates the purchase invoice, charges the saved payment method and adds the purchased credits once the payment is confirmed. Send successUrl to receive, when there is no saved payment method or it is declined, a checkout that charges the purchase and saves the method. A credit pack that the subscription's plan version does not sell is rejected with credit_pack_unavailable. */
   async purchaseCredits(
     params: PurchaseCreditsParams,
     options?: RequestOptions,
@@ -702,7 +817,7 @@ export class SubscriptionsResource {
     );
   }
 
-  /** Reactivates a subscription. A past_due subscription retries its outstanding renewal charge (recovering to active on success). A canceled subscription generates a fresh invoice, charges the saved card, and resets the billing period; when that invoice totals zero, for example under an Offer, it is marked paid without a charge and the subscription becomes active at once, still requiring a saved payment method. On a successful charge the subscription becomes active; a declined charge returns an error with a recoveryUrl in the error details that can be sent to the customer to update their card. A canceled subscription may apply an Offer by offerId; past-due recovery cannot. */
+  /** Reactivates a subscription. A past_due subscription retries its outstanding renewal charge (recovering to active on success). A canceled subscription generates a fresh invoice, charges the saved card, and resets the billing period; when that invoice totals zero, for example under an Offer, it is marked paid without a charge and the subscription becomes active at once, still requiring a saved payment method. On a successful charge the subscription becomes active; a declined charge returns an error with a recoveryUrl in the error details that can be sent to the customer to update their card. A past_due subscription without a payment method returns no_payment_method with the same recoveryUrl. A canceled subscription may apply an Offer by offerId; past-due recovery cannot. */
   async reactivate(
     params: ReactivateSubscriptionParams,
     options?: RequestOptions,
@@ -772,7 +887,7 @@ export class SubscriptionsResource {
     );
   }
 
-  /** Revert a scheduled cancellation and return the updated subscription. Only works before cancellation takes effect. */
+  /** Revert a scheduled cancellation and return the updated subscription. Only works before cancellation takes effect. When the cancellation scheduled a move to the group's default plan instead, it reverts that move: the subscription keeps its plan and renews normally. */
   async uncancel(
     params: UncancelSubscriptionParams,
     options?: RequestOptions,
@@ -789,7 +904,7 @@ export class SubscriptionsResource {
     return this.httpClient.get("/subscriptions/active", params, options);
   }
 
-  /** List all subscriptions. Filter by customer ID or status. */
+  /** List subscriptions, newest first. Filter by customer ID, status or plan version. Send `limit` or `cursor` to receive them in pages and follow `nextCursor` while `hasMore` is true; without them the response holds every matching subscription, up to 80,000. */
   async list(
     params?: ListSubscriptionsParams,
     options?: RequestOptions,
@@ -802,7 +917,7 @@ export class SubscriptionsResource {
     return this.httpClient.get("/subscriptions", params, options);
   }
 
-  /** Create a subscription for a customer. Commet selects the default price when priceId is omitted. The subscription starts at the base USD price; market and currency are resolved from the buyer's request country when the checkout opens. Without an offer override, Commet applies the price's automatic introductory Offer. Pass offerId to apply an active compatible Offer directly, or cardPromotionId to preselect a card-eligible Promotional Offer for the initial checkout when card promotions are enabled for the organization. For the initial checkout, provider accepts either a processor name or an exact payment connection ID. When the price's free trial requires no payment method, the subscription starts trialing right away with no checkout (checkoutUrl null, hasPaymentMethod false); it cannot be combined with offerId, promoCode, cardPromotionId or provider, and an organization that cannot charge yet receives 403. */
+  /** Create a subscription for a customer. Commet selects the default price when priceId is omitted. The subscription starts at the base USD price; market and currency are resolved from the buyer's request country when the checkout opens. Without an offer override, Commet applies the price's automatic introductory Offer. Pass offerId to apply an active compatible Offer directly, or cardPromotionId to preselect a card-eligible Promotional Offer for the initial checkout when card promotions are enabled for the organization. For the initial checkout, provider accepts either a processor name or an exact payment connection ID. When the price's free trial requires no payment method, the subscription starts trialing right away with no checkout (checkoutUrl null, hasPaymentMethod false); it cannot be combined with offerId, promoCode, cardPromotionId or provider, and an organization that cannot charge yet receives 403. When the customer already has a past_due subscription, the 409 error details carry its subscriptionId, its status and, while its renewal is unpaid, a recoveryUrl where the customer can pay it. */
   async create(
     params: CreateSubscriptionParams,
     options?: RequestOptions,
